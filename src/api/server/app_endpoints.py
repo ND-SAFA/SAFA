@@ -7,8 +7,7 @@ class AppEndpoints(Enum):
     """
     Enumerates all available endpoints.
     """
-    COMPLETE = "complete"
-    PROJECT_SUMMARY = "project-summary"
+    API = "api"
     HGEN = "hgen"
     TGEN = "tgen"
     SUMMARIZE = "summarize"

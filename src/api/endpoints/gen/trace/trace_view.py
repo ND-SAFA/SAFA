@@ -1,8 +1,8 @@
 import os.path
 from typing import List, Type, TypedDict, Union
 
-from api.endpoints.common.endpoint_decorator import endpoint
-from api.endpoints.views.predict_serializer import PredictionSerializer, TraceRequest
+from api.endpoints.gen.trace.trace_serializer import TraceSerializer, TraceRequest
+from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
 from tgen.common.constants.dataset_constants import NO_CHECK
 from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SEARCH_FILTER
@@ -42,7 +42,7 @@ def perform_tracing_job(dataset: ApiDefinition, job: Union[Type[RankingJob], Typ
     return {"predictions": prediction_result.prediction_entries}
 
 
-@endpoint(PredictionSerializer, is_async=True)
+@endpoint(TraceSerializer, is_async=True)
 def perform_trace_prediction(prediction_payload: TraceRequest) -> TracingOutput:
     """
     Performs embedding search and LLM review on rankings to create trace links.
@@ -55,7 +55,7 @@ def perform_trace_prediction(prediction_payload: TraceRequest) -> TracingOutput:
                                select_top_predictions=False)
 
 
-@endpoint(PredictionSerializer)
+@endpoint(TraceSerializer)
 def perform_embedding_search(prediction_payload: TraceRequest) -> TracingOutput:
     """
     Searches dataset against targets using the similarity scores from their embeddings.

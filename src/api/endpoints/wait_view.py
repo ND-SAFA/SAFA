@@ -3,8 +3,8 @@ from typing import TypedDict
 
 from rest_framework import serializers
 
-from api.endpoints.common.endpoint_decorator import endpoint
-from api.endpoints.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.handler.endpoint_decorator import endpoint
 from tgen.common.logging.logger_manager import logger
 
 

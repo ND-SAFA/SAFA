@@ -6,8 +6,8 @@ from celery import shared_task
 from django.http import JsonResponse
 
 from api.constants.config import get_current_version
-from api.endpoints.common.ihandler import IHandler
-from api.endpoints.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.handler.ihandler import IHandler
 from tgen.common.logging.log_capture import LogCapture
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder

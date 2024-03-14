@@ -3,7 +3,9 @@ from typing import Callable, Dict, List, Union
 
 from django.test import Client
 
+from api.endpoints.auth_view import AUTH_KEY
 from api.server.app_endpoints import AppEndpoints
+from tests.base_test import BaseTest
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.util.json_util import NpEncoder
@@ -51,7 +53,7 @@ class RequestProxy:
         :return: Artifact summaries and optionally project summary.
         """
         data = {"artifacts": artifacts}
-        response = RequestProxy._request(AppEndpoints.PROJECT_SUMMARY, data)
+        response = RequestProxy._request(AppEndpoints.SUMMARIZE, data)
         return response
 
     @staticmethod
@@ -68,6 +70,7 @@ class RequestProxy:
             url = url.as_endpoint()
         client_method = RequestProxy.get_client_method(method)
         data = json.loads(json.dumps(data, cls=NpEncoder))
+        data[AUTH_KEY] = BaseTest.API_KEY
         response = client_method(url, data=data, content_type=content_type)
         if response.status_code >= 300:
             raise Exception(response.content)

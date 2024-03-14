@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.endpoints.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.utils.serializer_utility import SerializerUtility
 from tgen.common.objects.trace_layer import TraceLayer
 

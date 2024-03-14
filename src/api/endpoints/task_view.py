@@ -7,8 +7,8 @@ from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_MEDIUM
 from api.constants.celery_status import CeleryStatus
-from api.endpoints.common.endpoint_decorator import endpoint, endpoint_get
-from api.endpoints.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.handler.endpoint_decorator import endpoint, endpoint_get
 from api.server.celery import celery
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder

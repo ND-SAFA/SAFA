@@ -3,9 +3,9 @@ from typing import Dict, List, TypedDict
 from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_LONG
-from api.endpoints.serializers.abstract_serializer import AbstractSerializer
-from api.endpoints.serializers.artifact_serializer import ArtifactSerializer
-from api.endpoints.serializers.trace_layer_serializer import LayerSerializer
+from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.gen.serializers.artifact_serializer import ArtifactSerializer
+from api.endpoints.gen.serializers.trace_layer_serializer import LayerSerializer
 from tgen.common.objects.trace_layer import TraceLayer
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 

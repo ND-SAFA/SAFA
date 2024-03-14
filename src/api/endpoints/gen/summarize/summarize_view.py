@@ -1,6 +1,6 @@
-from api.endpoints.common.dataset_converter import create_api_dataset
-from api.endpoints.common.endpoint_decorator import endpoint
-from api.endpoints.serializers.summarize_serializer import SummarizeRequest, SummarizeSerializer
+from api.endpoints.gen.summarize.summarize_serializer import SummarizeRequest, SummarizeSerializer
+from api.endpoints.handler.dataset_converter import create_api_dataset
+from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
 from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse

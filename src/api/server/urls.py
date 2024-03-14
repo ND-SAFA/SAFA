@@ -22,14 +22,13 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from api.constants.config import get_current_version, get_home_page
-from api.endpoints.completion.completion_view import perform_completion
-from api.endpoints.views.health_view import health_metrics
-from api.endpoints.views.hgen_view import perform_hgen
-from api.endpoints.views.project_summary_view import perform_project_summary
-from api.endpoints.views.result_view import cancel_job, get_active_task_ids, get_pending_task_ids, get_result, get_status
-from api.endpoints.views.summarize_view import perform_summarization_job, perform_summarization_sync
-from api.endpoints.views.trace_view import perform_embedding_search, perform_trace_prediction
-from api.endpoints.views.wait_view import perform_wait
+from api.endpoints.auth_view import generate_key
+from api.endpoints.gen.hgen.hgen_view import perform_hgen
+from api.endpoints.gen.summarize.summarize_view import perform_summarization_job, perform_summarization_sync
+from api.endpoints.gen.trace.trace_view import perform_embedding_search, perform_trace_prediction
+from api.endpoints.health_view import health_metrics
+from api.endpoints.task_view import cancel_job, get_active_task_ids, get_pending_task_ids, get_result, get_status
+from api.endpoints.wait_view import perform_wait
 from api.server.app_endpoints import AppEndpoints
 
 
@@ -65,19 +64,22 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    path('', homePageView),
     re_path(r'^playground/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     re_path(r'^docs/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('', homePageView),
-    path(AppEndpoints.COMPLETE.as_path(), perform_completion),
+    # Api Endpoints,
+    path(AppEndpoints.API.as_path(), generate_key),
+    # Generation Endpoints
     path(AppEndpoints.TGEN.as_path(), perform_trace_prediction),
     path(AppEndpoints.TGEN.as_path(suffix="sync"), perform_embedding_search),
     path(AppEndpoints.HGEN.as_path(), perform_hgen),
-    path(AppEndpoints.PROJECT_SUMMARY.as_path(), perform_project_summary),
     path(AppEndpoints.SUMMARIZE.as_path(), perform_summarization_job),
     path(AppEndpoints.SUMMARIZE.as_path(suffix="sync"), perform_summarization_sync),
+    # Celery Endpoints
     path(AppEndpoints.STATUS.as_path(), get_status),
     path(AppEndpoints.CANCEL.as_path(), cancel_job),
     path(AppEndpoints.RESULTS.as_path(), get_result),
+    # Health/Testing Endpoints
     path(AppEndpoints.WAIT.as_path(), perform_wait),
     path(AppEndpoints.TASKS_ACTIVE.as_path(), get_active_task_ids()),
     path(AppEndpoints.TASKS_PENDING.as_path(), get_pending_task_ids()),

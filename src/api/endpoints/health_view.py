@@ -1,6 +1,6 @@
 import psutil
 
-from api.endpoints.common.endpoint_decorator import endpoint_get
+from api.endpoints.handler.endpoint_decorator import endpoint_get
 
 
 @endpoint_get

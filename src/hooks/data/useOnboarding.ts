@@ -8,7 +8,13 @@ import {
   ONBOARDING_STEPS,
   ONBOARDING_SUPPORT_LINK,
 } from "@/util";
-import { artifactStore, jobStore, orgStore, projectStore } from "@/hooks";
+import {
+  artifactStore,
+  integrationsStore,
+  jobStore,
+  orgStore,
+  projectStore,
+} from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -88,8 +94,32 @@ export const useOnboarding = defineStore("useOnboarding", {
         artifactStore.allArtifacts.length > MAX_GENERATED_BASE_ARTIFACTS
       );
     },
+    /** @return Whether the onboarding workflow should skip to the repo step. */
+    skipToRepo(): boolean {
+      return integrationsStore.validGitHubCredentials;
+    },
+    /** @return Whether the onboarding workflow should skip to the upload step. */
+    skipToGenerate(): boolean {
+      return !!(
+        this.projectId &&
+        ((this.isUploadJob && this.uploadedJob?.status === "COMPLETED") ||
+          this.isGenerationJob)
+      );
+    },
+    /** @return Whether the onboarding workflow should skip to the upload step. */
+    skipToUpload(): boolean {
+      return this.isUploadJob || this.skipToGenerate;
+    },
   },
   actions: {
+    /**
+     * Updates whether the generation has been completed based on the state of any current generation jobs.
+     */
+    updateGenerationCompleted(): void {
+      this.generationCompleted =
+        this.generationCompleted ||
+        (this.isGenerationJob && this.uploadedJob?.status === "COMPLETED");
+    },
     /**
      * Proceeds to the next step of the onboarding workflow.
      * @param currentStep - The current step. If not provided, proceeds to the next step.

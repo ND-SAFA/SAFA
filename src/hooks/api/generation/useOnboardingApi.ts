@@ -171,31 +171,18 @@ export const useOnboardingApi = defineStore(
 
       await gitHubApiStore.handleVerifyCredentials();
       await jobApiStore.handleReload();
+      onboardingStore.updateGenerationCompleted();
 
-      // Load the project ID and generation status based on stored state, job state, or local storage.
-      onboardingStore.generationCompleted =
-        onboardingStore.generationCompleted ||
-        (onboardingStore.isGenerationJob &&
-          onboardingStore.uploadedJob?.status === "COMPLETED");
-      const skipToGenerate =
-        onboardingStore.projectId &&
-        ((onboardingStore.isUploadJob &&
-          onboardingStore.uploadedJob?.status === "COMPLETED") ||
-          onboardingStore.isGenerationJob);
-      const skipToUpload =
-        updateState !== "reset" &&
-        (onboardingStore.isUploadJob || skipToGenerate);
-
-      if (integrationsStore.validGitHubCredentials) {
-        // Skip to Code step if credentials are set.
+      if (onboardingStore.skipToRepo) {
+        // Skip to "code" step if credentials are set.
         await handleLoadNextStep("connect");
       }
-      if (skipToUpload) {
-        // Skip to the Summarize step if a job has been started, or a project has already been uploaded.
+      if (onboardingStore.skipToUpload && updateState !== "reset") {
+        // Skip to the "summarize" step if a job has been started, or a project has already been uploaded.
         await handleLoadNextStep("code");
       }
-      if (skipToGenerate) {
-        // Skip to the Generate step if a job has been completed.
+      if (onboardingStore.skipToGenerate && updateState !== "reset") {
+        // Skip to the "generate" step if a job has been completed.
         await handleLoadNextStep("summarize");
       }
 

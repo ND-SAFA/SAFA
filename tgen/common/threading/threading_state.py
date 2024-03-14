@@ -7,8 +7,6 @@ from tgen.common.constants.threading_constants import THREAD_SLEEP
 from tgen.common.logging.logger_manager import logger
 from tgen.common.threading.rate_limited_queue import RateLimitedQueue
 
-MIN_RPM = 0.1
-
 
 class MultiThreadState:
     def __init__(self, iterable: Iterable, title: str, retries: Set, collect_results: bool = False, max_attempts: int = 3,
@@ -26,8 +24,7 @@ class MultiThreadState:
         self.title = title
         self.iterable = list(enumerate(iterable))
         self.result_list = [None] * len(iterable)
-        self.rpm = max(60 / float(rpm), MIN_RPM) if rpm else None
-        self.item_queue = RateLimitedQueue(self.rpm)
+        self.item_queue = RateLimitedQueue(rpm)
         self.progress_bar = None
         self.successful: bool = True
         self.exception: Optional[Exception] = None
@@ -103,12 +100,19 @@ class MultiThreadState:
         logger.exception(e)
         logger.info(f"Request failed, retrying in {self.sleep_time_on_error} seconds.")
 
+    def increase_interval(self) -> None:
+        """
+        Increases the interval to wait between items in queue.
+        :return: None
+        """
+        self.item_queue.increment_interval(.1)
+
     def _init_progress_bar(self) -> None:
         """
         Initializes the progress bar for the job.
         :return: None
         """
-        self.progress_bar = tqdm(total=self.item_queue.unfinished_tasks, desc=self.title, ncols=TQDM_NCOLS)
+        self.progress_bar = tqdm(total=len(self.item_queue), desc=self.title, ncols=TQDM_NCOLS)
 
     def _init_retries(self, retries: Set) -> None:
         """

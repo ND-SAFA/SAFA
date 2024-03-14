@@ -12,7 +12,6 @@ class ChildThread(threading.Thread):
         Constructs a child thread for the multi-thread state.
         :param state: State containing synchronization information for child threads.
         :param thread_work: The work to be performed by the child thread.
-        :param start_delay: How much to delay the start of the thread
         """
         super().__init__()
         self.state = state
@@ -64,3 +63,5 @@ class ChildThread(threading.Thread):
             self.state.on_item_fail(e, index=index)
         else:
             self.state.on_valid_exception(e)
+        if "overloaded_error" in str(e).lower():
+            self.state.increase_interval()

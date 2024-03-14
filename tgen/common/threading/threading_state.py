@@ -11,7 +11,7 @@ from tgen.common.logging.logger_manager import logger
 
 class MultiThreadState:
     def __init__(self, iterable: Iterable, title: str, retries: Set, collect_results: bool = False, max_attempts: int = 3,
-                 sleep_time: float = THREAD_SLEEP):
+                 sleep_time: float = THREAD_SLEEP, rpm: int = None):
         """
         Creates the state to syncronize a multi-threaded job.
         :param iterable: List of items to perform work on.
@@ -20,6 +20,7 @@ class MultiThreadState:
         :param collect_results: Whether to collect the resutls of the jobs.
         :param max_attempts: The maximum number of retries after exception is thrown.
         :param sleep_time: The time to sleep after an exception has been thrown.
+        :param rpm: Maximum rate of items per minute.
         """
         self.title = title
         self.iterable = list(enumerate(iterable))
@@ -36,12 +37,35 @@ class MultiThreadState:
         self.max_attempts = max_attempts
         self._init_retries(retries)
         self._init_progress_bar()
+        self.seconds_per_request = 60 / float(rpm) if rpm else None
+        self.last_request_time = None
 
-    def has_work(self) -> bool:
+    def get_work(self) -> Any:
         """
         :return: Returns whether there is work to be performed and its still valid to do so.
         """
-        return not self.item_queue.empty() and self.successful
+        if not self.item_queue.empty() and self.successful:
+            wait_time = self.rpm_wait()
+            if wait_time > 0:
+                time.sleep(wait_time)
+                return self.get_work()
+            self.last_request_time = time.time()
+            item = self.item_queue.get()
+            return item
+        return None
+
+    def rpm_wait(self):
+        """
+        :return: Returns the amount of time to wait.
+        """
+        if self.seconds_per_request:
+            if self.last_request_time is None:
+                return 0
+            current_time = time.time()
+            elapsed_time = current_time - self.last_request_time
+            time_to_wait = self.seconds_per_request - elapsed_time
+            return time_to_wait
+        return 0
 
     def should_attempt_work(self, attempts: int) -> bool:
         """
@@ -63,6 +87,7 @@ class MultiThreadState:
         """
         :return: Returns the next work item.
         """
+        self.last_request_time = time.time()
         return self.item_queue.get()
 
     def on_item_finished(self, result: Any, index: int) -> None:

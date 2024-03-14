@@ -7,7 +7,7 @@ from tgen.common.threading.threading_state import MultiThreadState
 
 
 class ChildThread(threading.Thread):
-    def __init__(self, state: MultiThreadState, thread_work: Callable, start_delay: float = None):
+    def __init__(self, state: MultiThreadState, thread_work: Callable):
         """
         Constructs a child thread for the multi-thread state.
         :param state: State containing synchronization information for child threads.
@@ -17,17 +17,17 @@ class ChildThread(threading.Thread):
         super().__init__()
         self.state = state
         self.thread_work = thread_work
-        self.start_delay = start_delay
 
     def run(self) -> None:
         """
         Performs work on the next available items until no more work is available.
         :return: None
         """
-        if self.start_delay:
-            time.sleep(self.start_delay)
-        while self.state.has_work():
-            index, item = self.state.get_item()
+        while True:
+            work = self.state.get_work()
+            if work is None:
+                break
+            index, item = work
             work_result = self._perform_work(item, index)
             self.state.on_item_finished(work_result, index)
 

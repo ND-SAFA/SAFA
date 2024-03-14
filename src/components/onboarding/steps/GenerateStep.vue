@@ -48,7 +48,7 @@
         class="bd-gradient"
         icon="generate-artifacts"
         :disabled="onboardingStore.blockGeneration || onboardingStore.error"
-        @click="onboardingStore.handleGenerateDocumentation"
+        @click="onboardingApiStore.handleGenerateDocumentation()"
       >
         {{ generateLabel }}
       </text-button>
@@ -64,7 +64,7 @@
       class="bd-gradient"
       icon="download"
       :loading="projectApiStore.saveProjectLoading"
-      @click="onboardingStore.handleExportProject"
+      @click="onboardingApiStore.handleCloseOnboarding('export')"
     >
       Export as CSV
     </text-button>
@@ -78,7 +78,7 @@
       color="gradient"
       class="bd-gradient"
       icon="view-tree"
-      @click="onboardingStore.handleViewProject"
+      @click="onboardingApiStore.handleCloseOnboarding('view')"
     >
       View in SAFA
     </text-button>
@@ -115,7 +115,12 @@ import {
   ONBOARDING_GENERATE_MESSAGE,
   ONBOARDING_GENERATE_SUCCESS,
 } from "@/util";
-import { artifactStore, onboardingStore, projectApiStore } from "@/hooks";
+import {
+  artifactStore,
+  onboardingApiStore,
+  onboardingStore,
+  projectApiStore,
+} from "@/hooks";
 import {
   FlexBox,
   Separator,

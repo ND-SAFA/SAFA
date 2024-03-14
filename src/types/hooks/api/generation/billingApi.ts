@@ -2,25 +2,12 @@ import {
   CostEstimateSchema,
   GenerateArtifactSchema,
   IOHandlerCallback,
-  OnboardingStatusSchema,
 } from "@/types";
 
 /**
  * A hook for calling billing API endpoints.
  */
 export interface BillingApiHook {
-  /**
-   * Gets the onboarding status for the current user.
-   * @param callbacks - The callbacks for the action, with the onboarding status as the payload.
-   */
-  handleGetOnboardingStatus(
-    callbacks: IOHandlerCallback<OnboardingStatusSchema>
-  ): Promise<void>;
-  /**
-   * Gets the onboarding status for the current user.
-   * @param status - The new onboarding status.
-   */
-  handleUpdateOnboardingStatus(status: OnboardingStatusSchema): Promise<void>;
   /**
    * Estimates the cost of generating artifacts.
    *

@@ -35,13 +35,13 @@
             text
             icon="graph-refresh"
             label="Restart"
-            @click="onboardingStore.handleReload(true, true)"
+            @click="onboardingApiStore.handleLoadOnboardingState('reset')"
           />
           <text-button
             text
             icon="cancel"
             label="Skip Onboarding"
-            @click="onboardingStore.handleClose"
+            @click="onboardingApiStore.handleCloseOnboarding()"
           />
         </flex-box>
       </q-bar>
@@ -115,7 +115,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { onboardingStore, sessionStore } from "@/hooks";
+import { onboardingApiStore, onboardingStore, sessionStore } from "@/hooks";
 import {
   TextButton,
   Stepper,

@@ -5,15 +5,12 @@ import {
   CostEstimateSchema,
   GenerateArtifactSchema,
   IOHandlerCallback,
-  OnboardingStatusSchema,
 } from "@/types";
-import { onboardingStore, orgStore, projectStore, useApi } from "@/hooks";
+import { onboardingApiStore, orgStore, projectStore, useApi } from "@/hooks";
 import {
   createCheckoutSession,
   createCostEstimate,
   deleteCheckoutSession,
-  getOnboardingStatus,
-  setOnboardingStatus,
 } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -22,18 +19,6 @@ import { pinia } from "@/plugins";
  */
 export const useBillingApi = defineStore("billingApi", (): BillingApiHook => {
   const billingApi = useApi("billingApi");
-
-  async function handleGetOnboardingStatus(
-    callbacks: IOHandlerCallback<OnboardingStatusSchema>
-  ): Promise<void> {
-    await billingApi.handleRequest(() => getOnboardingStatus(), callbacks);
-  }
-
-  async function handleUpdateOnboardingStatus(
-    status: OnboardingStatusSchema
-  ): Promise<void> {
-    await billingApi.handleRequest(() => setOnboardingStatus(status));
-  }
 
   async function handleEstimateCost(
     configuration: GenerateArtifactSchema,
@@ -62,8 +47,8 @@ export const useBillingApi = defineStore("billingApi", (): BillingApiHook => {
   }
 
   async function handleAcceptPayment(): Promise<void> {
-    await onboardingStore.handleReload(true);
-    await onboardingStore.handleGenerateDocumentation(true);
+    await onboardingApiStore.handleLoadOnboardingState("open");
+    await onboardingApiStore.handleGenerateDocumentation(true);
   }
 
   async function handleCancelPayment(sessionId: string): Promise<void> {
@@ -71,8 +56,6 @@ export const useBillingApi = defineStore("billingApi", (): BillingApiHook => {
   }
 
   return {
-    handleGetOnboardingStatus,
-    handleUpdateOnboardingStatus,
     handleEstimateCost,
     handleCheckoutSession,
     handleAcceptPayment,

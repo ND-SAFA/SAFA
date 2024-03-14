@@ -60,7 +60,11 @@ import {
   ONBOARDING_SUMMARIZE_ERROR,
   ONBOARDING_SUMMARIZE_MESSAGE,
 } from "@/util";
-import { integrationsStore, onboardingStore } from "@/hooks";
+import {
+  integrationsStore,
+  onboardingApiStore,
+  onboardingStore,
+} from "@/hooks";
 import {
   FlexBox,
   List,
@@ -79,7 +83,7 @@ const status = ref<"initial" | "loading" | "success" | "error">("initial");
  */
 function handleGenerate() {
   status.value = "loading";
-  onboardingStore.handleImportProject();
+  onboardingApiStore.handleImportAndSummarize();
 }
 
 /**
@@ -99,7 +103,7 @@ function updateStatus(moveNext?: boolean) {
 
     if (!moveNext) return;
 
-    onboardingStore.handleNextStep("summarize");
+    onboardingApiStore.handleLoadNextStep("summarize");
   }
 }
 

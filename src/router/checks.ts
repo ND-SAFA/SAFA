@@ -3,13 +3,13 @@ import { PaymentStatus } from "@/types";
 import {
   billingApiStore,
   getVersionApiStore,
+  onboardingApiStore,
   sessionApiStore,
 } from "@/hooks/api";
 import { appStore, permissionStore, sessionStore } from "@/hooks/core";
 import {
   artifactStore,
   documentStore,
-  onboardingStore,
   projectStore,
   viewsStore,
 } from "@/hooks/data";
@@ -73,7 +73,7 @@ export const routerBeforeChecks: RouteChecks = {
     } else if (to.path !== Routes.PAYMENT && !permissionStore.isDemo) {
       // If logging in to a non-payment endpoint and not in demo mode, reload onboarding state.
       // This ensures that reloading onboarding is not duplicated when navigating to the payment page.
-      await onboardingStore.handleReload();
+      await onboardingApiStore.handleLoadOnboardingState();
     }
   },
   async closePanelsIfNotInGraph(to) {

@@ -49,20 +49,25 @@ def generate_key(request) -> JsonResponse:
         if duration not in duration2days:
             return JsonResponse({ERROR_KEY: f"Expected one of {list(duration2days.keys())} but got {duration}"}, status=400)
 
-        days = duration2days[duration]
-        exp_date = datetime.datetime.utcnow() + datetime.timedelta(days=days)
-        payload = {
-            EMAIL_KEY: email,
-            EXPIRATION_KEY: exp_date
-        }
-        encoded_jwt = jwt.encode(payload, SECRET_KEY, algorithm=JWT_ALGO)
-        key = f"{PREFIX}_{encoded_jwt}"
+        key = create_key(duration, email)
 
         response = JsonResponse({AUTH_KEY: key})
         response.set_cookie(COOKIE_KEY, key, max_age=EXPIRATION_SECONDS, httponly=True)
         return response
     except Exception as e:
         return JsonResponse({ERROR_KEY: str(e)}, status=500)
+
+
+def create_key(duration: str, email: str):
+    days = duration2days[duration]
+    exp_date = datetime.datetime.utcnow() + datetime.timedelta(days=days)
+    payload = {
+        EMAIL_KEY: email,
+        EXPIRATION_KEY: exp_date
+    }
+    encoded_jwt = jwt.encode(payload, SECRET_KEY, algorithm=JWT_ALGO)
+    key = f"{PREFIX}_{encoded_jwt}"
+    return key
 
 
 def decode_key(encoded_key: str) -> Dict:

@@ -12,7 +12,7 @@ class TraceRequest(TypedDict):
     dataset: ApiDefinition
 
 
-class PredictionSerializer(AbstractSerializer):
+class TraceSerializer(AbstractSerializer):
     """
     Serializes prediction payload.
     """

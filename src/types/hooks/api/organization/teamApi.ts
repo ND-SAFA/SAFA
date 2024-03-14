@@ -16,7 +16,7 @@ export interface TeamApiHook {
   /**
    * Loads the projects for the current team.
    */
-  handleLoadCurrent(): Promise<void>;
+  handleLoadState(): Promise<void>;
   /**
    * Creates a new team or updates an existing one.
    *

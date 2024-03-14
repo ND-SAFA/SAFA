@@ -1,6 +1,6 @@
 <template>
   <q-select
-    v-model="currentOrg"
+    v-model="orgStore.org"
     standout
     bg-color="transparent"
     class="nav-breadcrumb"
@@ -40,26 +40,12 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import {
-  getOrgApiStore,
-  orgStore,
-  permissionStore,
-  saveOrgStore,
-} from "@/hooks";
+import { ref } from "vue";
+import { orgStore, permissionStore, saveOrgStore } from "@/hooks";
 import { Modal, TextButton } from "@/components/common";
 import { SaveOrganizationInputs } from "@/components/organization/save";
 
 const createOpen = ref(false);
-
-const currentOrg = computed({
-  get() {
-    return orgStore.org;
-  },
-  set(org) {
-    getOrgApiStore.handleSwitch(org);
-  },
-});
 
 /**
  * Opens or closes the organization creator modal.

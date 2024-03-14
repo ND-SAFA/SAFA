@@ -17,7 +17,7 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
   const saveTeamApiLoading = computed(() => saveTeamApi.loading);
   const deleteTeamApiLoading = computed(() => deleteTeamApi.loading);
 
-  async function handleLoadCurrent(): Promise<void> {
+  async function handleLoadState(): Promise<void> {
     if (!teamStore.team.id) return;
 
     await getTeamApi.handleRequest(async () => {
@@ -77,15 +77,16 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
     );
   }
 
+  // Reload the current team's data when the team changes.
   watch(
     () => teamStore.team,
-    () => handleLoadCurrent()
+    () => handleLoadState()
   );
 
   return {
     saveTeamApiLoading,
     deleteTeamApiLoading,
-    handleLoadCurrent,
+    handleLoadState,
     handleSave,
     handleDelete,
   };

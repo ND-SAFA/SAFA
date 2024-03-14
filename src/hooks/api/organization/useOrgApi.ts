@@ -1,13 +1,16 @@
 import { defineStore } from "pinia";
 
-import { computed } from "vue";
+import { computed, watch } from "vue";
 import { IOHandlerCallback, OrganizationSchema, OrgApiHook } from "@/types";
 import { buildOrg } from "@/util";
-import { logStore, orgStore, useApi } from "@/hooks";
+import { logStore, orgStore, sessionStore, teamStore, useApi } from "@/hooks";
 import {
   createOrganization,
   deleteOrganization,
   editOrganization,
+  getAllBillingTransactions,
+  getMonthlyBillingTransactions,
+  saveDefaultOrg,
 } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -15,11 +18,32 @@ import { pinia } from "@/plugins";
  * A hook for managing requests to the organizations API.
  */
 export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
+  const getOrgApi = useApi("getOrgApi");
   const saveOrgApi = useApi("saveOrgApi");
   const deleteOrgApi = useApi("deleteOrgApi");
 
   const saveOrgApiLoading = computed(() => saveOrgApi.loading);
   const deleteOrgApiLoading = computed(() => deleteOrgApi.loading);
+
+  async function handleLoadState(): Promise<void> {
+    if (!orgStore.org.id) return;
+
+    await getOrgApi.handleRequest(async () => {
+      await saveDefaultOrg(orgStore.org.id);
+
+      orgStore.allTransactions = await getAllBillingTransactions(
+        orgStore.org.id
+      );
+      orgStore.monthlyTransactions = await getMonthlyBillingTransactions(
+        orgStore.org.id
+      );
+
+      teamStore.team =
+        orgStore.org.teams?.find(({ members = [] }) =>
+          members.find(({ email }) => email === sessionStore.userEmail)
+        ) || orgStore.org.teams[0];
+    });
+  }
 
   async function handleSave(
     org: OrganizationSchema,
@@ -79,6 +103,12 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
       }
     );
   }
+
+  // Reload the current org's data when the org changes.
+  watch(
+    () => orgStore.org,
+    () => handleLoadState()
+  );
 
   return {
     saveOrgApiLoading,

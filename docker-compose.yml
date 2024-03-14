@@ -21,6 +21,7 @@ services:
     - BROKER_PASSWORD=guest
     - DEBUG=true
     - ENV_MODE=local
+    - SECRET_KEY="ggs02han$(hrho&y(_i%4u)(%svf7v013yt6en_!hup+73qpp$"
 
   rabbitmq:
     container_name: rabbitmq

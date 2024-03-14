@@ -59,6 +59,12 @@ def generate_key(request) -> JsonResponse:
 
 
 def create_key(duration: str, email: str):
+    """
+    Creates API key valid for given email and valid for specified duration.
+    :param duration: The duration of the API key.
+    :param email: The email to assocaite with key.
+    :return:
+    """
     days = duration2days[duration]
     exp_date = datetime.datetime.utcnow() + datetime.timedelta(days=days)
     payload = {

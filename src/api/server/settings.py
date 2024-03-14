@@ -114,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # TGEN Configuration
-anthropic_constants.ANTHROPIC_MAX_THREADS = os.environ.get("MAX_THREADS", 10)
+anthropic_constants.ANTHROPIC_MAX_THREADS = int( os.environ.get("MAX_THREADS", 10))
 anthropic_constants.ANTHROPIC_MAX_RPM = anthropic_constants.ANTHROPIC_MAX_THREADS * 12
 
 # Internationalization

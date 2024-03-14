@@ -14,10 +14,9 @@ export interface TeamApiHook {
    */
   deleteTeamApiLoading: ComputedRef<boolean>;
   /**
-   * Loads the projects for the given team.
-   * @param team - The team to load.
+   * Loads the projects for the current team.
    */
-  handleLoadTeam(team: TeamSchema): Promise<void>;
+  handleLoadCurrent(): Promise<void>;
   /**
    * Creates a new team or updates an existing one.
    *

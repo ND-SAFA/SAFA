@@ -141,7 +141,7 @@ function handleReload() {
   projectInviteId.value = undefined;
 
   if (props.teamOnly) {
-    teamApiStore.handleLoadTeam(teamStore.team);
+    teamApiStore.handleLoadCurrent();
   } else {
     getProjectApiStore.handleReload();
   }

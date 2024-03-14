@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
+import edu.nd.crc.safa.features.generation.summary.ProjectSummaryService;
 import edu.nd.crc.safa.features.generation.summary.SummarizeArtifactRequestDTO;
 import edu.nd.crc.safa.features.generation.summary.SummaryService;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;

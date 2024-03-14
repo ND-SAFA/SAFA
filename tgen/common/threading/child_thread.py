@@ -2,6 +2,7 @@ import threading
 import time
 from typing import Any, Callable
 
+from tgen.common.constants.threading_constants import OVERLOADED_ERROR
 from tgen.common.logging.logger_manager import logger
 from tgen.common.threading.threading_state import MultiThreadState
 
@@ -63,5 +64,5 @@ class ChildThread(threading.Thread):
             self.state.on_item_fail(e, index=index)
         else:
             self.state.on_valid_exception(e)
-        if "overloaded_error" in str(e).lower():
+        if OVERLOADED_ERROR in str(e).lower():
             self.state.increase_interval()

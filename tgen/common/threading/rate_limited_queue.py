@@ -7,7 +7,7 @@ ItemType = TypeVar("ItemType")
 
 
 class RateLimitedQueue(Generic[ItemType]):
-    def __init__(self, items_per_minute):
+    def __init__(self, items_per_minute: int):
         """
         Synchronized queue with limited rate per limit.
         :param items_per_minute: How many items per minute are allowed.

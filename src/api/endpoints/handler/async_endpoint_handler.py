@@ -53,7 +53,6 @@ class AsyncEndpointHandler(IHandler):
             :param data: The input data to the job.
             :return:
             """
-            logger.info(f"Welcome to GEN @ {get_current_version()}")
             self.is_running = True
             self.pre_process()
             self.poll_job(data)
@@ -84,6 +83,7 @@ class AsyncEndpointHandler(IHandler):
         :return: None
         """
         try:
+            logger.info(f"Welcome to GEN @ {get_current_version()}")
             ModelCache.clear()
             data = self.serialize_data(data)
             response = self.func(data)

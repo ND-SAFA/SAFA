@@ -114,7 +114,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                                                          n_threads=anthropic_constants.ANTHROPIC_MAX_THREADS,
                                                                          max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS,
                                                                          raise_exception=raise_exception,
-                                                                         thread_delay=1)
+                                                                         rpm=anthropic_constants.ANTHROPIC_MAX_RPM)
         close_client(anthropic_client)
 
         self._handle_exceptions(global_state)

@@ -76,6 +76,13 @@ export interface SessionApiHook {
   handlePasswordUpdate(newPassword: string, resetToken: string): Promise<void>;
   /**
    * Attempts to log a user in.
+   * If successful:
+   * - Loads the current organization.
+   * - Loads the state of onboarding.
+   * - Loads the list of projects.
+   * - If navigating to the graph, loads the last project.
+   * - If navigating to a page, redirects there.
+   * - Otherwise, redirects to the home page.
    *
    * @param user - The user to log in.
    * @param demo - Whether to set permissions to demo restrictions.

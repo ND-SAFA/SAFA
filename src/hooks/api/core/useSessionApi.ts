@@ -13,6 +13,7 @@ import {
   getProjectApiStore,
   getVersionApiStore,
   logStore,
+  onboardingApiStore,
   permissionStore,
   sessionStore,
   setProjectApiStore,
@@ -129,10 +130,10 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
       sessionStore.user = await getCurrentUser();
       sessionStore.updateSession(session);
 
+      await getOrgApiStore.handleLoadCurrent();
+      await onboardingApiStore.handleLoadOnboardingState();
       await getProjectApiStore.handleReload({
         onComplete: async () => {
-          await getOrgApiStore.handleLoadCurrent();
-
           if (goToPath === Routes.ARTIFACT) {
             await getProjectApiStore.handleLoadRecent();
           } else if (typeof goToPath === "string") {

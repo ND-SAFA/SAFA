@@ -61,7 +61,7 @@ export default {
 <script setup lang="ts">
 import { ref } from "vue";
 import { ENABLED_FEATURES } from "@/util";
-import { onboardingApiStore, sessionApiStore } from "@/hooks";
+import { sessionApiStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
 import {
   CardPage,
@@ -96,6 +96,5 @@ async function handleSubmit() {
     email: email.value,
     password: password.value,
   });
-  await onboardingApiStore.handleLoadOnboardingState();
 }
 </script>

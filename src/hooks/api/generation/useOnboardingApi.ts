@@ -13,6 +13,7 @@ import {
   jobApiStore,
   logStore,
   onboardingStore,
+  permissionStore,
   projectApiStore,
   projectStore,
   useApi,
@@ -156,6 +157,9 @@ export const useOnboardingApi = defineStore(
     async function handleLoadOnboardingState(
       updateState?: "open" | "reset"
     ): Promise<void> {
+      // Never load onboarding state in demo mode.
+      if (permissionStore.isDemo) return;
+
       if (updateState === "reset") {
         // Reset all onboarding state.
         await handleOpenOnboarding();

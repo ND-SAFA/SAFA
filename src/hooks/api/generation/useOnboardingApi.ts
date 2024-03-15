@@ -30,6 +30,26 @@ export const useOnboardingApi = defineStore(
   (): OnboardingApiHook => {
     const onboardingApi = useApi("onboardingApi");
 
+    async function handleLoadOnboardingProject(): Promise<void> {
+      if (onboardingStore.projectId) {
+        // If a project ID is stored, load that.
+        await getVersionApiStore.handleLoadCurrent(
+          { projectId: onboardingStore.projectId },
+          {
+            onError: () => {
+              onboardingStore.projectId = "";
+              onboardingStore.error = true;
+            },
+          }
+        );
+      } else if (onboardingStore.uploadedJob?.completedEntityId) {
+        // If we only have the upload job's version ID, load that.
+        await getVersionApiStore.handleLoad(
+          onboardingStore.uploadedJob?.completedEntityId
+        );
+      }
+    }
+
     async function handleGetOnboardingStatus(open?: boolean): Promise<void> {
       await onboardingApi.handleRequest(() => getOnboardingStatus(), {
         onSuccess: (status) => {
@@ -52,9 +72,11 @@ export const useOnboardingApi = defineStore(
       const resetProject = !!openTo;
 
       if (openTo === "export") {
+        await handleLoadOnboardingProject();
         await projectApiStore.handleDownload("csv");
         logStore.onSuccess("Your data is being exported.");
       } else if (openTo === "view") {
+        await handleLoadOnboardingProject();
         await navigateTo(Routes.ARTIFACT, {
           projectId: onboardingStore.projectId,
         });
@@ -93,24 +115,7 @@ export const useOnboardingApi = defineStore(
     }
 
     async function handleEstimateCost(): Promise<void> {
-      if (onboardingStore.projectId) {
-        // If a project ID is stored, load that.
-        await getVersionApiStore.handleLoadCurrent(
-          { projectId: onboardingStore.projectId },
-          {
-            onError: () => {
-              onboardingStore.projectId = "";
-              onboardingStore.error = true;
-            },
-          }
-        );
-      } else if (onboardingStore.uploadedJob?.completedEntityId) {
-        // If we only have the upload job's version ID, load that.
-        await getVersionApiStore.handleLoad(
-          onboardingStore.uploadedJob?.completedEntityId
-        );
-      }
-
+      await handleLoadOnboardingProject();
       await billingApiStore.handleEstimateCost(
         {
           artifacts: artifactStore.allArtifacts.map(({ id }) => id),

@@ -16,6 +16,8 @@ public class TGenConfig {
     private static TGenConfig staticConfig;
     @Value("${tgen.endpoint}")
     private String baseEndpoint;
+    @Value("${tgen.key}")
+    private String genKey;
 
     public static TGenConfig get() {
         return TGenConfig.staticConfig;

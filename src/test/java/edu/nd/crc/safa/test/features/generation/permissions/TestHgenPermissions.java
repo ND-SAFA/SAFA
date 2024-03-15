@@ -7,7 +7,7 @@ import java.util.Set;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
-import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryService;
+import edu.nd.crc.safa.features.generation.summary.ProjectSummaryService;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.test.features.memberships.permissions.AbstractPermissionViolationTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;

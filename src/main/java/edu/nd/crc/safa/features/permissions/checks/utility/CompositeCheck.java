@@ -19,4 +19,9 @@ public abstract class CompositeCheck implements AdditionalPermissionCheck {
     public boolean doCheck(PermissionCheckContext context) {
         return subcheck.doCheck(context);
     }
+
+    @Override
+    public boolean superuserCanOverride() {
+        return subcheck.superuserCanOverride();
+    }
 }

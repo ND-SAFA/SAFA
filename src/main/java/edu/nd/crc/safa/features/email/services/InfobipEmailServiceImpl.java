@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import com.infobip.ApiClient;
+import com.infobip.ApiException;
 import com.infobip.ApiKey;
 import com.infobip.BaseUrl;
 import com.infobip.api.EmailApi;
@@ -51,6 +52,9 @@ public class InfobipEmailServiceImpl implements EmailService {
     @Value("${fend.verify-email-path}")
     private String verifyEmailUrl;
 
+    @Value("${email.infobip.fakeEmails}")
+    private boolean fakeSendingEmails;
+
     private EmailApi emailApi;
 
     @PostConstruct
@@ -63,11 +67,10 @@ public class InfobipEmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendPasswordReset(String recipient, String token) {
-        sendSimpleEmail(recipient, "Requested password reset token",
-            String.format(fendBase + resetPasswordUrl, token));
-
-
+    public void sendPasswordReset(String recipient, String resetAccount, String token) {
+        String body = "Here is the requested link to reset the password for the account belonging to " + resetAccount
+            + "\n\n" + String.format(fendBase + resetPasswordUrl, token);
+        sendSimpleEmail(recipient, "Requested password reset token", body);
     }
 
     @Override
@@ -103,12 +106,13 @@ public class InfobipEmailServiceImpl implements EmailService {
 
     private void sendSimpleEmail(String recipient, String subject, String text) {
         EmailSendResponse response = wrapSendEmail(() ->
-            emailApi
-                .sendEmail(List.of(recipient))
-                .from(infobipProperties.getSenderAddress())
-                .subject(subject)
-                .text(text)
-                .execute()
+            sendConfiguredEmail(
+                emailApi
+                    .sendEmail(List.of(recipient))
+                    .from(infobipProperties.getSenderAddress())
+                    .subject(subject)
+                    .text(text)
+            )
         );
 
         log.info("Email sent to " + recipient + " - subject \"" + subject + "\": " + response);
@@ -121,15 +125,30 @@ public class InfobipEmailServiceImpl implements EmailService {
             JSONObject placeholdersObject = new JSONObject(replacements);
             Long templateId = infobipProperties.getEmails().get(emailType).templateId();
 
-            return emailApi
-                .sendEmail(recipients)
-                .from(infobipProperties.getSenderAddress())
-                .templateId(templateId)
-                .defaultPlaceholders(placeholdersObject.toString())
-                .execute();
+            return sendConfiguredEmail(
+                emailApi
+                    .sendEmail(recipients)
+                    .from(infobipProperties.getSenderAddress())
+                    .templateId(templateId)
+                    .defaultPlaceholders(placeholdersObject.toString())
+            );
         });
 
         log.info(emailType + " email sent to " + recipients + ": " + response);
+    }
+
+    /**
+     * Sends an email that we have finished generating if sending emails is enabled in the config
+     *
+     * @param emailRequest The email request to send
+     * @return The response from sending the email, or null if email sending is disabled
+     */
+    private EmailSendResponse sendConfiguredEmail(EmailApi.SendEmailRequest emailRequest) throws ApiException {
+        if (!fakeSendingEmails) {
+            return emailRequest.execute();
+        } else {
+            return null;
+        }
     }
 
     /**

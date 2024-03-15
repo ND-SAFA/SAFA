@@ -22,6 +22,7 @@ public class AppRoutes {
         public static final String CHANGE_PASSWORD = Accounts.PREFIX + "/change";
         public static final String RESET_PASSWORD = Accounts.PREFIX + "/reset";
         public static final String FORGOT_PASSWORD = Accounts.PREFIX + "/forgot";
+        public static final String FORGOT_PASSWORD_NO_EMAIL = Accounts.PREFIX + "/forgot/no-email";
         public static final String CREATE_ACCOUNT = Accounts.PREFIX + "/create";
         public static final String CREATE_VERIFIED_ACCOUNT = Accounts.PREFIX + "/create-verified";
         public static final String VERIFY_ACCOUNT = Accounts.PREFIX + "/verify";
@@ -174,6 +175,7 @@ public class AppRoutes {
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Membership {
             public static final String GET_USER_PROJECTS = ROOT;
+            public static final String GET_TEAM_PROJECTS = ROOT + "/team/{teamId}";
         }
 
         @NoArgsConstructor(access = AccessLevel.NONE)
@@ -332,6 +334,14 @@ public class AppRoutes {
         public static final String ROOT = "/billing";
         public static final String CHECKOUT = ROOT + "/checkout";
         public static final String CHANGE_TIER = ROOT + "/update-payment-tier";
+
+        @NoArgsConstructor(access = AccessLevel.NONE)
+        public static class Transaction {
+            public static final String ROOT = Billing.ROOT + "/transactions";
+            public static final String BY_ORG = ROOT + "/{orgId}";
+            public static final String MONTHLY = ROOT + "/month";
+            public static final String BY_ORG_MONTHLY = BY_ORG + "/month";
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)

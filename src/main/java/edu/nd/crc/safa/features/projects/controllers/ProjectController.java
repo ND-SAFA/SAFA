@@ -162,6 +162,24 @@ public class ProjectController extends BaseController {
     }
 
     /**
+     * Returns list of all projects owned by the given team. Only projects that the current
+     * user has permission to see will be included.
+     *
+     * @param teamId The ID of the team
+     * @return List of projects
+     */
+    @GetMapping(AppRoutes.Projects.Membership.GET_TEAM_PROJECTS)
+    public List<ProjectIdAppEntity> getTeamProjects(@PathVariable UUID teamId) {
+        SafaUser user = getCurrentUser();
+        Team team = getResourceBuilder().fetchTeam(teamId).get();
+        return projectService.getProjectsOwnedByTeam(team)
+            .stream()
+            .filter(p -> permissionService.hasPermission(ProjectPermission.VIEW, p, user))
+            .map(p -> projectService.getIdAppEntity(p, user))
+            .toList();
+    }
+
+    /**
      * Deletes project with associated projectId.
      *
      * @param projectId UUID of project to delete.

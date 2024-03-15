@@ -21,4 +21,9 @@ public class OrPermissionCheck implements AdditionalPermissionCheck {
         return "Any of the following:\n  "
             + String.join("  \n", children.stream().map(AdditionalPermissionCheck::getMessage).toList());
     }
+
+    @Override
+    public boolean superuserCanOverride() {
+        return children.stream().map(AdditionalPermissionCheck::superuserCanOverride).reduce(true, (a,b) -> a && b);
+    }
 }

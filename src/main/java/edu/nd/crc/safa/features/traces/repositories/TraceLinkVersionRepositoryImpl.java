@@ -48,7 +48,17 @@ public class TraceLinkVersionRepositoryImpl
 
     @Override
     public TraceLinkVersion save(TraceLinkVersion traceLinkVersion) {
+        checkArtifactProjects(traceLinkVersion);
         return this.traceLinkVersionRepository.save(traceLinkVersion);
+    }
+
+    private void checkArtifactProjects(TraceLinkVersion traceLinkVersion) {
+        Project project = traceLinkVersion.getProjectVersion().getProject();
+        Project sourceProject = traceLinkVersion.getTraceLink().getSourceArtifact().getProject();
+        Project targetProject = traceLinkVersion.getTraceLink().getTargetArtifact().getProject();
+
+        assert sourceProject.getId().equals(project.getId());
+        assert targetProject.getId().equals(project.getId());
     }
 
     @Override

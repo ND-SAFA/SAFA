@@ -6,4 +6,5 @@ import lombok.Data;
 public class ProjectStatistics {
     private int artifactsTotal;
     private int linksTotal;
+    private int unsummarizedCodeArtifactsTotal;
 }

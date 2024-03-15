@@ -241,4 +241,14 @@ public class TransactionService {
         return transactionRepository.findByOrganizationAndTimestampIsAfter(organization, startTime);
     }
 
+    /**
+     * Get all transactions for an organization
+     *
+     * @param organization The organization
+     * @return The list of matching transactions
+     */
+    public List<Transaction> getOrgTransactions(Organization organization) {
+        return transactionRepository.findByOrganization(organization);
+    }
+
 }

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
-import edu.nd.crc.safa.features.generation.projectsummary.ProjectSummaryResponse;
+import edu.nd.crc.safa.features.generation.summary.SummaryResponse;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.test.features.generation.GenerationalTest;
@@ -34,9 +34,9 @@ public class GenTestService {
         });
     }
 
-    public static ProjectSummaryResponse createProjectSummaryResponse(String projectSummary,
-                                                                      List<GenerationArtifact> artifacts) {
-        ProjectSummaryResponse projectSummaryResponse = new ProjectSummaryResponse();
+    public static SummaryResponse createProjectSummaryResponse(String projectSummary,
+                                                               List<GenerationArtifact> artifacts) {
+        SummaryResponse projectSummaryResponse = new SummaryResponse();
         projectSummaryResponse.setSummary(projectSummary);
         projectSummaryResponse.setArtifacts(artifacts);
         return projectSummaryResponse;

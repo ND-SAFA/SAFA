@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 /**
  * Defines generic multi-part request containing a series of files.
  */
-public abstract class SafaMultiPartRequest extends SafaRequest {
+public class SafaMultiPartRequest extends SafaRequest {
     protected SafaMultiPartRequest(String path) {
         super(path);
     }
@@ -25,7 +25,7 @@ public abstract class SafaMultiPartRequest extends SafaRequest {
      * @return Response to HTTP request.
      * @throws Exception Throws exception if server fails to send HTTP request.
      */
-    protected JSONObject sendRequestWithFiles(List<MockMultipartFile> files,
+    public JSONObject sendRequestWithFiles(List<MockMultipartFile> files,
                                               ResultMatcher resultMatcher,
                                               JSONObject kwargs
     ) throws Exception {
@@ -49,6 +49,10 @@ public abstract class SafaMultiPartRequest extends SafaRequest {
             SafaRequest.getAuthorizationToken(),
             ResponseParser::jsonCreator
         );
+    }
+
+    public static SafaMultiPartRequest withRoute(String route) {
+        return new SafaMultiPartRequest(route);
     }
 
     /**

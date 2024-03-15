@@ -16,7 +16,7 @@ class RateLimitedQueue(Generic[ItemType]):
         self.items_per_minute = items_per_minute
         self.lock = threading.Lock()
         self.last_access_time = None
-        self.interval = 60.0 / items_per_minute
+        self.interval = 60.0 / items_per_minute if items_per_minute else None
 
     def __len__(self) -> int:
         """
@@ -37,6 +37,8 @@ class RateLimitedQueue(Generic[ItemType]):
         Gets the next item in the queue.
         :return: Returns next item in the queue.
         """
+        if self.interval is None:
+            return None if self.queue.qsize() == 0 else self.queue.get()
         with self.lock:
             if self.queue.qsize() == 0:
                 return None

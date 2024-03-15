@@ -36,9 +36,8 @@ export interface OnboardingApiHook {
   handleImportAndSummarize(): Promise<void>;
   /**
    * Loads the given project, and estimates the cost of generating documentation for it.
-   * @param projectId - The ID of the project to estimate the cost for.
    */
-  handleEstimateCost(projectId: string): Promise<void>;
+  handleEstimateCost(): Promise<void>;
   /**
    * Generate documentation for the selected project.
    */

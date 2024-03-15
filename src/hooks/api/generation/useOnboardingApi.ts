@@ -92,17 +92,25 @@ export const useOnboardingApi = defineStore(
       });
     }
 
-    async function handleEstimateCost(projectId: string): Promise<void> {
-      await getVersionApiStore.handleLoadCurrent(
-        { projectId },
-        {
-          onSuccess: () => (onboardingStore.projectId = projectId),
-          onError: () => {
-            onboardingStore.projectId = "";
-            onboardingStore.error = true;
-          },
-        }
-      );
+    async function handleEstimateCost(): Promise<void> {
+      if (onboardingStore.projectId) {
+        // If a project ID is stored, load that.
+        await getVersionApiStore.handleLoadCurrent(
+          { projectId: onboardingStore.projectId },
+          {
+            onError: () => {
+              onboardingStore.projectId = "";
+              onboardingStore.error = true;
+            },
+          }
+        );
+      } else if (onboardingStore.uploadedJob?.completedEntityId) {
+        // If we only have the upload job's version ID, load that.
+        await getVersionApiStore.handleLoad(
+          onboardingStore.uploadedJob?.completedEntityId
+        );
+      }
+
       await billingApiStore.handleEstimateCost(
         {
           artifacts: artifactStore.allArtifacts.map(({ id }) => id),
@@ -142,15 +150,11 @@ export const useOnboardingApi = defineStore(
     async function handleLoadNextStep(
       currentStep?: keyof typeof ONBOARDING_STEPS
     ): Promise<void> {
-      const projectId =
-        onboardingStore.projectId ||
-        onboardingStore.uploadedJob?.completedEntityId;
-
       if (currentStep === "connect") {
         integrationsStore.validGitHubCredentials = true;
         await gitHubApiStore.handleLoadProjects();
-      } else if (currentStep === "summarize" && projectId) {
-        await handleEstimateCost(projectId);
+      } else if (currentStep === "summarize") {
+        await handleEstimateCost();
       }
 
       await onboardingStore.handleNextStep(currentStep);

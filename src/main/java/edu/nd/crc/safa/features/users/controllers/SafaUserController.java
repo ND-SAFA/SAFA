@@ -34,6 +34,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +61,9 @@ public class SafaUserController extends BaseController {
     private final PermissionService permissionService;
     private final EmailVerificationService emailVerificationService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Value("${security.allow_new_accounts}")
+    private boolean allowNewAccounts;
 
     @Autowired
     public SafaUserController(ResourceBuilder resourceBuilder,
@@ -88,6 +92,10 @@ public class SafaUserController extends BaseController {
      */
     @PostMapping(AppRoutes.Accounts.CREATE_ACCOUNT)
     public UserAppEntity createNewUser(@RequestBody CreateAccountRequest newUser) {
+        if (!allowNewAccounts) {
+            throw new SafaError("Sign-ups are disabled. Please contact an admin.");
+        }
+
         // Step - Create user
         SafaUser createdAccount = getServiceProvider()
             .getSafaUserService()

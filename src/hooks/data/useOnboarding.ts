@@ -187,7 +187,6 @@ export const useOnboarding = defineStore("useOnboarding", {
       const index = currentStep
         ? ONBOARDING_STEPS[currentStep].index
         : this.step - 1;
-      const projectId = this.projectId || this.uploadedJob?.completedEntityId;
 
       this.steps[index].done = true;
       this.steps[index + 1].done = true;
@@ -201,14 +200,19 @@ export const useOnboarding = defineStore("useOnboarding", {
         await gitHubApiStore.handleLoadProjects();
       }
 
-      if (currentStep === "summarize" && projectId) {
-        await getVersionApiStore.handleLoadCurrent(
-          { projectId },
-          {
-            onSuccess: () => (this.projectId = projectId),
-            onError: () => (this.projectId = ""),
-          }
-        );
+      if (currentStep === "summarize") {
+        if (this.projectId) {
+          await getVersionApiStore.handleLoadCurrent(
+            { projectId: this.projectId },
+            {
+              onError: () => (this.projectId = ""),
+            }
+          );
+        } else if (this.uploadedJob?.completedEntityId) {
+          await getVersionApiStore.handleLoad(
+            this.uploadedJob?.completedEntityId
+          );
+        }
         await this.handleEstimateCost();
       }
     },

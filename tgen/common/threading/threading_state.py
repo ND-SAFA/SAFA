@@ -1,5 +1,3 @@
-import time
-from queue import Queue
 from typing import Any, Iterable, List, Optional, Set
 
 from tqdm import tqdm
@@ -7,6 +5,7 @@ from tqdm import tqdm
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.constants.threading_constants import THREAD_SLEEP
 from tgen.common.logging.logger_manager import logger
+from tgen.common.threading.rate_limited_queue import RateLimitedQueue
 
 
 class MultiThreadState:
@@ -25,7 +24,7 @@ class MultiThreadState:
         self.title = title
         self.iterable = list(enumerate(iterable))
         self.result_list = [None] * len(iterable)
-        self.item_queue = Queue()
+        self.item_queue = RateLimitedQueue(rpm)
         self.progress_bar = None
         self.successful: bool = True
         self.exception: Optional[Exception] = None
@@ -37,35 +36,12 @@ class MultiThreadState:
         self.max_attempts = max_attempts
         self._init_retries(retries)
         self._init_progress_bar()
-        self.seconds_per_request = 60 / float(rpm) if rpm else None
-        self.last_request_time = None
 
     def get_work(self) -> Any:
         """
         :return: Returns whether there is work to be performed and its still valid to do so.
         """
-        if not self.item_queue.empty() and self.successful:
-            wait_time = self.rpm_wait()
-            if wait_time > 0:
-                time.sleep(wait_time)
-                return self.get_work()
-            self.last_request_time = time.time()
-            item = self.item_queue.get()
-            return item
-        return None
-
-    def rpm_wait(self):
-        """
-        :return: Returns the amount of time to wait to respect rate limit.
-        """
-        if self.seconds_per_request:
-            if self.last_request_time is None:
-                return 0
-            current_time = time.time()
-            elapsed_time = current_time - self.last_request_time
-            time_to_wait = self.seconds_per_request - elapsed_time
-            return time_to_wait
-        return 0
+        return self.item_queue.get()
 
     def should_attempt_work(self, attempts: int) -> bool:
         """
@@ -87,7 +63,6 @@ class MultiThreadState:
         """
         :return: Returns the next work item.
         """
-        self.last_request_time = time.time()
         return self.item_queue.get()
 
     def on_item_finished(self, result: Any, index: int) -> None:
@@ -125,12 +100,19 @@ class MultiThreadState:
         logger.exception(e)
         logger.info(f"Request failed, retrying in {self.sleep_time_on_error} seconds.")
 
+    def increase_interval(self) -> None:
+        """
+        Increases the interval to wait between items in queue.
+        :return: None
+        """
+        self.item_queue.increment_interval(.1)
+
     def _init_progress_bar(self) -> None:
         """
         Initializes the progress bar for the job.
         :return: None
         """
-        self.progress_bar = tqdm(total=self.item_queue.unfinished_tasks, desc=self.title, ncols=TQDM_NCOLS)
+        self.progress_bar = tqdm(total=len(self.item_queue), desc=self.title, ncols=TQDM_NCOLS)
 
     def _init_retries(self, retries: Set) -> None:
         """

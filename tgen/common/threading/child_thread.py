@@ -2,6 +2,7 @@ import threading
 import time
 from typing import Any, Callable
 
+from tgen.common.constants.threading_constants import OVERLOADED_ERROR
 from tgen.common.logging.logger_manager import logger
 from tgen.common.threading.threading_state import MultiThreadState
 
@@ -12,7 +13,6 @@ class ChildThread(threading.Thread):
         Constructs a child thread for the multi-thread state.
         :param state: State containing synchronization information for child threads.
         :param thread_work: The work to be performed by the child thread.
-        :param start_delay: How much to delay the start of the thread
         """
         super().__init__()
         self.state = state
@@ -23,13 +23,12 @@ class ChildThread(threading.Thread):
         Performs work on the next available items until no more work is available.
         :return: None
         """
-        while True:
-            work = self.state.get_work()
-            if work is None:
-                break
+        work = self.state.get_work()
+        while work is not None:
             index, item = work
             work_result = self._perform_work(item, index)
             self.state.on_item_finished(work_result, index)
+            work = self.state.get_work()
 
     def _perform_work(self, item: Any, index: int) -> Any:
         """
@@ -65,3 +64,5 @@ class ChildThread(threading.Thread):
             self.state.on_item_fail(e, index=index)
         else:
             self.state.on_valid_exception(e)
+        if OVERLOADED_ERROR in str(e).lower():
+            self.state.increase_interval()

@@ -114,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # TGEN Configuration
-anthropic_constants.ANTHROPIC_MAX_THREADS = int( os.environ.get("MAX_THREADS", 10))
+anthropic_constants.ANTHROPIC_MAX_THREADS = int(os.environ.get("MAX_THREADS", 10))
 anthropic_constants.ANTHROPIC_MAX_RPM = anthropic_constants.ANTHROPIC_MAX_THREADS * 12
 
 # Internationalization
@@ -140,8 +140,9 @@ APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
 CORS_ALLOWED_ORIGINS = [
     'https://localhost:3000',
-    "https://bend.safa.ai",
-    "https://dev.bend.safa.ai"
+    "https://api.safa.ai",
+    "https://dev.api.safa.ai",
+    "https://staging.api.safa.ai"
 ]
 ENV_NAME = os.environ.get("ENV_MODE", "development")
 FAILURE_PATHS = {"test": "~/desktop"}

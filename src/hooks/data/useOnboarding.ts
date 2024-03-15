@@ -27,9 +27,7 @@ import {
 import { navigateTo, Routes } from "@/router";
 import { pinia } from "@/plugins";
 
-/**
- * This store manages the state of the onboarding workflow.
- */
+/** This store manages the state of the onboarding workflow. */
 export const useOnboarding = defineStore("useOnboarding", {
   state: () => ({
     /** Whether the onboarding workflow is open. */
@@ -177,6 +175,19 @@ export const useOnboarding = defineStore("useOnboarding", {
         projectId: resetProject ? "" : this.projectId || "",
       });
     },
+    /** Load the project for the onboarding workflow. */
+    async loadProject(): Promise<void> {
+      if (this.projectId) {
+        await getVersionApiStore.handleLoadCurrent(
+          { projectId: this.projectId },
+          { onError: () => (this.projectId = "") }
+        );
+      } else if (this.uploadedJob?.completedEntityId) {
+        await getVersionApiStore.handleLoad(
+          this.uploadedJob?.completedEntityId
+        );
+      }
+    },
     /**
      * Proceeds to the next step of the onboarding workflow.
      * @param currentStep - The current step. If not provided, proceeds to the next step.
@@ -201,18 +212,7 @@ export const useOnboarding = defineStore("useOnboarding", {
       }
 
       if (currentStep === "summarize") {
-        if (this.projectId) {
-          await getVersionApiStore.handleLoadCurrent(
-            { projectId: this.projectId },
-            {
-              onError: () => (this.projectId = ""),
-            }
-          );
-        } else if (this.uploadedJob?.completedEntityId) {
-          await getVersionApiStore.handleLoad(
-            this.uploadedJob?.completedEntityId
-          );
-        }
+        await this.loadProject();
         await this.handleEstimateCost();
       }
     },
@@ -282,12 +282,14 @@ export const useOnboarding = defineStore("useOnboarding", {
     },
     /** Export the selected project as a CSV. */
     async handleExportProject() {
+      await this.loadProject();
       await projectApiStore.handleDownload("csv");
       logStore.onSuccess("Your data is being exported.");
       await this.handleClose(true);
     },
     /** View the selected project in SAFA */
     async handleViewProject() {
+      await this.loadProject();
       await navigateTo(Routes.ARTIFACT, { projectId: this.projectId });
       await this.handleClose(true);
     },

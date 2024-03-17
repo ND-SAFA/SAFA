@@ -8,7 +8,7 @@ import {
   IOHandlerCallback,
 } from "@/types";
 import { useApi, integrationsStore } from "@/hooks";
-import { getParam, QueryParams } from "@/router";
+import { getParam, QueryParams, removeParams } from "@/router";
 import {
   getGitHubCredentials,
   getGitHubProjects,
@@ -53,6 +53,7 @@ export const useGitHubApi = defineStore("gitHubApi", (): GitHubApiHook => {
 
     const onSuccess = () => {
       integrationsStore.validGitHubCredentials = true;
+      removeParams();
       callbacks.onSuccess?.();
     };
     const onError = (e: Error) => {

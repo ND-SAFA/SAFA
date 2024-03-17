@@ -8,7 +8,7 @@ import {
   JiraProjectSchema,
 } from "@/types";
 import { useApi, integrationsStore } from "@/hooks";
-import { getParam, QueryParams } from "@/router";
+import { getParam, QueryParams, removeParams } from "@/router";
 import {
   getJiraCredentials,
   getJiraProjects,
@@ -52,6 +52,7 @@ export const useJiraApi = defineStore("jiraApi", (): JiraApiHook => {
 
     const onSuccess = () => {
       integrationsStore.validJiraCredentials = true;
+      removeParams();
       callbacks.onSuccess?.();
     };
     const onError = (e: Error) => {

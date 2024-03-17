@@ -43,6 +43,8 @@ export const useJiraApi = defineStore("jiraApi", (): JiraApiHook => {
   async function handleVerifyCredentials(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
+    if (integrationsStore.validJiraCredentials) return;
+
     const accessCode =
       getParam(QueryParams.TAB) === "jira"
         ? getParam(QueryParams.INTEGRATION_TOKEN)

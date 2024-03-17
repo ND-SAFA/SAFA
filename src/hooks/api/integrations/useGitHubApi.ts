@@ -44,6 +44,8 @@ export const useGitHubApi = defineStore("gitHubApi", (): GitHubApiHook => {
   async function handleVerifyCredentials(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
+    if (integrationsStore.validGitHubCredentials) return;
+
     const accessCode =
       getParam(QueryParams.TAB) === "github"
         ? getParam(QueryParams.INTEGRATION_TOKEN)

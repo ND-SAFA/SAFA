@@ -25,25 +25,15 @@ export const useDocuments = defineStore("documents", {
     const baseDocument = buildDocument();
 
     return {
-      /**
-       * The base document with all artifacts.
-       */
+      /** The base document with all artifacts. */
       baseDocument,
-      /**
-       * The currently visible document.
-       */
+      /** The currently visible document. */
       currentDocument: baseDocument,
-      /**
-       * All custom project documents.
-       */
+      /** All custom project documents. */
       allDocuments: [baseDocument],
-      /**
-       * The history of documents visited.
-       */
+      /** The history of documents visited. */
       history: [] as DocumentSchema[],
-      /**
-       * The current index in the history.
-       */
+      /** The current index in the history. */
       historyIndex: 0,
     };
   },
@@ -119,7 +109,10 @@ export const useDocuments = defineStore("documents", {
       this.currentDocument = loadedDocument;
       artifactStore.initializeArtifacts({ artifacts, currentArtifactIds });
       traceStore.initializeTraces({ traces, currentArtifactIds });
-      layoutStore.updatePositions(loadedDocument.layout);
+      layoutStore.updatePositions(
+        loadedDocument.layout,
+        currentArtifactIds.length
+      );
 
       // In subsets of the base document, hide children of leaf nodes.
       if (this.isBaseDocument) return;
@@ -145,7 +138,7 @@ export const useDocuments = defineStore("documents", {
 
       if (document.documentId !== this.currentId) return;
 
-      layoutStore.updatePositions(layout);
+      layoutStore.updatePositions(layout, document.artifactIds.length);
     },
     /**
      * Updates the base document's layout, and reruns the layout if on the base document.
@@ -157,7 +150,10 @@ export const useDocuments = defineStore("documents", {
 
       if (!this.isBaseDocument) return;
 
-      layoutStore.updatePositions(layout);
+      layoutStore.updatePositions(
+        layout,
+        this.currentDocument.artifactIds.length
+      );
     },
     /**
      * Updates matching documents.
@@ -181,6 +177,7 @@ export const useDocuments = defineStore("documents", {
     /**
      * Sets the current document and initializes its artifacts and traces.
      * - The view is set to the TIM if the base graph is too large and the tree view is selected.
+     * - In subsets of the base document, hides children of leaf nodes.
      * @param document - The document to switch to.
      */
     async switchDocuments(document: DocumentSchema): Promise<void> {
@@ -194,7 +191,6 @@ export const useDocuments = defineStore("documents", {
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
 
-      // Switch to TIM if the base graph is too large and the tree view is selected.
       if (
         this.isBaseDocument &&
         artifactStore.largeNodeCount &&
@@ -203,7 +199,10 @@ export const useDocuments = defineStore("documents", {
         layoutStore.mode = "tim";
       }
 
-      await layoutStore.updatePositions(document.layout);
+      await layoutStore.updatePositions(
+        document.layout,
+        currentArtifactIds.length
+      );
 
       await updateParam(
         QueryParams.VIEW,
@@ -211,7 +210,6 @@ export const useDocuments = defineStore("documents", {
         true
       );
 
-      // In subsets of the base document, hide children of leaf nodes.
       if (!this.isBaseDocument) {
         subtreeStore.hideLeafSubtrees();
       }
@@ -235,7 +233,7 @@ export const useDocuments = defineStore("documents", {
       subtreeStore.resetHiddenNodes();
       artifactStore.initializeArtifacts({ currentArtifactIds });
       traceStore.initializeTraces({ currentArtifactIds });
-      layoutStore.updatePositions(document.layout);
+      layoutStore.updatePositions(document.layout, currentArtifactIds.length);
     },
     /**
      * Adds a new document.

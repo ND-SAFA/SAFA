@@ -9,15 +9,12 @@ import {
   CytoEvent,
   CSSCursor,
 } from "@/types";
-import { LARGE_NODE_LAYOUT_COUNT, GENERATION_SCORE_VALUES } from "@/util";
 import {
-  appStore,
-  artifactStore,
-  cyStore,
-  projectStore,
-  selectionStore,
-  subtreeStore,
-} from "@/hooks";
+  LARGE_NODE_LAYOUT_COUNT,
+  GENERATION_SCORE_VALUES,
+  LARGE_NODE_COUNT,
+} from "@/util";
+import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
 import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
@@ -99,14 +96,13 @@ export const useLayout = defineStore("layout", {
         this.styleGeneratedLinks();
         this.applyAutomove();
 
-        // On the home page, load the project details panel.
         if (
           this.mode === "tim" &&
           type !== "creator" &&
           appStore.popups.detailsPanel !== "displayProject" &&
-          projectStore.isProjectDefined
+          cy.nodes().length > 0
         ) {
-          // On the home page, load the project details panel.
+          // On the TIM page, open the project details panel.
           appStore.openDetailsPanel("displayProject");
         }
 
@@ -159,11 +155,18 @@ export const useLayout = defineStore("layout", {
      * Updates artifact positions and resets the layout.
      *
      * @param positions - The new positions to set.
+     * @param visibleArtifacts - The number of visible artifacts.
      */
-    async updatePositions(positions: LayoutPositionsSchema): Promise<void> {
+    async updatePositions(
+      positions: LayoutPositionsSchema,
+      visibleArtifacts: number
+    ): Promise<void> {
       this.artifactPositions = positions;
 
-      if (artifactStore.currentArtifacts.length > LARGE_NODE_LAYOUT_COUNT) {
+      if (
+        visibleArtifacts === 0 ||
+        visibleArtifacts > LARGE_NODE_LAYOUT_COUNT
+      ) {
         await this.resetLayout();
       } else {
         this.setGraphLayout("project", true);
@@ -175,12 +178,14 @@ export const useLayout = defineStore("layout", {
      * - This action is skipped if the graph is too large.
      */
     applyAutomove(): void {
-      if (artifactStore.largeNodeCount) return;
-
       cyStore.getCy("project").then((cy) => {
+        const nodes = cy.nodes();
+
+        if (nodes.length > LARGE_NODE_COUNT) return;
+
         cy.automove("destroy");
 
-        cy.nodes().forEach((node) => {
+        nodes.forEach((node) => {
           const children = node
             .connectedEdges(`edge[source='${node.data().id}']`)
             .targets();
@@ -207,9 +212,9 @@ export const useLayout = defineStore("layout", {
      * - This action is skipped if the graph is too large.
      */
     styleGeneratedLinks(): void {
-      if (artifactStore.largeNodeCount) return;
-
       cyStore.getCy("project").then((cy) => {
+        if (cy.nodes().length > LARGE_NODE_COUNT) return;
+
         cy.edges(CYTO_CONFIG.GENERATED_LINK_SELECTOR).forEach((edge) => {
           const width =
             (edge.data().score >= GENERATION_SCORE_VALUES.HIGH

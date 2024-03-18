@@ -73,5 +73,7 @@ export async function updateParam(
  * Removes all query parameters.
  */
 export async function removeParams(): Promise<void> {
+  if (Object.keys(router.currentRoute.value.query).length === 0) return;
+
   await router.replace({ query: {} });
 }

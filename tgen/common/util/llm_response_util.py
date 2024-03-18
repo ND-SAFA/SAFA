@@ -2,7 +2,7 @@ import html
 import logging
 import os
 import re
-from typing import Dict, List, Set, Union, Any
+from typing import Any, Dict, List, Set, Union
 
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
@@ -15,7 +15,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.trace_output.stage_eval import TracePredictions
-from tgen.models.llm.llm_responses import SupportedLLMResponses, GenerationResponse
+from tgen.models.llm.llm_responses import GenerationResponse, SupportedLLMResponses
 
 
 class LLMResponseUtil:
@@ -72,7 +72,7 @@ class LLMResponseUtil:
                     if c:
                         content.append(c)
             assert len(content) > 0, f"Found no tags ({tag_name}) in:\n{res}"
-        except Exception:
+        except Exception as e:
             if not is_optional:
                 error = f"{NEW_LINE}Unable to parse {tag_name}"
                 logger.log_without_spam(level=logging.ERROR, msg=error)

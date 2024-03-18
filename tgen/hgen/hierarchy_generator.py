@@ -1,6 +1,7 @@
 from typing import Dict, Type
 
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.list_util import ListUtil
 from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -50,7 +51,11 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         summarizer_args = SummarizerArgs(
             summarize_code_only=True,
             do_resummarize_artifacts=False,
-            project_summary_sections=self.PROJECT_SUMMARY_SECTIONS,
+            project_summary_sections=ListUtil.append_if_exists(
+                self.PROJECT_SUMMARY_SECTIONS,
+                args.seed_project_summary_section,
+                as_new_list=True
+            )
         )
         super().__init__(args, HierarchyGenerator.steps, summarizer_args=summarizer_args)
         self.args = args
@@ -79,7 +84,6 @@ class HierarchyGenerator(AbstractPipeline[HGenArgs, HGenState], BaseObject):
         :return: Path to exported dataset of generated artifacts
         """
         super().run(**kwargs)
-
         dataset = self.state.final_dataset
         assert dataset is not None, f"Final dataset is not set."
         save_path = PipelineUtil.save_dataset_checkpoint(dataset, self.args.export_dir, filename=SAVE_DATASET_DIRNAME)

@@ -14,7 +14,7 @@ import {
   GENERATION_SCORE_VALUES,
   LARGE_NODE_COUNT,
 } from "@/util";
-import { appStore, cyStore, selectionStore, subtreeStore } from "@/hooks";
+import { appStore, cyStore } from "@/hooks";
 import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
@@ -93,6 +93,7 @@ export const useLayout = defineStore("layout", {
           cy.layout(this.layoutOptions).run();
         }
 
+        cyStore.drawMode("disable");
         this.styleGeneratedLinks();
         this.applyAutomove();
 
@@ -120,21 +121,6 @@ export const useLayout = defineStore("layout", {
         }, 350);
       });
     },
-    /**
-     * Resets the layout of the project graph.
-     */
-    async resetLayout(): Promise<void> {
-      appStore.onLoadStart();
-
-      await subtreeStore.restoreHiddenNodesAfter(async () => {
-        cyStore.drawMode("disable");
-        selectionStore.clearSelections();
-        this.setGraphLayout();
-      });
-
-      appStore.onLoadEnd();
-    },
-
     /**
      * Sets the position of an artifact to the saved one, and clears the saved position.
      *
@@ -167,7 +153,7 @@ export const useLayout = defineStore("layout", {
         visibleArtifacts === 0 ||
         visibleArtifacts > LARGE_NODE_LAYOUT_COUNT
       ) {
-        await this.resetLayout();
+        this.setGraphLayout("project", false);
       } else {
         this.setGraphLayout("project", true);
         cyStore.centerNodes(true);

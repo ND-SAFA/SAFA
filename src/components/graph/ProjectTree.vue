@@ -152,12 +152,15 @@ function handleClick(event: EventObject): void {
   )
     return;
 
-  selectionStore.clearSelections(true);
+  selectionStore.clearSelections();
 }
 
-onMounted(() => {
-  layoutStore.resetLayout();
-});
+function handleReset(): void {
+  selectionStore.clearSelections();
+  layoutStore.setGraphLayout();
+}
+
+onMounted(() => handleReset());
 
 /** Resets the layout when the route changes. */
 watch(
@@ -165,7 +168,7 @@ watch(
   () => {
     if (currentRoute.path !== Routes.ARTIFACT) return;
 
-    layoutStore.resetLayout();
+    handleReset();
   }
 );
 
@@ -174,14 +177,12 @@ watch(
   (inView) => {
     if (!inView) return;
 
-    layoutStore.resetLayout();
+    handleReset();
   }
 );
 
 watch(
   () => isTreeMode.value,
-  () => {
-    layoutStore.resetLayout();
-  }
+  () => handleReset()
 );
 </script>

@@ -22,54 +22,84 @@ import { pinia } from "@/plugins";
  */
 export const useOnboarding = defineStore("useOnboarding", {
   state: () => ({
-    /** Whether the onboarding workflow is open. */
+    /**
+     * Whether the onboarding workflow is open.
+     */
     open: false,
-    /** Whether the onboarding workflow ran into an error. */
+    /**
+     * Whether the onboarding workflow ran into an error.
+     */
     error: false,
-    /** Whether the onboarding workflow is loading. */
+    /**
+     * Whether the onboarding workflow is loading.
+     */
     loading: false,
-    /** The ID of the project used in onboarding.  */
+    /**
+     * The ID of the project used in onboarding.
+     */
     projectId: null as string | null,
-    /** The current step of the onboarding workflow, starting at 1. */
+    /**
+     * The current step of the onboarding workflow, starting at 1.
+     */
     step: 1,
-    /** The steps of the onboarding workflow, with their completion status.  */
+    /**
+     * The steps of the onboarding workflow, with their completion status.
+     */
     steps: Object.values(ONBOARDING_STEPS).map((step) => ({
       ...step,
       done: false,
     })),
-    /** The cost of generating the selected project data. */
+    /**
+     * The cost of generating the selected project data.
+     */
     cost: null as CostEstimateSchema | null,
-    /** Whether payment has been confirmed. */
+    /**
+     * Whether payment has been confirmed.
+     */
     paymentConfirmed: false,
-    /** Whether the generation step has been completed. */
+    /**
+     * Whether the generation step has been completed.
+     */
     generationCompleted: false,
-    /** Whether generation should ignore current jobs. */
+    /**
+     * Whether generation should ignore current jobs.
+     */
     ignoreCurrentJobs: false,
   }),
   getters: {
-    /** @return The onboarding project's upload job, if the generation step is done. */
+    /**
+     * @return The onboarding project's upload job, if the generation step is done.
+     */
     uploadedJob(): JobSchema | undefined {
       return this.ignoreCurrentJobs ? undefined : jobStore.jobs[0];
     },
-    /** @return Whether the onboarding project's upload job is uploading artifacts. */
+    /**
+     * @return Whether the onboarding project's upload job is uploading artifacts.
+     */
     isUploadJob(): boolean {
       return (
         this.uploadedJob?.steps.includes("Retrieving Github Repository") ||
         false
       );
     },
-    /** @return Whether the onboarding project's upload job is generating artifacts. */
+    /**
+     * @return Whether the onboarding project's upload job is generating artifacts.
+     */
     isGenerationJob(): boolean {
       return this.uploadedJob?.steps.includes("Generating Artifacts") || false;
     },
-    /** @return Whether the onboarding workflow should display the generated project overview. */
+    /**
+     * @return Whether the onboarding workflow should display the generated project overview.
+     */
     displayProject(): boolean {
       return (
         this.step >= ONBOARDING_STEPS.summarize.number &&
         projectStore.isProjectDefined
       );
     },
-    /** @return Whether the onboarding workflow should display billing information. */
+    /**
+     * @return Whether the onboarding workflow should display billing information.
+     */
     displayBilling(): boolean {
       const credits = this.cost?.credits;
 
@@ -80,7 +110,9 @@ export const useOnboarding = defineStore("useOnboarding", {
         orgStore.org.billing.monthlyRemainingCredits < credits
       );
     },
-    /** @return A display string for the onboarding project's upload job. */
+    /**
+     * @return A display string for the onboarding project's upload job.
+     */
     uploadProgress(): string {
       const { steps = [], currentStep = 0 } = this.uploadedJob || {};
       return this.uploadedJob
@@ -89,18 +121,24 @@ export const useOnboarding = defineStore("useOnboarding", {
           } (${jobStatus(this.uploadedJob).duration()})`
         : "";
     },
-    /** @return Whether the onboarding workflow should block generation because of project size. */
+    /**
+     * @return Whether the onboarding workflow should block generation because of project size.
+     */
     blockGeneration(): boolean {
       return (
         projectStore.isProjectDefined &&
         artifactStore.allArtifacts.length > MAX_GENERATED_BASE_ARTIFACTS
       );
     },
-    /** @return Whether the onboarding workflow should skip to the repo step. */
+    /**
+     * @return Whether the onboarding workflow should skip to the repo step.
+     */
     skipToRepo(): boolean {
       return integrationsStore.validGitHubCredentials;
     },
-    /** @return Whether the onboarding workflow should skip to the upload step. */
+    /**
+     * @return Whether the onboarding workflow should skip to the upload step.
+     */
     skipToGenerate(): boolean {
       return !!(
         this.projectId &&
@@ -108,7 +146,9 @@ export const useOnboarding = defineStore("useOnboarding", {
           this.isGenerationJob)
       );
     },
-    /** @return Whether the onboarding workflow should skip to the upload step. */
+    /**
+     * @return Whether the onboarding workflow should skip to the upload step.
+     */
     skipToUpload(): boolean {
       return this.isUploadJob || this.skipToGenerate;
     },

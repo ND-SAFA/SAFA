@@ -7,6 +7,7 @@ import {
   NodeSingular,
 } from "cytoscape";
 import {
+  CyConfiguration,
   CyPromise,
   CytoCore,
   CytoCoreGraph,
@@ -15,13 +16,7 @@ import {
   ResolveCy,
 } from "@/types";
 import { getTraceId } from "@/util";
-import {
-  appStore,
-  selectionStore,
-  traceApiStore,
-  traceMatrixApiStore,
-  traceStore,
-} from "@/hooks";
+import { appStore } from "@/hooks";
 import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
 
@@ -84,9 +79,11 @@ export const useCy = defineStore("cy", {
       };
     },
     /**
+     * Builds a new cytoscape graph for the project.
+     * @param config - The configuration for building a cytoscape graph.
      * @return The configuration for the project graph.
      */
-    buildProjectGraph(): CytoCoreGraph {
+    buildProjectGraph(config: CyConfiguration): CytoCoreGraph {
       return {
         name: "artifact-tree-graph",
         config: CYTO_CONFIG.GRAPH_CONFIG,
@@ -94,7 +91,7 @@ export const useCy = defineStore("cy", {
         plugins: CYTO_CONFIG.PROJECT_PLUGINS,
         afterInit: (cy) => {
           this.resetWindow("project");
-          this.configureDrawMode(cy);
+          this.configureDrawMode(cy, config);
         },
       };
     },
@@ -104,13 +101,7 @@ export const useCy = defineStore("cy", {
      */
     resetWindow(type?: "project" | "creator") {
       if (type !== "creator") {
-        const selectedId = selectionStore.selectedArtifact?.id;
-
-        if (selectedId) {
-          selectionStore.selectArtifact(selectedId);
-        } else {
-          this.centerNodes(false, "project");
-        }
+        this.centerNodes(false, "project");
       } else {
         this.creatorCy.then((cy) => {
           cy.maxZoom(0.8);
@@ -261,12 +252,12 @@ export const useCy = defineStore("cy", {
     /**
      * Initializes edge handles plugin for drawing links on the graph.
      * @param cy - The cytoscape instance.
+     * @param config - The configuration for building a cytoscape graph.
      */
-    configureDrawMode(cy: CytoCore): void {
+    configureDrawMode(cy: CytoCore, config: CyConfiguration): void {
       this.edgeHandles = cy.edgehandles({
         ...CYTO_CONFIG.EDGE_HANDLERS_OPTIONS,
-        canConnect: (source, target) =>
-          traceStore.isLinkAllowed(source.data(), target.data()) === true,
+        canConnect: config.canCreateTrace,
         edgeParams: (source, target) => ({
           id: getTraceId(source.data().id, target.data().id),
           source: source.data().id,
@@ -281,17 +272,8 @@ export const useCy = defineStore("cy", {
         addedEdge: CollectionReturnValue
       ) => {
         this.drawMode("disable");
-
         addedEdge.remove();
-
-        if (source.data()?.graph === "tree") {
-          traceApiStore.handleCreate(source.data(), target.data());
-        } else {
-          traceMatrixApiStore.handleCreate(
-            source.data().artifactType,
-            target.data().artifactType
-          );
-        }
+        config.handleCreateTrace(source, target);
       }) as EventHandler);
     },
   },

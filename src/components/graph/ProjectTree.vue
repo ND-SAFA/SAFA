@@ -87,6 +87,8 @@ import {
   layoutStore,
   timStore,
   cyStore,
+  traceApiStore,
+  traceMatrixApiStore,
 } from "@/hooks";
 import { Routes } from "@/router";
 import { PanelCard, TextButton } from "@/components/common";
@@ -96,7 +98,22 @@ import { TimNode, TimLink, TimMenu } from "./tim";
 
 const currentRoute = useRoute();
 
-const graph = ref(cyStore.buildProjectGraph());
+const graph = ref(
+  cyStore.buildProjectGraph({
+    canCreateTrace: (source, target) =>
+      traceStore.isLinkAllowed(source.data(), target.data()) === true,
+    handleCreateTrace: (source, target) => {
+      if (source.data()?.graph === "tree") {
+        traceApiStore.handleCreate(source.data(), target.data());
+      } else {
+        traceMatrixApiStore.handleCreate(
+          source.data().artifactType,
+          target.data().artifactType
+        );
+      }
+    },
+  })
+);
 
 const isInView = computed(() => !layoutStore.isTableMode);
 const isTreeMode = computed(() => layoutStore.isTreeMode);

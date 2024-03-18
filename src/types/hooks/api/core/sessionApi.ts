@@ -77,6 +77,7 @@ export interface SessionApiHook {
   /**
    * Attempts to log a user in.
    *
+   * @action If this is a demo account, update the permission store to demo.
    * @action Loads the current organization, state of onboarding, and list of projects.
    * @action Routes the user:
    *   - If navigating to the graph, loads the last project.
@@ -84,9 +85,8 @@ export interface SessionApiHook {
    *   - Otherwise, redirects to the home page.
    *
    * @param user - The user to log in.
-   * @param demo - Whether to set permissions to demo restrictions.
    */
-  handleLogin(user: UserPasswordSchema, demo?: boolean): Promise<void>;
+  handleLogin(user: UserPasswordSchema): Promise<void>;
   /**
    * Logs in to the demo account and opens the demo project.
    */

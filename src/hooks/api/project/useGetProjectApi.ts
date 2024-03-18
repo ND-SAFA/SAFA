@@ -38,6 +38,7 @@ export const useGetProjectApi = defineStore(
     async function handleReload(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
+      console.trace("!");
       if (!sessionStore.doesSessionExist) {
         callbacks.onSuccess?.();
         return;

@@ -71,8 +71,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { computed, ref, watch } from "vue";
 import {
   IdentifierSchema,
   MemberEntitySchema,
@@ -90,9 +89,8 @@ import {
   teamApiStore,
   teamStore,
 } from "@/hooks";
-import { SelectorTable, IconButton } from "@/components/common";
+import { SelectorTable, IconButton, Typography } from "@/components/common";
 import { InviteMemberModal } from "@/components/members";
-import Typography from "@/components/common/display/content/Typography.vue";
 
 const props = defineProps<ProjectSelectorTableProps>();
 
@@ -102,8 +100,6 @@ const emit = defineEmits<{
    */
   (e: "selected", project: IdentifierSchema | undefined): void;
 }>();
-
-const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
 const projectInviteId = ref<string>();
@@ -188,17 +184,4 @@ watch(
     handleReload();
   }
 );
-
-/**
- * Loads all projects when the page changes.
- */
-watch(
-  () => currentRoute.path,
-  () => handleReload()
-);
-
-/**
- * Loads all projects when mounted.
- */
-onMounted(() => handleReload());
 </script>

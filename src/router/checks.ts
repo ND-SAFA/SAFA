@@ -90,9 +90,6 @@ export const routerBeforeChecks: RouteChecks = {
 export const routerAfterChecks: RouteChecks = {
   async requireProjectForRoutes(to) {
     const requiresProject = to.matched.some(({ meta }) => meta.requiresProject);
-
-    if (projectStore.isProjectDefined || !requiresProject) return;
-
     const versionId = to.query[QueryParams.VERSION]
       ? String(to.query[QueryParams.VERSION])
       : undefined;
@@ -100,7 +97,7 @@ export const routerAfterChecks: RouteChecks = {
       ? String(to.query[QueryParams.VIEW])
       : undefined;
 
-    if (!versionId) return;
+    if (projectStore.isProjectDefined || !requiresProject || !versionId) return;
 
     await getVersionApiStore.handleLoad(versionId, viewId, false);
   },

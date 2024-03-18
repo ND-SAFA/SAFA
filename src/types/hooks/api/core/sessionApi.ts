@@ -77,10 +77,7 @@ export interface SessionApiHook {
   /**
    * Attempts to log a user in.
    *
-   * @assumption There is a valid session cookie.
-   * @action Loads the current organization.
-   * @action Loads the state of onboarding.
-   * @action Loads the list of projects.
+   * @action Loads the current organization, state of onboarding, and list of projects.
    * @action Routes the user:
    *   - If navigating to the graph, loads the last project.
    *   - If navigating to a page, redirects there.
@@ -107,10 +104,9 @@ export interface SessionApiHook {
   /**
    * Verifies the stored authentication token and logs in.
    *
+   * @assumption There is a valid session cookie.
    * @action If this is a demo account, update the permission store to demo.
-   * @action Loads the current organization.
-   * @action Loads the state of onboarding.
-   * @action Loads the list of projects.
+   * @action Loads the current organization, state of onboarding, and list of projects.
    *
    * @param callbacks - The callbacks to run on success or error.
    */

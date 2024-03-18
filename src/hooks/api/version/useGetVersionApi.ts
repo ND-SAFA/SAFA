@@ -2,18 +2,19 @@ import { defineStore } from "pinia";
 
 import { computed, ref, watch } from "vue";
 import {
-  DocumentSchema,
   IdentifierSchema,
   IOHandlerCallback,
   VersionSchema,
   GetVersionApiHook,
 } from "@/types";
 import {
+  artifactStore,
   documentStore,
   projectStore,
   sessionStore,
   setProjectApiStore,
   useApi,
+  viewsStore,
 } from "@/hooks";
 import { navigateTo, QueryParams, Routes, router } from "@/router";
 import { getProjectVersion, getProjectVersions } from "@/api";
@@ -63,7 +64,7 @@ export const useGetVersionApi = defineStore(
 
     async function handleLoad(
       versionId: string,
-      document?: DocumentSchema,
+      viewId?: string,
       doNavigate = true,
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
@@ -89,9 +90,16 @@ export const useGetVersionApi = defineStore(
 
           await setProjectApiStore.handleSet(project);
 
-          if (document) {
-            // If a document is given, switch to it.
-            await documentStore.switchDocuments(document);
+          if (viewId) {
+            // If a view is given, switch to the associated artifact or document.
+            const artifact = artifactStore.getArtifactById(viewId);
+            const document = documentStore.getDocument(viewId);
+
+            if (artifact) {
+              await viewsStore.addDocumentOfNeighborhood(artifact);
+            } else if (document) {
+              await documentStore.switchDocuments(document);
+            }
           }
 
           if (!doNavigate || routeRequiresProject) return;

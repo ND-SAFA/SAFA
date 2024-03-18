@@ -1,10 +1,5 @@
 import { ComputedRef, Ref, WritableComputedRef } from "vue";
-import {
-  DocumentSchema,
-  IdentifierSchema,
-  IOHandlerCallback,
-  VersionSchema,
-} from "@/types";
+import { IdentifierSchema, IOHandlerCallback, VersionSchema } from "@/types";
 
 /**
  * A hook for calling get version API endpoints.
@@ -42,15 +37,15 @@ export interface GetVersionApiHook {
    * Load the given project version.
    * Navigates to the artifact view page to show the loaded project.
    *
-   * @param versionId - The id of the version to retrieve and load.
-   * @param document - The document to start with viewing.
+   * @param versionId - The ID of the version to retrieve and load.
+   * @param viewId - The ID of an artifact or document to navigate to after loading the version.
    * @param doNavigate - Whether to navigate to the artifact tree if not already on an artifact page.
    *        @default true
    * @param callbacks - Callbacks for the action.
    */
   handleLoad(
     versionId: string,
-    document?: DocumentSchema,
+    viewId?: string,
     doNavigate?: boolean,
     callbacks?: IOHandlerCallback
   ): Promise<void>;

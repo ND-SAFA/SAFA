@@ -280,6 +280,14 @@ export const useDocuments = defineStore("documents", {
     doesDocumentExist(name: string): boolean {
       return !!this.projectDocuments.find((document) => document.name === name);
     },
+    /**
+     * Returns a document by its id.
+     * @param id - The document id to search for.
+     * @return The document, if one exists.
+     */
+    getDocument(id: string): DocumentSchema | undefined {
+      return this.projectDocuments.find(({ documentId }) => documentId === id);
+    },
   },
 });
 

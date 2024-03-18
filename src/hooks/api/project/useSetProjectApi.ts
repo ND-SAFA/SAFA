@@ -61,7 +61,7 @@ export const useSetProjectApi = defineStore(
       deltaStore.setIsDeltaViewEnabled(false);
       await getVersionApiStore.handleLoad(
         projectStore.versionId,
-        documentStore.currentDocument
+        documentStore.currentDocument.documentId
       );
     }
 

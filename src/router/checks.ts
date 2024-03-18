@@ -6,12 +6,7 @@ import {
   sessionApiStore,
 } from "@/hooks/api";
 import { appStore, sessionStore } from "@/hooks/core";
-import {
-  artifactStore,
-  documentStore,
-  projectStore,
-  viewsStore,
-} from "@/hooks/data";
+import { projectStore } from "@/hooks/data";
 import { QueryParams, Routes } from "@/router/routes";
 
 type RouteChecks = Record<
@@ -98,24 +93,15 @@ export const routerAfterChecks: RouteChecks = {
 
     if (projectStore.isProjectDefined || !requiresProject) return;
 
-    const versionId = to.query[QueryParams.VERSION];
-    const viewId = to.query[QueryParams.VIEW];
+    const versionId = to.query[QueryParams.VERSION]
+      ? String(to.query[QueryParams.VERSION])
+      : undefined;
+    const viewId = to.query[QueryParams.VIEW]
+      ? String(to.query[QueryParams.VIEW])
+      : undefined;
 
-    if (typeof versionId !== "string") return;
+    if (!versionId) return;
 
-    await getVersionApiStore.handleLoad(versionId, undefined, false);
-
-    if (!viewId) return;
-
-    const artifact = artifactStore.artifactsById.get(String(viewId));
-    const document = documentStore.allDocuments.find(
-      ({ documentId }) => documentId === viewId
-    );
-
-    if (artifact) {
-      await viewsStore.addDocumentOfNeighborhood(artifact);
-    } else if (document) {
-      await documentStore.switchDocuments(document);
-    }
+    await getVersionApiStore.handleLoad(versionId, viewId, false);
   },
 };

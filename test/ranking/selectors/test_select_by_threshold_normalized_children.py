@@ -21,7 +21,7 @@ class TestSelectByThresholdNormalizedChildren(TestCase):
         self.assertIn("s5", parent2children)
         self.assertEqual(parent2children["s5"], children_entries[3:])
         self.assertEqual(parent2scores["s5"], [entry['score'] for entry in children_entries[3:]])
-        SelectByThresholdNormalizedChildren._normalized_scores_based_on_parent(parent2children, parent2scores)
+        SelectByThresholdNormalizedChildren._normalized_scores_based_on_parent(parent2children, parent2scores, threshold=0.8)
         top_scores_indices = [1, 4]
         low_scores_indices = [0, 5]
         for i in top_scores_indices:

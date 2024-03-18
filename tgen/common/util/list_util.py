@@ -1,9 +1,8 @@
-from typing import Iterable, List, Tuple, Union, Any
-
 import numpy as np
 import pandas as pd
 from scipy.stats import percentileofscore
 from tqdm import tqdm
+from typing import Iterable, List, Tuple, Union, Any
 
 
 class ListUtil:
@@ -175,3 +174,12 @@ class ListUtil:
             return len(set(list_)) == 1
         except TypeError:  # not hashable
             return all([item1 == item2 for item1 in list_ for item2 in list_])
+
+    @staticmethod
+    def get_max_value_with_index(list_: List) -> Tuple[int, Any]:
+        """
+        Gets the index of the max value in the list.
+        :param list_: The list to get max of.
+        :return: The index of the max value in the list.
+        """
+        return max(enumerate(list_), key=lambda item: item[1])

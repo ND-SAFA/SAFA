@@ -1,12 +1,12 @@
 import random
 from collections import Counter
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 from datasets import Dataset
 from tqdm import tqdm
+from typing import Any, Callable, Dict, List, Tuple
 
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
@@ -377,7 +377,8 @@ class TraceDataset(iDataset):
                                    return_token_type_ids=True,
                                    add_special_tokens=True)
             entry = self._extract_feature_info(feature)
-            entry[DataKey.LABEL_KEY] = label
+            if DataFrameUtil.get_optional_value(label) is not None:
+                entry[DataKey.LABEL_KEY] = label
         return entry
 
     def resize_pos_links(self, new_length: int, include_duplicates: bool = False) -> None:

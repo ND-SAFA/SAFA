@@ -262,7 +262,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         if not isinstance(column2update, str):
             column2update = column2update.value
-        self.loc[self.index == id2update, column2update] = new_value
+        self.at[id2update, column2update] = new_value
 
     def update_values(self, column2update: Union[str, Enum], ids2update: List[str], new_values: List[Any]) -> None:
         """
@@ -272,6 +272,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
          :param new_values: The list of new values to update it to
          :return: None
          """
+        assert len(ids2update) == len(new_values), "Number of ids and values must match"
         for id_, val in zip(ids2update, new_values):
             self.update_value(column2update, id_, val)
 

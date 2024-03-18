@@ -1,3 +1,5 @@
+import math
+
 from typing import Tuple, Union
 
 
@@ -61,3 +63,21 @@ class MathUtil:
         :return: True if the number is odd, else False.
         """
         return num % 2 == 1
+
+    @staticmethod
+    def round_to_nearest_half(num: float, floor: bool = False, ceil: bool = False) -> float:
+        """
+        Rounds the number to the nearest 0.5 (e.g. 1.6 -> 1.5, 1.4 -> 1.0)
+        :param num: The number to round.
+        :param floor: If True, floors the number.
+        :param ceil: If True, ceils the number.
+        :return: The nearest 0.5 to the number.
+        """
+        assert not (floor and ceil), "Can only floor OR ceil the number, not both."
+        if floor:
+            func = math.floor
+        elif ceil:
+            func = math.ceil
+        else:
+            func = round
+        return func(num * 2) / 2

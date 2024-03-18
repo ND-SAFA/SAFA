@@ -1,7 +1,7 @@
 import json
-from typing import Dict, List, Optional, Tuple, Set, Union
 
 import numpy as np
+from typing import Dict, List, Optional, Tuple, Set, Union
 
 from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.common.logging.logger_manager import logger
@@ -26,13 +26,17 @@ class RankingUtil:
     """
 
     @staticmethod
-    def evaluate_trace_predictions(trace_df: TraceDataFrame, predicted_entries: List[EnumDict]) -> Optional[Dict]:
+    def evaluate_trace_predictions(trace_df: TraceDataFrame, predicted_entries: List[EnumDict],
+                                   all_scores: Dict[int, float] = None, log_results: bool = True) -> Optional[Dict]:
         """
         Calculates ranking metrics for ranking predictions.
         :param trace_df: The trace data frame containing true labels.
         :param predicted_entries: The ranking predictions.
+        :param all_scores: A dictionary mapping trace id to the score obtained for it.
+        :param log_results: If True, logs the results to the console.
         :return: The dictionary of metrics.
         """
+        all_scores = {} if not all_scores else all_scores
         if trace_df is None:
             logger.info("Skipping evaluation, trace data frame is none.")
             return
@@ -53,20 +57,28 @@ class RankingUtil:
         false_negative_ids = list(set(positive_link_ids).difference(set(predicted_link_ids)))
         false_positive_ids = list(set(negative_link_ids).intersection(set(predicted_link_ids)))
 
-        RankingUtil.log_artifacts("False Negatives", trace_df.to_map(), false_negative_ids)
-        RankingUtil.log_artifacts("False Positives", predicted_t_map, false_positive_ids)
-
         other_link_ids = set(all_link_ids).difference(predicted_link_ids)
         ordered_link_ids = predicted_link_ids + list(other_link_ids)
         scores = [entry[TraceKeys.SCORE.value] for entry in predicted_entries]
-        missing_scores = [0 for i in other_link_ids]
+        missing_scores = [all_scores.get(i, 0) for i in other_link_ids]
         all_scores = scores + missing_scores
 
-        metrics_manager = MetricsManager(trace_df, predicted_similarities=all_scores, link_ids=ordered_link_ids)
-        metric_names = list(SupportedTraceMetric.get_keys())
-        metrics = metrics_manager.eval(metric_names)
-        logger.log_with_title("Ranking Metrics", json.dumps(metrics))
-        return metrics
+        metrics_manager_scores = MetricsManager(trace_df, predicted_similarities=all_scores, link_ids=ordered_link_ids)
+        score_based_metrics = SupportedTraceMetric.get_score_based_metrics()
+        metric_results = metrics_manager_scores.eval(score_based_metrics)
+
+        metrics_manager_labels = MetricsManager(trace_df,
+                                                predicted_similarities=[int(id_ in predicted_link_ids) for id_ in ordered_link_ids],
+                                                link_ids=ordered_link_ids)
+        other_metrics = set(SupportedTraceMetric.get_keys()).difference(score_based_metrics)
+        other_metric_results = metrics_manager_labels.eval(other_metrics)
+
+        metric_results.update(other_metric_results)
+        if log_results:
+            RankingUtil.log_artifacts("False Negatives", trace_df.to_map(), false_negative_ids)
+            RankingUtil.log_artifacts("False Positives", predicted_t_map, false_positive_ids)
+            logger.log_with_title("Ranking Metrics", json.dumps(metric_results))
+        return metric_results
 
     @staticmethod
     def ranking_to_predictions(parent2rankings, parent2explanations: Dict[str, List[str]] = None) -> List[Trace]:
@@ -311,7 +323,7 @@ class RankingUtil:
         :param candidate_entries: Candidate trace entries
         :return: None
         """
-        scores = [e[TraceKeys.SCORE] for e in candidate_entries]
+        scores = RankingUtil.get_scores(candidate_entries)
         min_score, max_score = min(scores), max(scores)
         for entry in candidate_entries:
             entry[TraceKeys.SCORE] = MathUtil.convert_to_new_range(entry[TraceKeys.SCORE], (0, max_score), (0, 1))
@@ -324,4 +336,13 @@ class RankingUtil:
         :param sigma: Number of standard deviations.
         :return: A trace threshold.
         """
-        return 1 - sigma * np.std([trace[TraceKeys.SCORE] for trace in trace_entries])
+        return 1 - sigma * np.std(RankingUtil.get_scores(trace_entries))
+
+    @staticmethod
+    def get_scores(trace_entries: List[Trace]) -> List[float]:
+        """
+        Gets all scores for the trace entries.
+        :param trace_entries: List of all trace entries.
+        :return: A list of scores corresponding to the trace entries.
+        """
+        return [entry[TraceKeys.SCORE] for entry in trace_entries]

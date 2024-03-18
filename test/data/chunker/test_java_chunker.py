@@ -1,7 +1,7 @@
 import os
 
 from test.data.chunker.base_code_chunker_test import BaseCodeChunkerTest
-from tgen.data.chunkers.java_chunker import JavaChunker
+from tgen.data.chunkers.ast_chunkers.java_chunker import JavaChunker
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 

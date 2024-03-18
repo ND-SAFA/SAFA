@@ -6,7 +6,7 @@ import pandas as pd
 
 from tgen.common.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT
 from tgen.core.args.open_ai_args import OpenAIArgs
-from tgen.data.chunkers.abstract_chunker import AbstractChunker
+from tgen.data.chunkers.ast_chunkers.abstract_ast_chunker import AbstractASTChunker
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.open_ai_manager import OpenAIManager
@@ -55,7 +55,7 @@ class TestPromptDataset(BaseTest):
                                                                                    target_id=link[TraceKeys.TARGET]))
 
     @mock.patch.object(ModelTokenLimits, "get_token_limit_for_model")
-    @mock.patch.object(AbstractChunker, "exceeds_token_limit")
+    @mock.patch.object(AbstractASTChunker, "exceeds_token_limit")
     def test_get_prompt_entry(self, exceeds_token_limit_mock: mock.MagicMock, token_limit_mock: mock.MagicMock):
         token_limit = 5
         token_limit_mock.return_value = token_limit + MAX_TOKENS_BUFFER + MAX_TOKENS_DEFAULT

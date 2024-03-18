@@ -186,17 +186,16 @@ class DictUtil:
         return orig_kwargs
 
     @staticmethod
-    def set_or_increment_count(mapping: Dict, item_key: Any, increment_value: int = 1, initial_value: int = 1) -> None:
+    def set_or_increment_count(mapping: Dict, item_key: Any, increment_value: int = 1) -> None:
         """
         Adds item to mapping if it does not exists, otherwise increments it.
         :param mapping: The map to add item to.
         :param item_key: The key to store item under.
         :param increment_value: The value to increment the count by if the key is in the dict.
-        :param initial_value: The value to place under key if key is not contained.
         :return: None
         """
         if item_key not in mapping:
-            mapping[item_key] = initial_value
+            mapping[item_key] = increment_value
         else:
             mapping[item_key] += increment_value
 

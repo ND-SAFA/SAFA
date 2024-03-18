@@ -3,13 +3,13 @@ from abc import ABC, abstractmethod
 from asyncio.log import logger
 from typing import List, Tuple, Type
 
-from tgen.data.chunkers.abstract_chunker import AbstractChunker
-from tgen.data.chunkers.chunked_node import ChunkedNode
-from tgen.data.chunkers.natural_language_chunker import NaturalLanguageChunker
+from tgen.data.chunkers.ast_chunkers.abstract_ast_chunker import AbstractASTChunker
+from tgen.data.chunkers.ast_chunkers.chunked_node import ChunkedNode
+from tgen.data.chunkers.ast_chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.models.tokens.token_calculator import TokenCalculator
 
 
-class AbstractCodeChunker(AbstractChunker, ABC):
+class AbstractCodeChunker(AbstractASTChunker, ABC):
 
     def chunk(self, content: str, id_: str = None) -> List[str]:
         """

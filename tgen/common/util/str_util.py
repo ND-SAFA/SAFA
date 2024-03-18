@@ -222,3 +222,13 @@ class StrUtil:
         :return: The string without stop words.
         """
         return SPACE.join([word for word in input_string.split() if word.lower() not in StrUtil.STOP_WORDS])
+
+    @staticmethod
+    def split_by_punctuation(input_string: str) -> List[str]:
+        """
+        Splits a string by punctuation.
+        :param input_string: The string to split.
+        :return: List of substrings, divided using the punctuation.
+        """
+        pattern = re.compile(r'[.!?;]+')
+        return [line for line in re.split(pattern, input_string) if line]

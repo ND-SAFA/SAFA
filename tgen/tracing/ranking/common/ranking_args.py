@@ -1,6 +1,7 @@
 import os
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from tgen.common.constants import environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
@@ -14,7 +15,9 @@ from tgen.common.util.file_util import FileUtil
 from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.pipeline_args import PipelineArgs
+from tgen.tracing.ranking.filters.supported_filters import SupportedFilter
 from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
+from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
 
 
 @dataclass
@@ -46,7 +49,11 @@ class RankingArgs(PipelineArgs):
     """ 
     - sorter: The sorting algorithm to use before ranking with claude
     """
-    sorter: str = DEFAULT_SORTING_ALGORITHM
+    sorter: Union[str, SupportedSorter] = DEFAULT_SORTING_ALGORITHM
+    """ 
+    - filter: If provided, sets scores of filtered out children to 0 using provided filter.
+    """
+    filter: SupportedFilter = None
     """
     - generate_explanations: Whether to generate explanations for links.
     """
@@ -71,7 +78,7 @@ class RankingArgs(PipelineArgs):
     """
     - max_context_artifacts: The maximum number of artifacts to consider in a context window. 
     """
-    max_context_artifacts = DEFAULT_MAX_CONTEXT_ARTIFACTS
+    max_context_artifacts: int = DEFAULT_MAX_CONTEXT_ARTIFACTS
     """
     - link_threshold: The threshold at which to accept links when selecting top predictions.
     """
@@ -80,6 +87,10 @@ class RankingArgs(PipelineArgs):
     - selection_method: The method to use to select top predictions
     """
     selection_method: Optional[SupportedSelectionMethod] = SupportedSelectionMethod.SELECT_BY_THRESHOLD
+    """
+    - use_chunks: If True, uses the chunks of the artifacts.
+    """
+    use_chunks: bool = False
     """
     - weight_of_explanation_scores: If greater than 0, will weight the scores from the explanation in the final score
     """

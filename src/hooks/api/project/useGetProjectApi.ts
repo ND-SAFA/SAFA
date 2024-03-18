@@ -6,12 +6,7 @@ import {
   IdentifierSchema,
   IOHandlerCallback,
 } from "@/types";
-import {
-  getVersionApiStore,
-  projectStore,
-  sessionStore,
-  useApi,
-} from "@/hooks";
+import { getVersionApiStore, projectStore, useApi } from "@/hooks";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { getCurrentVersion, getProjects } from "@/api";
 import { pinia } from "@/plugins";
@@ -38,12 +33,6 @@ export const useGetProjectApi = defineStore(
     async function handleReload(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
-      console.trace("!");
-      if (!sessionStore.doesSessionExist) {
-        callbacks.onSuccess?.();
-        return;
-      }
-
       await getProjectApi.handleRequest(
         async () => {
           projectStore.allProjects = await getProjects();
@@ -56,8 +45,6 @@ export const useGetProjectApi = defineStore(
     }
 
     async function handleLoadRecent(): Promise<void> {
-      if (!sessionStore.doesSessionExist) return;
-
       let versionId = getParam(QueryParams.VERSION);
 
       if (!versionId) {

@@ -47,17 +47,16 @@ export const useGetProjectApi = defineStore(
     async function handleLoadRecent(): Promise<void> {
       let versionId = getParam(QueryParams.VERSION);
 
-      if (!versionId) {
-        if (projectStore.allProjects.length > 0) {
-          versionId = (
-            await getCurrentVersion(projectStore.allProjects[0].projectId)
-          ).versionId;
-        }
+      if (!versionId && projectStore.allProjects.length > 0) {
+        versionId = (
+          await getCurrentVersion(projectStore.allProjects[0].projectId)
+        ).versionId;
       }
+
       if (typeof versionId === "string") {
-        await getVersionApiStore.handleLoad(versionId).catch(() => {
-          navigateTo(Routes.HOME);
-        });
+        await getVersionApiStore
+          .handleLoad(versionId)
+          .catch(() => navigateTo(Routes.HOME));
       } else {
         await navigateTo(Routes.HOME);
       }

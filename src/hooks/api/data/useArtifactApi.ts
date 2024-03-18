@@ -8,6 +8,7 @@ import {
   artifactSaveStore,
   artifactStore,
   logStore,
+  selectionStore,
   traceApiStore,
   traceStore,
   useApi,
@@ -82,6 +83,7 @@ export const useArtifactApi = defineStore(
               await artifactCommitApiStore.handleCreate(artifact);
 
             artifactStore.addCreatedArtifact(createdArtifacts[0]);
+            selectionStore.selectArtifact(createdArtifacts[0].id);
 
             if (parentArtifact) {
               for (const createdArtifact of createdArtifacts) {
@@ -127,6 +129,7 @@ export const useArtifactApi = defineStore(
 
               artifactStore.deleteArtifacts([artifact]);
               traceStore.deleteTraceLinks(relatedTraces);
+              selectionStore.clearSelections();
             },
             {
               ...callbacks,

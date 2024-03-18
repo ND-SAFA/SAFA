@@ -13,7 +13,6 @@ import {
   documentStore,
   layoutStore,
   projectStore,
-  selectionStore,
   timStore,
   traceStore,
 } from "@/hooks";
@@ -134,7 +133,6 @@ export const useArtifacts = defineStore("artifacts", {
     addCreatedArtifact(artifact: ArtifactSchema): void {
       layoutStore.setArtifactToSavedPosition(artifact.id);
       this.addOrUpdateArtifacts([artifact]);
-      selectionStore.selectArtifact(artifact.id);
       timStore.addTypesFromArtifacts([artifact]);
     },
     /**
@@ -162,10 +160,6 @@ export const useArtifacts = defineStore("artifacts", {
         ),
       });
       projectStore.updateProject({ artifacts: allArtifacts });
-
-      if (ids.includes(selectionStore.selectedArtifact?.id || "")) {
-        selectionStore.clearSelections();
-      }
     },
     /**
      * Finds the given artifact by name.

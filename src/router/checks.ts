@@ -6,7 +6,7 @@ import {
   sessionApiStore,
 } from "@/hooks/api";
 import { appStore, sessionStore } from "@/hooks/core";
-import { projectStore } from "@/hooks/data";
+import { projectStore } from "@/hooks/management";
 import { QueryParams, Routes } from "@/router/routes";
 
 type RouteChecks = Record<

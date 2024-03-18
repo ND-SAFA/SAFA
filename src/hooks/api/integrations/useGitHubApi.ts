@@ -8,7 +8,7 @@ import {
   IOHandlerCallback,
 } from "@/types";
 import { useApi, integrationsStore } from "@/hooks";
-import { getParam, QueryParams } from "@/router";
+import { getParam, QueryParams, removeParams } from "@/router";
 import {
   getGitHubCredentials,
   getGitHubProjects,
@@ -44,6 +44,8 @@ export const useGitHubApi = defineStore("gitHubApi", (): GitHubApiHook => {
   async function handleVerifyCredentials(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
+    if (integrationsStore.validGitHubCredentials) return;
+
     const accessCode =
       getParam(QueryParams.TAB) === "github"
         ? getParam(QueryParams.INTEGRATION_TOKEN)
@@ -51,6 +53,7 @@ export const useGitHubApi = defineStore("gitHubApi", (): GitHubApiHook => {
 
     const onSuccess = () => {
       integrationsStore.validGitHubCredentials = true;
+      removeParams();
       callbacks.onSuccess?.();
     };
     const onError = (e: Error) => {

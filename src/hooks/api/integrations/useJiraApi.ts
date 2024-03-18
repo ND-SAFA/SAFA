@@ -8,7 +8,7 @@ import {
   JiraProjectSchema,
 } from "@/types";
 import { useApi, integrationsStore } from "@/hooks";
-import { getParam, QueryParams } from "@/router";
+import { getParam, QueryParams, removeParams } from "@/router";
 import {
   getJiraCredentials,
   getJiraProjects,
@@ -43,6 +43,8 @@ export const useJiraApi = defineStore("jiraApi", (): JiraApiHook => {
   async function handleVerifyCredentials(
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
+    if (integrationsStore.validJiraCredentials) return;
+
     const accessCode =
       getParam(QueryParams.TAB) === "jira"
         ? getParam(QueryParams.INTEGRATION_TOKEN)
@@ -50,6 +52,7 @@ export const useJiraApi = defineStore("jiraApi", (): JiraApiHook => {
 
     const onSuccess = () => {
       integrationsStore.validJiraCredentials = true;
+      removeParams();
       callbacks.onSuccess?.();
     };
     const onError = (e: Error) => {

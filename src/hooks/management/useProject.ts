@@ -1,5 +1,10 @@
 import { defineStore } from "pinia";
-import { IdentifierSchema, ProjectSchema, VersionSchema } from "@/types";
+import {
+  IdentifierSchema,
+  MinimalProjectSchema,
+  ProjectSchema,
+  VersionSchema,
+} from "@/types";
 import { buildProject, buildProjectIdentifier, removeMatches } from "@/util";
 import {
   attributesStore,
@@ -20,7 +25,7 @@ export const useProject = defineStore("project", {
     /**
      * The currently loaded project.
      */
-    project: buildProject(),
+    project: buildProject() as MinimalProjectSchema,
     /**
      * All projects the user has access to.
      */
@@ -113,7 +118,7 @@ export const useProject = defineStore("project", {
      *
      * @param project - The new project fields.
      */
-    updateProject(project: Partial<ProjectSchema>): void {
+    updateProject(project: Partial<MinimalProjectSchema>): void {
       this.project = {
         ...this.project,
         ...project,

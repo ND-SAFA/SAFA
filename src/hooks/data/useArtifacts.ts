@@ -9,13 +9,7 @@ import {
   removeMatches,
   standardizeValueArray,
 } from "@/util";
-import {
-  documentStore,
-  layoutStore,
-  projectStore,
-  timStore,
-  traceStore,
-} from "@/hooks";
+import { documentStore, layoutStore, timStore, traceStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -121,9 +115,6 @@ export const useArtifacts = defineStore("artifacts", {
         artifacts: updatedArtifacts,
         currentArtifactIds: documentStore.currentArtifactIds,
       });
-      projectStore.updateProject({
-        artifacts: updatedArtifacts,
-      });
     },
     /**
      * Adds a created artifact and updates the layout.
@@ -159,7 +150,6 @@ export const useArtifacts = defineStore("artifacts", {
           Object.entries(collectByField(allArtifacts, "type"))
         ),
       });
-      projectStore.updateProject({ artifacts: allArtifacts });
     },
     /**
      * Finds the given artifact by name.

@@ -140,4 +140,14 @@ export interface ProjectSchema extends IdentifierSchema {
   attributeLayouts?: AttributeLayoutSchema[];
 }
 
+/**
+ * Represents a minimal project schema, to ensure that the main project store does
+ * not have stale data retrieved from it. All omitted fields should be retrieved from their
+ * own respective stores.
+ */
+export type MinimalProjectSchema = Omit<
+  ProjectSchema,
+  "layout" | "artifacts" | "traces" | "artifactTypes" | "traceMatrices"
+>;
+
 export type VersionType = "major" | "minor" | "revision";

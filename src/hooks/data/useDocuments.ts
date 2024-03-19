@@ -9,7 +9,6 @@ import { buildDocument, DEFAULT_VIEW_NAME, removeMatches } from "@/util";
 import {
   subtreeStore,
   layoutStore,
-  projectStore,
   traceStore,
   artifactStore,
   selectionStore,
@@ -145,7 +144,6 @@ export const useDocuments = defineStore("documents", {
      * @param layout - The new layout to set.
      */
     updateBaseLayout(layout: LayoutPositionsSchema): void {
-      projectStore.updateProject({ layout });
       this.baseDocument.layout = layout;
 
       if (!this.isBaseDocument) return;

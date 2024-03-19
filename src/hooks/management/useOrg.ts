@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { OrganizationSchema, TransactionSchema } from "@/types";
 import { buildOrg, removeMatches } from "@/util";
+import { membersStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -50,6 +51,20 @@ export const useOrg = defineStore("org", {
     },
   },
   actions: {
+    /**
+     * Synchronizes loaded data for the current organization.
+     * @assumption The org has already been updated.
+     */
+    sync(
+      allTransactions: TransactionSchema[],
+      monthlyTransactions: TransactionSchema[]
+    ): void {
+      this.allTransactions = allTransactions;
+      this.monthlyTransactions = monthlyTransactions;
+
+      membersStore.initialize(this.org.members, "ORGANIZATION");
+      teamStore.initialize(this.org);
+    },
     /**
      * Adds an organization to the list of all organizations.
      * @param org - The organization to add.

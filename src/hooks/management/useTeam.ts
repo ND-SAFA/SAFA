@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 import { IdentifierSchema, OrganizationSchema, TeamSchema } from "@/types";
 import { buildTeam, removeMatches } from "@/util";
-import { permissionStore, sessionStore } from "@/hooks";
+import { membersStore, permissionStore, sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -41,6 +41,10 @@ export const useTeam = defineStore("team", {
     },
   },
   actions: {
+    /**
+     * Initializes the team with the given organization.
+     * @param org - The organization to initialize the team from.
+     */
     initialize(org: OrganizationSchema): void {
       this.allTeams = org.teams;
       this.team =
@@ -49,6 +53,15 @@ export const useTeam = defineStore("team", {
         ) ||
         org.teams[0] ||
         buildTeam();
+    },
+    /**
+     * Synchronizes loaded data for the current team.
+     * @assumption The team has already been updated.
+     */
+    sync(allProjects: IdentifierSchema[]): void {
+      this.allProjects = allProjects;
+
+      membersStore.initialize(this.team.members, "TEAM");
     },
     /**
      * Adds a team to the list of all teams.

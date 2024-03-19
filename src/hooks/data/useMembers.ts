@@ -2,40 +2,49 @@ import { defineStore } from "pinia";
 
 import { MemberEntitySchema, MembershipSchema, MembershipType } from "@/types";
 import { removeMatches } from "@/util";
-import { orgStore, projectStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
  * This module defines the state of the current project's members.
  */
 export const useMembers = defineStore("members", {
+  state: () => ({
+    /**
+     * @return The list of members and their roles in the current project.
+     */
+    members: [] as MembershipSchema[],
+    /**
+     * @return The list of members and their roles in the current organization.
+     */
+    orgMembers: [] as MembershipSchema[],
+    /**
+     * @return The list of members and their roles in the current team.
+     */
+    teamMembers: [] as MembershipSchema[],
+  }),
   getters: {
     /**
      * @return Active members of the project.
      */
     activeMembers(): MembershipSchema[] {
-      return projectStore.project.members.filter((m) => m.active);
-    },
-    /**
-     * @return The list of members and their roles in the current project.
-     */
-    members(): MembershipSchema[] {
-      return projectStore.project.members;
-    },
-    /**
-     * @return The list of members and their roles in the current organization.
-     */
-    orgMembers(): MembershipSchema[] {
-      return orgStore.org.members;
-    },
-    /**
-     * @return The list of members and their roles in the current team.
-     */
-    teamMembers(): MembershipSchema[] {
-      return teamStore.team.members;
+      return this.members.filter((m) => m.active);
     },
   },
   actions: {
+    /**
+     * Initializes the members of the current project, team, or org
+     * @param members - The members to initialize.
+     * @param type - The type of members to initialize.
+     */
+    initialize(members: MembershipSchema[], type: MembershipType): void {
+      if (type === "TEAM") {
+        this.teamMembers = members;
+      } else if (type === "ORGANIZATION") {
+        this.orgMembers = members;
+      } else {
+        this.members = members;
+      }
+    },
     /**
      * Returns members of a given type.
      * @param type - The type of members to return.
@@ -50,12 +59,15 @@ export const useMembers = defineStore("members", {
 
       return this.members;
     },
+    /**
+     * Updates which members are active on the current project.
+     * @param members - The members to update to active.
+     */
     setActiveMembers(members: MembershipSchema[]): void {
       const activeMemberIds = new Set(members.map((m) => m.email));
-      const currentMembers: MembershipSchema[] = projectStore.project.members;
-      projectStore.project.members = currentMembers.map((m) => {
-        m.active = activeMemberIds.has(m.email);
-        return m;
+
+      this.members.forEach((member) => {
+        member.active = activeMemberIds.has(member.email);
       });
     },
     /**
@@ -71,19 +83,17 @@ export const useMembers = defineStore("members", {
       const ids = updatedMembers.map((member) => member.id);
 
       if (entity.entityType === "PROJECT") {
-        projectStore.project.members = [
+        this.members = [
           ...removeMatches(this.members, "id", ids),
           ...updatedMembers,
         ];
-
-        projectStore.project.members = this.members;
       } else if (entity.entityType === "ORGANIZATION") {
-        orgStore.org.members = [
+        this.orgMembers = [
           ...removeMatches(this.orgMembers, "id", ids),
           ...updatedMembers,
         ];
       } else if (entity.entityType === "TEAM") {
-        teamStore.team.members = [
+        this.teamMembers = [
           ...removeMatches(this.teamMembers, "id", ids),
           ...updatedMembers,
         ];
@@ -97,21 +107,11 @@ export const useMembers = defineStore("members", {
      */
     deleteMembers(deletedMembers: string[], entity: MemberEntitySchema): void {
       if (entity.entityType === "PROJECT") {
-        projectStore.project.members = removeMatches(
-          this.members,
-          "id",
-          deletedMembers
-        );
-
-        projectStore.project.members = this.members;
+        this.members = removeMatches(this.members, "id", deletedMembers);
       } else if (entity.entityType === "ORGANIZATION") {
-        orgStore.org.members = removeMatches(
-          this.orgMembers,
-          "id",
-          deletedMembers
-        );
+        this.orgMembers = removeMatches(this.orgMembers, "id", deletedMembers);
       } else if (entity.entityType === "TEAM") {
-        teamStore.team.members = removeMatches(
+        this.teamMembers = removeMatches(
           this.teamMembers,
           "id",
           deletedMembers

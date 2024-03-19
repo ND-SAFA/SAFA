@@ -11,6 +11,7 @@ import {
   documentStore,
   layoutStore,
   logStore,
+  membersStore,
   selectionStore,
   subtreeStore,
   timStore,
@@ -136,6 +137,7 @@ export const useProject = defineStore("project", {
       subtreeStore.initializeProject(project);
       documentStore.initializeProject(project); // Must be after subtree store reset.
       attributesStore.initializeProject(project);
+      membersStore.initialize(project.members, "PROJECT");
     },
   },
 });

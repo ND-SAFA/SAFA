@@ -21,7 +21,7 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
     if (!teamStore.team.id) return;
 
     await getTeamApi.handleRequest(async () => {
-      teamStore.allProjects = await getTeamProjects(teamStore.team.id);
+      teamStore.sync(await getTeamProjects(teamStore.team.id));
     });
   }
 

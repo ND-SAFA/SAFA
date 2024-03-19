@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { computed, watch } from "vue";
 import { IOHandlerCallback, OrganizationSchema, OrgApiHook } from "@/types";
 import { buildOrg } from "@/util";
-import { logStore, orgStore, teamStore, useApi } from "@/hooks";
+import { logStore, orgStore, useApi } from "@/hooks";
 import {
   createOrganization,
   deleteOrganization,
@@ -31,14 +31,10 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
     await getOrgApi.handleRequest(async () => {
       await saveDefaultOrg(orgStore.org.id);
 
-      orgStore.allTransactions = await getAllBillingTransactions(
-        orgStore.org.id
+      orgStore.sync(
+        await getAllBillingTransactions(orgStore.org.id),
+        await getMonthlyBillingTransactions(orgStore.org.id)
       );
-      orgStore.monthlyTransactions = await getMonthlyBillingTransactions(
-        orgStore.org.id
-      );
-
-      teamStore.initialize(orgStore.org);
     });
   }
 

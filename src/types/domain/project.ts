@@ -153,6 +153,7 @@ export type MinimalProjectSchema = Omit<
   | "artifactTypes"
   | "traceMatrices"
   | "attributes"
+  | "attributeLayouts"
 >;
 
 export type VersionType = "major" | "minor" | "revision";

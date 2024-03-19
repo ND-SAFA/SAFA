@@ -14,14 +14,14 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { permissionStore, selectionStore, traceMatrixApiStore } from "@/hooks";
+import { permissionStore, timStore, traceMatrixApiStore } from "@/hooks";
 import { FlexBox, TextButton } from "@/components/common";
 
 /**
  * Attempts to delete the selected trace matrix.
  */
 function handleDelete(): void {
-  const traceMatrix = selectionStore.selectedTraceMatrix;
+  const traceMatrix = timStore.selectedTraceMatrix;
 
   if (!traceMatrix) return;
 

@@ -9,7 +9,7 @@ import {
   removeMatches,
   standardizeValueArray,
 } from "@/util";
-import { layoutStore, timStore, traceStore } from "@/hooks";
+import { layoutStore, selectionStore, timStore, traceStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -72,6 +72,20 @@ export const useArtifacts = defineStore("artifacts", {
       });
 
       return leaves;
+    },
+    /**
+     * @return The currently selected artifact.
+     */
+    selectedArtifact(): ArtifactSchema | undefined {
+      return this.artifactsById.get(selectionStore.selectedArtifactId);
+    },
+    /**
+     * @return The ids of artifacts that are in the viewport.
+     */
+    artifactsInView(): string[] {
+      return this.currentArtifacts
+        .filter((artifact) => selectionStore.isArtifactInView(artifact))
+        .map(({ id }) => id);
     },
   },
   actions: {

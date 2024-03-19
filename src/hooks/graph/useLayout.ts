@@ -9,11 +9,7 @@ import {
   CytoEvent,
   CSSCursor,
 } from "@/types";
-import {
-  LARGE_NODE_LAYOUT_COUNT,
-  GENERATION_SCORE_VALUES,
-  LARGE_NODE_COUNT,
-} from "@/util";
+import { LARGE_NODE_LAYOUT_COUNT, GENERATION_SCORE_VALUES } from "@/util";
 import { appStore, cyStore } from "@/hooks";
 import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
@@ -164,14 +160,10 @@ export const useLayout = defineStore("layout", {
      * - This action is skipped if the graph is too large.
      */
     applyAutomove(): void {
-      cyStore.getCy("project").then((cy) => {
-        const nodes = cy.nodes();
-
-        if (nodes.length > LARGE_NODE_COUNT) return;
-
+      cyStore.basedOnSize((cy) => {
         cy.automove("destroy");
 
-        nodes.forEach((node) => {
+        cy.nodes().forEach((node) => {
           const children = node
             .connectedEdges(`edge[source='${node.data().id}']`)
             .targets();
@@ -198,9 +190,7 @@ export const useLayout = defineStore("layout", {
      * - This action is skipped if the graph is too large.
      */
     styleGeneratedLinks(): void {
-      cyStore.getCy("project").then((cy) => {
-        if (cy.nodes().length > LARGE_NODE_COUNT) return;
-
+      cyStore.basedOnSize((cy) => {
         cy.edges(CYTO_CONFIG.GENERATED_LINK_SELECTOR).forEach((edge) => {
           const width =
             (edge.data().score >= GENERATION_SCORE_VALUES.HIGH

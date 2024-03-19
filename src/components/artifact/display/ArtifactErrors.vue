@@ -30,7 +30,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { selectionStore, warningStore } from "@/hooks";
+import { artifactStore, warningStore } from "@/hooks";
 import {
   Typography,
   PanelCard,
@@ -38,7 +38,7 @@ import {
   ExpansionItem,
 } from "@/components/common";
 
-const artifact = computed(() => selectionStore.selectedArtifact);
+const artifact = computed(() => artifactStore.selectedArtifact);
 
 const warnings = computed(() => {
   const id = artifact.value?.id || "";

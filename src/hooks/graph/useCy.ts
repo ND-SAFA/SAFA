@@ -15,7 +15,7 @@ import {
   EdgeHandleCore,
   ResolveCy,
 } from "@/types";
-import { getTraceId } from "@/util";
+import { getTraceId, LARGE_NODE_COUNT } from "@/util";
 import { appStore } from "@/hooks";
 import { CYTO_CONFIG } from "@/cytoscape";
 import { pinia } from "@/plugins";
@@ -35,25 +35,15 @@ export const useCy = defineStore("cy", {
     });
 
     return {
-      /**
-       * Wraps creator cytoscape instance in a promise until it is created.
-       */
+      /** Wraps creator cytoscape instance in a promise until it is created. */
       creatorResolveCy,
-      /**
-       * A promise for using the creator cy instance.
-       */
+      /** A promise for using the creator cy instance. */
       creatorCy,
-      /**
-       * Wraps project cytoscape instance in a promise until it is created.
-       */
+      /** Wraps project cytoscape instance in a promise until it is created. */
       projectResolveCy,
-      /**
-       * A promise for using the project cy instance.
-       */
+      /** A promise for using the project cy instance. */
       projectCy,
-      /**
-       * The edge handles link drawing plugin.
-       */
+      /** The edge handles link drawing plugin. */
       edgeHandles: undefined as EdgeHandleCore | undefined,
     };
   },
@@ -275,6 +265,26 @@ export const useCy = defineStore("cy", {
         addedEdge.remove();
         config.handleCreateTrace(source, target);
       }) as EventHandler);
+    },
+    /**
+     * Run different operations based on the project size.
+     * - Defaults to the large node count.
+     * @param smaller - The operation to run if the project is smaller than the given size.
+     * @param larger - The operation to run if the project is larger than the given size.
+     * @param size - The size to compare against.
+     */
+    basedOnSize(
+      smaller: (cy: CytoCore) => void,
+      larger?: (cy: CytoCore) => void,
+      size = LARGE_NODE_COUNT
+    ) {
+      this.getCy("project").then((cy) => {
+        if (cy.nodes().length > size) {
+          larger?.(cy);
+        } else {
+          smaller(cy);
+        }
+      });
     },
   },
 });

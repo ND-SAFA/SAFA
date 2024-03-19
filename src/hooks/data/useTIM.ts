@@ -16,6 +16,7 @@ import {
   sanitizeNodeId,
   sortArtifactTypes,
 } from "@/util";
+import { selectionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -39,6 +40,26 @@ export const useTIM = defineStore("tim", {
      */
     typeNames(): string[] {
       return this.artifactTypes.map(({ name }) => name);
+    },
+    /**
+     * @return The currently selected artifact level.
+     */
+    selectedArtifactLevel(): ArtifactTypeSchema | undefined {
+      return this.artifactTypes.find(
+        (type) => type.name === selectionStore.selectedArtifactLevelType
+      );
+    },
+    /**
+     * @return The currently selected trace matrix.
+     */
+    selectedTraceMatrix(): TraceMatrixSchema | undefined {
+      return this.traceMatrices.find(
+        ({ sourceType, targetType }) =>
+          sanitizeNodeId(sourceType) ===
+            selectionStore.selectedTraceMatrixTypes[0] &&
+          sanitizeNodeId(targetType) ===
+            selectionStore.selectedTraceMatrixTypes[1]
+      );
     },
   },
   actions: {

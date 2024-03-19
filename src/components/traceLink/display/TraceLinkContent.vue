@@ -51,11 +51,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { artifactStore, selectionStore } from "@/hooks";
+import { artifactStore, selectionStore, traceStore } from "@/hooks";
 import { AttributeChip, PanelCard, Typography } from "@/components/common";
 import { ArtifactBodyDisplay } from "@/components/artifact/display";
 
-const traceLink = computed(() => selectionStore.selectedTraceLink);
+const traceLink = computed(() => traceStore.selectedTraceLink);
 
 const sourceArtifact = computed(() =>
   artifactStore.getArtifactById(traceLink.value?.sourceId || "")

@@ -30,10 +30,10 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { appStore, selectionStore } from "@/hooks";
+import { appStore, artifactStore } from "@/hooks";
 import { Typography, TextButton, PanelCard } from "@/components/common";
 
-const artifact = computed(() => selectionStore.selectedArtifact);
+const artifact = computed(() => artifactStore.selectedArtifact);
 
 const body = computed(() => artifact.value?.body.trim() || "");
 

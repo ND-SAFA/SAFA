@@ -64,17 +64,21 @@ export default {
 import { computed, watch } from "vue";
 import {
   artifactGenerationApiStore,
+  artifactStore,
   permissionStore,
-  selectionStore,
 } from "@/hooks";
-import { Typography, FlexBox, TextButton } from "@/components/common";
-import TextInput from "@/components/common/input/TextInput.vue";
+import {
+  Typography,
+  FlexBox,
+  TextButton,
+  TextInput,
+} from "@/components/common";
 
 const displayActions = computed(() =>
   permissionStore.isAllowed("project.generate")
 );
 
-const artifact = computed(() => selectionStore.selectedArtifact);
+const artifact = computed(() => artifactStore.selectedArtifact);
 
 const generateConfirmation = computed(
   () => artifactGenerationApiStore.summaryGenConfirm

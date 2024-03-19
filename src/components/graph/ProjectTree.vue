@@ -119,7 +119,7 @@ const isInView = computed(() => !layoutStore.isTableMode);
 const isTreeMode = computed(() => layoutStore.isTreeMode);
 
 const artifacts = computed(() => artifactStore.currentArtifacts);
-const artifactsInView = computed(() => selectionStore.artifactsInView);
+const artifactsInView = computed(() => artifactStore.artifactsInView);
 
 const traceLinks = computed(() =>
   deltaStore.inDeltaView ? traceStore.currentTraces : traceStore.visibleTraces

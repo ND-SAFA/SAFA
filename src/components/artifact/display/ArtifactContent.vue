@@ -38,7 +38,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { selectionStore } from "@/hooks";
+import { artifactStore } from "@/hooks";
 import {
   Typography,
   PanelCard,
@@ -48,7 +48,7 @@ import {
 import { ArtifactSummary } from "@/components/artifact/save";
 import ArtifactNameDisplay from "./ArtifactNameDisplay.vue";
 
-const artifact = computed(() => selectionStore.selectedArtifact);
+const artifact = computed(() => artifactStore.selectedArtifact);
 const body = computed(() => artifact.value?.body.trim() || "");
 const isCode = computed(() => !!artifact.value?.isCode);
 const variant = computed(() => (isCode.value ? "code" : "expandable"));

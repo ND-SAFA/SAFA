@@ -175,7 +175,7 @@ watch(
 );
 
 watch(
-  () => selectionStore.selectedArtifact,
+  () => artifactStore.selectedArtifact,
   (artifact) => {
     if (
       !searchStore.basicSearchMode ||

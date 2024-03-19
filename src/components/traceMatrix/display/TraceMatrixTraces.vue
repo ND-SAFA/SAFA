@@ -37,12 +37,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import {
-  artifactStore,
-  selectionStore,
-  subtreeStore,
-  viewsStore,
-} from "@/hooks";
+import { artifactStore, subtreeStore, timStore, viewsStore } from "@/hooks";
 import {
   PanelCard,
   Typography,
@@ -52,7 +47,7 @@ import {
   AttributeChip,
 } from "@/components/common";
 
-const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
+const traceMatrix = computed(() => timStore.selectedTraceMatrix);
 
 const sourceType = computed(() => traceMatrix.value?.sourceType || "");
 const targetType = computed(() => traceMatrix.value?.targetType || "");

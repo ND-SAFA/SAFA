@@ -41,7 +41,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { appStore, selectionStore, timStore } from "@/hooks";
+import { appStore, timStore } from "@/hooks";
 import {
   PanelCard,
   TypeDirectionInput,
@@ -52,10 +52,10 @@ import {
   Icon,
   Separator,
   Typography,
+  TypeColorInput,
 } from "@/components/common";
-import TypeColorInput from "@/components/common/input/TypeColorInput.vue";
 
-const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
+const artifactLevel = computed(() => timStore.selectedArtifactLevel);
 const name = computed(() => artifactLevel.value?.name || "");
 const iconId = computed(() => timStore.getTypeIcon(name.value));
 const iconColor = computed(() => timStore.getTypeColor(name.value));

@@ -12,7 +12,7 @@ import {
   removeMatches,
   standardizeValueArray,
 } from "@/util";
-import { timStore, layoutStore } from "@/hooks";
+import { timStore, layoutStore, selectionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -39,6 +39,17 @@ export const useTraces = defineStore("traces", {
      */
     visibleTraces(): TraceLinkSchema[] {
       return this.currentTraces.filter((t) => t.approvalStatus != "DECLINED");
+    },
+    /**
+     * @return The currently selected trace link.
+     */
+    selectedTraceLink(): TraceLinkSchema | undefined {
+      return this.tracesById.get(
+        getTraceId(
+          selectionStore.selectedTraceLinkIds[0],
+          selectionStore.selectedTraceLinkIds[1]
+        )
+      );
     },
   },
   actions: {

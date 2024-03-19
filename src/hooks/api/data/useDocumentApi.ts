@@ -14,6 +14,7 @@ import {
   documentStore,
   projectStore,
   documentSaveStore,
+  artifactStore,
 } from "@/hooks";
 import {
   saveDocument,
@@ -120,7 +121,7 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
 
   async function handleReload(
     versionId = projectStore.versionId,
-    artifacts = projectStore.project.artifacts
+    artifacts = artifactStore.allArtifacts
   ): Promise<void> {
     await documentApi.handleRequest(async () => {
       const documents = await getDocuments(versionId);

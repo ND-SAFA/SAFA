@@ -83,7 +83,7 @@ export const useArtifactApi = defineStore(
             const createdArtifacts =
               await artifactCommitApiStore.handleCreate(artifact);
 
-            documentStore.addDocumentArtifacts(createdArtifacts[0].id);
+            documentStore.addDocumentArtifacts([createdArtifacts[0].id]);
             artifactStore.addCreatedArtifact(createdArtifacts[0]);
             selectionStore.selectArtifact(createdArtifacts[0].id);
 

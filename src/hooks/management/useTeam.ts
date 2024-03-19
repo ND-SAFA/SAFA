@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 
-import { IdentifierSchema, TeamSchema } from "@/types";
+import { IdentifierSchema, OrganizationSchema, TeamSchema } from "@/types";
 import { buildTeam, removeMatches } from "@/util";
-import { orgStore, permissionStore } from "@/hooks";
+import { permissionStore, sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -10,6 +10,10 @@ import { pinia } from "@/plugins";
  */
 export const useTeam = defineStore("team", {
   state: () => ({
+    /**
+     * All teams for the current org.
+     */
+    allTeams: [] as TeamSchema[],
     /**
      * The currently loaded team.
      */
@@ -27,38 +31,38 @@ export const useTeam = defineStore("team", {
       return this.team.id;
     },
     /**
-     * @return The current organization's teams.
-     */
-    allTeams(): TeamSchema[] {
-      return orgStore.org.teams;
-    },
-    /**
      * @return The current organization's teams that allow the current user
      * to create a project.
      */
     teamsWithCreateProject(): TeamSchema[] {
-      return orgStore.org.teams.filter((team) =>
+      return this.allTeams.filter((team) =>
         permissionStore.isAllowed("team.create_projects", team)
       );
     },
   },
   actions: {
+    initialize(org: OrganizationSchema): void {
+      this.allTeams = org.teams;
+      this.team =
+        org.teams.find(({ members = [] }) =>
+          members.find(({ email }) => email === sessionStore.userEmail)
+        ) ||
+        org.teams[0] ||
+        buildTeam();
+    },
     /**
      * Adds a team to the list of all teams.
      * @param team - The team to add.
      */
     addTeam(team: TeamSchema): void {
-      orgStore.org.teams = [
-        team,
-        ...removeMatches(this.allTeams, "id", [team.id]),
-      ];
+      this.allTeams = [team, ...removeMatches(this.allTeams, "id", [team.id])];
     },
     /**
      * Removes a team to the list of all teams.
      * @param team - The team to remove.
      */
     removeTeam(team: TeamSchema): void {
-      orgStore.org.teams = removeMatches(this.allTeams, "id", [team.id]);
+      this.allTeams = removeMatches(this.allTeams, "id", [team.id]);
 
       if (team.id === this.teamId) {
         this.team = this.allTeams[0] || buildTeam();

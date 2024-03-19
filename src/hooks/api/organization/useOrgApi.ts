@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { computed, watch } from "vue";
 import { IOHandlerCallback, OrganizationSchema, OrgApiHook } from "@/types";
 import { buildOrg } from "@/util";
-import { logStore, orgStore, sessionStore, teamStore, useApi } from "@/hooks";
+import { logStore, orgStore, teamStore, useApi } from "@/hooks";
 import {
   createOrganization,
   deleteOrganization,
@@ -38,10 +38,7 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
         orgStore.org.id
       );
 
-      teamStore.team =
-        orgStore.org.teams?.find(({ members = [] }) =>
-          members.find(({ email }) => email === sessionStore.userEmail)
-        ) || orgStore.org.teams[0];
+      teamStore.initialize(orgStore.org);
     });
   }
 

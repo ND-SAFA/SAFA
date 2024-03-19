@@ -147,7 +147,12 @@ export interface ProjectSchema extends IdentifierSchema {
  */
 export type MinimalProjectSchema = Omit<
   ProjectSchema,
-  "layout" | "artifacts" | "traces" | "artifactTypes" | "traceMatrices"
+  | "layout"
+  | "artifacts"
+  | "traces"
+  | "artifactTypes"
+  | "traceMatrices"
+  | "attributes"
 >;
 
 export type VersionType = "major" | "minor" | "revision";

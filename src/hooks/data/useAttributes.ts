@@ -57,8 +57,6 @@ export const useAttributes = defineStore("attributes", {
         ...removeMatches(this.attributes, "key", ids),
         ...updatedAttributes,
       ];
-
-      projectStore.project.attributes = this.attributes;
     },
     /**
      * Deletes from the stored custom attributes.
@@ -71,8 +69,6 @@ export const useAttributes = defineStore("attributes", {
         "key",
         deletedAttributes
       );
-
-      projectStore.project.attributes = this.attributes;
     },
 
     /**

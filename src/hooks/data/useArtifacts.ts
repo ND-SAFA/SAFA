@@ -9,7 +9,7 @@ import {
   removeMatches,
   standardizeValueArray,
 } from "@/util";
-import { documentStore, layoutStore, timStore, traceStore } from "@/hooks";
+import { layoutStore, timStore, traceStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -110,10 +110,21 @@ export const useArtifacts = defineStore("artifacts", {
         ...newArtifacts,
       ];
 
-      documentStore.addDocumentArtifacts(newIds);
-      this.initializeArtifacts({
-        artifacts: updatedArtifacts,
-        currentArtifactIds: documentStore.currentArtifactIds,
+      this.$patch({
+        allArtifacts: updatedArtifacts,
+        currentArtifacts: [
+          ...removeMatches(this.currentArtifacts, "id", newIds),
+          ...newArtifacts,
+        ],
+        artifactsById: new Map(
+          updatedArtifacts.map((artifact) => [artifact.id, artifact])
+        ),
+        artifactsByName: new Map(
+          updatedArtifacts.map((artifact) => [artifact.name, artifact])
+        ),
+        artifactsByType: new Map(
+          Object.entries(collectByField(updatedArtifacts, "type"))
+        ),
       });
     },
     /**

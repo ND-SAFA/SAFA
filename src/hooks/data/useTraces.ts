@@ -12,7 +12,7 @@ import {
   removeMatches,
   standardizeValueArray,
 } from "@/util";
-import { timStore, documentStore, layoutStore } from "@/hooks";
+import { timStore, layoutStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -77,9 +77,18 @@ export const useTraces = defineStore("traces", {
         ...newTraces,
       ];
 
-      this.initializeTraces({
-        traces: updatedTraces,
-        currentArtifactIds: documentStore.currentDocument.artifactIds,
+      this.$patch({
+        allTraces: updatedTraces,
+        currentTraces: [
+          ...removeMatches(this.currentTraces, "traceLinkId", newIds),
+          ...newTraces,
+        ],
+        tracesById: new Map(
+          updatedTraces.map((trace) => [
+            getTraceId(trace.sourceId, trace.targetId),
+            trace,
+          ])
+        ),
       });
       layoutStore.applyAutomove();
     },

@@ -11,9 +11,11 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.Price;
+import com.stripe.model.Product;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
+import com.stripe.param.ProductRetrieveParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,15 +39,15 @@ public class StripeService implements IExternalBillingService {
     @Value("${stripe.cancel_url}")
     private String cancelUrl;
 
-    @Value("${stripe.credit_price_key}")
-    private String creditPriceKey;
+    @Value("${stripe.credit_product_id}")
+    private String creditProductId;
 
     @Value("${stripe.webhook_key}")
     private String webhookSecret;
 
     private final BillingService billingService;
 
-    private final CachedValue<Long> priceOfCredit;
+    private final CachedValue<Price> priceOfCredit;
 
     public StripeService(@Value("${stripe.api_key}") String apiKey, @Lazy BillingService billingService) {
         this.billingService = billingService;
@@ -76,7 +78,7 @@ public class StripeService implements IExternalBillingService {
                 .addLineItem(
                     SessionCreateParams.LineItem.builder()
                         .setQuantity((long) transaction.getAmount())
-                        .setPrice(creditPriceKey)
+                        .setPrice(priceOfCredit.getValue().getId())
                         .build())
                 .setClientReferenceId(transaction.getId().toString())
                 .build();
@@ -111,7 +113,7 @@ public class StripeService implements IExternalBillingService {
     // spam Stripe with requests
     @Override
     public long getCreditPrice() {
-        return priceOfCredit.getValue();
+        return priceOfCredit.getValue().getUnitAmount();
     }
 
     /**
@@ -120,9 +122,15 @@ public class StripeService implements IExternalBillingService {
      *
      * @return The price of a credit according to stripe
      */
-    private long retrieveCreditPriceFromStripe() {
+    private Price retrieveCreditPriceFromStripe() {
         try {
-            return Price.retrieve(creditPriceKey).getUnitAmount();
+            ProductRetrieveParams params =
+                ProductRetrieveParams.builder()
+                    .addExpand("default_price")
+                    .build();
+
+            Product creditProduct = Product.retrieve(creditProductId, params, null);
+            return creditProduct.getDefaultPriceObject();
         } catch (StripeException e) {
             throw new SafaError("Failed to retrieve credit price from Stripe", e);
         }

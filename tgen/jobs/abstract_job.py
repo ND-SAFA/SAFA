@@ -6,6 +6,7 @@ import uuid
 from abc import abstractmethod
 from copy import deepcopy
 from inspect import getfullargspec
+
 from typing import Any, Dict, Type
 
 from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
@@ -17,10 +18,10 @@ from tgen.common.util.random_util import RandomUtil
 from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
 from tgen.common.util.status import Status
 from tgen.core.wb.wb_manager import WBManager
-from tgen.embeddings.model_cache import ModelCache
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager
+from tgen.relationship_manager.model_cache import ModelCache
 
 
 class AbstractJob(threading.Thread, BaseObject):

@@ -1,19 +1,19 @@
-from typing import Dict, List, Union
 from unittest import TestCase
 
 from sklearn.metrics.pairwise import cosine_similarity
+from typing import Dict, List, Union
 
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.common.constants.clustering_constants import DEFAULT_TESTING_CLUSTERING_METHODS
 from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
 from tgen.common.objects.artifact import Artifact
+from tgen.common.util.embedding_util import EmbeddingType
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
-from tgen.common.util.embedding_util import EmbeddingType
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class ClusteringTestUtil:

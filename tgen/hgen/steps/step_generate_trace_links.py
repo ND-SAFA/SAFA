@@ -75,7 +75,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         generation2id = {content: a_id for a_id, content in new_artifact_map.items()}
         subset_ids = list({a_id for a_ids in state.get_cluster2artifacts(ids_only=True).values() for a_id in a_ids})
         subset_ids += list(state.new_artifact_dataset.artifact_df.index)
-        state.embedding_manager.create_artifact_embeddings(artifact_ids=subset_ids)
+        state.embedding_manager.create_embeddings(artifact_ids=subset_ids)
         for cluster_id, generations in state.get_cluster2generation().items():
             parent_ids = [generation2id[generation] for generation in generations if
                           generation in generation2id]  # ignores if dup deleted already

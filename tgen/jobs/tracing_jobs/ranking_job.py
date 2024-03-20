@@ -19,9 +19,9 @@ from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil

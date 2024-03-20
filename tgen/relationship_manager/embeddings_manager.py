@@ -2,22 +2,26 @@ import logging
 import math
 import os
 import uuid
-from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+from typing import Any, Dict, List, Union
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
+from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.embedding_util import EmbeddingType, EmbeddingUtil, IdType
+from tgen.common.util.embedding_util import EmbeddingType, IdType
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.override import overrides
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.embeddings.model_cache import ModelCache
+from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
 
 
 class EmbeddingsManagerObjects(SupportedEnum):
@@ -26,11 +30,11 @@ class EmbeddingsManagerObjects(SupportedEnum):
     ORDERED_IDS = "ordered_ids"
 
 
-class EmbeddingsManager:
+class EmbeddingsManager(AbstractRelationshipManager):
     MODEL_MAP = {}
 
-    def __init__(self, content_map: Dict[str, str], model_name: str = None, model: SentenceTransformer = None,
-                 show_progress_bar: bool = True):
+    def __init__(self, content_map: Dict[str, str], model_name: str = DEFAULT_EMBEDDING_MODEL, model: SentenceTransformer = None,
+                 show_progress_bar: bool = True, create_embeddings_on_init: bool = False):
         """
         Initializes the embedding manager with the content used to create embeddings
         :param content_map: Maps id to the corresponding content
@@ -38,31 +42,16 @@ class EmbeddingsManager:
         :param model: The model to use to embed artifacts.
         :param show_progress_bar: Whether to show progress bar when calculating batches.
         """
-        assert model_name is not None or model is not None, f"Expected model or model name to be defined but got None for both."
-        self.model_name = model_name
-        self.show_progress_bar = show_progress_bar
-        self._content_map = content_map
         self._embedding_map = {}
         self.__ordered_ids = []
         self._base_path = None
-        self.__model = model
-        self.__state_changed_since_last_save = False
 
-    @staticmethod
-    def create_from_content(content_list: List[str], **kwargs) -> "EmbeddingsManager":
-        """
-        Creates embeddings manager mapping content in list to its embeddings.
-        :param content_list: The content list to create embeddings for.
-        :param kwargs: Keyword arguments passed to embeddings manager.
-        :return: EmbeddingsManager.
-        """
-        content_list = list(set(content_list))
-        content_map = {c: c for c in content_list}
-        embeddings_manager = EmbeddingsManager(content_map, **kwargs)
-        embeddings_manager.create_artifact_embeddings()
-        return embeddings_manager
+        super().__init__(model_name=model_name, show_progress_bar=show_progress_bar, content_map=content_map, model=model)
 
-    def create_artifact_embeddings(self, artifact_ids: List[str] = None, **kwargs) -> List[EmbeddingType]:
+        if create_embeddings_on_init:
+            self.create_embeddings()
+
+    def create_embeddings(self, artifact_ids: List[str] = None, **kwargs) -> List[EmbeddingType]:
         """
         Creates list of embeddings for each artifact.
         :param artifact_ids: The artifact ids to embed.
@@ -118,73 +107,30 @@ class EmbeddingsManager:
         """
         return self._embedding_map
 
-    def get_all_ids(self) -> List[Any]:
-        """
-        Gets a list of all ids present in the context map
-        :return: A list of all ids present in the context map
-        """
-        return list(self._content_map.keys())
-
-    def get_content(self, a_id: Any) -> str:
-        """
-        Gets the content associated with a given id
-        :param a_id: The id to get content for
-        :return: The content
-        """
-        return self._content_map.get(a_id)
-
-    def update_or_add_content(self, a_id: Any, content: str, create_embedding: bool = False) -> Optional[EmbeddingType]:
+    @overrides(AbstractRelationshipManager)
+    def update_or_add_content(self, a_id: Any, content: str) -> None:
         """
         Updates or adds new content for an id
         :param a_id: The id to update the content of
         :param content: The new content
-        :param create_embedding: If True, automatically creates a new embedding
-        :return: The embedding if one was created, else None
-        """
-        self._content_map[a_id] = content
-        if a_id in self._embedding_map:
-            self.__state_changed_since_last_save = True
-            self._embedding_map.pop(a_id)
-        if create_embedding:
-            return self.get_embedding(a_id)
-
-    def update_or_add_contents(self, content_map: Dict[Any, str], create_embedding: bool = False) -> Optional[
-        EmbeddingType]:
-        """
-        Updates or adds new content for all artifacts in teh map
-        :param content_map: Maps the id of the new or existing artifact to the its content
-        :param create_embedding: If True, automatically creates a new embedding
-        :return: The embeddings if created, else None
-        """
-        for a_id, content in content_map.items():
-            if a_id not in self._content_map or self._content_map[a_id] != content:
-                self.update_or_add_content(a_id=a_id, content=content, create_embedding=False)
-        if create_embedding:
-            return self.create_embedding_map(list(content_map.keys()))
-
-    def remove_artifacts(self, a_ids: Union[IdType, List[IdType]]) -> None:
-        """
-        Removes artifacts with ids from embeddings manager.
-        :param a_ids: IDs of the artifact to remove.
         :return: None
         """
-        if isinstance(a_ids, str):
-            a_ids = [a_ids]
-        for a_id in a_ids:
-            if a_id in self._content_map:
-                self._content_map.pop(a_id)
-            if a_id in self._embedding_map:
-                self._embedding_map.pop(a_id)
-                self.__state_changed_since_last_save = a_id in self.__ordered_ids
+        updated_artifact = super().update_or_add_content(a_id, content)
+        if a_id in self._embedding_map and updated_artifact:
+            self.__state_changed_since_last_save = True
+            self._embedding_map.pop(a_id)
 
-    def get_model(self) -> SentenceTransformer:
+    @overrides(AbstractRelationshipManager)
+    def remove_artifact(self, a_id: IdType) -> None:
         """
-        Returns sentence transformer model.
-        :return: The model.
+        Removes an artifact with ids from the manager.
+        :param a_id: ID of the artifact to remove.
+        :return: None
         """
-        if self.__model is None:
-            self.__model = ModelCache.get_model(self.model_name)
-        return self.__model
+        super().remove_artifact(a_id)
+        if a_id in self._embedding_map:
+            self._embedding_map.pop(a_id)
+            self.__state_changed_since_last_save = True
 
     def to_yaml(self, export_path: str) -> "EmbeddingsManager":
         """
@@ -196,12 +142,12 @@ class EmbeddingsManager:
         if self.embeddings_need_saved(export_path):
             self.save_embeddings_to_file(export_path)
         embedding_map_var = ReflectionUtil.extract_name_of_variable(f"{self._embedding_map=}", is_self_property=True)
-        model_var = ReflectionUtil.extract_name_of_variable(f"{self.__model=}", is_self_property=True,
-                                                            class_attr=EmbeddingsManager)
+        model_var = ReflectionUtil.extract_name_of_variable(f"{self._model=}", is_self_property=True,
+                                                            class_attr=AbstractRelationshipManager)
         content_map_var = ReflectionUtil.extract_name_of_variable(f"{self._content_map=}", is_self_property=True,
-                                                                  class_attr=EmbeddingsManager)
+                                                                  class_attr=AbstractRelationshipManager)
         ordered_ids_var = ReflectionUtil.extract_name_of_variable(f"{self.__ordered_ids=}", is_self_property=True,
-                                                                  class_attr=EmbeddingsManager)
+                                                                  class_attr=AbstractRelationshipManager)
         replacements = {embedding_map_var: {}, model_var: None, content_map_var: {}, ordered_ids_var: []}
         yaml_embeddings_manager.__dict__ = {k: (replacements[k] if k in replacements else v) for k, v in
                                             self.__dict__.items()}
@@ -322,44 +268,49 @@ class EmbeddingsManager:
         need_save = not self._base_path or self.__state_changed_since_last_save
         return need_save and len(self._embedding_map) > 0
 
-    def compare_embeddings(self, id1: str, id2: str) -> float:
-        """
-        Calculates the similarities between two embeddings.
-        :param id1: Id for first embedding.
-        :param id2: Id for second embedding.
-        :return: The similarity.
-        """
-        score = EmbeddingUtil.calculate_similarities([self.get_embedding(id1)], [self.get_embedding(id2)])[0][0]
-        return score
-
-    def calculate_centroid(self, cluster: List[str]):
+    def calculate_centroid(self, cluster: List[str], key_to_add_to_map: str = None):
         """
         Calculates the embedding pointing at the center of the cluster.
         :param cluster: The artifacts whose embeddings are used to calculate the centroid.
+        :param key_to_add_to_map: If provided, adds the centroid to the embedding and cluster map.
         :return: Embedding pointing at center of cluster.
         """
         if len(cluster) == 0:
             raise Exception("Cannot calculate center of empty cluster.")
         embeddings = [self.get_embedding(a_id) for a_id in cluster]
         centroid = np.sum(embeddings, axis=0) / len(cluster)
+        if key_to_add_to_map:
+            self._content_map[key_to_add_to_map] = EMPTY_STRING
+            self._embedding_map[key_to_add_to_map] = centroid
         return centroid
 
+    @overrides(AbstractRelationshipManager)
     def merge(self, other: "EmbeddingsManager") -> None:
         """
         Combines the embeddings and contents maps of the two embedding managers.
         :param other: The embedding manager to merge with.
         :return: None.
         """
-        self.update_or_add_contents(other._content_map, create_embedding=False)
+        super().merge(other)
         self._embedding_map.update(other._embedding_map)
 
-    def _get_default_artifact_ids(self, artifact_ids: List[str] = None):
+    def _compare_artifacts(self, ids1: List[str], ids2: List[str], **kwargs) -> float:
         """
-        Returns the artifact ids if not None otherwise return list of all artifact ids.
-        :param artifact_ids: Inputted artifact ids to evaluate.
-        :return: The artifact ids.
+        Calculates the similarities between two sets of artifacts.
+        :param ids1: List of ids to compare with ids2.
+        :param ids2: List of ids to compare with ids1.
+        :return: The scores between each artifact in ids1 with those in ids2.
         """
-        return artifact_ids if artifact_ids is not None else self._content_map.keys()
+        source_embeddings = self.get_embeddings(ids1, **kwargs)
+        target_embeddings = self.get_embeddings(ids2, **kwargs)
+        source_matrix = np.asarray(source_embeddings)
+        target_matrix = np.asarray(target_embeddings)
+        if source_matrix.shape[0] == 0:
+            raise Exception("Source matrix has no examples.")
+        if target_matrix.shape[0] == 0:
+            raise Exception("Target matrix has no examples.")
+        cluster_similarities = cosine_similarity(source_matrix, target_matrix)
+        return cluster_similarities
 
     def __encode(self, subset_ids: Union[List[Any], Any], include_ids: bool = False, **kwargs) -> List:
         """
@@ -393,11 +344,3 @@ class EmbeddingsManager:
         """
         ordered_ids = list(self._embedding_map.keys()) if not ordered_ids else ordered_ids
         self.__ordered_ids = ordered_ids
-
-    def __contains__(self, item: str) -> bool:
-        """
-        Returns True if the item is in the content map, else False.
-        :param item: The artifact id to check if it is in the content map.
-        :return: True if the item is in the content map, else False.
-        """
-        return item in self._content_map

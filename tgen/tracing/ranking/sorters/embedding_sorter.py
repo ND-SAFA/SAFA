@@ -1,8 +1,7 @@
 from typing import Dict, List
 
-from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
 
@@ -22,13 +21,11 @@ class EmbeddingSorter(iSorter):
         """
         if len(child_ids) == 0:
             return {p: [] for p in parent_ids}
-        children_embeddings = embedding_manager.create_artifact_embeddings(artifact_ids=child_ids, include_ids=True)
 
         parent2rankings = {}
         iterable = ListUtil.selective_tqdm(parent_ids, desc="Performing Ranking Via Embeddings")
         for parent_id in iterable:
-            parent_embedding = embedding_manager.get_embedding(parent_id)
-            scores = EmbeddingUtil.calculate_similarities([parent_embedding], children_embeddings)[0]
+            scores = embedding_manager.compare_artifacts([parent_id], child_ids)[0]
             scores = ListUtil.convert_numpy_array_to_native_types(scores)
 
             parent2rankings[parent_id] = RankingUtil.create_parent_child_ranking(zip(child_ids, scores), all_child_ids=set(child_ids),

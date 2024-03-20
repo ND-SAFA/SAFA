@@ -5,8 +5,8 @@ from typing import Dict, List, Optional, Union
 
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.state import State
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 

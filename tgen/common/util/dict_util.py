@@ -1,4 +1,5 @@
 from enum import Enum
+
 from typing import Any, Dict, Iterable, List, Set, Tuple, Type, TypeVar, Union
 
 from tgen.common.util.enum_util import EnumDict
@@ -186,6 +187,20 @@ class DictUtil:
         return orig_kwargs
 
     @staticmethod
+    def initialize_value_if_not_in_dict(mapping: Dict, item_key: Any, value: Any) -> bool:
+        """
+        Sets the value of the key if it is not in the mapping.
+        :param mapping: The mapping to add the value to.
+        :param item_key: The key to set.
+        :param value: The value to set the key to.
+        :return: True if the item did not exist so was initialized else False
+        """
+        if item_key not in mapping:
+            mapping[item_key] = value
+            return True
+        return False
+
+    @staticmethod
     def set_or_increment_count(mapping: Dict, item_key: Any, increment_value: int = 1) -> None:
         """
         Adds item to mapping if it does not exists, otherwise increments it.
@@ -194,9 +209,8 @@ class DictUtil:
         :param increment_value: The value to increment the count by if the key is in the dict.
         :return: None
         """
-        if item_key not in mapping:
-            mapping[item_key] = increment_value
-        else:
+        was_initialized = DictUtil.initialize_value_if_not_in_dict(mapping, item_key, increment_value)
+        if not was_initialized:
             mapping[item_key] += increment_value
 
     @staticmethod
@@ -209,8 +223,7 @@ class DictUtil:
         :param iterable_type: The type of iterable to use for the value
         :return: None
         """
-        if item_key not in mapping:
-            mapping[item_key] = iterable_type()
+        DictUtil.initialize_value_if_not_in_dict(mapping, item_key, iterable_type())
         if isinstance(item_value, iterable_type):
             for item in item_value:
                 DictUtil.set_or_append_item(mapping, item_key, item, iterable_type)

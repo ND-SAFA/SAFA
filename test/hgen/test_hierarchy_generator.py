@@ -8,7 +8,6 @@ import pandas as pd
 from test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import PipelineUtil
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -31,6 +30,7 @@ from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_libraries import mock_libraries
@@ -133,7 +133,7 @@ class TestHierarchyGenerator(BaseTest):
         for name in expected_names:
             self.assertIn(name, list(self.HGEN_STATE.all_artifacts_dataset.artifact_df.index))
 
-    @mock.patch.object(EmbeddingUtil, "calculate_similarities")
+    @mock.patch.object(EmbeddingsManager, "compare_artifacts")
     def assert_generate_trace_links_step(self, sim_mock: MagicMock, anthropic_ai_manager: TestAIManager, ):
         responses = []
         embedding_similarities = [0.8 for source in self.HGEN_STATE.source_dataset.artifact_df.index]

@@ -8,7 +8,7 @@ from sentence_transformers.SentenceTransformer import SentenceTransformer
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.testprojects.safa_test_project import SafaTestProject
@@ -49,7 +49,8 @@ class TestEmbeddingManager(BaseTest):
         original_embeddings = embedding_manager.create_embedding_map(["s1", "s2"])
         original_embeddings = {k: ListUtil.convert_numpy_array_to_native_types(v) for k, v in original_embeddings.items()}
         new_content_map = {"s1": "new content", "new_art": "some content", "s2": content_map["s2"]}
-        new_embeddings = embedding_manager.update_or_add_contents(new_content_map, create_embedding=True)
+        embedding_manager.update_or_add_contents(new_content_map)
+        new_embeddings = embedding_manager.create_embedding_map(subset_ids=new_content_map.keys())
         new_embeddings = {k: ListUtil.convert_numpy_array_to_native_types(v) for k, v in new_embeddings.items()}
         self.assertEqual(original_embeddings["s2"], new_embeddings["s2"])
         self.assertNotEqual(original_embeddings["s1"], new_embeddings["s1"])

@@ -13,13 +13,13 @@ from tgen.common.util.file_util import FileUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.common.content_generator import ContentGenerator
 from tgen.hgen.common.duplicate_detector import DuplicateDetector, DuplicateType
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingSorter
 

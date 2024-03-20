@@ -6,8 +6,8 @@ from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBE
 from tgen.common.constants.ranking_constants import PRE_SORTED_SCORE
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.keys.structure_keys import TraceKeys
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil

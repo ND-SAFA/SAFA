@@ -1,4 +1,5 @@
 from collections import Counter
+
 from typing import Dict, List, Set, Tuple
 
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
@@ -8,11 +9,11 @@ from tgen.common.util.dict_util import DictUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.common.duplicate_detector import DuplicateDetector, DuplicateType
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingSorter
@@ -34,7 +35,7 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         embeddings_manager = state.embedding_manager
 
         new_artifact_map = state.new_artifact_dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
-        embeddings_manager.update_or_add_contents(new_artifact_map, create_embedding=True)
+        embeddings_manager.update_or_add_contents(new_artifact_map)
 
         duplicate_detector = DuplicateDetector(embeddings_manager,
                                                duplicate_similarity_threshold=args.duplicate_similarity_threshold)
@@ -73,6 +74,7 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         """
         content_map = state.all_artifacts_dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS)
         state.embedding_manager.update_or_add_contents(content_map=content_map)
+        state.embedding_manager.create_embeddings(list(content_map.keys()))
         parent2selections = RankingUtil.group_trace_predictions(state.selected_predictions, TraceKeys.parent_label())
         strong_duplicates = {}
         dup2links = {}

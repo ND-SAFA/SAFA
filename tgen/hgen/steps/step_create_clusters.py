@@ -16,11 +16,11 @@ from tgen.common.util.pipeline_util import nested_pipeline
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):

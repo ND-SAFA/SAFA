@@ -1,12 +1,12 @@
 from collections import Counter
+
 from typing import List, Dict, Callable, Type, Any, Set, Tuple
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
 
@@ -126,7 +126,7 @@ class ClusterVotingSorter(iSorter):
         :param child: The id of the child.
         :return: The score between child and parent.
         """
-        sim_score = embedding_manager.compare_embeddings(parent, child)
+        sim_score = embedding_manager.compare_artifact(parent, child)
         vote_score = (votes / max_votes)
         score = 0 * sim_score + 1 * vote_score
         return score

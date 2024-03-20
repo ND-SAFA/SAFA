@@ -7,19 +7,17 @@ import {
   ProjectApiHook,
   ProjectSchema,
   TransferProjectSchema,
-  VersionSchema,
 } from "@/types";
 import { versionToString } from "@/util";
 import {
+  getProjectApiStore,
   identifierSaveStore,
-  logStore,
   projectStore,
   setProjectApiStore,
   useApi,
 } from "@/hooks";
 import {
   deleteProject,
-  deleteProjectVersion,
   getProjectFiles,
   createProject,
   editProject,
@@ -33,11 +31,9 @@ import { pinia } from "@/plugins";
 export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
   const saveProjectApi = useApi("saveProjectApi");
   const deleteProjectApi = useApi("deleteProjectApi");
-  const deleteVersionApi = useApi("deleteVersionApi");
 
   const saveProjectLoading = computed(() => saveProjectApi.loading);
   const deleteProjectLoading = computed(() => deleteProjectApi.loading);
-  const deleteVersionLoading = computed(() => deleteVersionApi.loading);
 
   async function handleSave(
     callbacks: IOHandlerCallback<ProjectSchema> = {}
@@ -87,9 +83,7 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
     });
   }
 
-  async function handleDeleteProject(
-    callbacks: IOHandlerCallback
-  ): Promise<void> {
+  async function handleDelete(callbacks: IOHandlerCallback): Promise<void> {
     const project = identifierSaveStore.baseIdentifier;
 
     if (!project) return;
@@ -98,12 +92,12 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
       async () => {
         await deleteProject(project.projectId);
 
-        projectStore.removeProject(project);
+        projectStore.removeProject(project, () =>
+          setProjectApiStore.handleClear()
+        );
 
-        if (project.name !== projectStore.project.name) return;
-
-        // Clear the current project if it has been deleted.
-        await setProjectApiStore.handleClear();
+        // Reload the list of projects.
+        await getProjectApiStore.handleReload();
       },
       {
         ...callbacks,
@@ -113,31 +107,7 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
     );
   }
 
-  function handleDeleteVersion(
-    version: VersionSchema,
-    callbacks: IOHandlerCallback
-  ): void {
-    const name = versionToString(version);
-
-    logStore.confirm(
-      `Delete Version`,
-      `Are you sure you would like to delete "${name}"?`,
-      async (isConfirmed: boolean) => {
-        if (!isConfirmed) return;
-
-        await deleteVersionApi.handleRequest(
-          async () => deleteProjectVersion(version.versionId),
-          {
-            ...callbacks,
-            success: `Version has been deleted: ${name}`,
-            error: `Unable to delete version: ${name}`,
-          }
-        );
-      }
-    );
-  }
-
-  async function handleTransferProject(
+  async function handleTransfer(
     newOwner: TransferProjectSchema,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
@@ -165,12 +135,10 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
   return {
     saveProjectLoading,
     deleteProjectLoading,
-    deleteVersionLoading,
     handleSave,
     handleDownload,
-    handleDeleteProject,
-    handleDeleteVersion,
-    handleTransferProject,
+    handleDelete,
+    handleTransfer,
   };
 });
 

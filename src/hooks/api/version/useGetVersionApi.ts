@@ -7,9 +7,11 @@ import {
   VersionSchema,
   GetVersionApiHook,
 } from "@/types";
+import { versionToString } from "@/util";
 import {
   artifactStore,
   documentStore,
+  logStore,
   projectStore,
   sessionStore,
   setProjectApiStore,
@@ -17,7 +19,11 @@ import {
   viewsStore,
 } from "@/hooks";
 import { navigateTo, QueryParams, Routes, router } from "@/router";
-import { getProjectVersion, getProjectVersions } from "@/api";
+import {
+  deleteProjectVersion,
+  getProjectVersion,
+  getProjectVersions,
+} from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -29,11 +35,13 @@ export const useGetVersionApi = defineStore(
   (): GetVersionApiHook => {
     const getVersionApi = useApi("getVersionApi");
     const loadVersionApi = useApi("loadVersionApi");
+    const deleteVersionApi = useApi("deleteVersionApi");
 
     const allVersions = ref<VersionSchema[]>([]);
 
     const getLoading = computed(() => getVersionApi.loading);
     const loadLoading = computed(() => loadVersionApi.loading);
+    const deleteLoading = computed(() => deleteVersionApi.loading);
 
     const currentProject = computed(() => projectStore.project);
     const currentVersion = computed({
@@ -121,6 +129,37 @@ export const useGetVersionApi = defineStore(
       await handleLoad(versions[0].versionId, undefined, false, callbacks);
     }
 
+    function handleDelete(
+      version: VersionSchema,
+      callbacks: IOHandlerCallback = {}
+    ): void {
+      const name = versionToString(version);
+
+      logStore.confirm(
+        `Delete Version`,
+        `Are you sure you would like to delete "${name}"?`,
+        async (isConfirmed: boolean) => {
+          if (!isConfirmed) return;
+
+          await deleteVersionApi.handleRequest(
+            async () => {
+              await deleteProjectVersion(version.versionId);
+              await handleReload();
+
+              if (currentVersion.value?.versionId === version.versionId) {
+                await handleLoad(allVersions.value[0].versionId);
+              }
+            },
+            {
+              ...callbacks,
+              success: `Version has been deleted: ${name}`,
+              error: `Unable to delete version: ${name}`,
+            }
+          );
+        }
+      );
+    }
+
     // Load the versions of the current project whenever the current project changes.
     watch(
       () => currentProject.value,
@@ -130,11 +169,13 @@ export const useGetVersionApi = defineStore(
     return {
       getLoading,
       loadLoading,
+      deleteLoading,
       allVersions,
       currentVersion,
       handleReload,
       handleLoad,
       handleLoadCurrent,
+      handleDelete,
     };
   }
 );

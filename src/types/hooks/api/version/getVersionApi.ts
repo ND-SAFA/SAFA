@@ -14,6 +14,10 @@ export interface GetVersionApiHook {
    */
   loadLoading: ComputedRef<boolean>;
   /**
+   * Whether the delete version request is loading.
+   */
+  deleteLoading: ComputedRef<boolean>;
+  /**
    * All versions for the currently loaded project.
    */
   allVersions: Ref<VersionSchema[]>;
@@ -59,4 +63,11 @@ export interface GetVersionApiHook {
     identifier: Pick<IdentifierSchema, "projectId">,
     callbacks?: IOHandlerCallback
   ): Promise<void>;
+  /**
+   * Deletes a version, updates app state, and logs the status.
+   *
+   * @param version - The version to delete.
+   * @param callbacks - Callbacks for the action.
+   */
+  handleDelete(version: VersionSchema, callbacks?: IOHandlerCallback): void;
 }

@@ -28,7 +28,7 @@
               :tooltip="`Delete ${versionToString(opt)}`"
               icon="delete"
               data-cy="button-version-delete"
-              @click="handleDelete(opt)"
+              @click="getVersionApiStore.handleDelete(opt)"
             />
           </flex-box>
         </template>
@@ -67,12 +67,7 @@ export default {
 import { computed, ref } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
-import {
-  getVersionApiStore,
-  permissionStore,
-  projectApiStore,
-  projectStore,
-} from "@/hooks";
+import { getVersionApiStore, permissionStore, projectStore } from "@/hooks";
 import { TextButton, ListItem, IconButton, FlexBox } from "@/components/common";
 import { CreateVersionModal } from "@/components/project/creator";
 
@@ -96,15 +91,5 @@ const deletable = computed(
 async function handleVersionCreated(version: VersionSchema): Promise<void> {
   openCreateVersion.value = false;
   await getVersionApiStore.handleLoad(version.versionId);
-}
-
-/**
- * Attempts to delete the version.
- * @param version - The version to delete.
- */
-function handleDelete(version: VersionSchema) {
-  projectApiStore.handleDeleteVersion(version, {
-    onSuccess: async () => getVersionApiStore.handleReload(),
-  });
 }
 </script>

@@ -39,12 +39,7 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { VersionSchema, VersionSelectorTableProps } from "@/types";
 import { actionsColumn, versionColumns } from "@/util";
-import {
-  projectApiStore,
-  getVersionApiStore,
-  projectStore,
-  permissionStore,
-} from "@/hooks";
+import { getVersionApiStore, projectStore, permissionStore } from "@/hooks";
 import { SelectorTable } from "@/components/common";
 import { CreateVersionModal } from "@/components/project/creator";
 
@@ -116,7 +111,7 @@ function handleAdd(version: VersionSchema) {
  * @param version - The version to delete.
  */
 function handleDelete(version: VersionSchema) {
-  projectApiStore.handleDeleteVersion(version, {
+  getVersionApiStore.handleDelete(version, {
     onSuccess: () => {
       versions.value = versions.value.filter(
         ({ versionId }) => versionId != version.versionId

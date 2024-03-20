@@ -108,11 +108,19 @@ export const useProject = defineStore("project", {
     /**
      * Removes a project to the list of all projects.
      * @param project - The project to remove.
+     * @param onCurrentRemoved - A callback to run if the current project is removed.
      */
-    removeProject(project: IdentifierSchema): void {
+    removeProject(
+      project: IdentifierSchema,
+      onCurrentRemoved?: () => void
+    ): void {
       this.allProjects = removeMatches(this.allProjects, "projectId", [
         project.projectId,
       ]);
+
+      if (project.projectId === this.projectId) {
+        onCurrentRemoved?.();
+      }
     },
     /**
      * Updates the current project.

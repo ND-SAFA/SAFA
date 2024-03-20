@@ -21,7 +21,9 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
       async () => {
         orgStore.allOrgs = await getOrganizations();
 
-        orgStore.org = (await getPersonalOrganization()) || orgStore.allOrgs[0];
+        orgStore.initialize(
+          (await getPersonalOrganization()) || orgStore.allOrgs[0]
+        );
       },
       {
         error: "Unable to load your current organization.",

@@ -82,12 +82,6 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
     );
   }
 
-  // Reload the current team's data when the team changes.
-  watch(
-    () => teamStore.team,
-    () => handleLoadState()
-  );
-
   return {
     currentTeam,
     saveTeamApiLoading,

@@ -60,7 +60,7 @@ export const useOrg = defineStore("org", {
 
       this.addOrg(org);
       membersStore.initialize(org.members, "ORGANIZATION");
-      teamStore.initialize(org);
+      teamStore.initializeOrg(org);
     },
     /**
      * Synchronizes loaded data for the current organization.
@@ -84,12 +84,17 @@ export const useOrg = defineStore("org", {
      * - If the organization is the current organization,
      *   the first organization in the list will be set as the current.
      * @param org - The organization to remove.
+     * @param onCurrentRemoved - The callback to call if the current organization is removed.
      */
-    removeOrg(org: OrganizationSchema): void {
+    removeOrg(
+      org: OrganizationSchema,
+      onCurrentRemoved?: (newOrg: OrganizationSchema) => void
+    ): void {
       this.allOrgs = removeMatches(this.allOrgs, "id", [org.id]);
 
       if (org.id === this.org.id) {
         this.org = this.allOrgs[0] || buildOrg();
+        onCurrentRemoved?.(this.org);
       }
     },
   },

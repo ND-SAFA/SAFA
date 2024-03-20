@@ -1,4 +1,4 @@
-import { defineStore, MutationType } from "pinia";
+import { defineStore } from "pinia";
 import { Frame } from "webstomp-client";
 
 import { watch } from "vue";

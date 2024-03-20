@@ -1,10 +1,16 @@
 import { ComputedRef } from "vue";
+import { WritableComputedRef } from "vue/dist/vue";
 import { IOHandlerCallback, TeamSchema } from "@/types";
 
 /**
  * A hook for calling team API endpoints.
  */
 export interface TeamApiHook {
+  /**
+   * The current selected team.
+   * @reactive Updates stores and loads related data.
+   */
+  currentTeam: WritableComputedRef<TeamSchema>;
   /**
    * Whether the save team request is loading.
    */

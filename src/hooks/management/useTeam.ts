@@ -42,26 +42,34 @@ export const useTeam = defineStore("team", {
   },
   actions: {
     /**
+     * Initializes the current team.
+     * @param team - The team to initialize.
+     */
+    initialize(team: TeamSchema): void {
+      this.team = team;
+
+      this.addTeam(team);
+      membersStore.initialize(team.members, "TEAM");
+    },
+    /**
      * Initializes the team with the given organization.
      * @param org - The organization to initialize the team from.
      */
-    initialize(org: OrganizationSchema): void {
+    initializeOrg(org: OrganizationSchema): void {
       this.allTeams = org.teams;
-      this.team =
+      this.initialize(
         org.teams.find(({ members = [] }) =>
           members.find(({ email }) => email === sessionStore.userEmail)
         ) ||
-        org.teams[0] ||
-        buildTeam();
+          org.teams[0] ||
+          buildTeam()
+      );
     },
     /**
      * Synchronizes loaded data for the current team.
-     * @assumption The team has already been updated.
      */
     sync(allProjects: IdentifierSchema[]): void {
       this.allProjects = allProjects;
-
-      membersStore.initialize(this.team.members, "TEAM");
     },
     /**
      * Adds a team to the list of all teams.
@@ -72,13 +80,21 @@ export const useTeam = defineStore("team", {
     },
     /**
      * Removes a team to the list of all teams.
+     * - If the team is the current team,
+     *   the first team in the list will be set as the current.
      * @param team - The team to remove.
+     * @param onCurrentRemoved - The callback to call if the current team is removed.
+     *
      */
-    removeTeam(team: TeamSchema): void {
+    removeTeam(
+      team: TeamSchema,
+      onCurrentRemoved?: (team: TeamSchema) => void
+    ): void {
       this.allTeams = removeMatches(this.allTeams, "id", [team.id]);
 
       if (team.id === this.teamId) {
         this.team = this.allTeams[0] || buildTeam();
+        onCurrentRemoved?.(this.team);
       }
     },
   },

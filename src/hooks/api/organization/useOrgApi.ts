@@ -2,8 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { IOHandlerCallback, OrganizationSchema, OrgApiHook } from "@/types";
-import { buildOrg } from "@/util";
-import { logStore, orgStore, useApi } from "@/hooks";
+import { logStore, orgStore, teamApiStore, useApi } from "@/hooks";
 import {
   createOrganization,
   deleteOrganization,
@@ -34,14 +33,20 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
     await getOrgApi.handleRequest(async () => {
       orgStore.initialize(org);
 
-      if (!org.id) return;
-
-      await saveDefaultOrg(org.id);
-      orgStore.sync(
-        await getAllBillingTransactions(org.id),
-        await getMonthlyBillingTransactions(org.id)
-      );
+      await handleLoadState();
     });
+  }
+
+  async function handleLoadState(): Promise<void> {
+    if (!orgStore.org.id) return;
+
+    await saveDefaultOrg(orgStore.org.id);
+    orgStore.sync(
+      await getAllBillingTransactions(orgStore.org.id),
+      await getMonthlyBillingTransactions(orgStore.org.id)
+    );
+
+    await teamApiStore.handleLoadState();
   }
 
   async function handleSave(
@@ -51,15 +56,9 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
     await saveOrgApi.handleRequest(
       async () => {
         if (!org.id) {
-          const createdOrg = await createOrganization(org);
-
-          orgStore.addOrg(createdOrg);
-          orgStore.org = createdOrg;
+          currentOrg.value = await createOrganization(org);
         } else {
-          const editedOrg = await editOrganization(org);
-
-          orgStore.addOrg(editedOrg);
-          orgStore.org = editedOrg;
+          orgStore.initialize(await editOrganization(org));
         }
       },
       {
@@ -85,13 +84,7 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
           async () => {
             await deleteOrganization(org);
 
-            orgStore.removeOrg(org);
-
-            if (orgStore.orgId !== org.id) return;
-
-            // Clear the current org if it was deleted.
-            orgStore.$reset();
-            await handleUpdate(orgStore.allOrgs[0] || buildOrg());
+            orgStore.removeOrg(org, (newOrg) => handleUpdate(newOrg));
           },
           {
             ...callbacks,

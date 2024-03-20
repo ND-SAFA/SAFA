@@ -9,7 +9,7 @@
         option-label="name"
       />
       <select-input
-        v-model="teamStore.team"
+        v-model="teamApiStore.currentTeam"
         label="Team"
         :options="teamStore.teamsWithCreateProject"
         class="full-width"
@@ -42,7 +42,13 @@ export default {
 
 <script setup lang="ts">
 import { ProjectIdentifierProps } from "@/types";
-import { orgApiStore, orgStore, teamStore, useVModel } from "@/hooks";
+import {
+  orgApiStore,
+  orgStore,
+  teamApiStore,
+  teamStore,
+  useVModel,
+} from "@/hooks";
 import { FlexBox, SelectInput, TextInput } from "@/components/common";
 
 const props = withDefaults(defineProps<ProjectIdentifierProps>(), {

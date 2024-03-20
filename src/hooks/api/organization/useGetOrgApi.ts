@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 
 import { GetOrgApiHook } from "@/types";
-import { orgApiStore, orgStore, sessionStore, useApi } from "@/hooks";
+import { orgApiStore, orgStore, useApi } from "@/hooks";
 import { getOrganizations, getPersonalOrganization } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -15,8 +15,6 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
   const loading = computed(() => getOrgApi.loading);
 
   async function handleLoadCurrent(): Promise<void> {
-    if (!sessionStore.doesSessionExist) return;
-
     await getOrgApi.handleRequest(
       async () => {
         orgStore.allOrgs = await getOrganizations();

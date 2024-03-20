@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import { IOHandlerCallback, TeamApiHook, TeamSchema } from "@/types";
 import { logStore, orgStore, teamStore, useApi } from "@/hooks";
 import { createTeam, deleteTeam, editTeam, getTeamProjects } from "@/api";

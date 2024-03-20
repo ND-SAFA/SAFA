@@ -21,8 +21,4 @@ export interface SetProjectApiHook {
    * @param project - Project created containing entities.
    */
   handleSet(project: ProjectSchema): Promise<void>;
-  /**
-   * Reloads the current project.
-   */
-  handleReload(): Promise<void>;
 }

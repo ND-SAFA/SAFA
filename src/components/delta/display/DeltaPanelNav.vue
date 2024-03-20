@@ -7,7 +7,7 @@
       label="Hide Delta View"
       icon="cancel"
       class="q-mb-md"
-      @click="handleClose"
+      @click="deltaApiStore.handleDisable()"
     />
     <select-input
       v-model="deltaVersion"
@@ -34,7 +34,7 @@ export default {
 import { computed } from "vue";
 import { VersionSchema } from "@/types";
 import { versionToString } from "@/util";
-import { deltaApiStore, deltaStore, setProjectApiStore } from "@/hooks";
+import { deltaApiStore, deltaStore } from "@/hooks";
 import { TextButton, PanelCard, SelectInput } from "@/components/common";
 
 const deltaVersion = computed({
@@ -53,12 +53,5 @@ const deltaVersion = computed({
  */
 function getVersionName(version: VersionSchema): string {
   return versionToString(version);
-}
-
-/**
- * Disables delta view.
- */
-function handleClose(): void {
-  setProjectApiStore.handleReload();
 }
 </script>

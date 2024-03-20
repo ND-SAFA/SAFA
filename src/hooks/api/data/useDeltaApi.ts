@@ -2,7 +2,13 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { DeltaApiHook, IOHandlerCallback, VersionSchema } from "@/types";
-import { useApi, deltaStore, projectStore, getVersionApiStore } from "@/hooks";
+import {
+  useApi,
+  deltaStore,
+  projectStore,
+  getVersionApiStore,
+  documentStore,
+} from "@/hooks";
 import { getProjectDelta } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -45,7 +51,15 @@ export const useDeltaApi = defineStore("deltaApi", (): DeltaApiHook => {
     );
   }
 
-  return { loading, deltaVersions, handleCreate };
+  async function handleDisable(): Promise<void> {
+    deltaStore.setIsDeltaViewEnabled(false);
+    await getVersionApiStore.handleLoad(
+      projectStore.versionId,
+      documentStore.currentDocument.documentId
+    );
+  }
+
+  return { loading, deltaVersions, handleCreate, handleDisable };
 });
 
 export default useDeltaApi(pinia);

@@ -9,7 +9,7 @@
     label="Version"
     :options="allVersions"
     option-value="versionId"
-    @popup-show="getVersionApiStore.handleReload"
+    @popup-show="getVersionApiStore.handleLoadVersions()"
   >
     <template #selected>
       {{ versionToString(getVersionApiStore.currentVersion) }}

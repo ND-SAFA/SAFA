@@ -53,7 +53,7 @@ export const useGetVersionApi = defineStore(
       },
     });
 
-    async function handleReload(
+    async function handleLoadVersions(
       projectId?: string,
       callbacks: IOHandlerCallback<VersionSchema[]> = {}
     ): Promise<void> {
@@ -144,7 +144,7 @@ export const useGetVersionApi = defineStore(
           await deleteVersionApi.handleRequest(
             async () => {
               await deleteProjectVersion(version.versionId);
-              await handleReload();
+              await handleLoadVersions();
 
               if (currentVersion.value?.versionId === version.versionId) {
                 await handleLoad(allVersions.value[0].versionId);
@@ -163,7 +163,7 @@ export const useGetVersionApi = defineStore(
     // Load the versions of the current project whenever the current project changes.
     watch(
       () => currentProject.value,
-      () => handleReload()
+      () => handleLoadVersions()
     );
 
     return {
@@ -172,7 +172,7 @@ export const useGetVersionApi = defineStore(
       deleteLoading,
       allVersions,
       currentVersion,
-      handleReload,
+      handleLoadVersions,
       handleLoad,
       handleLoadCurrent,
       handleDelete,

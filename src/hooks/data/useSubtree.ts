@@ -33,8 +33,13 @@ export const useSubtree = defineStore("subtrees", {
     /**
      * Updates the subtree map.
      */
-    initializeProject(project: ProjectSchema): void {
+    initializeProject(project: ProjectSchema, preserveHidden?: boolean): void {
       this.subtreeMap = project.subtrees;
+
+      if (preserveHidden) return;
+
+      this.hiddenSubtreeNodes = [];
+      this.collapsedParentNodes = [];
     },
     /**
      * Returns the subtree information of an artifact, creating one if none exists.

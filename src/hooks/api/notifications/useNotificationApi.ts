@@ -187,7 +187,7 @@ export const useNotificationApi = defineStore(
         case "LAYOUT":
           return documentStore.updateBaseLayout(project.layout);
         case "SUBTREES":
-          return subtreeStore.initializeProject(project);
+          return subtreeStore.initializeProject(project, true);
         case "ATTRIBUTES":
           return attributesStore.updateAttributes(project.attributes || []);
         case "ATTRIBUTE_LAYOUTS":

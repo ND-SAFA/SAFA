@@ -14,7 +14,7 @@ export interface IntegrationsApiHook {
    *
    * @param callbacks - Called once the action is complete.
    */
-  handleReload(callbacks?: IOHandlerCallback): Promise<void>;
+  handleLoadInstallations(callbacks?: IOHandlerCallback): Promise<void>;
   /**
    * Syncs the current project with the selected installation's data.
    *

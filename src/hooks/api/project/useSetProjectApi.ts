@@ -3,12 +3,9 @@ import { defineStore } from "pinia";
 import { ProjectSchema, SetProjectApiHook } from "@/types";
 import { buildProject } from "@/util";
 import {
-  deltaStore,
   documentStore,
-  getVersionApiStore,
   integrationsApiStore,
   projectStore,
-  subtreeStore,
   useApi,
 } from "@/hooks";
 import { QueryParams, removeParams, updateParam } from "@/router";
@@ -40,32 +37,20 @@ export const useSetProjectApi = defineStore(
       const project = buildProject();
 
       projectStore.initializeProject(project);
-      subtreeStore.$reset();
       await removeParams();
     }
 
     async function handleSet(project: ProjectSchema): Promise<void> {
       await setProjectApi.handleRequest(async () => {
-        const versionId = project.projectVersion?.versionId || "";
-
-        // Automatic update subscription set by `useNotificationApi`
         projectStore.initializeProject(project);
 
-        await integrationsApiStore.handleReload();
+        await integrationsApiStore.handleLoadInstallations();
         await handleSetCurrentDocument(project);
-        await updateParam(QueryParams.VERSION, versionId);
+        await updateParam(QueryParams.VERSION, projectStore.versionId);
       });
     }
 
-    async function handleReload(): Promise<void> {
-      deltaStore.setIsDeltaViewEnabled(false);
-      await getVersionApiStore.handleLoad(
-        projectStore.versionId,
-        documentStore.currentDocument.documentId
-      );
-    }
-
-    return { handleSetCurrentDocument, handleClear, handleSet, handleReload };
+    return { handleSetCurrentDocument, handleClear, handleSet };
   }
 );
 

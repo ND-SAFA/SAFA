@@ -33,7 +33,7 @@ export interface GetVersionApiHook {
    * @param projectId - The id of the project to load the versions of.
    * @param callbacks - Callbacks for the action.
    */
-  handleReload(
+  handleLoadVersions(
     projectId?: string,
     callbacks?: IOHandlerCallback<VersionSchema[]>
   ): Promise<void>;

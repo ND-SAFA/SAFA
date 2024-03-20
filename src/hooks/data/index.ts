@@ -3,8 +3,6 @@ export { default as timStore } from "./useTIM";
 export { default as artifactStore } from "./useArtifacts";
 export { default as traceStore } from "./useTraces";
 export { default as warningStore } from "./useWarnings";
-export { default as documentStore } from "./useDocuments";
-export { default as viewsStore } from "./useViews";
 export { default as commitStore } from "./useCommits";
 export { default as subtreeStore } from "./useSubtree";
 export { default as deltaStore } from "./useDelta";

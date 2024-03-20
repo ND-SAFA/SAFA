@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import {
   IdentifierSchema,
   IOHandlerCallback,
@@ -86,17 +86,8 @@ export const useGetVersionApi = defineStore(
 
           const project = await getProjectVersion(versionId);
 
-          if (
-            project.projectVersion &&
-            !allVersions.value.find(
-              ({ versionId }) => versionId === project.projectVersion?.versionId
-            )
-          ) {
-            // Add the current version to the list of versions if it is not already there.
-            allVersions.value = [project.projectVersion, ...allVersions.value];
-          }
-
           await setProjectApiStore.handleSet(project);
+          await handleLoadVersions();
 
           if (viewId) {
             // If a view is given, switch to the associated artifact or document.
@@ -159,12 +150,6 @@ export const useGetVersionApi = defineStore(
         }
       );
     }
-
-    // Load the versions of the current project whenever the current project changes.
-    watch(
-      () => currentProject.value,
-      () => handleLoadVersions()
-    );
 
     return {
       getLoading,

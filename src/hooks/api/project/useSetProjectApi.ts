@@ -44,13 +44,13 @@ export const useSetProjectApi = defineStore(
       await setProjectApi.handleRequest(async () => {
         projectStore.initializeProject(project);
 
-        await integrationsApiStore.handleLoadInstallations();
         await handleSetCurrentDocument(project);
         await updateParam(QueryParams.VERSION, projectStore.versionId);
+        await integrationsApiStore.handleLoadInstallations();
       });
     }
 
-    return { handleSetCurrentDocument, handleClear, handleSet };
+    return { handleClear, handleSet };
   }
 );
 

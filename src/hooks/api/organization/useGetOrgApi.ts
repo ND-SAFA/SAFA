@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 
 import { GetOrgApiHook } from "@/types";
-import { orgStore, sessionStore, useApi } from "@/hooks";
+import { orgApiStore, orgStore, sessionStore, useApi } from "@/hooks";
 import { getOrganizations, getPersonalOrganization } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -20,10 +20,8 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
     await getOrgApi.handleRequest(
       async () => {
         orgStore.allOrgs = await getOrganizations();
-
-        orgStore.initialize(
-          (await getPersonalOrganization()) || orgStore.allOrgs[0]
-        );
+        orgApiStore.currentOrg =
+          (await getPersonalOrganization()) || orgStore.allOrgs[0];
       },
       {
         error: "Unable to load your current organization.",

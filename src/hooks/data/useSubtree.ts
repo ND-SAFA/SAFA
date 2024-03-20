@@ -15,17 +15,11 @@ import { pinia } from "@/plugins";
  */
 export const useSubtree = defineStore("subtrees", {
   state: () => ({
-    /**
-     * A map containing root artifact names as keys and children names are values.
-     */
+    /** A map containing root artifact names as keys and children names are values. */
     subtreeMap: {} as SubtreeMapSchema,
-    /**
-     * List of artifact ids currently hidden within subtrees.
-     */
+    /** List of artifact ids currently hidden within subtrees. */
     hiddenSubtreeNodes: [] as string[],
-    /**
-     * List of artifact ids whose children are currently hidden.
-     */
+    /** List of artifact ids whose children are currently hidden. */
     collapsedParentNodes: [] as string[],
   }),
   getters: {},
@@ -288,7 +282,7 @@ export const useSubtree = defineStore("subtrees", {
     async restoreHiddenNodesAfter(cb: () => Promise<void>): Promise<void> {
       const collapsedParents = this.collapsedParentNodes;
 
-      await this.resetHiddenNodes();
+      this.resetHiddenNodes();
       await cb();
 
       for (const id of collapsedParents) {

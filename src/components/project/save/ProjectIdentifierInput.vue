@@ -2,7 +2,7 @@
   <div class="q-mx-auto long-input">
     <flex-box v-if="!props.isUpdate" b="4">
       <select-input
-        v-model="orgStore.org"
+        v-model="orgApiStore.currentOrg"
         label="Organization"
         :options="orgStore.allOrgs"
         class="q-mr-sm"
@@ -42,7 +42,7 @@ export default {
 
 <script setup lang="ts">
 import { ProjectIdentifierProps } from "@/types";
-import { orgStore, teamStore, useVModel } from "@/hooks";
+import { orgApiStore, orgStore, teamStore, useVModel } from "@/hooks";
 import { FlexBox, SelectInput, TextInput } from "@/components/common";
 
 const props = withDefaults(defineProps<ProjectIdentifierProps>(), {

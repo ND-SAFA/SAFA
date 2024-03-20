@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import { IOHandlerCallback, OrganizationSchema, OrgApiHook } from "@/types";
 import { buildOrg } from "@/util";
 import { logStore, orgStore, useApi } from "@/hooks";
@@ -25,15 +25,21 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
   const saveOrgApiLoading = computed(() => saveOrgApi.loading);
   const deleteOrgApiLoading = computed(() => deleteOrgApi.loading);
 
-  async function handleLoadState(): Promise<void> {
-    if (!orgStore.org.id) return;
+  const currentOrg = computed({
+    get: () => orgStore.org,
+    set: (org: OrganizationSchema) => handleUpdate(org),
+  });
 
+  async function handleUpdate(org: OrganizationSchema): Promise<void> {
     await getOrgApi.handleRequest(async () => {
-      await saveDefaultOrg(orgStore.org.id);
+      orgStore.initialize(org);
 
+      if (!org.id) return;
+
+      await saveDefaultOrg(org.id);
       orgStore.sync(
-        await getAllBillingTransactions(orgStore.org.id),
-        await getMonthlyBillingTransactions(orgStore.org.id)
+        await getAllBillingTransactions(org.id),
+        await getMonthlyBillingTransactions(org.id)
       );
     });
   }
@@ -85,7 +91,7 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
 
             // Clear the current org if it was deleted.
             orgStore.$reset();
-            orgStore.org = orgStore.allOrgs[0] || buildOrg();
+            await handleUpdate(orgStore.allOrgs[0] || buildOrg());
           },
           {
             ...callbacks,
@@ -97,13 +103,8 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
     );
   }
 
-  // Reload the current org's data when the org changes.
-  watch(
-    () => orgStore.org,
-    () => handleLoadState()
-  );
-
   return {
+    currentOrg,
     saveOrgApiLoading,
     deleteOrgApiLoading,
     handleSave,

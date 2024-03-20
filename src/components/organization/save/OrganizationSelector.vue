@@ -1,6 +1,6 @@
 <template>
   <q-select
-    v-model="orgStore.org"
+    v-model="orgApiStore.currentOrg"
     standout
     bg-color="transparent"
     class="nav-breadcrumb"
@@ -41,7 +41,7 @@ export default {
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { orgStore, permissionStore, saveOrgStore } from "@/hooks";
+import { orgApiStore, orgStore, permissionStore, saveOrgStore } from "@/hooks";
 import { Modal, TextButton } from "@/components/common";
 import { SaveOrganizationInputs } from "@/components/organization/save";
 

@@ -52,8 +52,18 @@ export const useOrg = defineStore("org", {
   },
   actions: {
     /**
+     * Initializes an organization.
+     * @param org - The organization to initialize.
+     */
+    initialize(org: OrganizationSchema): void {
+      this.org = org;
+
+      this.addOrg(org);
+      membersStore.initialize(org.members, "ORGANIZATION");
+      teamStore.initialize(org);
+    },
+    /**
      * Synchronizes loaded data for the current organization.
-     * @assumption The org has already been updated.
      */
     sync(
       allTransactions: TransactionSchema[],
@@ -61,9 +71,6 @@ export const useOrg = defineStore("org", {
     ): void {
       this.allTransactions = allTransactions;
       this.monthlyTransactions = monthlyTransactions;
-
-      membersStore.initialize(this.org.members, "ORGANIZATION");
-      teamStore.initialize(this.org);
     },
     /**
      * Adds an organization to the list of all organizations.

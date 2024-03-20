@@ -1,10 +1,15 @@
-import { ComputedRef } from "vue";
+import { ComputedRef, WritableComputedRef } from "vue";
 import { IOHandlerCallback, OrganizationSchema } from "@/types";
 
 /**
  * A hook for calling organization API endpoints.
  */
 export interface OrgApiHook {
+  /**
+   * The current selected organization.
+   * @reactive Updates stores and loads related data.
+   */
+  currentOrg: WritableComputedRef<OrganizationSchema>;
   /**
    * Whether the save organization request is loading.
    */

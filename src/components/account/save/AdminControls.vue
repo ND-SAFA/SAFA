@@ -33,7 +33,7 @@
     </expansion-item>
     <expansion-item label="Enable Generation">
       <select-input
-        v-model="orgStore.org"
+        v-model="orgApiStore.currentOrg"
         :options="orgStore.allOrgs"
         label="Organization"
         option-value="id"
@@ -76,6 +76,7 @@ export default {
 import { ref } from "vue";
 import {
   adminApiStore,
+  orgApiStore,
   orgStore,
   permissionStore,
   sessionApiStore,
@@ -86,8 +87,8 @@ import {
   Typography,
   ExpansionItem,
   TextInput,
+  SelectInput,
 } from "@/components/common";
-import SelectInput from "@/components/common/input/SelectInput.vue";
 
 const adminCreateEmail = ref("");
 const adminCreatePassword = ref("");

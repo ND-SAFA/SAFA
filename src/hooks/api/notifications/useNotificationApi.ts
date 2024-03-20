@@ -1,6 +1,7 @@
 import { defineStore, MutationType } from "pinia";
 import { Frame } from "webstomp-client";
 
+import { watch } from "vue";
 import {
   ActionType,
   ArtifactSchema,
@@ -243,30 +244,6 @@ export const useNotificationApi = defineStore(
     }
 
     /**
-     * Change the current project subscribed to when the project changes.
-     */
-    projectStore.$subscribe((mutation) => {
-      if (mutation.type === MutationType.direct) {
-        if (mutation.events?.key === "project") {
-          const oldProject: ProjectSchema = mutation.events.oldValue;
-          const newProject: ProjectSchema = mutation.events.newValue;
-          const oldProjectVersion = oldProject.projectVersion?.versionId || "";
-          const newProjectVersion = newProject.projectVersion?.versionId || "";
-
-          if (newProjectVersion && oldProjectVersion !== newProjectVersion) {
-            handleSubscribeVersion(
-              newProject.projectId,
-              newProjectVersion
-            ).then();
-          } else if (!newProjectVersion && oldProjectVersion) {
-            // no project selected, clear subscriptions
-            clearProjectSubscriptions().then();
-          }
-        }
-      }
-    });
-
-    /**
      * Clears subscriptions to project and related versions.
      */
     async function clearProjectSubscriptions() {
@@ -276,6 +253,25 @@ export const useNotificationApi = defineStore(
       );
       await stompApiStore.unsubscribe(projectSubscriptions);
     }
+
+    /**
+     * Change the current project subscribed to when the project changes.
+     */
+    watch(
+      () => projectStore.project,
+      async (newProject, oldProject) => {
+        const oldProjectVersion = oldProject.projectVersion?.versionId || "";
+        const newProjectVersion = newProject.projectVersion?.versionId || "";
+
+        if (newProjectVersion && oldProjectVersion !== newProjectVersion) {
+          // Subscribe to the new project version.
+          await handleSubscribeVersion(newProject.projectId, newProjectVersion);
+        } else if (!newProjectVersion && oldProjectVersion) {
+          // If project is selected, clear subscriptions.
+          await clearProjectSubscriptions();
+        }
+      }
+    );
 
     return { handleSubscribeVersion };
   }

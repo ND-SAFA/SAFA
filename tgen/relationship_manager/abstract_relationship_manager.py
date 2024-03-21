@@ -6,7 +6,7 @@ from sentence_transformers import SentenceTransformer
 from typing import Any, Dict, List, Union
 
 from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.embedding_util import IdType
+from tgen.relationship_manager.embedding_types import IdType
 from tgen.relationship_manager.model_cache import ModelCache
 
 
@@ -174,6 +174,15 @@ class AbstractRelationshipManager:
         if not (self.relationship_exists(id1, id2)):
             relationship_score = self._compare_artifacts([id1], [id2], **kwargs)[0][0]
             self.add_relationship(id1, id2, relationship_score)
+        return self.get_relationship(id1, id2)
+
+    def get_relationship(self, id1, id2):
+        """
+        Gets the relationship score between artifact with id1 and artifact with id2.
+        :param id1: The id of the first artifact in the relationship.
+        :param id2: The id of the second artifact in the relationship.
+        :return: The relationship score between artifact with id1 and artifact with id2.
+        """
         return self._relationship_map[id1][id2]
 
     def relationship_exists(self, id1: str, id2: str) -> bool:
@@ -192,15 +201,6 @@ class AbstractRelationshipManager:
         :return: The artifact ids.
         """
         return artifact_ids if artifact_ids is not None else self._content_map.keys()
-
-    @abstractmethod
-    def _compare_artifact(self, id1: str, id2: str) -> float:
-        """
-        Compares the two artifacts.
-        :param id1: Id for first artifact.
-        :param id2: Id for second artifact.
-        :return: The comparison score.
-        """
 
     @abstractmethod
     def _compare_artifacts(self, ids1: List[str], ids2: List[str], **kwargs) -> np.array:

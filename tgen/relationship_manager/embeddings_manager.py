@@ -13,7 +13,6 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.embedding_util import EmbeddingType, IdType
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.override import overrides
@@ -22,6 +21,7 @@ from tgen.common.util.str_util import StrUtil
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
+from tgen.relationship_manager.embedding_types import EmbeddingType, IdType
 
 
 class EmbeddingsManagerObjects(SupportedEnum):

@@ -8,11 +8,11 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.common.constants.clustering_constants import DEFAULT_TESTING_CLUSTERING_METHODS
 from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.embedding_util import EmbeddingType
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
+from tgen.relationship_manager.embedding_types import EmbeddingType
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 

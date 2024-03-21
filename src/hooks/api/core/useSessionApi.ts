@@ -83,15 +83,21 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     user: UserPasswordSchema,
     verified?: boolean
   ): Promise<void> {
-    await sessionApi.handleRequest(async () => {
-      if (verified) {
-        await createVerifiedUser(user);
-      } else {
-        await createUser(user);
-      }
+    await sessionApi.handleRequest(
+      async () => {
+        if (verified) {
+          await createVerifiedUser(user);
+        } else {
+          await createUser(user);
+        }
 
-      createdAccount.value = true;
-    });
+        createdAccount.value = true;
+      },
+      {
+        success: "Your account has been created.",
+        error: "Unable to create your account.",
+      }
+    );
   }
 
   async function handleVerifyAccount(token: string): Promise<void> {

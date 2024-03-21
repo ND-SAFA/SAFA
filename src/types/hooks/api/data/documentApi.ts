@@ -1,4 +1,5 @@
 import { ComputedRef } from "vue/dist/vue";
+import { WritableComputedRef } from "vue";
 import {
   ArtifactSchema,
   DocumentSchema,
@@ -14,6 +15,11 @@ export interface DocumentApiHook {
    * Whether any document request is loading.
    */
   loading: ComputedRef<boolean>;
+  /**
+   * The current loaded document.
+   * - Reactively loads the current document when set.
+   */
+  currentDocument: WritableComputedRef<DocumentSchema>;
   /**
    * Creates a new document and updates app state.
    *

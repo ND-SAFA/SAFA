@@ -33,6 +33,15 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
 
   const loading = computed(() => documentApi.loading);
 
+  const currentDocument = computed({
+    get() {
+      return documentStore.currentDocument;
+    },
+    set(document) {
+      handleSwitch(document);
+    },
+  });
+
   async function handleCreate(
     name: string,
     type: DocumentType,
@@ -169,6 +178,7 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
 
   return {
     loading,
+    currentDocument,
     handleCreate,
     handleCreatePreset,
     handleUpdate,

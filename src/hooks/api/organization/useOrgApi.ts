@@ -33,11 +33,11 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
     await getOrgApi.handleRequest(async () => {
       orgStore.initialize(org);
 
-      await handleLoadState();
+      await handleLoadTransactions();
     });
   }
 
-  async function handleLoadState(): Promise<void> {
+  async function handleLoadTransactions(): Promise<void> {
     if (!orgStore.org.id) return;
 
     await saveDefaultOrg(orgStore.org.id);
@@ -46,7 +46,7 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
       await getMonthlyBillingTransactions(orgStore.org.id)
     );
 
-    await teamApiStore.handleLoadState();
+    await teamApiStore.handleLoadProjects();
   }
 
   async function handleSave(

@@ -67,7 +67,7 @@ function handleSave(): void {
     onSuccess: async () => {
       emit("save");
 
-      await getProjectApiStore.handleReload();
+      await getProjectApiStore.handleLoadProjects();
     },
   });
 }

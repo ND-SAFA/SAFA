@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import {
   IdentifierSchema,
   IOHandlerCallback,
@@ -37,13 +37,18 @@ export const useGetVersionApi = defineStore(
     const loadVersionApi = useApi("loadVersionApi");
     const deleteVersionApi = useApi("deleteVersionApi");
 
-    const allVersions = ref<VersionSchema[]>([]);
-
     const getLoading = computed(() => getVersionApi.loading);
     const loadLoading = computed(() => loadVersionApi.loading);
     const deleteLoading = computed(() => deleteVersionApi.loading);
 
-    const currentProject = computed(() => projectStore.project);
+    const currentProject = computed({
+      get: () => (projectStore.projectId ? projectStore.project : undefined),
+      set(identifier: IdentifierSchema | undefined) {
+        if (!identifier) return;
+
+        handleLoadCurrent(identifier);
+      },
+    });
     const currentVersion = computed({
       get: () => projectStore.version,
       set(version: VersionSchema | undefined) {
@@ -63,7 +68,7 @@ export const useGetVersionApi = defineStore(
         const versions = id ? await getProjectVersions(id) : [];
 
         if (!projectId) {
-          allVersions.value = versions;
+          projectStore.allVersions = versions;
         }
 
         return versions;
@@ -135,11 +140,10 @@ export const useGetVersionApi = defineStore(
           await deleteVersionApi.handleRequest(
             async () => {
               await deleteProjectVersion(version.versionId);
-              await handleLoadVersions();
 
-              if (currentVersion.value?.versionId === version.versionId) {
-                await handleLoad(allVersions.value[0].versionId);
-              }
+              projectStore.removeVersion(version, (newVersion) =>
+                handleLoad(newVersion.versionId)
+              );
             },
             {
               ...callbacks,
@@ -155,7 +159,7 @@ export const useGetVersionApi = defineStore(
       getLoading,
       loadLoading,
       deleteLoading,
-      allVersions,
+      currentProject,
       currentVersion,
       handleLoadVersions,
       handleLoad,

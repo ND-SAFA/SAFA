@@ -23,7 +23,7 @@ export const useDeltaApi = defineStore("deltaApi", (): DeltaApiHook => {
   const deltaVersions = computed(() => {
     const currentVersionId = projectStore.version?.versionId;
 
-    return getVersionApiStore.allVersions.filter(
+    return projectStore.allVersions.filter(
       ({ versionId }) => versionId !== currentVersionId
     );
   });

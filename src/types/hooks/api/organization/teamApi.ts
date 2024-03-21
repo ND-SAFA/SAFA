@@ -22,7 +22,7 @@ export interface TeamApiHook {
   /**
    * Loads the projects for the current team.
    */
-  handleLoadState(): Promise<void>;
+  handleLoadProjects(): Promise<void>;
   /**
    * Creates a new team or updates an existing one.
    *

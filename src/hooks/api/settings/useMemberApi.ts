@@ -136,7 +136,7 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
           async () => {
             await deleteMember(member);
             membersStore.deleteMembers([member.id], member);
-            await getProjectApiStore.handleReload();
+            await getProjectApiStore.handleLoadProjects();
           },
           {
             success: `Deleted a member: ${member.email}`,

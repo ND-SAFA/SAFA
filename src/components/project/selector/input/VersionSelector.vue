@@ -73,7 +73,7 @@ import { CreateVersionModal } from "@/components/project/creator";
 
 const openCreateVersion = ref(false);
 
-const allVersions = computed(() => getVersionApiStore.allVersions);
+const allVersions = computed(() => projectStore.allVersions);
 const project = computed(() => projectStore.project);
 const isProjectDefined = computed(() => projectStore.isProjectDefined);
 

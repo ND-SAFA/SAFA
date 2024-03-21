@@ -25,10 +25,10 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
   async function handleUpdate(team: TeamSchema): Promise<void> {
     teamStore.initialize(team);
 
-    await handleLoadState();
+    await handleLoadProjects();
   }
 
-  async function handleLoadState(): Promise<void> {
+  async function handleLoadProjects(): Promise<void> {
     if (!teamStore.team.id) return;
 
     await getTeamApi.handleRequest(async () => {
@@ -86,7 +86,7 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
     currentTeam,
     saveTeamApiLoading,
     deleteTeamApiLoading,
-    handleLoadState,
+    handleLoadProjects,
     handleSave,
     handleDelete,
   };

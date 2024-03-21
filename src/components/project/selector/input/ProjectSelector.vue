@@ -1,6 +1,6 @@
 <template>
   <q-select
-    v-model="getProjectApiStore.currentProject"
+    v-model="getVersionApiStore.currentProject"
     standout
     bg-color="transparent"
     class="nav-breadcrumb"
@@ -100,6 +100,6 @@ const entity = computed(
 function handleReload() {
   projectInviteId.value = undefined;
 
-  getProjectApiStore.handleReload();
+  getProjectApiStore.handleLoadProjects();
 }
 </script>

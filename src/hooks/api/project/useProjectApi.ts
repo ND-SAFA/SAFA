@@ -96,8 +96,7 @@ export const useProjectApi = defineStore("projectApi", (): ProjectApiHook => {
           setProjectApiStore.handleClear()
         );
 
-        // Reload the list of projects.
-        await getProjectApiStore.handleReload();
+        await getProjectApiStore.handleLoadProjects();
       },
       {
         ...callbacks,

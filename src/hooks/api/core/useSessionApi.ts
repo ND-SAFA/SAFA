@@ -70,7 +70,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
 
     await getOrgApiStore.handleLoadCurrent();
     await onboardingApiStore.handleLoadOnboardingState();
-    await getProjectApiStore.handleReload({});
+    await getProjectApiStore.handleLoadProjects();
   }
 
   function handleReset(): void {

@@ -1,4 +1,4 @@
-import { ComputedRef, Ref, WritableComputedRef } from "vue";
+import { ComputedRef, WritableComputedRef } from "vue";
 import { IdentifierSchema, IOHandlerCallback, VersionSchema } from "@/types";
 
 /**
@@ -18,9 +18,10 @@ export interface GetVersionApiHook {
    */
   deleteLoading: ComputedRef<boolean>;
   /**
-   * All versions for the currently loaded project.
+   * The current loaded project.
+   * - Reactively loads the current project when set.
    */
-  allVersions: Ref<VersionSchema[]>;
+  currentProject: WritableComputedRef<IdentifierSchema | undefined>;
   /**
    * The currently loaded project version.
    * - Reactively loads a new project version when updated.

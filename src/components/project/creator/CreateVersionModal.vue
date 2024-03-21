@@ -66,7 +66,7 @@ function nextVersion(type: VersionType): string {
     return "X.X.X";
   }
 
-  const { majorVersion, minorVersion, revision } = projectStore.version;
+  const { majorVersion, minorVersion, revision } = projectStore.allVersions[0];
 
   switch (type) {
     case "major":

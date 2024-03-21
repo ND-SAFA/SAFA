@@ -31,6 +31,10 @@ export const useProject = defineStore("project", {
      * All projects the user has access to.
      */
     allProjects: [] as IdentifierSchema[],
+    /**
+     * All versions for the currently loaded project.
+     */
+    allVersions: [] as VersionSchema[],
   }),
   getters: {
     /**
@@ -132,6 +136,24 @@ export const useProject = defineStore("project", {
         ...this.project,
         ...project,
       };
+    },
+    /**
+     * Removes a version to the list of all versions.
+     * @param version - The version to remove.
+     * @param onCurrentRemoved - A callback to run if the current version is removed.
+     */
+    removeVersion(
+      version: VersionSchema,
+      onCurrentRemoved?: (newVersion: VersionSchema) => void
+    ): void {
+      this.allVersions = removeMatches(this.allVersions, "versionId", [
+        version.versionId,
+      ]);
+
+      if (version.versionId === this.versionId) {
+        this.project.projectVersion = this.allVersions[0];
+        onCurrentRemoved?.(this.project.projectVersion);
+      }
     },
     /**
      * Initializes the current project.

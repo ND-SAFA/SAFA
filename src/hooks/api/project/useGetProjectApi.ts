@@ -1,11 +1,7 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
-import {
-  GetProjectApiHook,
-  IdentifierSchema,
-  IOHandlerCallback,
-} from "@/types";
+import { GetProjectApiHook, IOHandlerCallback } from "@/types";
 import { getVersionApiStore, projectStore, useApi } from "@/hooks";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { getCurrentVersion, getProjects } from "@/api";
@@ -21,16 +17,7 @@ export const useGetProjectApi = defineStore(
 
     const loading = computed(() => getProjectApi.loading);
 
-    const currentProject = computed({
-      get: () => (projectStore.projectId ? projectStore.project : undefined),
-      set(identifier: IdentifierSchema | undefined) {
-        if (!identifier) return;
-
-        getVersionApiStore.handleLoadCurrent(identifier);
-      },
-    });
-
-    async function handleReload(
+    async function handleLoadProjects(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       await getProjectApi.handleRequest(
@@ -64,8 +51,7 @@ export const useGetProjectApi = defineStore(
 
     return {
       loading,
-      currentProject,
-      handleReload,
+      handleLoadProjects,
       handleLoadRecent,
     };
   }

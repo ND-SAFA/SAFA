@@ -5,6 +5,7 @@
       v-model="currentStep"
       :steps="steps"
       :minimal="props.minimal"
+      :loading="getVersionApiStore.loadLoading"
       data-cy="project-version-stepper"
       @submit="handleSubmit"
     >

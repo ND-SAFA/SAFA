@@ -42,9 +42,29 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { onboardingStore } from "@/hooks";
 import { FlexBox, Icon, ListItem } from "@/components/common";
 
+const progress = ref("");
+const progressTimer = ref<ReturnType<typeof setTimeout> | undefined>();
+
 const uploadedJob = computed(() => onboardingStore.uploadedJob);
+
+function updateProgress() {
+  progress.value = onboardingStore.uploadProgress;
+
+  if (uploadedJob.value?.status !== "IN_PROGRESS") return;
+
+  if (progressTimer.value) clearTimeout(progressTimer.value);
+
+  progressTimer.value = setTimeout(() => updateProgress(), 60 * 1000);
+}
+
+onMounted(() => updateProgress());
+
+watch(
+  () => uploadedJob.value,
+  () => updateProgress()
+);
 </script>

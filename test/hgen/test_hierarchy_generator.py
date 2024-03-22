@@ -143,7 +143,8 @@ class TestHierarchyGenerator(BaseTest):
         anthropic_ai_manager.add_responses(responses)
         anthropic_ai_manager.mock_summarization()
 
-        sim_mock.return_value = [[np.float32(sim) for sim in embedding_similarities]]
+        sim_mock.return_value = np.array(
+            [np.array([np.float32(sim) for sim in embedding_similarities]) for i in new_artifact_names])
         step = GenerateTraceLinksStep()
         step.run(self.HGEN_ARGS, self.HGEN_STATE)
 

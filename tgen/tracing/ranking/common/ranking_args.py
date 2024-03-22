@@ -14,7 +14,7 @@ from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.pipeline_args import PipelineArgs
-from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
+from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
 from tgen.tracing.ranking.filters.supported_filters import SupportedFilter
 from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
@@ -101,9 +101,9 @@ class RankingArgs(PipelineArgs):
      """
     weight_of_embedding_scores: float = DEFAULT_EMBEDDINGS_SCORE_WEIGHT
     """
-    - embeddings_manager: If provided, will be used in the sorting step if using an embedding sorter
+    - relationship_manager: If provided, will be used in the sorting step if using an transformer sorter
     """
-    embeddings_manager: EmbeddingsManager = None
+    relationship_manager: AbstractRelationshipManager = None
 
     def save(self, obj: Any, file_name: str) -> str:
         """

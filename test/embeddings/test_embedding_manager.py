@@ -39,9 +39,9 @@ class TestEmbeddingManager(BaseTest):
         for a_id, embedding in original_embeddings.items():
             self.assertIn(a_id, loaded_embeddings)
             self.assertEqual(list(embedding), list(loaded_embeddings[a_id]))
-        self.assertFalse(loaded_manager.embeddings_need_saved(os.path.join(TEST_OUTPUT_DIR, key)))
+        self.assertFalse(loaded_manager.need_saved(os.path.join(TEST_OUTPUT_DIR, key)))
         loaded_manager.update_or_add_content("s1", "something new")
-        self.assertTrue(loaded_manager.embeddings_need_saved(os.path.join(TEST_OUTPUT_DIR, key)))
+        self.assertTrue(loaded_manager.need_saved(os.path.join(TEST_OUTPUT_DIR, key)))
 
     @mock.patch.object(SentenceTransformer, "encode")
     def test_update_or_add_contents(self, encode_mock: MagicMock):

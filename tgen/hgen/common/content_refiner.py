@@ -21,7 +21,7 @@ from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingSorter
+from tgen.tracing.ranking.sorters.transformer_sorter import TransformerSorter
 
 
 class ContentRefiner:
@@ -144,9 +144,9 @@ class ContentRefiner:
         :param link_threshold: The threshold above which a child is selected as related to parent.
         :return: None (selections added to parent2children dict)
         """
-        parent2ranking = EmbeddingSorter.sort(parent_ids=candidate_parents,
-                                              child_ids=candidate_children,
-                                              embedding_manager=embedding_manager, return_scores=True)
+        parent2ranking = TransformerSorter.sort(parent_ids=candidate_parents,
+                                                child_ids=candidate_children,
+                                                relationship_manager=embedding_manager, return_scores=True)
         all_trace_preds: List[Trace] = [RankingUtil.create_entry(p_id, child, score) for p_id, (children, scores) in
                                         parent2ranking.items() for child, score in zip(children, scores)]
         RankingUtil.normalized_scores_based_on_parent(all_trace_preds)
@@ -172,9 +172,9 @@ class ContentRefiner:
         for cluster_id, child_artifact_ids in cluster2children.items():
             parent_ids = [content2id[parent] for parent in cluster2parents[cluster_id]]
             # switching parent and child so that we can grab best parent for child this time
-            child2parents = EmbeddingSorter.sort(parent_ids=child_artifact_ids,
-                                                 child_ids=parent_ids,
-                                                 embedding_manager=state.embedding_manager, return_scores=False)
+            child2parents = TransformerSorter.sort(parent_ids=child_artifact_ids,
+                                                   child_ids=parent_ids,
+                                                   relationship_manager=state.embedding_manager, return_scores=False)
             for child, parents in child2parents.items():
                 DictUtil.set_or_append_item(dup_artifact_to_related_sources, parents[0], child, set)
         return dup_artifact_to_related_sources

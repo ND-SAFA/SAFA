@@ -25,7 +25,7 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         :param skip_summarization: Whether to skip summarization of artifacts.
         """
         super().__init__(args, EmbeddingRankingPipeline.steps, skip_summarization=skip_summarization, no_project_summary=True)
-        self.state.embedding_manager = args.embeddings_manager
+        self.state.relationship_manager = args.relationship_manager
 
     def state_class(self) -> RankingState:
         """
@@ -39,7 +39,7 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
 
         :return: List of parents mapped to their ranked children.
         """
-        self.args.sorter = SupportedSorter.EMBEDDING.name
+        self.args.sorter = SupportedSorter.TRANSFORMER.name
         super().run()
 
     def get_input_output_counts(self) -> Dict[str, int]:

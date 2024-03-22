@@ -16,7 +16,7 @@ from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
-from tgen.tracing.ranking.sorters.embedding_sorter import EmbeddingSorter
+from tgen.tracing.ranking.sorters.transformer_sorter import TransformerSorter
 
 
 class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -81,9 +81,9 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         for dup_id, related_dups in duplicate_map.items():
             selected_traces = parent2selections[dup_id]
             candidate_children = [trace[TraceKeys.child_label()] for trace in selected_traces]
-            parent_rankings = EmbeddingSorter.sort([dup_id, *related_dups], candidate_children,
-                                                   embedding_manager=state.embedding_manager,
-                                                   return_scores=True)
+            parent_rankings = TransformerSorter.sort([dup_id, *related_dups], candidate_children,
+                                                     relationship_manager=state.embedding_manager,
+                                                     return_scores=True)
             dup_scores = parent_rankings.pop(dup_id)
             baseline = {child: score for child, score in zip(dup_scores[0], dup_scores[1])}
 
@@ -160,8 +160,8 @@ class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):
         :param min_score: The minimum similarity score to allow.
         :return: The most similar parent, if its score reaches a minimum threshold.
         """
-        sorted_parents, sorted_scores = EmbeddingSorter.sort([artifact_id], potential_parents,
-                                                             embedding_manager=embeddings_manager,
-                                                             return_scores=True)[artifact_id]
+        sorted_parents, sorted_scores = TransformerSorter.sort([artifact_id], potential_parents,
+                                                               embedding_manager=embeddings_manager,
+                                                               return_scores=True)[artifact_id]
         top_parent, top_parent_score = sorted_parents[0], sorted_scores[0]
         return top_parent

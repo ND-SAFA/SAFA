@@ -1,7 +1,7 @@
 import json
 from copy import deepcopy
 
-from typing import Dict, Tuple, Union
+from typing import Dict, Union, List
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
@@ -25,7 +25,7 @@ class RankingChunkJob(AbstractJob):
     MIN_THRESHOLD = 0.85
 
     def __init__(self, dataset_creator: PromptDatasetCreator = None, dataset: PromptDataset = None,
-                 layer_ids: Tuple[str, str] = None, **kwargs):
+                 layer_ids: List[str] = None, **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param dataset_creator: Creates the dataset to rank.
@@ -50,7 +50,7 @@ class RankingChunkJob(AbstractJob):
         logger.log_with_title("Starting regular ranking job.")
         base_ranking_kwargs = DictUtil.update_kwarg_values(
             self.ranking_kwargs, selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD_NORMALIZED_CHILDREN,
-            link_threshold=RankingChunkJob.MIN_THRESHOLD, )
+            link_threshold=RankingChunkJob.MIN_THRESHOLD)
         base_ranking_job = self.create_ranking_job(**base_ranking_kwargs)
         base_results = base_ranking_job.run()
 
@@ -58,12 +58,12 @@ class RankingChunkJob(AbstractJob):
 
         # RANKING WITH CHUNKS
         logger.log_with_title("Starting ranking job with Chunks.")
-        chunk_ranking_job = self.create_ranking_job(use_chunks=True, embeddings_manager=base_ranking_job.embedding_manager,
+        chunk_ranking_job = self.create_ranking_job(use_chunks=True, relationship_manager=base_ranking_job.relationship_manager,
                                                     **with_filter_kwargs)
         chunk_results: JobResult = chunk_ranking_job.run()
 
         # TODO clean this up once we stop experimenting
-        job_results = {"Base": base_results, "Chunks": chunk_results}
+        job_results = {"Chunks": chunk_results, "Base": base_results}
 
         for job_type, job_result in deepcopy(job_results).items():
             if job_result.status != Status.SUCCESS:

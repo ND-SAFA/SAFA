@@ -73,7 +73,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         state.source_dataset.artifact_df.add_artifact(DUP_SOURCE_ARTIFACT, content,
                                                       self.HGEN_ARGS.source_layer_ids[0])
 
-        state.embedding_manager.update_or_add_content(DUP_SOURCE_ARTIFACT, content)
+        state.relationship_manager.update_or_add_content(DUP_SOURCE_ARTIFACT, content)
         DictUtil.get_value_by_index(state.get_cluster2generation()).append(dup_content)
 
         original_link = EnumDict({TraceKeys.child_label(): DUP_SOURCE_ARTIFACT,

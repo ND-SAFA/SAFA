@@ -1,8 +1,7 @@
 export const ONBOARDING_SUPPORT_LINK =
   "https://calendly.com/agulaya/safa-support-call";
 
-export const ONBOARDING_MEET_LINK =
-  "https://calendly.com/agulaya/safa-alignment-call";
+export const ONBOARDING_MEET_LINK = "https://www.safa.ai/contactus";
 
 export const ONBOARDING_GITHUB_IMPORT = `
   To import code, you will need to connect to our GitHub integration,

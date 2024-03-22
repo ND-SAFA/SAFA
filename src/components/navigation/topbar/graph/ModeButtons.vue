@@ -114,6 +114,8 @@ function handleTimView(): void {
  */
 function handleTreeView(): void {
   layoutStore.mode = "tree";
+
+  appStore.closeSidePanels();
 }
 
 /**
@@ -121,6 +123,8 @@ function handleTreeView(): void {
  */
 function handleTableView(): void {
   layoutStore.mode = "table";
+
+  appStore.closeSidePanels();
 }
 /**
  * Opens delta view.

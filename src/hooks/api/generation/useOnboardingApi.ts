@@ -16,6 +16,7 @@ import {
   permissionStore,
   projectApiStore,
   projectStore,
+  setProjectApiStore,
   useApi,
 } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
@@ -95,8 +96,10 @@ export const useOnboardingApi = defineStore(
       onboardingStore.open = true;
       onboardingStore.error = false;
       onboardingStore.ignoreCurrentJobs = true;
+      onboardingStore.generationCompleted = false;
       onboardingStore.step = 1;
       onboardingStore.steps.forEach((step) => (step.done = false));
+      await setProjectApiStore.handleClear();
       await handleUpdateOnboardingStatus({
         completed: false,
         projectId: "",

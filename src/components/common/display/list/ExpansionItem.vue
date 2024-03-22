@@ -9,7 +9,7 @@
         {{ label }}
       </q-item-section>
     </template>
-    <q-card class="q-my-md">
+    <q-card class="q-my-md transparent">
       <slot />
     </q-card>
   </q-expansion-item>

@@ -3,7 +3,11 @@ package edu.nd.crc.safa.test.features.organizations;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
 import edu.nd.crc.safa.features.generation.summary.ProjectSummaryService;
@@ -29,9 +33,12 @@ public class TestPaymentTierPermissionCheck extends ApplicationBaseTest {
 
     private ProjectVersion projectVersion;
 
+    private final static String projectName = "projectName";
+
     @BeforeEach
     public void setup() {
-        projectVersion = rootBuilder.getActionBuilder().createProjectWithVersion(getCurrentUser());
+
+        projectVersion = dbEntityBuilder.newProject(projectName).newVersionWithReturn(projectName);
     }
 
     @Test
@@ -50,7 +57,16 @@ public class TestPaymentTierPermissionCheck extends ApplicationBaseTest {
         defaultOrg.setPaymentTier(PaymentTier.AS_NEEDED);
         serviceProvider.getOrganizationService().updateOrganization(defaultOrg);
 
+        String typeName = "type";
+        String artifactName = "artifact";
+        ArtifactVersion artifactVersion =
+            dbEntityBuilder.newType(projectName, typeName)
+                .newArtifact(projectName, typeName, artifactName)
+                .newArtifactBodyWithReturn(projectName, 0, ModificationType.ADDED, artifactName, "summary", "content");
+
         HGenRequest body = new HGenRequest();
+        body.setArtifacts(List.of(artifactVersion.getEntityVersionId()));
+        body.setTargetTypes(List.of("newType"));
         JSONObject response = SafaRequest.withRoute(AppRoutes.HGen.GENERATE)
             .withVersion(projectVersion)
             .postWithJsonObject(body, status().is4xxClientError());

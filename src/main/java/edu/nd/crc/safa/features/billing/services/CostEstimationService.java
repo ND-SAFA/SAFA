@@ -13,7 +13,7 @@ public class CostEstimationService {
      * @return The number of credits the run will use
      */
     public int estimateHgen(int numArtifacts, int numLayers) {
-        return (int) Math.ceil(numArtifacts * (2 - (1 / Math.pow(2, numLayers - 1))));
+        return (int) Math.ceil(numArtifacts * (2 - (1 / Math.pow(2, numLayers))));
     }
 
 }

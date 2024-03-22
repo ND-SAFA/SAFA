@@ -40,12 +40,6 @@ export const useArtifacts = defineStore("artifacts", {
   }),
   getters: {
     /**
-     * @return The flattened artifacts for the current document.
-     */
-    flatArtifacts(): FlatArtifact[] {
-      return this.currentArtifacts.map(flattenArtifact);
-    },
-    /**
      * @return Whether the current document has a large number of artifacts,
      * in which case certain graph features are optimized and disabled.
      */
@@ -202,6 +196,16 @@ export const useArtifacts = defineStore("artifacts", {
      */
     getArtifactsByType(type: string): ArtifactSchema[] {
       return this.artifactsByType.get(type) || [];
+    },
+    /**
+     * Returns flattened artifacts for display.
+     * @param allArtifacts - Whether to return all artifacts, or just the current document's.
+     * @return The flattened artifacts.
+     */
+    getFlatArtifacts(allArtifacts?: boolean): FlatArtifact[] {
+      return allArtifacts
+        ? this.allArtifacts.map(flattenArtifact)
+        : this.currentArtifacts.map(flattenArtifact);
     },
   },
 });

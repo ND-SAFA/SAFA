@@ -58,6 +58,22 @@
           data-cy="input-delta-type"
           b=""
         />
+        <q-btn-group
+          v-if="!documentStore.isBaseDocument"
+          flat
+          class="q-mx-sm nav-mode-select"
+        >
+          <text-button
+            label="Current View"
+            v-bind="buttonProps('view')"
+            @click="showAll = false"
+          />
+          <text-button
+            label="All Artifacts"
+            v-bind="buttonProps('all')"
+            @click="showAll = true"
+          />
+        </q-btn-group>
       </template>
 
       <template #body-expanded="{ row }">
@@ -115,6 +131,7 @@ import {
   artifactStore,
   attributesStore,
   deltaStore,
+  documentStore,
   selectionStore,
   subtreeStore,
   timStore,
@@ -130,6 +147,7 @@ import {
   ArtifactContentDisplay,
   ArtifactNameDisplay,
 } from "@/components/artifact/display";
+import TextButton from "@/components/common/button/TextButton.vue";
 import ArtifactTableRowActions from "./ArtifactTableRowActions.vue";
 
 const customCells: (keyof FlatArtifact | string)[] = [
@@ -152,6 +170,7 @@ const inDeltaView = computed(() => deltaStore.inDeltaView);
 const typeOptions = computed(() => timStore.typeNames);
 
 const expanded = ref<string[]>([]);
+const showAll = ref(false);
 
 const columns = computed(() => [
   ...artifactColumns,
@@ -160,7 +179,21 @@ const columns = computed(() => [
   actionsColumn,
 ]);
 
-const rows = computed(() => artifactStore.flatArtifacts);
+const rows = computed(() => artifactStore.getFlatArtifacts(showAll.value));
+
+/**
+ * Returns props for a mode button.
+ * @param mode - The mode button to get props for.
+ */
+function buttonProps(mode: "all" | "view") {
+  const selected = mode === "all" ? showAll.value : !showAll.value;
+
+  return {
+    text: !selected,
+    outlined: selected,
+    color: "text",
+  };
+}
 
 /**
  * Filters out rows that don't match the selected delta types.

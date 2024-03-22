@@ -65,7 +65,7 @@ export const useDocuments = defineStore("documents", {
      * @return Whether the selected document is the base document.
      */
     isBaseDocument(): boolean {
-      return this.currentId === "";
+      return this.currentDocument.name === DEFAULT_VIEW_NAME;
     },
     /**
      * @return Whether there is a next document in the history.

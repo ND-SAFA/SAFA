@@ -190,8 +190,8 @@ export function creatorTabOptions(): SelectOption<CreatorSectionTab>[] {
 export function loaderTabOptions(): SelectOption<LoaderTab>[] {
   return [
     createOption("load", "My Projects"),
-    createOption("user", "Recent Tasks"),
-    createOption("project", "Project Tasks"),
+    createOption("user", "Recent Jobs"),
+    createOption("project", "Project Jobs"),
   ];
 }
 
@@ -202,7 +202,7 @@ export function settingsTabOptions(): SelectOption<SettingsTab>[] {
   return [
     createOption("overview", "Overview"),
     createOption("members", "Members"),
-    createOption("jobs", "Tasks"),
+    createOption("jobs", "Jobs"),
     createOption("upload", "Data Upload"),
     createOption("integrations", "Data Integrations"),
     createOption("attributes", "Custom Attributes"),

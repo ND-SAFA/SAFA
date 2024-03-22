@@ -271,3 +271,9 @@ body.body--dark .q-layout__shadow:after {
   background: linear-gradient(rgba(0, 0, 0, 0), $color-neutral 40%);
   bottom: 0;
 }
+
+// Tabs
+
+.q-tab__label {
+  font-size: 20px !important;
+}

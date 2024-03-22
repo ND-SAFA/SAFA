@@ -36,7 +36,7 @@ public class MinimumBalanceCheck implements AdditionalPermissionCheck {
 
         BillingService billingService = context.getServiceProvider().getBillingService();
         BillingInfo billingInfo = billingService.getBillingInfoForOrg(org);
-        return billingInfo.getBalance() > getMinimumBalance(context);
+        return billingInfo.getBalance() >= getMinimumBalance(context);
     }
 
     @Override

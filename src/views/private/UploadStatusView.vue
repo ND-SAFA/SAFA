@@ -3,7 +3,7 @@
     title="Project Uploads"
     subtitle="Select an upload below to see more details on its status."
   >
-    <jobs-table />
+    <jobs-table :display-project-jobs="false" />
   </private-page>
 </template>
 

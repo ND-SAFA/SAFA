@@ -21,6 +21,7 @@
         <version-selector-table
           v-if="selectedProject"
           :minimal="props.minimal"
+          :disabled="getVersionApiStore.loadLoading"
           :open="isVersionStep"
           :project="selectedProject"
           @selected="handleVersionSelect"

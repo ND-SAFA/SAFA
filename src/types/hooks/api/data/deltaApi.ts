@@ -23,4 +23,8 @@ export interface DeltaApiHook {
     targetVersion?: VersionSchema,
     callbacks?: IOHandlerCallback
   ): Promise<void>;
+  /**
+   * Disables delta mode and reloads the project.
+   */
+  handleDisable(): Promise<void>;
 }

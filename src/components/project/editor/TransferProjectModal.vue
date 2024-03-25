@@ -106,7 +106,7 @@ function handleClose(): void {
  * Confirms the project deletion.
  */
 function handleConfirm(): void {
-  projectApiStore.handleTransferProject({
+  projectApiStore.handleTransfer({
     owner: owner.value,
     ownerType: ownerType.value,
   });

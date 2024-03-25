@@ -24,7 +24,7 @@ export const useIntegrationsApi = defineStore(
 
     const installations = ref<InstallationSchema[]>([]);
 
-    async function handleReload(
+    async function handleLoadInstallations(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       await integrationsApi.handleRequest(async () => {
@@ -91,7 +91,7 @@ export const useIntegrationsApi = defineStore(
 
     return {
       installations,
-      handleReload,
+      handleLoadInstallations,
       handleSync,
       handleNewSync,
     };

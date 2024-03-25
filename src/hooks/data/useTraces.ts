@@ -12,7 +12,7 @@ import {
   removeMatches,
   standardizeValueArray,
 } from "@/util";
-import { timStore, documentStore, layoutStore, projectStore } from "@/hooks";
+import { timStore, layoutStore, selectionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -39,6 +39,17 @@ export const useTraces = defineStore("traces", {
      */
     visibleTraces(): TraceLinkSchema[] {
       return this.currentTraces.filter((t) => t.approvalStatus != "DECLINED");
+    },
+    /**
+     * @return The currently selected trace link.
+     */
+    selectedTraceLink(): TraceLinkSchema | undefined {
+      return this.tracesById.get(
+        getTraceId(
+          selectionStore.selectedTraceLinkIds[0],
+          selectionStore.selectedTraceLinkIds[1]
+        )
+      );
     },
   },
   actions: {
@@ -77,11 +88,19 @@ export const useTraces = defineStore("traces", {
         ...newTraces,
       ];
 
-      this.initializeTraces({
-        traces: updatedTraces,
-        currentArtifactIds: documentStore.currentDocument.artifactIds,
+      this.$patch({
+        allTraces: updatedTraces,
+        currentTraces: [
+          ...removeMatches(this.currentTraces, "traceLinkId", newIds),
+          ...newTraces,
+        ],
+        tracesById: new Map(
+          updatedTraces.map((trace) => [
+            getTraceId(trace.sourceId, trace.targetId),
+            trace,
+          ])
+        ),
       });
-      projectStore.updateProject({ traces: updatedTraces });
       layoutStore.applyAutomove();
     },
     /**
@@ -105,7 +124,6 @@ export const useTraces = defineStore("traces", {
           ])
         ),
       });
-      projectStore.updateProject({ traces: allTraces });
       layoutStore.applyAutomove();
     },
     /**

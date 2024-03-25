@@ -28,11 +28,11 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { selectionStore, artifactStore, viewsStore } from "@/hooks";
+import { artifactStore, viewsStore, timStore } from "@/hooks";
 import { PanelCard, TextButton } from "@/components/common";
 import { ArtifactListDisplay } from "@/components/artifact/display";
 
-const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
+const artifactLevel = computed(() => timStore.selectedArtifactLevel);
 const name = computed(() => artifactLevel.value?.name || "");
 
 const artifacts = computed(() => artifactStore.getArtifactsByType(name.value));

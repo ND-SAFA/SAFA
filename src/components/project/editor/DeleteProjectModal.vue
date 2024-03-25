@@ -36,12 +36,7 @@ export default {
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import {
-  projectApiStore,
-  identifierSaveStore,
-  appStore,
-  getProjectApiStore,
-} from "@/hooks";
+import { projectApiStore, identifierSaveStore, appStore } from "@/hooks";
 import { Modal, TextInput, TextButton } from "@/components/common";
 
 const confirmText = ref("");
@@ -65,12 +60,8 @@ function handleClose(): void {
  * Confirms the project deletion.
  */
 function handleConfirm(): void {
-  projectApiStore.handleDeleteProject({
-    onSuccess: async () => {
-      handleClose();
-
-      await getProjectApiStore.handleReload();
-    },
+  projectApiStore.handleDelete({
+    onSuccess: handleClose,
   });
 }
 </script>

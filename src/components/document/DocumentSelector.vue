@@ -1,6 +1,6 @@
 <template>
   <q-select
-    v-model="document"
+    v-model="documentApiStore.currentDocument"
     standout
     bg-color="transparent"
     class="nav-breadcrumb"
@@ -22,7 +22,15 @@
         @click="handleSave"
       />
     </template>
-    <template #option="{ opt, itemProps }: { opt: DocumentSchema }">
+    <template
+      #option="{
+        opt,
+        itemProps,
+      }: {
+        opt: DocumentSchema;
+        itemProps: Record<string, unknown>;
+      }"
+    >
       <list-item
         v-bind="itemProps"
         :title="opt.name"
@@ -92,15 +100,6 @@ import { IconButton, TextButton, ListItem, FlexBox } from "@/components/common";
 
 const options = computed(() => documentStore.projectDocuments);
 
-const document = computed({
-  get() {
-    return documentStore.currentDocument;
-  },
-  set(document) {
-    documentApiStore.handleSwitch(document);
-  },
-});
-
 const disabled = computed(() => deltaStore.inDeltaView);
 
 /**
@@ -108,7 +107,7 @@ const disabled = computed(() => deltaStore.inDeltaView);
  * @param doc - The document to check.
  * @return Whether saving is allowed.
  */
-function canSave(doc = document.value): boolean {
+function canSave(doc = documentApiStore.currentDocument): boolean {
   return (
     doc.name !== DEFAULT_VIEW_NAME &&
     !doc.documentId &&
@@ -147,6 +146,6 @@ function handleEditOpen(document: DocumentSchema): void {
  * Saves a new document.
  */
 function handleSave(): void {
-  documentApiStore.handleCreatePreset(document.value);
+  documentApiStore.handleCreatePreset(documentApiStore.currentDocument);
 }
 </script>

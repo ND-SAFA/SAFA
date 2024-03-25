@@ -3,7 +3,6 @@ import {
   IOHandlerCallback,
   ProjectSchema,
   TransferProjectSchema,
-  VersionSchema,
 } from "@/types";
 
 /**
@@ -18,10 +17,6 @@ export interface ProjectApiHook {
    * Whether the delete project request is loading.
    */
   deleteProjectLoading: ComputedRef<boolean>;
-  /**
-   * Whether the delete version request is loading.
-   */
-  deleteVersionLoading: ComputedRef<boolean>;
   /**
    * Saves a project, updates app state, and logs the status.
    *
@@ -41,24 +36,14 @@ export interface ProjectApiHook {
    *
    * @param callbacks - Callbacks for the action.
    */
-  handleDeleteProject(callbacks: IOHandlerCallback): Promise<void>;
-  /**
-   * Deletes a version, updates app state, and logs the status.
-   *
-   * @param version - The version to delete.
-   * @param callbacks - Callbacks for the action.
-   */
-  handleDeleteVersion(
-    version: VersionSchema,
-    callbacks: IOHandlerCallback
-  ): void;
+  handleDelete(callbacks: IOHandlerCallback): Promise<void>;
   /**
    * Moves the current project to a new owner.
    *
    * @param newOwner - The new owner of the project.
    * @param callbacks - Callbacks for the action.
    */
-  handleTransferProject(
+  handleTransfer(
     newOwner: TransferProjectSchema,
     callbacks?: IOHandlerCallback
   ): Promise<void>;

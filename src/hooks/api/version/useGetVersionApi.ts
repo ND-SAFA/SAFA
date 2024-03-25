@@ -1,22 +1,29 @@
 import { defineStore } from "pinia";
 
-import { computed, ref, watch } from "vue";
+import { computed } from "vue";
 import {
-  DocumentSchema,
   IdentifierSchema,
   IOHandlerCallback,
   VersionSchema,
   GetVersionApiHook,
 } from "@/types";
+import { versionToString } from "@/util";
 import {
+  artifactStore,
   documentStore,
+  logStore,
   projectStore,
   sessionStore,
   setProjectApiStore,
   useApi,
+  viewsStore,
 } from "@/hooks";
 import { navigateTo, QueryParams, Routes, router } from "@/router";
-import { getProjectVersion, getProjectVersions } from "@/api";
+import {
+  deleteProjectVersion,
+  getProjectVersion,
+  getProjectVersions,
+} from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -28,13 +35,20 @@ export const useGetVersionApi = defineStore(
   (): GetVersionApiHook => {
     const getVersionApi = useApi("getVersionApi");
     const loadVersionApi = useApi("loadVersionApi");
-
-    const allVersions = ref<VersionSchema[]>([]);
+    const deleteVersionApi = useApi("deleteVersionApi");
 
     const getLoading = computed(() => getVersionApi.loading);
     const loadLoading = computed(() => loadVersionApi.loading);
+    const deleteLoading = computed(() => deleteVersionApi.loading);
 
-    const currentProject = computed(() => projectStore.project);
+    const currentProject = computed({
+      get: () => (projectStore.projectId ? projectStore.project : undefined),
+      set(identifier: IdentifierSchema | undefined) {
+        if (!identifier) return;
+
+        handleLoadCurrent(identifier);
+      },
+    });
     const currentVersion = computed({
       get: () => projectStore.version,
       set(version: VersionSchema | undefined) {
@@ -44,7 +58,7 @@ export const useGetVersionApi = defineStore(
       },
     });
 
-    async function handleReload(
+    async function handleLoadVersions(
       projectId?: string,
       callbacks: IOHandlerCallback<VersionSchema[]> = {}
     ): Promise<void> {
@@ -54,7 +68,7 @@ export const useGetVersionApi = defineStore(
         const versions = id ? await getProjectVersions(id) : [];
 
         if (!projectId) {
-          allVersions.value = versions;
+          projectStore.allVersions = versions;
         }
 
         return versions;
@@ -63,7 +77,7 @@ export const useGetVersionApi = defineStore(
 
     async function handleLoad(
       versionId: string,
-      document?: DocumentSchema,
+      viewId?: string,
       doNavigate = true,
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
@@ -77,21 +91,19 @@ export const useGetVersionApi = defineStore(
 
           const project = await getProjectVersion(versionId);
 
-          if (
-            project.projectVersion &&
-            !allVersions.value.find(
-              ({ versionId }) => versionId === project.projectVersion?.versionId
-            )
-          ) {
-            // Add the current version to the list of versions if it is not already there.
-            allVersions.value = [project.projectVersion, ...allVersions.value];
-          }
-
           await setProjectApiStore.handleSet(project);
+          await handleLoadVersions();
 
-          if (document) {
-            // If a document is given, switch to it.
-            await documentStore.switchDocuments(document);
+          if (viewId) {
+            // If a view is given, switch to the associated artifact or document.
+            const artifact = artifactStore.getArtifactById(viewId);
+            const document = documentStore.getDocument(viewId);
+
+            if (artifact) {
+              await viewsStore.addDocumentOfNeighborhood(artifact);
+            } else if (document) {
+              await documentStore.switchDocuments(document);
+            }
           }
 
           if (!doNavigate || routeRequiresProject) return;
@@ -113,20 +125,46 @@ export const useGetVersionApi = defineStore(
       await handleLoad(versions[0].versionId, undefined, false, callbacks);
     }
 
-    // Load the versions of the current project whenever the current project changes.
-    watch(
-      () => currentProject.value,
-      () => handleReload()
-    );
+    function handleDelete(
+      version: VersionSchema,
+      callbacks: IOHandlerCallback = {}
+    ): void {
+      const name = versionToString(version);
+
+      logStore.confirm(
+        `Delete Version`,
+        `Are you sure you would like to delete "${name}"?`,
+        async (isConfirmed: boolean) => {
+          if (!isConfirmed) return;
+
+          await deleteVersionApi.handleRequest(
+            async () => {
+              await deleteProjectVersion(version.versionId);
+
+              projectStore.removeVersion(version, (newVersion) =>
+                handleLoad(newVersion.versionId)
+              );
+            },
+            {
+              ...callbacks,
+              success: `Version has been deleted: ${name}`,
+              error: `Unable to delete version: ${name}`,
+            }
+          );
+        }
+      );
+    }
 
     return {
       getLoading,
       loadLoading,
-      allVersions,
+      deleteLoading,
+      currentProject,
       currentVersion,
-      handleReload,
+      handleLoadVersions,
       handleLoad,
       handleLoadCurrent,
+      handleDelete,
     };
   }
 );

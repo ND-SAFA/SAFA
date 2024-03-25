@@ -118,7 +118,7 @@ const definition = computed<ArtifactCytoElement>(() => {
 function handleAdd(cy: CytoCore): void {
   cy.getElementById(id.value).layout(layoutStore.layoutOptions).run();
 
-  if (id.value !== selectionStore.selectedArtifact?.id) return;
+  if (id.value !== selectionStore.selectedArtifactId) return;
 
   selectionStore.selectArtifact(id.value);
 }

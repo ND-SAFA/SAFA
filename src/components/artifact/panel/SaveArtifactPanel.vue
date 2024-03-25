@@ -27,7 +27,7 @@ export default {
 
 <script setup lang="ts">
 import { watch } from "vue";
-import { appStore, artifactSaveStore, selectionStore } from "@/hooks";
+import { appStore, artifactSaveStore, artifactStore } from "@/hooks";
 import { DetailsPanel, PanelCard, TextButton } from "@/components/common";
 import {
   SaveArtifactInputs,
@@ -35,7 +35,7 @@ import {
 } from "@/components/artifact/save";
 
 watch(
-  () => selectionStore.selectedArtifact,
+  () => artifactStore.selectedArtifact,
   () => artifactSaveStore.resetArtifact()
 );
 </script>

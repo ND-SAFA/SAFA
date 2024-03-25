@@ -62,7 +62,7 @@ export const useAttributeApi = defineStore(
       attribute: AttributeSchema,
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
-      await logStore.confirm(
+      logStore.confirm(
         "Delete Attribute",
         `Are you sure you would like to delete "${attribute.label}"?`,
         async (isConfirmed: boolean) => {
@@ -115,7 +115,7 @@ export const useAttributeApi = defineStore(
       layout: AttributeLayoutSchema,
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
-      await logStore.confirm(
+      logStore.confirm(
         "Delete Attribute Layout",
         `Are you sure you would like to delete "${layout.name}"?`,
         async (isConfirmed: boolean) => {

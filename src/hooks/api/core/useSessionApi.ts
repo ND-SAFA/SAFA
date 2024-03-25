@@ -11,13 +11,21 @@ import { DEMO_ACCOUNT, DEMO_VERSION_ID } from "@/util";
 import {
   getOrgApiStore,
   getProjectApiStore,
-  getVersionApiStore,
+  integrationsStore,
   logStore,
+  onboardingApiStore,
   permissionStore,
   sessionStore,
   setProjectApiStore,
 } from "@/hooks";
-import { getParam, getParams, navigateTo, QueryParams, Routes } from "@/router";
+import {
+  getParam,
+  getParams,
+  navigateTo,
+  QueryParams,
+  Routes,
+  updateParam,
+} from "@/router";
 import {
   createLoginSession,
   createPasswordReset,
@@ -58,6 +66,14 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     "Unable to update password."
   );
 
+  async function loadSessionData(): Promise<void> {
+    permissionStore.isDemo = sessionStore.user.email === DEMO_ACCOUNT.email;
+
+    await getOrgApiStore.handleLoadCurrent();
+    await onboardingApiStore.handleLoadOnboardingState();
+    await getProjectApiStore.handleLoadProjects();
+  }
+
   function handleReset(): void {
     createdAccount.value = false;
     passwordSubmitted.value = false;
@@ -68,15 +84,21 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     user: UserPasswordSchema,
     verified?: boolean
   ): Promise<void> {
-    await sessionApi.handleRequest(async () => {
-      if (verified) {
-        await createVerifiedUser(user);
-      } else {
-        await createUser(user);
-      }
+    await sessionApi.handleRequest(
+      async () => {
+        if (verified) {
+          await createVerifiedUser(user);
+        } else {
+          await createUser(user);
+        }
 
-      createdAccount.value = true;
-    });
+        createdAccount.value = true;
+      },
+      {
+        success: "Your account has been created.",
+        error: "Unable to create your account.",
+      }
+    );
   }
 
   async function handleVerifyAccount(token: string): Promise<void> {
@@ -113,13 +135,8 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     });
   }
 
-  async function handleLogin(
-    user: UserPasswordSchema,
-    demo?: boolean
-  ): Promise<void> {
+  async function handleLogin(user: UserPasswordSchema): Promise<void> {
     await sessionApi.handleRequest(async () => {
-      permissionStore.isDemo = demo || false;
-
       const session = await createLoginSession(user);
       const goToPath = getParam(QueryParams.LOGIN_PATH);
       const query = { ...getParams() };
@@ -129,30 +146,25 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
       sessionStore.user = await getCurrentUser();
       sessionStore.updateSession(session);
 
-      await getProjectApiStore.handleReload({
-        onComplete: async () => {
-          await getOrgApiStore.handleLoadCurrent();
+      await loadSessionData();
 
-          if (goToPath === Routes.ARTIFACT) {
-            await getProjectApiStore.handleLoadRecent();
-          } else if (typeof goToPath === "string") {
-            await navigateTo(goToPath, query);
-          } else {
-            await navigateTo(Routes.HOME, query);
-          }
-        },
-      });
+      if (goToPath === Routes.ARTIFACT) {
+        await getProjectApiStore.handleLoadRecent();
+      } else if (typeof goToPath === "string") {
+        await navigateTo(goToPath, query);
+      } else {
+        await navigateTo(Routes.HOME, query);
+      }
     });
   }
 
   async function handleDemoLogin(): Promise<void> {
-    await handleLogin(DEMO_ACCOUNT, true).then(() => {
-      const versionId = String(
-        getParam(QueryParams.VERSION) || DEMO_VERSION_ID
-      );
-
-      getVersionApiStore.handleLoad(versionId);
-    });
+    await updateParam(
+      QueryParams.VERSION,
+      String(getParam(QueryParams.VERSION) || DEMO_VERSION_ID)
+    );
+    await updateParam(QueryParams.LOGIN_PATH, Routes.ARTIFACT, true);
+    await handleLogin(DEMO_ACCOUNT);
   }
 
   async function handleLogout(
@@ -161,13 +173,14 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
   ): Promise<void> {
     await sessionApi.handleRequest(async () => {
       document.cookie = "";
+      logStore.notifications = [];
 
       await setProjectApiStore.handleClear();
+      integrationsStore.handleReset();
+      sessionStore.clearSession();
       await navigateTo(
         createAccount ? Routes.CREATE_ACCOUNT : Routes.LOGIN_ACCOUNT
       );
-      sessionStore.clearSession();
-      logStore.notifications = [];
 
       if (sendLogoutRequest) {
         await deleteSession();
@@ -181,12 +194,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
     await authApi.handleRequest(async () => {
       sessionStore.user = await getCurrentUser();
 
-      if (sessionStore.user.email === DEMO_ACCOUNT.email) {
-        permissionStore.isDemo = true;
-      }
-
-      await getOrgApiStore.handleLoadCurrent();
-      await getProjectApiStore.handleReload({});
+      await loadSessionData();
     }, callbacks);
   }
 

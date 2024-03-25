@@ -1,15 +1,9 @@
 import { defineStore } from "pinia";
 import { computed } from "vue";
 
-import { GetOrgApiHook, OrganizationSchema } from "@/types";
-import { orgStore, sessionStore, teamApiStore, useApi } from "@/hooks";
-import {
-  getAllBillingTransactions,
-  getMonthlyBillingTransactions,
-  getOrganizations,
-  getPersonalOrganization,
-  saveDefaultOrg,
-} from "@/api";
+import { GetOrgApiHook } from "@/types";
+import { orgApiStore, orgStore, useApi } from "@/hooks";
+import { getOrganizations, getPersonalOrganization } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -20,40 +14,11 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
   const loading = computed(() => getOrgApi.loading);
 
-  const currentOrg = computed({
-    get: () => orgStore.org,
-    set(org: OrganizationSchema | undefined) {
-      handleSwitch(org);
-    },
-  });
-
-  async function handleSwitch(
-    org: OrganizationSchema | undefined
-  ): Promise<void> {
-    if (!org) return;
-
-    await saveDefaultOrg(org.id);
-
-    orgStore.org = org;
-    orgStore.allTransactions = await getAllBillingTransactions(org.id);
-    orgStore.monthlyTransactions = await getMonthlyBillingTransactions(org.id);
-
-    const defaultTeam =
-      orgStore.org.teams?.find(({ members = [] }) =>
-        members.find(({ email }) => email === sessionStore.userEmail)
-      ) || orgStore.org.teams[0];
-
-    await teamApiStore.handleSwitch(defaultTeam);
-  }
-
   async function handleLoadCurrent(): Promise<void> {
-    if (!sessionStore.doesSessionExist) return;
-
     await getOrgApi.handleRequest(
       async () => {
         orgStore.allOrgs = await getOrganizations();
-
-        currentOrg.value =
+        orgApiStore.currentOrg =
           (await getPersonalOrganization()) || orgStore.allOrgs[0];
       },
       {
@@ -64,8 +29,6 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
   return {
     loading,
-    currentOrg,
-    handleSwitch,
     handleLoadCurrent,
   };
 });

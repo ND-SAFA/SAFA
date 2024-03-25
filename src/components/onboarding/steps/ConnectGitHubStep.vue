@@ -22,7 +22,7 @@
     <text-button
       outlined
       icon="changelog"
-      @click="onboardingStore.handleNextStep('connect')"
+      @click="onboardingApiStore.handleLoadNextStep('connect')"
     >
       Upload Public Repo
     </text-button>
@@ -46,7 +46,10 @@
     t="4"
     justify="center"
   >
-    <text-button outlined @click="onboardingStore.handleNextStep('connect')">
+    <text-button
+      outlined
+      @click="onboardingApiStore.handleLoadNextStep('connect')"
+    >
       Continue
     </text-button>
   </flex-box>
@@ -68,7 +71,7 @@ import {
   ONBOARDING_GITHUB_SECURITY,
   SECURITY_LINK,
 } from "@/util";
-import { integrationsStore, onboardingStore } from "@/hooks";
+import { integrationsStore, onboardingApiStore } from "@/hooks";
 import { GitHubAuthentication } from "@/components/integrations";
 import {
   TextButton,

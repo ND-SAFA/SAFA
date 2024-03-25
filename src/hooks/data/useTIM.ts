@@ -16,7 +16,7 @@ import {
   sanitizeNodeId,
   sortArtifactTypes,
 } from "@/util";
-import { projectStore } from "@/hooks";
+import { selectionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -41,6 +41,26 @@ export const useTIM = defineStore("tim", {
     typeNames(): string[] {
       return this.artifactTypes.map(({ name }) => name);
     },
+    /**
+     * @return The currently selected artifact level.
+     */
+    selectedArtifactLevel(): ArtifactTypeSchema | undefined {
+      return this.artifactTypes.find(
+        (type) => type.name === selectionStore.selectedArtifactLevelType
+      );
+    },
+    /**
+     * @return The currently selected trace matrix.
+     */
+    selectedTraceMatrix(): TraceMatrixSchema | undefined {
+      return this.traceMatrices.find(
+        ({ sourceType, targetType }) =>
+          sanitizeNodeId(sourceType) ===
+            selectionStore.selectedTraceMatrixTypes[0] &&
+          sanitizeNodeId(targetType) ===
+            selectionStore.selectedTraceMatrixTypes[1]
+      );
+    },
   },
   actions: {
     /**
@@ -59,13 +79,11 @@ export const useTIM = defineStore("tim", {
      */
     addOrUpdateArtifactTypes(artifactTypes: ArtifactTypeSchema[]): void {
       const ids = artifactTypes.map(({ name }) => name);
-      const updatedArtifactTypes = [
+
+      this.artifactTypes = [
         ...removeMatches(this.artifactTypes, "name", ids),
         ...artifactTypes,
       ];
-
-      this.artifactTypes = updatedArtifactTypes;
-      projectStore.updateProject({ artifactTypes: updatedArtifactTypes });
     },
     /**
      * Adds a new placeholder artifact type if it does not yet exist.
@@ -94,14 +112,11 @@ export const useTIM = defineStore("tim", {
      * @param removedTypeIds - The artifact type ids to remove.
      */
     deleteArtifactTypes(removedTypeIds: string[]): void {
-      const preservedArtifactTypes = removeMatches(
+      this.artifactTypes = removeMatches(
         this.artifactTypes,
         "typeId",
         removedTypeIds
       );
-
-      this.artifactTypes = preservedArtifactTypes;
-      projectStore.updateProject({ artifactTypes: preservedArtifactTypes });
     },
     /**
      * Adds new trace matrices.
@@ -110,13 +125,11 @@ export const useTIM = defineStore("tim", {
      */
     addOrUpdateTraceMatrices(traceMatrices: TraceMatrixSchema[]): void {
       const ids = traceMatrices.map(({ id }) => id);
-      const updatedTraceMatrices = [
+
+      this.traceMatrices = [
         ...removeMatches(this.traceMatrices, "id", ids),
         ...traceMatrices,
       ];
-
-      this.traceMatrices = updatedTraceMatrices;
-      projectStore.updateProject({ traceMatrices: updatedTraceMatrices });
     },
     /**
      * Adds a placeholder trace matrix between these types.
@@ -141,14 +154,11 @@ export const useTIM = defineStore("tim", {
      * @param removedMatrixIds - The trace matrix ids to remove.
      */
     deleteTraceMatrices(removedMatrixIds: string[]): void {
-      const preservedTraceMatrices = removeMatches(
+      this.traceMatrices = removeMatches(
         this.traceMatrices,
         "id",
         removedMatrixIds
       );
-
-      this.traceMatrices = preservedTraceMatrices;
-      projectStore.updateProject({ traceMatrices: preservedTraceMatrices });
     },
     /**
      * Removes a trace matrix between these types.

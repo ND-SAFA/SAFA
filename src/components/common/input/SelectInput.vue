@@ -10,6 +10,7 @@
     :option-label="props.optionLabel"
     :map-options="props.optionToValue"
     :emit-value="props.optionToValue"
+    class="text-ellipsis"
     @new-value="emit('new-value', $event)"
   >
     <template #prepend>

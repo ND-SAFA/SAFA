@@ -25,6 +25,7 @@
             color="primary"
             :outlined="currentStep !== steps.length"
             :disabled="!isStepDone"
+            :loading="props.loading"
             data-cy="button-stepper-continue"
             :label="continueText"
             @click="onStepForward"

@@ -4,10 +4,9 @@
       <organization-selector />
     </q-breadcrumbs-el>
 
-    <q-breadcrumbs-el>
+    <q-breadcrumbs-el v-if="displayProjectOptions">
       <project-selector />
     </q-breadcrumbs-el>
-
     <q-breadcrumbs-el v-if="displayProjectOptions">
       <version-selector />
     </q-breadcrumbs-el>
@@ -75,7 +74,9 @@ const displayMore = computed(
 
 const displayOptions = computed(() => !smallWindow.value || !collapsed.value);
 
-const displayOrgOptions = computed(() => currentRoute.path === Routes.ORG);
+const displayOrgOptions = computed(
+  () => currentRoute.path === Routes.ORG || currentRoute.path === Routes.TEAM
+);
 
 const displayProjectOptions = computed(
   () =>

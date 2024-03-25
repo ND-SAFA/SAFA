@@ -43,14 +43,14 @@ export default {
 
 <script setup lang="ts">
 import { ABOUT_SAFA_LINK, CHANGELOG_LINK, FEEDBACK_LINK } from "@/util";
-import { onboardingStore } from "@/hooks";
+import { onboardingApiStore } from "@/hooks";
 import { PanelCard, FlexBox, TextButton } from "@/components/common";
 
 /**
  * Opens the onboarding workflow.
  */
 function handleOnboarding(): void {
-  onboardingStore.handleReload(true);
+  onboardingApiStore.handleLoadOnboardingState("open");
 }
 
 /**

@@ -36,7 +36,7 @@ import {
   appStore,
   artifactApiStore,
   artifactSaveStore,
-  selectionStore,
+  artifactStore,
 } from "@/hooks";
 import { TextButton, FlexBox } from "@/components/common";
 
@@ -47,7 +47,7 @@ const isUpdate = computed(() => artifactSaveStore.isUpdate);
  * Attempts to delete the selected artifact.
  */
 function handleDelete(): void {
-  const artifact = selectionStore.selectedArtifact;
+  const artifact = artifactStore.selectedArtifact;
 
   if (!artifact) return;
 

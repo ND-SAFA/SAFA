@@ -1,11 +1,17 @@
 import { defineStore } from "pinia";
-import { IdentifierSchema, ProjectSchema, VersionSchema } from "@/types";
+import {
+  IdentifierSchema,
+  MinimalProjectSchema,
+  ProjectSchema,
+  VersionSchema,
+} from "@/types";
 import { buildProject, buildProjectIdentifier, removeMatches } from "@/util";
 import {
   attributesStore,
   documentStore,
   layoutStore,
   logStore,
+  membersStore,
   selectionStore,
   subtreeStore,
   timStore,
@@ -20,11 +26,15 @@ export const useProject = defineStore("project", {
     /**
      * The currently loaded project.
      */
-    project: buildProject(),
+    project: buildProject() as MinimalProjectSchema,
     /**
      * All projects the user has access to.
      */
     allProjects: [] as IdentifierSchema[],
+    /**
+     * All versions for the currently loaded project.
+     */
+    allVersions: [] as VersionSchema[],
   }),
   getters: {
     /**
@@ -102,22 +112,48 @@ export const useProject = defineStore("project", {
     /**
      * Removes a project to the list of all projects.
      * @param project - The project to remove.
+     * @param onCurrentRemoved - A callback to run if the current project is removed.
      */
-    removeProject(project: IdentifierSchema): void {
+    removeProject(
+      project: IdentifierSchema,
+      onCurrentRemoved?: () => void
+    ): void {
       this.allProjects = removeMatches(this.allProjects, "projectId", [
         project.projectId,
       ]);
+
+      if (project.projectId === this.projectId) {
+        onCurrentRemoved?.();
+      }
     },
     /**
      * Updates the current project.
      *
      * @param project - The new project fields.
      */
-    updateProject(project: Partial<ProjectSchema>): void {
+    updateProject(project: Partial<MinimalProjectSchema>): void {
       this.project = {
         ...this.project,
         ...project,
       };
+    },
+    /**
+     * Removes a version to the list of all versions.
+     * @param version - The version to remove.
+     * @param onCurrentRemoved - A callback to run if the current version is removed.
+     */
+    removeVersion(
+      version: VersionSchema,
+      onCurrentRemoved?: (newVersion: VersionSchema) => void
+    ): void {
+      this.allVersions = removeMatches(this.allVersions, "versionId", [
+        version.versionId,
+      ]);
+
+      if (version.versionId === this.versionId) {
+        this.project.projectVersion = this.allVersions[0];
+        onCurrentRemoved?.(this.project.projectVersion);
+      }
     },
     /**
      * Initializes the current project.
@@ -131,6 +167,7 @@ export const useProject = defineStore("project", {
       subtreeStore.initializeProject(project);
       documentStore.initializeProject(project); // Must be after subtree store reset.
       attributesStore.initializeProject(project);
+      membersStore.initialize(project.members, "PROJECT");
     },
   },
 });

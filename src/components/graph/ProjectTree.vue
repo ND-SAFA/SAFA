@@ -87,6 +87,8 @@ import {
   layoutStore,
   timStore,
   cyStore,
+  traceApiStore,
+  traceMatrixApiStore,
 } from "@/hooks";
 import { Routes } from "@/router";
 import { PanelCard, TextButton } from "@/components/common";
@@ -96,13 +98,28 @@ import { TimNode, TimLink, TimMenu } from "./tim";
 
 const currentRoute = useRoute();
 
-const graph = ref(cyStore.buildProjectGraph());
+const graph = ref(
+  cyStore.buildProjectGraph({
+    canCreateTrace: (source, target) =>
+      traceStore.isLinkAllowed(source.data(), target.data()) === true,
+    handleCreateTrace: (source, target) => {
+      if (source.data()?.graph === "tree") {
+        traceApiStore.handleCreate(source.data(), target.data());
+      } else {
+        traceMatrixApiStore.handleCreate(
+          source.data().artifactType,
+          target.data().artifactType
+        );
+      }
+    },
+  })
+);
 
 const isInView = computed(() => !layoutStore.isTableMode);
 const isTreeMode = computed(() => layoutStore.isTreeMode);
 
 const artifacts = computed(() => artifactStore.currentArtifacts);
-const artifactsInView = computed(() => selectionStore.artifactsInView);
+const artifactsInView = computed(() => artifactStore.artifactsInView);
 
 const traceLinks = computed(() =>
   deltaStore.inDeltaView ? traceStore.currentTraces : traceStore.visibleTraces
@@ -152,12 +169,15 @@ function handleClick(event: EventObject): void {
   )
     return;
 
-  selectionStore.clearSelections(true);
+  selectionStore.clearSelections();
 }
 
-onMounted(() => {
-  layoutStore.resetLayout();
-});
+function handleReset(): void {
+  selectionStore.clearSelections();
+  layoutStore.setGraphLayout();
+}
+
+onMounted(() => handleReset());
 
 /** Resets the layout when the route changes. */
 watch(
@@ -165,7 +185,7 @@ watch(
   () => {
     if (currentRoute.path !== Routes.ARTIFACT) return;
 
-    layoutStore.resetLayout();
+    handleReset();
   }
 );
 
@@ -174,14 +194,12 @@ watch(
   (inView) => {
     if (!inView) return;
 
-    layoutStore.resetLayout();
+    handleReset();
   }
 );
 
 watch(
   () => isTreeMode.value,
-  () => {
-    layoutStore.resetLayout();
-  }
+  () => handleReset()
 );
 </script>

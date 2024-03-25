@@ -69,7 +69,7 @@ import {
   ListItem,
 } from "@/components/common";
 
-const traceMatrix = computed(() => selectionStore.selectedTraceMatrix);
+const traceMatrix = computed(() => timStore.selectedTraceMatrix);
 const generatedCount = computed(() => traceMatrix.value?.generatedCount || 0);
 
 const sourceType = computed(() => traceMatrix.value?.sourceType || "");

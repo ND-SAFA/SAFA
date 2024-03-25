@@ -7,7 +7,7 @@ import {
   OrganizationSchema,
   MembershipType,
 } from "@/types";
-import { projectStore, sessionStore, teamStore } from "@/hooks";
+import { orgStore, projectStore, sessionStore, teamStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -41,7 +41,7 @@ export const usePermission = defineStore("permissionStore", {
       if (type === "TEAM") {
         return teamStore.team;
       } else if (type === "ORGANIZATION") {
-        return teamStore.team;
+        return orgStore.org;
       } else {
         return projectStore.project;
       }

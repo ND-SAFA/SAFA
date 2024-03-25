@@ -14,6 +14,7 @@ import {
   documentStore,
   projectStore,
   documentSaveStore,
+  artifactStore,
 } from "@/hooks";
 import {
   saveDocument,
@@ -31,6 +32,15 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
   const documentApi = useApi("documentApi");
 
   const loading = computed(() => documentApi.loading);
+
+  const currentDocument = computed({
+    get() {
+      return documentStore.currentDocument;
+    },
+    set(document) {
+      handleSwitch(document);
+    },
+  });
 
   async function handleCreate(
     name: string,
@@ -120,7 +130,7 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
 
   async function handleReload(
     versionId = projectStore.versionId,
-    artifacts = projectStore.project.artifacts
+    artifacts = artifactStore.allArtifacts
   ): Promise<void> {
     await documentApi.handleRequest(async () => {
       const documents = await getDocuments(versionId);
@@ -168,6 +178,7 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
 
   return {
     loading,
+    currentDocument,
     handleCreate,
     handleCreatePreset,
     handleUpdate,

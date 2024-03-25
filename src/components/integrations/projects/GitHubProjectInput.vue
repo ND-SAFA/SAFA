@@ -197,6 +197,13 @@ watch(
 );
 
 watch(
+  () => integrationsStore.gitHubProject,
+  () => {
+    filePaths.value = [];
+  }
+);
+
+watch(
   () => filePaths.value,
   (newPaths, oldPaths) => {
     const newGlobs = newPaths.map((path) =>
@@ -206,12 +213,20 @@ watch(
       path.endsWith("/") ? `${path}**` : `${path}/**`
     );
 
-    integrationsStore.gitHubConfig.include = [
+    const include = [
       ...(integrationsStore.gitHubConfig.include || []).filter(
         (pattern) => !oldGlobs.includes(pattern)
       ),
       ...newGlobs,
     ];
+
+    // If the include array is empty, it will be removed from the config,
+    // as an empty include means include no artifacts.
+    if (include.length === 0) {
+      integrationsStore.gitHubConfig.include = undefined;
+    } else {
+      integrationsStore.gitHubConfig.include = include;
+    }
   }
 );
 </script>

@@ -77,10 +77,16 @@ export interface SessionApiHook {
   /**
    * Attempts to log a user in.
    *
+   * @action If this is a demo account, update the permission store to demo.
+   * @action Loads the current organization, state of onboarding, and list of projects.
+   * @action Routes the user:
+   *   - If navigating to the graph, loads the last project.
+   *   - If navigating to a page, redirects there.
+   *   - Otherwise, redirects to the home page.
+   *
    * @param user - The user to log in.
-   * @param demo - Whether to set permissions to demo restrictions.
    */
-  handleLogin(user: UserPasswordSchema, demo?: boolean): Promise<void>;
+  handleLogin(user: UserPasswordSchema): Promise<void>;
   /**
    * Logs in to the demo account and opens the demo project.
    */
@@ -96,8 +102,11 @@ export interface SessionApiHook {
     createAccount?: boolean
   ): Promise<void>;
   /**
-   * Verifies the stored authentication token,
-   * and loads the last project if routing to the artifact tree.
+   * Verifies the stored authentication token and logs in.
+   *
+   * @assumption There is a valid session cookie.
+   * @action If this is a demo account, update the permission store to demo.
+   * @action Loads the current organization, state of onboarding, and list of projects.
    *
    * @param callbacks - The callbacks to run on success or error.
    */

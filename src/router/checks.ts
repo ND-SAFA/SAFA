@@ -5,14 +5,8 @@ import {
   getVersionApiStore,
   sessionApiStore,
 } from "@/hooks/api";
-import { appStore, permissionStore, sessionStore } from "@/hooks/core";
-import {
-  artifactStore,
-  documentStore,
-  onboardingStore,
-  projectStore,
-  viewsStore,
-} from "@/hooks/data";
+import { appStore, sessionStore } from "@/hooks/core";
+import { projectStore } from "@/hooks/management";
 import { QueryParams, Routes } from "@/router/routes";
 
 type RouteChecks = Record<
@@ -70,10 +64,6 @@ export const routerBeforeChecks: RouteChecks = {
           [QueryParams.LOGIN_PATH]: to.path,
         },
       };
-    } else if (to.path !== Routes.PAYMENT && !permissionStore.isDemo) {
-      // If logging in to a non-payment endpoint and not in demo mode, reload onboarding state.
-      // This ensures that reloading onboarding is not duplicated when navigating to the payment page.
-      await onboardingStore.handleReload();
     }
   },
   async closePanelsIfNotInGraph(to) {
@@ -100,27 +90,15 @@ export const routerBeforeChecks: RouteChecks = {
 export const routerAfterChecks: RouteChecks = {
   async requireProjectForRoutes(to) {
     const requiresProject = to.matched.some(({ meta }) => meta.requiresProject);
+    const versionId = to.query[QueryParams.VERSION]
+      ? String(to.query[QueryParams.VERSION])
+      : undefined;
+    const viewId = to.query[QueryParams.VIEW]
+      ? String(to.query[QueryParams.VIEW])
+      : undefined;
 
-    if (projectStore.isProjectDefined || !requiresProject) return;
+    if (projectStore.isProjectDefined || !requiresProject || !versionId) return;
 
-    const versionId = to.query[QueryParams.VERSION];
-    const viewId = to.query[QueryParams.VIEW];
-
-    if (typeof versionId !== "string") return;
-
-    await getVersionApiStore.handleLoad(versionId, undefined, false);
-
-    if (!viewId) return;
-
-    const artifact = artifactStore.artifactsById.get(String(viewId));
-    const document = documentStore.allDocuments.find(
-      ({ documentId }) => documentId === viewId
-    );
-
-    if (artifact) {
-      await viewsStore.addDocumentOfNeighborhood(artifact);
-    } else if (document) {
-      await documentStore.switchDocuments(document);
-    }
+    await getVersionApiStore.handleLoad(versionId, viewId, false);
   },
 };

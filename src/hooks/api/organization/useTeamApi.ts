@@ -17,14 +17,23 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
   const saveTeamApiLoading = computed(() => saveTeamApi.loading);
   const deleteTeamApiLoading = computed(() => deleteTeamApi.loading);
 
-  async function handleSwitch(
-    team: TeamSchema,
-    callbacks: IOHandlerCallback = {}
-  ): Promise<void> {
+  const currentTeam = computed({
+    get: () => teamStore.team,
+    set: (team: TeamSchema) => handleUpdate(team),
+  });
+
+  async function handleUpdate(team: TeamSchema): Promise<void> {
+    teamStore.initialize(team);
+
+    await handleLoadProjects();
+  }
+
+  async function handleLoadProjects(): Promise<void> {
+    if (!teamStore.team.id) return;
+
     await getTeamApi.handleRequest(async () => {
-      teamStore.team = team;
-      teamStore.allProjects = await getTeamProjects(team.id);
-    }, callbacks);
+      teamStore.sync(await getTeamProjects(teamStore.team.id));
+    });
   }
 
   async function handleSave(
@@ -34,15 +43,9 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
     await saveTeamApi.handleRequest(
       async () => {
         if (!team.id) {
-          const createdTeam = await createTeam(orgStore.orgId, team);
-
-          teamStore.addTeam(createdTeam);
-          teamStore.team = createdTeam;
+          currentTeam.value = await createTeam(orgStore.orgId, team);
         } else {
-          const editedTeam = await editTeam(orgStore.orgId, team);
-
-          teamStore.addTeam(editedTeam);
-          teamStore.team = editedTeam;
+          teamStore.initialize(await editTeam(orgStore.orgId, team));
         }
       },
       {
@@ -67,7 +70,7 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
           async () => {
             await deleteTeam(orgStore.orgId, team);
 
-            teamStore.removeTeam(team);
+            teamStore.removeTeam(team, (newTeam) => handleUpdate(newTeam));
           },
           {
             ...callbacks,
@@ -80,9 +83,10 @@ export const useTeamApi = defineStore("teamApi", (): TeamApiHook => {
   }
 
   return {
+    currentTeam,
     saveTeamApiLoading,
     deleteTeamApiLoading,
-    handleSwitch,
+    handleLoadProjects,
     handleSave,
     handleDelete,
   };

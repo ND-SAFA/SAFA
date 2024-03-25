@@ -18,7 +18,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
     /**
      * The artifact being created or edited.
      */
-    editedArtifact: buildArtifact(selectionStore.selectedArtifact),
+    editedArtifact: buildArtifact(artifactStore.selectedArtifact),
     /**
      * The id of the parent artifact to connect to, if there is one.
      */
@@ -33,19 +33,19 @@ export const useSaveArtifact = defineStore("saveArtifact", {
      * @return Whether an existing artifact is being updated.
      */
     isUpdate(): boolean {
-      return !!selectionStore.selectedArtifact;
+      return !!artifactStore.selectedArtifact;
     },
     /**
      * @return Whether the artifact name has changed.
      */
     hasNameChanged(): boolean {
-      return selectionStore.selectedArtifact?.name !== this.editedArtifact.name;
+      return artifactStore.selectedArtifact?.name !== this.editedArtifact.name;
     },
     /**
      * @return Whether the base artifact has a summary.
      */
     hasSummary(): boolean {
-      return !!selectionStore.selectedArtifact?.summary;
+      return !!artifactStore.selectedArtifact?.summary;
     },
     /**
      * @return The parent artifact of a logic node.
@@ -88,7 +88,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
      * Resets the state of the artifact to the selected artifact.
      */
     resetArtifact(): void {
-      const artifact = selectionStore.selectedArtifact;
+      const artifact = artifactStore.selectedArtifact;
 
       this.editedArtifact = buildArtifact(artifact);
       this.isNameValid = !!artifact?.name;

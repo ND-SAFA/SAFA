@@ -1,17 +1,8 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
-import {
-  GetProjectApiHook,
-  IdentifierSchema,
-  IOHandlerCallback,
-} from "@/types";
-import {
-  getVersionApiStore,
-  projectStore,
-  sessionStore,
-  useApi,
-} from "@/hooks";
+import { GetProjectApiHook, IOHandlerCallback } from "@/types";
+import { getVersionApiStore, projectStore, useApi } from "@/hooks";
 import { getParam, navigateTo, QueryParams, Routes } from "@/router";
 import { getCurrentVersion, getProjects } from "@/api";
 import { pinia } from "@/plugins";
@@ -26,23 +17,9 @@ export const useGetProjectApi = defineStore(
 
     const loading = computed(() => getProjectApi.loading);
 
-    const currentProject = computed({
-      get: () => (projectStore.projectId ? projectStore.project : undefined),
-      set(identifier: IdentifierSchema | undefined) {
-        if (!identifier) return;
-
-        getVersionApiStore.handleLoadCurrent(identifier);
-      },
-    });
-
-    async function handleReload(
+    async function handleLoadProjects(
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
-      if (!sessionStore.doesSessionExist) {
-        callbacks.onSuccess?.();
-        return;
-      }
-
       await getProjectApi.handleRequest(
         async () => {
           projectStore.allProjects = await getProjects();
@@ -55,21 +32,18 @@ export const useGetProjectApi = defineStore(
     }
 
     async function handleLoadRecent(): Promise<void> {
-      if (!sessionStore.doesSessionExist) return;
-
       let versionId = getParam(QueryParams.VERSION);
 
-      if (!versionId) {
-        if (projectStore.allProjects.length > 0) {
-          versionId = (
-            await getCurrentVersion(projectStore.allProjects[0].projectId)
-          ).versionId;
-        }
+      if (!versionId && projectStore.allProjects.length > 0) {
+        versionId = (
+          await getCurrentVersion(projectStore.allProjects[0].projectId)
+        ).versionId;
       }
+
       if (typeof versionId === "string") {
-        await getVersionApiStore.handleLoad(versionId).catch(() => {
-          navigateTo(Routes.HOME);
-        });
+        await getVersionApiStore
+          .handleLoad(versionId)
+          .catch(() => navigateTo(Routes.HOME));
       } else {
         await navigateTo(Routes.HOME);
       }
@@ -77,8 +51,7 @@ export const useGetProjectApi = defineStore(
 
     return {
       loading,
-      currentProject,
-      handleReload,
+      handleLoadProjects,
       handleLoadRecent,
     };
   }

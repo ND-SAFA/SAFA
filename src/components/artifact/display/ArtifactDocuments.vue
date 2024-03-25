@@ -7,7 +7,7 @@
         clickable
         tooltip
         :title="doc.name"
-        @click="handleSwitch(doc)"
+        @click="documentApiStore.handleSwitch(doc)"
       />
     </list>
   </panel-card>
@@ -24,11 +24,10 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { DocumentSchema } from "@/types";
-import { documentApiStore, documentStore, selectionStore } from "@/hooks";
+import { artifactStore, documentApiStore, documentStore } from "@/hooks";
 import { List, ListItem, PanelCard } from "@/components/common";
 
-const artifact = computed(() => selectionStore.selectedArtifact);
+const artifact = computed(() => artifactStore.selectedArtifact);
 
 const documents = computed(() =>
   artifact.value
@@ -39,12 +38,4 @@ const documents = computed(() =>
 );
 
 const doDisplay = computed(() => documents.value.length > 0);
-
-/**
- * Switches to another document.
- * @param document - The document to switch to.
- */
-function handleSwitch(document: DocumentSchema): void {
-  documentApiStore.handleSwitch(document);
-}
 </script>

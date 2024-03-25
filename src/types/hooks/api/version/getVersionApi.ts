@@ -1,10 +1,5 @@
-import { ComputedRef, Ref, WritableComputedRef } from "vue";
-import {
-  DocumentSchema,
-  IdentifierSchema,
-  IOHandlerCallback,
-  VersionSchema,
-} from "@/types";
+import { ComputedRef, WritableComputedRef } from "vue";
+import { IdentifierSchema, IOHandlerCallback, VersionSchema } from "@/types";
 
 /**
  * A hook for calling get version API endpoints.
@@ -19,9 +14,14 @@ export interface GetVersionApiHook {
    */
   loadLoading: ComputedRef<boolean>;
   /**
-   * All versions for the currently loaded project.
+   * Whether the delete version request is loading.
    */
-  allVersions: Ref<VersionSchema[]>;
+  deleteLoading: ComputedRef<boolean>;
+  /**
+   * The current loaded project.
+   * - Reactively loads the current project when set.
+   */
+  currentProject: WritableComputedRef<IdentifierSchema | undefined>;
   /**
    * The currently loaded project version.
    * - Reactively loads a new project version when updated.
@@ -34,7 +34,7 @@ export interface GetVersionApiHook {
    * @param projectId - The id of the project to load the versions of.
    * @param callbacks - Callbacks for the action.
    */
-  handleReload(
+  handleLoadVersions(
     projectId?: string,
     callbacks?: IOHandlerCallback<VersionSchema[]>
   ): Promise<void>;
@@ -42,15 +42,15 @@ export interface GetVersionApiHook {
    * Load the given project version.
    * Navigates to the artifact view page to show the loaded project.
    *
-   * @param versionId - The id of the version to retrieve and load.
-   * @param document - The document to start with viewing.
+   * @param versionId - The ID of the version to retrieve and load.
+   * @param viewId - The ID of an artifact or document to navigate to after loading the version.
    * @param doNavigate - Whether to navigate to the artifact tree if not already on an artifact page.
    *        @default true
    * @param callbacks - Callbacks for the action.
    */
   handleLoad(
     versionId: string,
-    document?: DocumentSchema,
+    viewId?: string,
     doNavigate?: boolean,
     callbacks?: IOHandlerCallback
   ): Promise<void>;
@@ -64,4 +64,11 @@ export interface GetVersionApiHook {
     identifier: Pick<IdentifierSchema, "projectId">,
     callbacks?: IOHandlerCallback
   ): Promise<void>;
+  /**
+   * Deletes a version, updates app state, and logs the status.
+   *
+   * @param version - The version to delete.
+   * @param callbacks - Callbacks for the action.
+   */
+  handleDelete(version: VersionSchema, callbacks?: IOHandlerCallback): void;
 }

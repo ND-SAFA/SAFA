@@ -1,21 +1,8 @@
 import { defineStore } from "pinia";
 
-import {
-  ArtifactSchema,
-  ArtifactTypeSchema,
-  FilterAction,
-  TraceLinkSchema,
-  TraceMatrixSchema,
-} from "@/types";
+import { ArtifactSchema, FilterAction, TraceLinkSchema } from "@/types";
 import { sanitizeNodeId } from "@/util";
-import {
-  timStore,
-  subtreeStore,
-  artifactStore,
-  traceStore,
-  appStore,
-  cyStore,
-} from "@/hooks";
+import { subtreeStore, appStore, cyStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -57,41 +44,9 @@ export const useSelection = defineStore("selection", {
      */
     selectedTraceMatrixTypes: ["", ""] as [string, string],
   }),
-  getters: {
-    /**
-     * @return The currently selected artifact.
-     */
-    selectedArtifact(): ArtifactSchema | undefined {
-      return artifactStore.getArtifactById(this.selectedArtifactId);
-    },
-    /**
-     * @return The currently selected trace link.
-     */
-    selectedTraceLink(): TraceLinkSchema | undefined {
-      return traceStore.getTraceLinkByArtifacts(
-        this.selectedTraceLinkIds[0],
-        this.selectedTraceLinkIds[1]
-      );
-    },
-    /**
-     * @return The currently selected artifact level.
-     */
-    selectedArtifactLevel(): ArtifactTypeSchema | undefined {
-      return timStore.getType(this.selectedArtifactLevelType);
-    },
-    /**
-     * @return The currently selected trace matrix.
-     */
-    selectedTraceMatrix(): TraceMatrixSchema | undefined {
-      return timStore.getMatrix(
-        this.selectedTraceMatrixTypes[0],
-        this.selectedTraceMatrixTypes[1]
-      );
-    },
-    /**
-     * @return The ids of artifacts that are in the viewport.
-     */
-    artifactsInView(): string[] {
+  getters: {},
+  actions: {
+    isArtifactInView(artifact: ArtifactSchema): boolean {
       const subtree = this.selectedSubtreeIds;
       const ignoreTypes = this.ignoreTypes;
 
@@ -99,15 +54,8 @@ export const useSelection = defineStore("selection", {
         subtree.length === 0 || subtree.includes(id);
       const doesNotContainType = (type: string) => !ignoreTypes.includes(type);
 
-      return artifactStore.currentArtifacts
-        .filter(
-          (artifact) =>
-            isInSubtree(artifact.id) && doesNotContainType(artifact.type)
-        )
-        .map(({ id }) => id);
+      return isInSubtree(artifact.id) && doesNotContainType(artifact.type);
     },
-  },
-  actions: {
     /**
      * Clears any selected elements in the graph.
      * Each clear is wrapped in an if-statement to help improve performance on large graphs.
@@ -166,18 +114,18 @@ export const useSelection = defineStore("selection", {
       this.selectedTraceLinkIds = ["", ""];
       this.selectedArtifactId = artifactId;
 
-      if (artifactStore.largeNodeCount) {
-        this.centerOnArtifacts([artifactId]);
-      } else {
-        this.filterGraph({
-          type: "subtree",
-          nodeIds: [
-            ...(subtreeStore.subtreeMap[artifactId]?.neighbors || []),
-            artifactId,
-          ],
-          centerIds: [artifactId],
-        });
-      }
+      cyStore.basedOnSize(
+        () =>
+          this.filterGraph({
+            type: "subtree",
+            nodeIds: [
+              ...(subtreeStore.subtreeMap[artifactId]?.neighbors || []),
+              artifactId,
+            ],
+            centerIds: [artifactId],
+          }),
+        () => this.centerOnArtifacts([artifactId])
+      );
 
       appStore.openDetailsPanel("displayArtifact");
     },
@@ -188,7 +136,7 @@ export const useSelection = defineStore("selection", {
      * @param artifactId - The artifact to select.
      */
     toggleSelectArtifact(artifactId: string): void {
-      if (this.selectedArtifact?.id === artifactId) {
+      if (this.selectedArtifactId === artifactId) {
         this.clearSelections();
       } else {
         this.selectArtifact(artifactId);
@@ -212,11 +160,10 @@ export const useSelection = defineStore("selection", {
       this.selectedArtifactId = "";
       this.selectedTraceLinkIds = nodeIds;
 
-      if (artifactStore.largeNodeCount) {
-        this.centerOnArtifacts(nodeIds);
-      } else {
-        this.filterGraph({ type: "subtree", nodeIds });
-      }
+      cyStore.basedOnSize(
+        () => this.filterGraph({ type: "subtree", nodeIds }),
+        () => this.centerOnArtifacts(nodeIds)
+      );
 
       appStore.openDetailsPanel("displayTrace");
     },
@@ -279,7 +226,7 @@ export const useSelection = defineStore("selection", {
      */
     isArtifactInSelected(artifactId: string): boolean {
       return (
-        artifactId === this.selectedArtifact?.id ||
+        artifactId === this.selectedArtifactId ||
         this.selectedGroupIds.includes(artifactId)
       );
     },

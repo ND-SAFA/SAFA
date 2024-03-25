@@ -43,8 +43,8 @@ import {
   appStore,
   artifactApiStore,
   artifactSaveStore,
+  artifactStore,
   permissionStore,
-  selectionStore,
 } from "@/hooks";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
@@ -52,7 +52,7 @@ const displayActions = computed(() =>
   permissionStore.isAllowed("project.edit_data")
 );
 
-const artifact = computed(() => selectionStore.selectedArtifact);
+const artifact = computed(() => artifactStore.selectedArtifact);
 
 /**
  * Attempts to delete the selected artifact.

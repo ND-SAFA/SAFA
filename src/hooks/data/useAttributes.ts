@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 
 import { AttributeLayoutSchema, AttributeSchema, ProjectSchema } from "@/types";
 import { removeMatches } from "@/util";
-import { projectStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -57,8 +56,6 @@ export const useAttributes = defineStore("attributes", {
         ...removeMatches(this.attributes, "key", ids),
         ...updatedAttributes,
       ];
-
-      projectStore.project.attributes = this.attributes;
     },
     /**
      * Deletes from the stored custom attributes.
@@ -71,8 +68,6 @@ export const useAttributes = defineStore("attributes", {
         "key",
         deletedAttributes
       );
-
-      projectStore.project.attributes = this.attributes;
     },
 
     /**
@@ -87,8 +82,6 @@ export const useAttributes = defineStore("attributes", {
         ...removeMatches(this.attributeLayouts, "id", ids),
         ...updatedLayouts,
       ];
-
-      projectStore.project.attributeLayouts = this.attributeLayouts;
     },
     /**
      * Deletes from the stored custom attribute layouts.
@@ -101,8 +94,6 @@ export const useAttributes = defineStore("attributes", {
         "id",
         deletedLayouts
       );
-
-      projectStore.project.attributeLayouts = this.attributeLayouts;
     },
     /**
      * Returns the attribute grid layout for the given artifact type.

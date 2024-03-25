@@ -10,7 +10,6 @@ import {
   OrganizationSchema,
   TeamSchema,
 } from "@/types";
-import { removeMatches } from "@/util";
 import {
   getProjectApiStore,
   logStore,
@@ -50,17 +49,13 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
     await memberApi.handleRequest(
       async () => {
         const entityId = member.entityId || projectStore.projectId;
-        const entityType = member.entityType || "PROJECT";
 
         const invitedMember = await createMember({
           ...member,
           entityId,
         });
 
-        membersStore.updateMembers(
-          [...membersStore.getMembers(entityType), invitedMember],
-          member
-        );
+        membersStore.updateMembers([invitedMember], member);
       },
       {
         ...callbacks,
@@ -77,22 +72,13 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
     await memberApi.handleRequest(
       async () => {
         const entityId = member.entityId || projectStore.projectId;
-        const entityType = member.entityType || "PROJECT";
 
         const updatedMember = await editMember({
           ...member,
           entityId,
         });
 
-        membersStore.updateMembers(
-          [
-            updatedMember,
-            ...removeMatches(membersStore.getMembers(entityType), "id", [
-              updatedMember.id,
-            ]),
-          ],
-          member
-        );
+        membersStore.updateMembers([updatedMember], member);
       },
       {
         ...callbacks,
@@ -136,7 +122,7 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
           async () => {
             await deleteMember(member);
             membersStore.deleteMembers([member.id], member);
-            await getProjectApiStore.handleReload();
+            await getProjectApiStore.handleLoadProjects();
           },
           {
             success: `Deleted a member: ${member.email}`,

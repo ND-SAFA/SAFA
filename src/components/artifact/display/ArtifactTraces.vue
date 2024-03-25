@@ -114,7 +114,7 @@ const displayActions = computed(() =>
   permissionStore.isAllowed("project.edit_data")
 );
 
-const artifact = computed(() => selectionStore.selectedArtifact);
+const artifact = computed(() => artifactStore.selectedArtifact);
 
 const parents = computed(() =>
   artifact.value

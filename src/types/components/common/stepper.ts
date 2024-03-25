@@ -21,7 +21,7 @@ export interface StepperStep {
 /**
  * Defines props for the stepper component.
  */
-export interface StepperProps extends MinimalProps {
+export interface StepperProps extends MinimalProps, LoadingProps {
   /**
    * The current 1-based step number.
    */

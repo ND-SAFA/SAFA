@@ -63,8 +63,9 @@ const props = defineProps<{ hideTitle?: boolean; hideOverflow?: boolean }>();
 // Hide the description if it is just a copy of the generated specification.
 const displayDescription = computed(
   () =>
+    !!projectStore.project.description &&
     projectStore.project.description.length !==
-    projectStore.project.specification?.length
+      projectStore.project.specification?.length
 );
 
 const description = computed(

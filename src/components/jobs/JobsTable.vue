@@ -41,7 +41,7 @@ import JobRow from "./JobRow.vue";
 const props = defineProps<JobTableProps>();
 
 const panelTitle = computed(() =>
-  props.displayProjectJobs ? "Project Tasks" : "Recent Tasks"
+  props.displayProjectJobs ? "Project Jobs" : "Recent Jobs"
 );
 const rows = computed(() =>
   props.displayProjectJobs ? jobStore.projectJobs : jobStore.jobs

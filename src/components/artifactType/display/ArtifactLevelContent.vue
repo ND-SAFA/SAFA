@@ -31,10 +31,10 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { timStore, selectionStore } from "@/hooks";
+import { timStore } from "@/hooks";
 import { PanelCard, Typography, Icon } from "@/components/common";
 
-const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
+const artifactLevel = computed(() => timStore.selectedArtifactLevel);
 const name = computed(() => artifactLevel.value?.name || "");
 const artifactCount = computed(() => artifactLevel.value?.count || 0);
 

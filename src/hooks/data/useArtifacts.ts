@@ -9,14 +9,7 @@ import {
   removeMatches,
   standardizeValueArray,
 } from "@/util";
-import {
-  documentStore,
-  layoutStore,
-  projectStore,
-  selectionStore,
-  timStore,
-  traceStore,
-} from "@/hooks";
+import { layoutStore, selectionStore, timStore, traceStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -47,12 +40,6 @@ export const useArtifacts = defineStore("artifacts", {
   }),
   getters: {
     /**
-     * @return The flattened artifacts for the current document.
-     */
-    flatArtifacts(): FlatArtifact[] {
-      return this.currentArtifacts.map(flattenArtifact);
-    },
-    /**
      * @return Whether the current document has a large number of artifacts,
      * in which case certain graph features are optimized and disabled.
      */
@@ -79,6 +66,20 @@ export const useArtifacts = defineStore("artifacts", {
       });
 
       return leaves;
+    },
+    /**
+     * @return The currently selected artifact.
+     */
+    selectedArtifact(): ArtifactSchema | undefined {
+      return this.artifactsById.get(selectionStore.selectedArtifactId);
+    },
+    /**
+     * @return The ids of artifacts that are in the viewport.
+     */
+    artifactsInView(): string[] {
+      return this.currentArtifacts
+        .filter((artifact) => selectionStore.isArtifactInView(artifact))
+        .map(({ id }) => id);
     },
   },
   actions: {
@@ -117,13 +118,21 @@ export const useArtifacts = defineStore("artifacts", {
         ...newArtifacts,
       ];
 
-      documentStore.addDocumentArtifacts(newIds);
-      this.initializeArtifacts({
-        artifacts: updatedArtifacts,
-        currentArtifactIds: documentStore.currentArtifactIds,
-      });
-      projectStore.updateProject({
-        artifacts: updatedArtifacts,
+      this.$patch({
+        allArtifacts: updatedArtifacts,
+        currentArtifacts: [
+          ...removeMatches(this.currentArtifacts, "id", newIds),
+          ...newArtifacts,
+        ],
+        artifactsById: new Map(
+          updatedArtifacts.map((artifact) => [artifact.id, artifact])
+        ),
+        artifactsByName: new Map(
+          updatedArtifacts.map((artifact) => [artifact.name, artifact])
+        ),
+        artifactsByType: new Map(
+          Object.entries(collectByField(updatedArtifacts, "type"))
+        ),
       });
     },
     /**
@@ -134,7 +143,6 @@ export const useArtifacts = defineStore("artifacts", {
     addCreatedArtifact(artifact: ArtifactSchema): void {
       layoutStore.setArtifactToSavedPosition(artifact.id);
       this.addOrUpdateArtifacts([artifact]);
-      selectionStore.selectArtifact(artifact.id);
       timStore.addTypesFromArtifacts([artifact]);
     },
     /**
@@ -161,11 +169,6 @@ export const useArtifacts = defineStore("artifacts", {
           Object.entries(collectByField(allArtifacts, "type"))
         ),
       });
-      projectStore.updateProject({ artifacts: allArtifacts });
-
-      if (ids.includes(selectionStore.selectedArtifact?.id || "")) {
-        selectionStore.clearSelections();
-      }
     },
     /**
      * Finds the given artifact by name.
@@ -193,6 +196,16 @@ export const useArtifacts = defineStore("artifacts", {
      */
     getArtifactsByType(type: string): ArtifactSchema[] {
       return this.artifactsByType.get(type) || [];
+    },
+    /**
+     * Returns flattened artifacts for display.
+     * @param allArtifacts - Whether to return all artifacts, or just the current document's.
+     * @return The flattened artifacts.
+     */
+    getFlatArtifacts(allArtifacts?: boolean): FlatArtifact[] {
+      return allArtifacts
+        ? this.allArtifacts.map(flattenArtifact)
+        : this.currentArtifacts.map(flattenArtifact);
     },
   },
 });

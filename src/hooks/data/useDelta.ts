@@ -143,7 +143,7 @@ export const useDelta = defineStore("delta", {
       // Switch to tree view and generate the graph layout for the unique set of delta artifacts.
       await subtreeStore.restoreHiddenNodesAfter(async () => {
         layoutStore.mode = "tree";
-        await layoutStore.updatePositions({});
+        await layoutStore.updatePositions({}, 0);
         layoutStore.setGraphLayout();
       });
       this.setIsDeltaViewEnabled(true);

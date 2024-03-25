@@ -5,6 +5,7 @@
       v-model="currentStep"
       :steps="steps"
       :minimal="props.minimal"
+      :loading="getVersionApiStore.loadLoading"
       data-cy="project-version-stepper"
       @submit="handleSubmit"
     >
@@ -20,6 +21,7 @@
         <version-selector-table
           v-if="selectedProject"
           :minimal="props.minimal"
+          :disabled="getVersionApiStore.loadLoading"
           :open="isVersionStep"
           :project="selectedProject"
           @selected="handleVersionSelect"

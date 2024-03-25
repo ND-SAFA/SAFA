@@ -20,7 +20,7 @@ export default {
 
 <script setup lang="ts">
 import { ONBOARDING_REPO_FREE, ONBOARDING_REPO_SELECT } from "@/util";
-import { integrationsStore, onboardingStore } from "@/hooks";
+import { integrationsStore, onboardingApiStore } from "@/hooks";
 import { GitHubProjectInput } from "@/components/integrations";
 import { Typography, TextButton, FlexBox } from "@/components/common";
 import CalloutSubStep from "./CalloutSubStep.vue";
@@ -29,6 +29,6 @@ import CalloutSubStep from "./CalloutSubStep.vue";
  * Handles continuing to the next step.
  */
 function handleContinue() {
-  onboardingStore.handleNextStep("code");
+  onboardingApiStore.handleLoadNextStep("code");
 }
 </script>

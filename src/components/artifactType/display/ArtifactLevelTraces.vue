@@ -72,7 +72,7 @@ import { computed } from "vue";
 import { timStore, selectionStore } from "@/hooks";
 import { PanelCard, List, ListItem, IconButton } from "@/components/common";
 
-const artifactLevel = computed(() => selectionStore.selectedArtifactLevel);
+const artifactLevel = computed(() => timStore.selectedArtifactLevel);
 const name = computed(() => artifactLevel.value?.name || "");
 
 const parentTypes = computed(() => timStore.getParentMatrices(name.value));

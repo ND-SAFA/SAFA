@@ -2,12 +2,14 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { IOHandlerCallback, OrganizationSchema, OrgApiHook } from "@/types";
-import { buildOrg } from "@/util";
-import { logStore, orgStore, useApi } from "@/hooks";
+import { logStore, orgStore, teamApiStore, useApi } from "@/hooks";
 import {
   createOrganization,
   deleteOrganization,
   editOrganization,
+  getAllBillingTransactions,
+  getMonthlyBillingTransactions,
+  saveDefaultOrg,
 } from "@/api";
 import { pinia } from "@/plugins";
 
@@ -15,11 +17,37 @@ import { pinia } from "@/plugins";
  * A hook for managing requests to the organizations API.
  */
 export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
+  const getOrgApi = useApi("getOrgApi");
   const saveOrgApi = useApi("saveOrgApi");
   const deleteOrgApi = useApi("deleteOrgApi");
 
   const saveOrgApiLoading = computed(() => saveOrgApi.loading);
   const deleteOrgApiLoading = computed(() => deleteOrgApi.loading);
+
+  const currentOrg = computed({
+    get: () => orgStore.org,
+    set: (org: OrganizationSchema) => handleUpdate(org),
+  });
+
+  async function handleUpdate(org: OrganizationSchema): Promise<void> {
+    await getOrgApi.handleRequest(async () => {
+      orgStore.initialize(org);
+
+      await handleLoadTransactions();
+    });
+  }
+
+  async function handleLoadTransactions(): Promise<void> {
+    if (!orgStore.org.id) return;
+
+    await saveDefaultOrg(orgStore.org.id);
+    orgStore.sync(
+      await getAllBillingTransactions(orgStore.org.id),
+      await getMonthlyBillingTransactions(orgStore.org.id)
+    );
+
+    await teamApiStore.handleLoadProjects();
+  }
 
   async function handleSave(
     org: OrganizationSchema,
@@ -28,15 +56,9 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
     await saveOrgApi.handleRequest(
       async () => {
         if (!org.id) {
-          const createdOrg = await createOrganization(org);
-
-          orgStore.addOrg(createdOrg);
-          orgStore.org = createdOrg;
+          currentOrg.value = await createOrganization(org);
         } else {
-          const editedOrg = await editOrganization(org);
-
-          orgStore.addOrg(editedOrg);
-          orgStore.org = editedOrg;
+          orgStore.initialize(await editOrganization(org));
         }
       },
       {
@@ -62,13 +84,7 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
           async () => {
             await deleteOrganization(org);
 
-            orgStore.removeOrg(org);
-
-            if (orgStore.orgId !== org.id) return;
-
-            // Clear the current org if it was deleted.
-            orgStore.$reset();
-            orgStore.org = orgStore.allOrgs[0] || buildOrg();
+            orgStore.removeOrg(org, (newOrg) => handleUpdate(newOrg));
           },
           {
             ...callbacks,
@@ -81,6 +97,7 @@ export const useOrgApi = defineStore("orgApi", (): OrgApiHook => {
   }
 
   return {
+    currentOrg,
     saveOrgApiLoading,
     deleteOrgApiLoading,
     handleSave,

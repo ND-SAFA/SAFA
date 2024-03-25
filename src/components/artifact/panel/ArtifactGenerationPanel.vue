@@ -70,6 +70,7 @@ import {
   artifactGenerationApiStore,
   artifactStore,
   selectionStore,
+  timStore,
 } from "@/hooks";
 import {
   DetailsPanel,
@@ -122,9 +123,9 @@ function handleReset(): void {
     mode.value = "single";
     childArtifactIds.value = selectionStore.selectedGroupIds;
     childArtifactTypes.value = [];
-  } else if (selectionStore.selectedArtifactLevel) {
+  } else if (timStore.selectedArtifactLevel) {
     mode.value = "multiple";
-    childArtifactTypes.value = [selectionStore.selectedArtifactLevel.name];
+    childArtifactTypes.value = [timStore.selectedArtifactLevel.name];
     childArtifactIds.value = [];
   } else {
     mode.value = "single";

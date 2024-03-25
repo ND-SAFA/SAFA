@@ -33,6 +33,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { useRoute } from "vue-router";
 import {
   logStore,
   permissionStore,
@@ -52,8 +53,15 @@ import { AppNavBar } from "./topbar";
 import { DetailsDrawer } from "./detailsDrawer";
 import Snackbar from "./Snackbar.vue";
 
+const currentRoute = useRoute();
+
 const displayLoading = computed(() => sessionApiStore.authLoading);
-const displayNavigation = computed(() => sessionStore.doesSessionExist);
+const displayNavigation = computed(
+  () =>
+    sessionStore.doesSessionExist &&
+    !sessionApiStore.loading &&
+    !currentRoute.meta.isPublic
+);
 const displaySidebar = computed(
   () => displayNavigation.value && permissionStore.isAllowed("safa.view")
 );

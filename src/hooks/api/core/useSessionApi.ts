@@ -11,6 +11,7 @@ import { DEMO_ACCOUNT, DEMO_VERSION_ID } from "@/util";
 import {
   getOrgApiStore,
   getProjectApiStore,
+  integrationsStore,
   logStore,
   onboardingApiStore,
   permissionStore,
@@ -175,6 +176,7 @@ export const useSessionApi = defineStore("sessionApi", (): SessionApiHook => {
       logStore.notifications = [];
 
       await setProjectApiStore.handleClear();
+      integrationsStore.handleReset();
       sessionStore.clearSession();
       await navigateTo(
         createAccount ? Routes.CREATE_ACCOUNT : Routes.LOGIN_ACCOUNT

@@ -197,6 +197,13 @@ watch(
 );
 
 watch(
+  () => integrationsStore.gitHubProject,
+  () => {
+    filePaths.value = [];
+  }
+);
+
+watch(
   () => filePaths.value,
   (newPaths, oldPaths) => {
     const newGlobs = newPaths.map((path) =>

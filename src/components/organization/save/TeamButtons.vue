@@ -1,5 +1,12 @@
 <template>
-  <flex-box t="2" class="settings-buttons">
+  <flex-box t="2" class="settings-buttons" wrap>
+    <text-button
+      text
+      label="Organization"
+      icon="back"
+      @click="navigateTo(Routes.ORG)"
+    />
+    <separator vertical />
     <q-btn-dropdown flat auto-close label="Switch Teams">
       <flex-box column align="center" x="2" y="2">
         <text-button
@@ -51,6 +58,7 @@ import {
   teamApiStore,
   teamStore,
 } from "@/hooks";
+import { navigateTo, Routes } from "@/router";
 import { FlexBox, TextButton, Separator } from "@/components/common";
 
 const team = computed(() => teamStore.team);

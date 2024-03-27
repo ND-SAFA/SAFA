@@ -4,7 +4,7 @@
       <organization-selector />
     </q-breadcrumbs-el>
 
-    <q-breadcrumbs-el v-if="displayProjectOptions">
+    <q-breadcrumbs-el v-if="!displayOrgOptions">
       <project-selector />
     </q-breadcrumbs-el>
     <q-breadcrumbs-el v-if="displayProjectOptions">

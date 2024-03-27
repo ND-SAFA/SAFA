@@ -1,4 +1,9 @@
-import { MinimalProps, OpenableProps, ProjectIdProps } from "@/types";
+import {
+  DisabledProps,
+  MinimalProps,
+  OpenableProps,
+  ProjectIdProps,
+} from "@/types";
 
 /**
  * The props for displaying a project files upload input.
@@ -63,6 +68,7 @@ export interface ProjectSelectorTableProps extends OpenableProps, MinimalProps {
 export interface VersionSelectorTableProps
   extends OpenableProps,
     MinimalProps,
+    DisabledProps,
     ProjectIdProps {
   /**
    * If true, the current version will be hidden.

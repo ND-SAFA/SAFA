@@ -32,6 +32,13 @@
           <typography variant="caption" value="Child Artifacts" l="2" />
         </template>
       </artifact-input>
+      <text-input
+        v-model="traceSaveStore.explanation"
+        label="Explanation"
+        class="q-my-md"
+        type="textarea"
+        data-cy="input-trace-explanation"
+      />
 
       <expansion-item
         label="Allowed Trace Directions"
@@ -99,6 +106,7 @@ import {
   Separator,
 } from "@/components/common";
 import { ArtifactBodyDisplay } from "@/components/artifact/display";
+import TextInput from "@/components/common/input/TextInput.vue";
 
 const loading = ref(false);
 

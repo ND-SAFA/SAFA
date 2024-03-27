@@ -74,9 +74,7 @@ const title = computed(() =>
   generated.value ? "Generated Link" : "Manual Link"
 );
 
-const explanation = computed(() =>
-  generated.value ? traceLink.value?.explanation : undefined
-);
+const explanation = computed(() => traceLink.value?.explanation);
 
 /**
  * Views the target artifact.

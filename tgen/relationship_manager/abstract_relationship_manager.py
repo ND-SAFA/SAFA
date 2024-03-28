@@ -32,7 +32,7 @@ class RelationshipManagerObjects(SupportedEnum):
 class AbstractRelationshipManager:
     MODEL_MAP = {}
 
-    def __init__(self, content_map: Dict[str, str], model_name: str = None, model: SentenceTransformer = None,
+    def __init__(self, content_map: Dict[str, str] = None, model_name: str = None, model: SentenceTransformer = None,
                  show_progress_bar: bool = True, model_type: str = ModelTask.SENTENCE_TRANSFORMER.name):
         """
         Initializes the relationship manager with the content used to create relationships between artifacts
@@ -44,7 +44,7 @@ class AbstractRelationshipManager:
         """
         self.model_name = model_name
         self.show_progress_bar = show_progress_bar
-        self._content_map = deepcopy(content_map)
+        self._content_map = deepcopy(content_map) if content_map else {}
         self._relationship_map = {}
         self._model = model
         self.__state_changed_since_last_save = False

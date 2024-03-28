@@ -7,6 +7,7 @@
           "export_dir": "[OUTPUT_PATH]/chunks/[CURRENT_PROJECT]",
           "generate_explanations": false,
           "layer_ids": ["[TARGET_TYPE]","[SOURCE_LAYER_IDS]"],
+          "relationship_manager_type": "[RELATIONSHIP_MANAGER_TYPE]",
           "dataset_creator": {
             "object_type": "PROMPT",
             "trace_dataset_creator": {

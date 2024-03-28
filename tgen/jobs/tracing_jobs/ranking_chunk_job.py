@@ -13,6 +13,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
+from tgen.relationship_manager.supported_relationship_managers import SupportedRelationshipManager
 from tgen.tracing.ranking.filters.supported_filters import SupportedFilter
 from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
@@ -25,7 +26,8 @@ class RankingChunkJob(AbstractJob):
     MIN_THRESHOLD = 0.85
 
     def __init__(self, dataset_creator: PromptDatasetCreator = None, dataset: PromptDataset = None,
-                 layer_ids: List[str] = None, **kwargs):
+                 layer_ids: List[str] = None,
+                 relationship_manager_type: SupportedRelationshipManager = SupportedRelationshipManager.EMBEDDING, **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param dataset_creator: Creates the dataset to rank.
@@ -39,6 +41,7 @@ class RankingChunkJob(AbstractJob):
         self.dataset: PromptDataset = dataset
         self.layer_ids = layer_ids
         self.ranking_kwargs = kwargs
+        self.relationship_manager_type = relationship_manager_type
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         """
@@ -51,7 +54,8 @@ class RankingChunkJob(AbstractJob):
         base_ranking_kwargs = DictUtil.update_kwarg_values(
             self.ranking_kwargs, selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD_NORMALIZED_CHILDREN,
             link_threshold=RankingChunkJob.MIN_THRESHOLD)
-        base_ranking_job = self.create_ranking_job(**base_ranking_kwargs)
+        base_ranking_job = self.create_ranking_job(relationship_manager=self.relationship_manager_type.value(),
+                                                   **base_ranking_kwargs)
         base_results = base_ranking_job.run()
 
         with_filter_kwargs = DictUtil.update_kwarg_values(base_ranking_kwargs, filter=SupportedFilter.SIMILARITY_THRESHOLD)

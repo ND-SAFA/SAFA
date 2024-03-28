@@ -23,7 +23,8 @@ class EmbeddingsManagerObjects(SupportedEnum):
 class EmbeddingsManager(AbstractRelationshipManager):
     MODEL_MAP = {}
 
-    def __init__(self, content_map: Dict[str, str], model_name: str = DEFAULT_EMBEDDING_MODEL, model: SentenceTransformer = None,
+    def __init__(self, content_map: Dict[str, str] = None, model_name: str = DEFAULT_EMBEDDING_MODEL,
+                 model: SentenceTransformer = None,
                  show_progress_bar: bool = True, create_embeddings_on_init: bool = False):
         """
         Initializes the embedding manager with the content used to create embeddings

@@ -11,8 +11,8 @@ from tgen.relationship_manager.abstract_relationship_manager import AbstractRela
 class CrossEncoderManager(AbstractRelationshipManager):
     MODEL_MAP = {}
 
-    def __init__(self, content_map: Dict[str, str], model_name: str = DEFAULT_CROSS_ENCODER_MODEL, model: SentenceTransformer = None,
-                 show_progress_bar: bool = True):
+    def __init__(self, content_map: Dict[str, str] = None, model_name: str = DEFAULT_CROSS_ENCODER_MODEL,
+                 model: SentenceTransformer = None, show_progress_bar: bool = True):
         """
         Initializes the manager with the content used to predict using a given cross encoder.
         :param content_map: Maps id to the corresponding content.

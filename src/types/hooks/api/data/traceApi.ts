@@ -40,11 +40,13 @@ export interface TraceApiHook {
    *
    * @param source - The artifact to link from.
    * @param target - The artifact to link to.
+   * @param explanation - The explanation for the trace link.
    * @param callbacks - The callbacks to call after the action.
    */
   handleCreate(
     source: ArtifactSchema | ArtifactCytoElementData,
     target: ArtifactSchema | ArtifactCytoElementData,
+    explanation?: string,
     callbacks?: IOHandlerCallback
   ): Promise<void>;
   /**

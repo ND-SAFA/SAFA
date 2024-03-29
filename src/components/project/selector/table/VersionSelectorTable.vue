@@ -7,6 +7,7 @@
     :loading="getVersionApiStore.getLoading"
     :columns="columns"
     :rows="rows"
+    :disabled="props.disabled ? true : undefined"
     row-key="projectId"
     item-name="version"
     :icons="{ add: 'version-add', edit: 'edit', delete: 'version-delete' }"

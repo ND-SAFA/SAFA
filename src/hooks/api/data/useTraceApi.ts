@@ -44,6 +44,7 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
   async function handleCreate(
     source: ArtifactSchema | ArtifactCytoElementData,
     target: ArtifactSchema | ArtifactCytoElementData,
+    explanation = "",
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     const sourceName =
@@ -61,6 +62,7 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
       traceType: "MANUAL",
       approvalStatus: "APPROVED",
       score: 1,
+      explanation,
     };
 
     await createTraceApi.handleRequest(
@@ -83,7 +85,7 @@ export const useTraceApi = defineStore("traceApi", (): TraceApiHook => {
       for (const source of traceSaveStore.sources) {
         if (!source || !target) continue;
 
-        await handleCreate(source, target);
+        await handleCreate(source, target, traceSaveStore.explanation);
       }
     }
   }

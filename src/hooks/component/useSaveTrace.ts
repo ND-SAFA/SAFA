@@ -23,6 +23,10 @@ export const useSaveTrace = defineStore("saveTrace", {
      * The target artifact ids.
      */
     targetIds: null as string[] | null,
+    /**
+     * The trace link explanation.
+     */
+    explanation: "",
   }),
   getters: {
     /**
@@ -187,6 +191,7 @@ export const useSaveTrace = defineStore("saveTrace", {
     resetTrace(openTo?: TraceCreatorOpenState): void {
       this.sourceIds = [];
       this.targetIds = [];
+      this.explanation = "";
 
       if (typeof openTo !== "object") return;
 

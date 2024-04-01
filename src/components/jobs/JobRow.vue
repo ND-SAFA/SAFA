@@ -131,11 +131,10 @@ const steps = computed<StepperStep[]>(
 
 const { displayTime } = useTimeDisplay({
   getStart: () => props.job.startedAt,
-  getEnd: () => "",
-  // getEnd: () =>
-  //   ["IN_PROGRESS", "COMPLETED"].includes(props.job.status)
-  //     ? props.job.completedAt
-  //     : props.job.lastUpdatedAt,
+  getEnd: () =>
+    ["IN_PROGRESS", "COMPLETED"].includes(props.job.status)
+      ? props.job.completedAt
+      : props.job.lastUpdatedAt,
 });
 
 const displayLogs = computed(

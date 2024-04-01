@@ -1,44 +1,7 @@
-import { computed, ComputedRef, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { defineStore } from "pinia";
+import { TimeDisplayHook, TimeDisplayProps } from "@/types";
 import { pinia } from "@/plugins";
-
-/**
- * The properties for the time display.
- */
-interface TimeDisplayProps {
-  /**
-   * The start of the duration, as an ISO timestamp.
-   */
-  getStart: () => string;
-  /**
-   * The end of the duration, as an ISO timestamp.
-   * Set as empty string to display the current time.
-   */
-  getEnd: () => string;
-}
-
-/**
- * A hook for managing the display of a timestamp that updates in real-time.
- */
-interface TimeDisplayHook {
-  /**
-   * The current time.
-   */
-  displayTime: ComputedRef<string>;
-  /**
-   * Updates the time display manually.
-   */
-  resetTime(): void;
-  /**
-   * Stops the time display from updating.
-   */
-  stopTime(): void;
-}
-
-/**
- * The interval for updating the time display, in milliseconds.
- */
-const interval = 60000;
 
 /**
  * A store for managing the current time.
@@ -55,7 +18,7 @@ const useTime = defineStore("time", () => {
       if (timer.value) {
         clearTimeout(timer.value);
       }
-      timer.value = setTimeout(updateNow, interval);
+      timer.value = setTimeout(updateNow, 60 * 1000);
     }
   }
 

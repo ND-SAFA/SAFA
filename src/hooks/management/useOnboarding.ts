@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 
 import { CostEstimateSchema, JobSchema } from "@/types";
 import {
-  jobStatus,
   MAX_GENERATED_BASE_ARTIFACTS,
   ONBOARDING_MEET_LINK,
   ONBOARDING_STEPS,
@@ -116,9 +115,7 @@ export const useOnboarding = defineStore("useOnboarding", {
     uploadProgress(): string {
       const { steps = [], currentStep = 0 } = this.uploadedJob || {};
       return this.uploadedJob
-        ? `Step ${currentStep + 1} of ${steps.length}: ${
-            steps[currentStep]
-          } (${jobStatus(this.uploadedJob).duration()})`
+        ? `Step ${currentStep + 1} of ${steps.length}: ${steps[currentStep]}`
         : "";
     },
     /**

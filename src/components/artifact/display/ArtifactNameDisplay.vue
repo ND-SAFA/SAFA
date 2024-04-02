@@ -1,5 +1,11 @@
 <template>
-  <flex-box align="center" justify="between" class="overflow-hidden">
+  <flex-box
+    :align="smallWindow ? 'start' : 'center'"
+    justify="between"
+    class="overflow-hidden"
+    :column="smallWindow"
+    :style="smallWindow ? 'flex-direction: column-reverse' : undefined"
+  >
     <flex-box column full-width>
       <typography
         v-if="splitLines"
@@ -51,10 +57,12 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactNameDisplayProps } from "@/types";
-import { timStore } from "@/hooks";
+import { timStore, useScreen } from "@/hooks";
 import { FlexBox, Typography, AttributeChip } from "@/components/common";
 
 const props = defineProps<ArtifactNameDisplayProps>();
+
+const { smallWindow } = useScreen();
 
 const artifactType = computed(() => timStore.getTypeName(props.artifact.type));
 

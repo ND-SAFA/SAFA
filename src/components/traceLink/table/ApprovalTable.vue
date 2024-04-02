@@ -27,7 +27,7 @@
           option-to-value
           option-value="id"
           option-label="name"
-          class="table-input"
+          class="table-input q-mb-sm q-mr-sm"
           data-cy="input-approval-type"
           b=""
         />
@@ -41,7 +41,7 @@
           option-value="id"
           label="Visible Artifacts"
           b=""
-          class="q-ml-sm table-input"
+          class="table-input q-mb-sm"
           data-cy="input-trace-table-count"
         />
         <text-button

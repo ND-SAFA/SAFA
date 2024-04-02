@@ -4,6 +4,7 @@
     :clickable="props.clickable"
     :divider="props.displayDivider"
     :class="props.fullWidth ? 'full-width' : 'artifact-display'"
+    :style="smallWindow ? 'padding: 0px' : undefined"
     @click="emit('click')"
   >
     <artifact-name-display
@@ -41,6 +42,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { ArtifactListItemProps } from "@/types";
+import { useScreen } from "@/hooks";
 import { Typography, ListItem } from "@/components/common";
 import ArtifactNameDisplay from "./ArtifactNameDisplay.vue";
 
@@ -52,6 +54,8 @@ const emit = defineEmits<{
    */
   (e: "click"): void;
 }>();
+
+const { smallWindow } = useScreen();
 
 const showSummary = computed(() => !!props.artifact?.summary);
 const isCode = computed(() => props.artifact.isCode);

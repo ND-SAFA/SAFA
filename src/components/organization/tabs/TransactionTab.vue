@@ -17,6 +17,7 @@
           outlined
           dense
           label="Period"
+          class="q-mb-sm"
           :options="modeOptions"
         />
       </template>

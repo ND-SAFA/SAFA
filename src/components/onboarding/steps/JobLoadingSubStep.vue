@@ -6,7 +6,7 @@
     v-if="!!uploadedJob"
     dense
     :title="uploadedJob.name"
-    :subtitle="onboardingStore.uploadProgress"
+    :subtitle="progress"
     class="q-mt-md"
   >
     <template #icon>
@@ -42,29 +42,32 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
-import { onboardingStore } from "@/hooks";
+import { computed, onMounted, watch } from "vue";
+import { onboardingStore, useTimeDisplay } from "@/hooks";
 import { FlexBox, Icon, ListItem } from "@/components/common";
-
-const progress = ref("");
-const progressTimer = ref<ReturnType<typeof setTimeout> | undefined>();
 
 const uploadedJob = computed(() => onboardingStore.uploadedJob);
 
-function updateProgress() {
-  progress.value = onboardingStore.uploadProgress;
+const { displayTime, resetTime, stopTime } = useTimeDisplay({
+  getStart: () => onboardingStore.uploadedJob?.startedAt || "",
+  getEnd: () => onboardingStore.uploadedJob?.completedAt || "",
+});
 
-  if (uploadedJob.value?.status !== "IN_PROGRESS") return;
+const progress = computed(
+  () => `${onboardingStore.uploadProgress} (${displayTime.value})`
+);
 
-  if (progressTimer.value) clearTimeout(progressTimer.value);
-
-  progressTimer.value = setTimeout(() => updateProgress(), 60 * 1000);
-}
-
-onMounted(() => updateProgress());
+onMounted(() => resetTime());
 
 watch(
   () => uploadedJob.value,
-  () => updateProgress()
+  () => resetTime()
+);
+
+watch(
+  () => uploadedJob.value?.status,
+  (status) => {
+    if (status !== "IN_PROGRESS") stopTime();
+  }
 );
 </script>

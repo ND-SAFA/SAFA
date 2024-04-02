@@ -16,11 +16,7 @@
       />
     </q-td>
     <q-td align="end">
-      <typography
-        secondary
-        :value="jobStatus(props.job).duration()"
-        data-cy="job-duration"
-      />
+      <typography secondary :value="displayTime" data-cy="job-duration" />
     </q-td>
     <q-td align="end">
       <chip outlined :color="jobStatus(props.job).color()" data-cy="job-status">
@@ -100,6 +96,7 @@ import {
   jobStore,
   logStore,
   permissionStore,
+  useTimeDisplay,
   useVModel,
 } from "@/hooks";
 import {
@@ -131,6 +128,14 @@ const steps = computed<StepperStep[]>(
       done: idx < currentStep.value,
     })) || []
 );
+
+const { displayTime } = useTimeDisplay({
+  getStart: () => props.job.startedAt,
+  getEnd: () =>
+    ["IN_PROGRESS", "COMPLETED"].includes(props.job.status)
+      ? props.job.completedAt
+      : props.job.lastUpdatedAt,
+});
 
 const displayLogs = computed(
   () => permissionStore.isSuperuser || process.env.NODE_ENV !== "production"

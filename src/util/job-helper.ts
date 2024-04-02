@@ -28,18 +28,6 @@ export function jobStatus(job: JobSchema) {
           return "";
       }
     },
-    duration: () => {
-      const duration = job.completedAt
-        ? new Date(job.completedAt).getTime() -
-          new Date(job.startedAt).getTime()
-        : new Date(Date.now()).getTime() - new Date(job.startedAt).getTime();
-      const hours = Math.floor(duration / 3600000);
-      const minutes = Math.floor((duration % 3600000) / 60000);
-      const hoursDisplay = `${hours} Hour${hours === 1 ? "" : "s"}`;
-      const minutesDisplay = `${minutes} Minute${minutes === 1 ? "" : "s"}`;
-
-      return hours ? `${hoursDisplay}, ${minutesDisplay}` : minutesDisplay;
-    },
     status: () => enumToDisplay(job.status || ""),
     color: () => getEnumColor(job.status || ""),
     icon: (): IconVariant => {

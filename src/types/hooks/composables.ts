@@ -43,6 +43,39 @@ export interface ScreenHook {
 }
 
 /**
+ * The properties for the time display.
+ */
+export interface TimeDisplayProps {
+  /**
+   * The start of the duration, as an ISO timestamp.
+   */
+  getStart: () => string;
+  /**
+   * The end of the duration, as an ISO timestamp.
+   * Set as empty string to display the current time.
+   */
+  getEnd: () => string;
+}
+
+/**
+ * A hook for managing the display of a timestamp that updates in real-time.
+ */
+export interface TimeDisplayHook {
+  /**
+   * The current time.
+   */
+  displayTime: ComputedRef<string>;
+  /**
+   * Updates the time display manually.
+   */
+  resetTime(): void;
+  /**
+   * Stops the time display from updating.
+   */
+  stopTime(): void;
+}
+
+/**
  * Props for creating a table filter hook.
  */
 export interface TableFilterProps {

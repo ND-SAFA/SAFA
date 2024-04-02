@@ -8,17 +8,17 @@ import { pinia } from "@/plugins";
  * Watches for updates to time in a single place, at 1-minute intervals.
  */
 const useTime = defineStore("time", () => {
-  const now = ref(new Date(Date.now()).getTime());
+  const now = ref(Date.now());
   const timer = ref<ReturnType<typeof setTimeout> | null>(null);
 
   function updateNow(repeat = true) {
-    now.value = new Date(Date.now()).getTime();
+    now.value = Date.now();
 
     if (repeat) {
       if (timer.value) {
         clearTimeout(timer.value);
       }
-      timer.value = setTimeout(updateNow, 60 * 1000);
+      timer.value = setTimeout(updateNow, 1000 * 60);
     }
   }
 

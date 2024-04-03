@@ -183,6 +183,10 @@ $color-linear-gradient: linear-gradient(
   }
 }
 
+.bd-transparent {
+  border: 1px solid transparent !important;
+}
+
 // Text Palette Tags
 
 .text-text {

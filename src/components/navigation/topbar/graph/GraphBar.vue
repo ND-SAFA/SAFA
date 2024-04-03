@@ -7,7 +7,6 @@
       <update-button />
       <commit-buttons />
       <document-history />
-      <visible-type-buttons />
     </flex-box>
   </flex-box>
 </template>
@@ -25,6 +24,5 @@ export default {
 import { FlexBox, CommitButtons } from "@/components/common";
 import { DocumentHistory } from "@/components/document";
 import ModeButtons from "./ModeButtons.vue";
-import VisibleTypeButtons from "./VisibleTypeButtons.vue";
 import UpdateButton from "./UpdateButton.vue";
 </script>

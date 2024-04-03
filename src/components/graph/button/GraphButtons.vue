@@ -4,7 +4,8 @@
     position="top-right"
     class="artifact-fab"
   >
-    <flex-box column x="2" y="2">
+    <flex-box column x="2" y="2" align="end">
+      <visible-type-buttons />
       <icon-button
         v-for="definition in viewButtons"
         :key="definition.label"
@@ -41,6 +42,7 @@ import {
 } from "@/hooks";
 import { IconButton } from "@/components/common";
 import FlexBox from "@/components/common/display/content/FlexBox.vue";
+import VisibleTypeButtons from "./VisibleTypeButtons.vue";
 
 const viewButtons = computed(() => [
   {

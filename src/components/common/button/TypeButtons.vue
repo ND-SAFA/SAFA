@@ -2,7 +2,7 @@
   <q-card
     :bordered="visible"
     flat
-    :class="visible ? 'bd-primary q-mx-sm' : 'q-mx-sm'"
+    :class="visible ? 'bd-primary q-mx-sm' : 'q-mx-sm bd-transparent'"
   >
     <q-btn-group flat>
       <icon-button

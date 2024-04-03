@@ -1,10 +1,7 @@
 package edu.nd.crc.safa.features.generation.hgen;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -42,8 +39,9 @@ public class HGenService {
     public ProjectCommitDefinition generateHierarchy(ProjectVersion projectVersion, HGenRequest request,
                                                      JobLogger jobLogger) {
         List<String> targetTypes = request.getTargetTypes();
-        List<ArtifactAppEntity> sourceArtifacts = this.artifactService.getAppEntities(projectVersion);
-        List<GenerationArtifact> artifacts = toHGenArtifacts(sourceArtifacts, request.getArtifacts());
+        List<ArtifactAppEntity> sourceArtifacts =
+                this.artifactService.getAppEntitiesByIds(projectVersion, request.getArtifacts());
+        List<GenerationArtifact> artifacts = toHGenArtifacts(sourceArtifacts);
         TGenHGenRequest tgenRequest = new TGenHGenRequest(artifacts, targetTypes, request.getSummary());
 
         GenerationDataset dataset = genApi.generateHierarchy(tgenRequest, jobLogger);
@@ -101,18 +99,11 @@ public class HGenService {
      * Converts artifacts to HGEN format.
      *
      * @param artifacts   The project artifacts to query from.
-     * @param artifactIds The IDs of the artifacts to prepare.
      * @return List of prepared artifacts for HGEN.
      */
-    private List<GenerationArtifact> toHGenArtifacts(List<ArtifactAppEntity> artifacts,
-                                                     List<UUID> artifactIds) {
+    private List<GenerationArtifact> toHGenArtifacts(List<ArtifactAppEntity> artifacts) {
         List<GenerationArtifact> preparedArtifacts = new ArrayList<>();
-        Set<UUID> artifactIdSet = new HashSet<>(artifactIds);
-        artifacts.stream()
-            .filter(a -> artifactIdSet.contains(a.getId()))
-            .forEach(a -> {
-                preparedArtifacts.add(new GenerationArtifact(a));
-            });
+        artifacts.forEach(a -> preparedArtifacts.add(new GenerationArtifact(a)));
         return preparedArtifacts;
     }
 }

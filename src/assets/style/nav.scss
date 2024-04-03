@@ -17,6 +17,7 @@
 
 .nav-mode-selected {
   background-color: $color-background !important;
+  border-radius: $default-border-radius !important;
 }
 
 .nav-input {
@@ -40,7 +41,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 80%
+    max-width: 80%;
   }
 
   &.nav-search {
@@ -85,6 +86,10 @@
     & > .q-field__inner > .q-field__control {
       border-bottom-left-radius: 0;
       border-top-left-radius: 0;
+
+      &:before {
+        border-left: none;
+      }
     }
   }
 }
@@ -98,7 +103,7 @@
   max-width: 300px;
   border: 1px solid transparent;
   transition: border 0.3s;
-  border-radius: 4px;
+  border-radius: $default-border-radius;
 
   .q-field__label {
     font-size: 16px;
@@ -135,7 +140,7 @@
 // Navigation - Topbar
 
 .nav-topbar {
-  border-left: 1px solid rgba(0, 0, 0, 0.12);
+  //border-left: 1px solid rgba(0, 0, 0, 0.12);
   min-height: 70px;
 }
 
@@ -161,7 +166,7 @@
 
 .nav-mode-select {
   .q-btn--outline:before {
-    border-radius: 4px;
+    border-radius: $default-border-radius;
   }
 }
 
@@ -219,7 +224,7 @@
 
 .q-item.q-link {
   margin: 8px;
-  border-radius: 4px;
+  border-radius: $default-border-radius;
   transition: margin 0.1s;
 
   &.q-router-link--active {

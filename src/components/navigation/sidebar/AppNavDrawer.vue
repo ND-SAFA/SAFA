@@ -4,9 +4,9 @@
     :mini="!sidebarOpen"
     :mini-width="65"
     :width="260"
-    elevated
     model-value
     persistent
+    bordered
   >
     <flex-box
       v-if="sidebarOpen"

@@ -1,5 +1,5 @@
 <template>
-  <q-header elevated class="bg-neutral">
+  <q-header bordered class="bg-neutral">
     <q-toolbar class="nav-topbar">
       <div class="full-width">
         <header-bar />

@@ -63,7 +63,6 @@ const options = computed(() => {
       iconTitle: !sidebarOpen.value ? "View" : undefined,
       icon: "nav-artifact",
       disabled: hideProjectOptions.value,
-      divider: true,
       path: { path: Routes.ARTIFACT, query },
       color: Routes.ARTIFACT === currentRoute.path ? "primary" : "text",
     },

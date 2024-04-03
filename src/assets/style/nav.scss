@@ -213,6 +213,20 @@
   }
 }
 
+.q-drawer-container:not(.q-drawer--mini-animate) .q-drawer--mini .q-item {
+  margin: 4px;
+}
+
+.q-item.q-link {
+  margin: 8px;
+  border-radius: 4px;
+  transition: margin 0.1s;
+
+  &.q-router-link--active {
+    background-color: $color-background !important;
+  }
+}
+
 // Navigation - Notifications
 
 .nav-notifications {

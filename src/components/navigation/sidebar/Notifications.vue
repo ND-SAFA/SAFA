@@ -1,5 +1,11 @@
 <template>
-  <list-item to="" title="Notifications" clickable @click="handleOpen">
+  <list-item
+    to=""
+    title="Notifications"
+    clickable
+    tooltip="Notifications"
+    @click="handleOpen"
+  >
     <template #icon>
       <div class="nav-job-icon">
         <q-circular-progress

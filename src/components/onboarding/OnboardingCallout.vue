@@ -1,27 +1,29 @@
 <template>
-  <flex-box x="2" y="2" justify="center">
+  <flex-box v-if="appStore.popups.navPanel" x="2" t="3" b="4" justify="center">
     <text-button
-      v-if="appStore.popups.navPanel"
       block
-      icon="onboarding"
-      color="primary"
-      label="Generate Now"
-      class="q-py-sm"
-      @click="handleOnboarding"
-    />
-    <icon-button
-      v-else
-      tooltip="Generate Now"
-      icon="onboarding"
-      color="primary"
+      flat
+      icon="generate-artifacts"
+      label="Generate Docs"
+      class="q-py-sm text-gradient bd-gradient"
       @click="handleOnboarding"
     />
   </flex-box>
+  <list-item
+    v-else
+    to=""
+    title="Generate Docs"
+    icon="generate-artifacts"
+    class="text-gradient"
+    clickable
+    tooltip="Generate Documentation"
+    @click="handleOnboarding"
+  />
 </template>
 
 <script lang="ts">
 /**
- * A substep in the onboarding process that displays a callout message.
+ * A callout button that opens the onboarding workflow.
  */
 export default {
   name: "OnboardingCallout",
@@ -30,7 +32,7 @@ export default {
 
 <script setup lang="ts">
 import { appStore, onboardingApiStore } from "@/hooks";
-import { IconButton, TextButton, FlexBox } from "@/components/common";
+import { TextButton, FlexBox, ListItem } from "@/components/common";
 
 /**
  * Opens the onboarding workflow.

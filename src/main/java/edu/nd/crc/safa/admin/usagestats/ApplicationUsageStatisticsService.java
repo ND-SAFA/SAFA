@@ -1,7 +1,12 @@
 package edu.nd.crc.safa.admin.usagestats;
 
+import java.util.List;
+
 import edu.nd.crc.safa.admin.usagestats.entities.db.ApplicationUsageStatistics;
 import edu.nd.crc.safa.admin.usagestats.repositories.ApplicationUsageStatisticsRepository;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
+import edu.nd.crc.safa.features.generation.GenerationPerformedEvent;
 import edu.nd.crc.safa.features.github.entities.events.GithubLinkedEvent;
 import edu.nd.crc.safa.features.github.entities.events.GithubProjectImportedEvent;
 import edu.nd.crc.safa.features.github.entities.events.ProjectSummarizedEvent;
@@ -17,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class ApplicationUsageStatisticsService {
 
     private final ApplicationUsageStatisticsRepository statsRepo;
+    private final ArtifactService artifactService;
 
     /**
      * Get statistics for a user
@@ -87,5 +93,32 @@ public class ApplicationUsageStatisticsService {
         ApplicationUsageStatistics stats = getByUser(event.getUser());
         stats.setProjectSummarizations(stats.getProjectSummarizations() + 1);
         statsRepo.save(stats);
+    }
+
+    /**
+     * Handle generation performed event by updating generation-related values in statistics object for the user
+     *
+     * @param event Event with details about the generation
+     */
+    @EventListener
+    public void handleGenerationPerformed(GenerationPerformedEvent event) {
+        ApplicationUsageStatistics stats = getByUser(event.getUser());
+        stats.setProjectGenerations(stats.getProjectGenerations() + 1);
+        stats.setLinesGeneratedOn((int) (stats.getLinesGeneratedOn() + getLinesInGeneration(event)));
+
+        if (stats.getGenerationPerformed() == null) {
+            stats.setGenerationPerformed(event.getPerformedTime());
+        }
+
+        statsRepo.save(stats);
+    }
+
+    private long getLinesInGeneration(GenerationPerformedEvent event) {
+        List<ArtifactAppEntity> artifacts =
+                artifactService.getAppEntitiesByIds(event.getProjectVersion(), event.getHGenRequest().getArtifacts());
+
+        return artifacts.stream()
+                .flatMap(a -> a.getBody().lines())
+                .count();
     }
 }

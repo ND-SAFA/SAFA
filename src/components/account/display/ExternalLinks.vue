@@ -5,7 +5,7 @@
         <text-button
           text
           color="primary"
-          label="Getting Started"
+          label="Generate Now"
           icon="onboarding"
           @click="handleOnboarding"
         />

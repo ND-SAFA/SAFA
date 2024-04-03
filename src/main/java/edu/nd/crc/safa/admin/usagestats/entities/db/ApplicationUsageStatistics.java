@@ -10,7 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
 @Entity
-@Table(name = "usage_statistics")  // TODO
+@Table(name = "usage_statistics")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,12 +29,12 @@ public class ApplicationUsageStatistics {
     @JdbcTypeCode(SqlTypes.BINARY)
     @Id
     @GeneratedValue
-    @Column
+    @Column(nullable = false)
     private UUID id;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @ManyToOne
+    @OneToOne
     private SafaUser user;
 
     @Column
@@ -59,5 +59,9 @@ public class ApplicationUsageStatistics {
     private LocalDateTime projectImported;
 
     @Column
-    private LocalDateTime generated;
+    private LocalDateTime generationPerformed;
+
+    public ApplicationUsageStatistics(SafaUser user) {
+        this.user = user;
+    }
 }

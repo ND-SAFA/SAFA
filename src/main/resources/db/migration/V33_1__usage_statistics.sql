@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS usage_statistics
     account_created         DATETIME,
     github_linked           DATETIME,
     project_imported        DATETIME,
-    generated               DATETIME,
+    generation_performed    DATETIME,
     CONSTRAINT usage_statistics_user_id_fk FOREIGN KEY (user_id) REFERENCES safa_user (user_id) ON DELETE CASCADE,
     CONSTRAINT usage_statistics_user_id_unique UNIQUE (user_id)
 );

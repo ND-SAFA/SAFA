@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.users.entities;
+package edu.nd.crc.safa.features.github.entities;
 
 import java.time.LocalDateTime;
 
@@ -8,14 +8,14 @@ import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
-public class AccountCreatedEvent extends ApplicationEvent {
+public class GithubLinkedEvent extends ApplicationEvent {
 
+    private final LocalDateTime linkedTime;
     private final SafaUser user;
-    private final LocalDateTime createdTime;
 
-    public AccountCreatedEvent(Object source, SafaUser user) {
+    public GithubLinkedEvent(Object source, SafaUser user) {
         super(source);
+        this.linkedTime = LocalDateTime.now();
         this.user = user;
-        this.createdTime = LocalDateTime.now();
     }
 }

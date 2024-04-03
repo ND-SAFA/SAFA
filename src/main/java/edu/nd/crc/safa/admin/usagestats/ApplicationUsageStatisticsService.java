@@ -2,6 +2,7 @@ package edu.nd.crc.safa.admin.usagestats;
 
 import edu.nd.crc.safa.admin.usagestats.entities.db.ApplicationUsageStatistics;
 import edu.nd.crc.safa.admin.usagestats.repositories.ApplicationUsageStatisticsRepository;
+import edu.nd.crc.safa.features.github.entities.GithubLinkedEvent;
 import edu.nd.crc.safa.features.users.entities.AccountCreatedEvent;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
@@ -38,5 +39,20 @@ public class ApplicationUsageStatisticsService {
         ApplicationUsageStatistics stats = getByUser(event.getUser());
         stats.setAccountCreated(event.getCreatedTime());
         statsRepo.save(stats);
+    }
+
+    /**
+     * Handle github linked event by setting the github link time for the user, if it was not already set
+     *
+     * @param event Event with details about the github link
+     */
+    @EventListener
+    public void handleGithubLinked(GithubLinkedEvent event) {
+        ApplicationUsageStatistics stats = getByUser(event.getUser());
+
+        if (stats.getGithubLinked() == null) {
+            stats.setGithubLinked(event.getLinkedTime());
+            statsRepo.save(stats);
+        }
     }
 }

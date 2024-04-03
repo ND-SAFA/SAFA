@@ -8,4 +8,13 @@ public class UserProgressSummaryAppEntity {
     private GithubIntegrationStatistics github;
     private ProjectImportStatistics imports;
     private ProjectSummarizationStatistics summarizations;
+    private GenerationStatistics generations;
+
+    public UserProgressSummaryAppEntity() {
+        accounts = new AccountCreationStatistics();
+        github = new GithubIntegrationStatistics();
+        imports = new ProjectImportStatistics();
+        summarizations = new ProjectSummarizationStatistics();
+        generations = new GenerationStatistics();
+    }
 }

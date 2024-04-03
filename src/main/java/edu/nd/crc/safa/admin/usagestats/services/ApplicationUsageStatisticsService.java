@@ -1,7 +1,9 @@
-package edu.nd.crc.safa.admin.usagestats;
+package edu.nd.crc.safa.admin.usagestats.services;
 
 import java.util.List;
 
+import edu.nd.crc.safa.admin.usagestats.ProgressSummaryCalculator;
+import edu.nd.crc.safa.admin.usagestats.entities.app.UserProgressSummaryAppEntity;
 import edu.nd.crc.safa.admin.usagestats.entities.db.ApplicationUsageStatistics;
 import edu.nd.crc.safa.admin.usagestats.repositories.ApplicationUsageStatisticsRepository;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -120,5 +122,15 @@ public class ApplicationUsageStatisticsService {
         return artifacts.stream()
                 .flatMap(a -> a.getBody().lines())
                 .count();
+    }
+
+    /**
+     * Get orientation progress summary for all users
+     *
+     * @return Orientation progress summary
+     */
+    public UserProgressSummaryAppEntity getOrientationProgressSummary() {
+        Iterable<ApplicationUsageStatistics> allUsageStats = statsRepo.findAll();
+        return ProgressSummaryCalculator.fromUsageStats(allUsageStats);
     }
 }

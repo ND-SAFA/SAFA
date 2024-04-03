@@ -1,18 +1,22 @@
 <template>
-  <flex-box v-if="!layoutStore.isTableMode">
-    <separator vertical inset nav x="1" />
-    <icon-button
-      v-for="definition in viewButtons"
-      :key="definition.label"
-      color="text"
-      :tooltip="definition.label"
-      :icon="definition.icon"
-      :disabled="definition.disabled"
-      :data-cy="definition.dataCy"
-      @click="definition.handler"
-    />
-    <separator vertical inset nav x="1" />
-  </flex-box>
+  <q-page-sticky
+    v-if="!layoutStore.isTableMode"
+    position="top-right"
+    class="artifact-fab"
+  >
+    <flex-box column x="2" y="2">
+      <icon-button
+        v-for="definition in viewButtons"
+        :key="definition.label"
+        color="text"
+        :tooltip="definition.label"
+        :icon="definition.icon"
+        :disabled="definition.disabled"
+        :data-cy="definition.dataCy"
+        @click="definition.handler"
+      />
+    </flex-box>
+  </q-page-sticky>
 </template>
 
 <script lang="ts">
@@ -35,7 +39,8 @@ import {
   layoutStore,
   permissionStore,
 } from "@/hooks";
-import { IconButton, FlexBox, Separator } from "@/components/common";
+import { IconButton } from "@/components/common";
+import FlexBox from "@/components/common/display/content/FlexBox.vue";
 
 const viewButtons = computed(() => [
   {

@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.github.entities;
+package edu.nd.crc.safa.features.github.entities.events;
 
 import java.time.LocalDateTime;
 

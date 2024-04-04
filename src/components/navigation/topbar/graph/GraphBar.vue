@@ -6,7 +6,6 @@
     <flex-box align="center">
       <update-button />
       <commit-buttons />
-      <document-history />
     </flex-box>
   </flex-box>
 </template>
@@ -22,7 +21,6 @@ export default {
 
 <script setup lang="ts">
 import { FlexBox, CommitButtons } from "@/components/common";
-import { DocumentHistory } from "@/components/document";
 import ModeButtons from "./ModeButtons.vue";
 import UpdateButton from "./UpdateButton.vue";
 </script>

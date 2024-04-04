@@ -1,19 +1,27 @@
 <template>
   <flex-box v-if="layoutStore.mode !== 'tim'" align="center">
-    <separator vertical inset nav x="1" />
     <icon-button
-      :disabled="!documentStore.hasPreviousHistory"
+      v-if="documentStore.hasPreviousHistory"
+      small
       tooltip="Previous View"
       icon="back"
       color="text"
       @click="documentStore.switchDocumentHistory('previous')"
     />
     <icon-button
-      :disabled="!documentStore.hasNextHistory"
+      v-if="documentStore.hasNextHistory"
+      small
       tooltip="Next View"
       icon="forward"
       color="text"
       @click="documentStore.switchDocumentHistory('next')"
+    />
+    <separator
+      v-if="documentStore.hasPreviousHistory || documentStore.hasNextHistory"
+      vertical
+      inset
+      nav
+      x="1"
     />
   </flex-box>
 </template>
@@ -29,5 +37,5 @@ export default {
 
 <script setup lang="ts">
 import { documentStore, layoutStore } from "@/hooks";
-import { FlexBox, IconButton, Separator } from "@/components";
+import { FlexBox, IconButton, Separator } from "@/components/common";
 </script>

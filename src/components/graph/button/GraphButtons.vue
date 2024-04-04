@@ -5,7 +5,7 @@
     class="artifact-fab"
   >
     <flex-box column x="2" y="2" align="end">
-      <visible-type-buttons />
+      <visible-type-buttons class="q-mb-sm q-mr-xs" />
       <icon-button
         v-for="definition in viewButtons"
         :key="definition.label"

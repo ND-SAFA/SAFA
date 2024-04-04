@@ -2,7 +2,7 @@
   <q-card
     :bordered="visible"
     flat
-    :class="visible ? 'bd-primary q-mx-sm' : 'q-mx-sm bd-transparent'"
+    :class="visible ? 'bd-primary' : 'bd-transparent'"
   >
     <q-btn-group flat>
       <icon-button
@@ -71,7 +71,7 @@ function buttonProps(option: ArtifactTypeSchema) {
   return {
     style: `color: ${option.color};` + (hidden ? "opacity: 0.3" : ""),
     tooltip: option.name,
-    class: !hidden ? "nav-mode-selected" : "",
+    class: !hidden ? "bg-background" : "",
   };
 }
 </script>

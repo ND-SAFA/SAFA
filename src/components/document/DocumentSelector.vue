@@ -3,7 +3,7 @@
     v-model="documentApiStore.currentDocument"
     standout
     bg-color="transparent"
-    class="nav-breadcrumb"
+    class="nav-breadcrumb nav-view"
     options-selected-class="primary"
     :options="options"
     :disable="disabled"
@@ -13,14 +13,18 @@
     option-value="name"
     data-cy="button-document-select-open"
   >
-    <template v-if="canSave()" #append>
-      <icon-button
-        small
-        tooltip="Save View"
-        icon="save"
-        data-cy="button-document-select-save"
-        @click="handleSave"
-      />
+    <template #append>
+      <flex-box @click.stop="">
+        <document-history />
+        <icon-button
+          v-if="canSave()"
+          small
+          tooltip="Save View"
+          icon="save"
+          data-cy="button-document-select-save"
+          @click="handleSave"
+        />
+      </flex-box>
     </template>
     <template
       #option="{
@@ -97,6 +101,7 @@ import {
   permissionStore,
 } from "@/hooks";
 import { IconButton, TextButton, ListItem, FlexBox } from "@/components/common";
+import DocumentHistory from "./DocumentHistory.vue";
 
 const options = computed(() => documentStore.projectDocuments);
 

@@ -10,5 +10,7 @@ export const ENABLED_FEATURES = {
 
   ONBOARDING_PUBLIC_REPOS: false,
 
+  GENERATE_SUMMARIES: false,
+
   SIGN_UP: true,
 };

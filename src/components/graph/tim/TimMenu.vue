@@ -16,7 +16,7 @@
       />
       <separator v-if="displayGenerateActions" vertical class="q-mx-xs" />
       <icon-button
-        v-if="displayGenerateActions"
+        v-if="displayGenerateActions && ENABLED_FEATURES.GENERATE_SUMMARIES"
         tooltip="Summarize artifacts"
         icon="generate-summaries"
         color="gradient"
@@ -56,6 +56,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, inject } from "vue";
+import { ENABLED_FEATURES } from "@/util";
 import { appStore, cyStore, permissionStore } from "@/hooks";
 import { FlexBox, IconButton, Separator } from "@/components/common";
 import { NodeDisplay } from "@/components/graph/display";

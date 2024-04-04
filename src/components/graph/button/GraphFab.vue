@@ -36,7 +36,7 @@
         @click="appStore.openDetailsPanel('generateArtifact')"
       />
       <q-fab-action
-        v-if="displayGenerateActions"
+        v-if="displayGenerateActions && ENABLED_FEATURES.GENERATE_SUMMARIES"
         label="Summarize Artifacts"
         :icon="getIcon('generate-summaries')"
         color="gradient"
@@ -89,7 +89,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { getIcon } from "@/util";
+import { ENABLED_FEATURES, getIcon } from "@/util";
 import {
   appStore,
   artifactSaveStore,

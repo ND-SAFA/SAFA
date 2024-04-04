@@ -9,8 +9,7 @@
           "generate_explanations": "[GENERATE_EXPLANATIONS_OPTIONAL]",
           "embedding_model_name": {
             "*": [
-              "sentence-transformers/all-roberta-large-v1", "sentence-transformers/all-MiniLM-L6-v2",
-              "BAAI/bge-m3"
+              "sentence-transformers/all-roberta-large-v1", "Salesforce/SFR-Embedding-Mistral"
             ]
           },
           "dataset_creator": {

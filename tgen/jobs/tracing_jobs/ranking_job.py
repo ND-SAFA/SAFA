@@ -22,6 +22,7 @@ from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
+from tgen.relationship_manager.supported_relationship_managers import SupportedRelationshipManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
@@ -40,6 +41,7 @@ class RankingJob(AbstractJob):
                  ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM, layer_ids: Tuple[str, str] = None,
                  select_top_predictions: bool = DEFAULT_SELECT_TOP_PREDICTIONS, log_results: bool = True,
                  relationship_manager: AbstractRelationshipManager = None,
+                 relationship_manager_type: SupportedRelationshipManager = SupportedRelationshipManager.EMBEDDING,
                  **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
@@ -61,6 +63,7 @@ class RankingJob(AbstractJob):
         self.ranking_kwargs = kwargs
         self.log_results = log_results
         self.relationship_manager = relationship_manager
+        self.relationship_manager_type = relationship_manager_type
         assert self.dataset.trace_dataset is not None or self.layer_ids, "Must specify parent-child layers or provide trace dataset"
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
@@ -102,6 +105,10 @@ class RankingJob(AbstractJob):
         if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
             export_dir = FileUtil.safely_join_paths(export_dir, RankingJob._get_run_dir(child_type, parent_type))
         layer_dataset = PromptDataset(artifact_df=selected_artifacts, project_summary=self.dataset.project_summary)
+        if not self.relationship_manager and self.relationship_manager_type:
+            model_name = DictUtil.get_kwarg_values(self.ranking_kwargs, model_name=None)
+            kwargs = DictUtil.update_kwarg_values({}, model_name=model_name) if model_name else {}
+            self.relationship_manager = self.relationship_manager_type.value(**kwargs)
         pipeline_args = RankingArgs(dataset=layer_dataset,
                                     parent_ids=parent_ids,
                                     children_ids=children_ids,

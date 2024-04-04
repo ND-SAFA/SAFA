@@ -7,9 +7,10 @@
           "ranking_pipeline": "EMBEDDING",
           "export_dir": "[OUTPUT_PATH]/embedding/[CURRENT_PROJECT]",
           "generate_explanations": "[GENERATE_EXPLANATIONS_OPTIONAL]",
+          "relationship_manager_type": "[RELATIONSHIP_MANAGER_TYPE]",
           "embedding_model_name": {
             "*": [
-              "sentence-transformers/all-roberta-large-v1", "Salesforce/SFR-Embedding-Mistral"
+              "mixedbread-ai/mxbai-rerank-large-v1", "GritLM/GritLM-7B"
             ]
           },
           "dataset_creator": {

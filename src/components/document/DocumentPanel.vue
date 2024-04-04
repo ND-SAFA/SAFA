@@ -1,6 +1,6 @@
 <template>
   <details-panel panel="document" @open="handleReset">
-    <panel-card>
+    <panel-card title="Save View">
       <text-input
         v-model="editedDocument.name"
         label="Name"

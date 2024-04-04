@@ -1,6 +1,8 @@
 <template>
   <details-panel panel="displayTrace" data-cy="panel-trace-display">
-    <trace-link-buttons />
+    <template #actions>
+      <trace-link-buttons />
+    </template>
     <trace-link-content />
   </details-panel>
 </template>

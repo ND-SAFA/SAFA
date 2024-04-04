@@ -1,11 +1,18 @@
 <template>
-  <flex-box b="2">
+  <flex-box v-if="artifact">
     <text-button
       text
-      label="View Content"
+      label="Tree"
+      icon="view-tree"
+      data-cy="button-artifact-tree"
+      @click="viewsStore.addDocumentOfNeighborhood(artifact)"
+    />
+    <text-button
+      text
+      label="Expand"
       icon="code"
       data-cy="button-artifact-body"
-      @click="handleViewBody"
+      @click="appStore.openDetailsPanel('displayArtifactBody')"
     />
     <text-button
       v-if="displayActions"
@@ -13,9 +20,8 @@
       label="Edit"
       icon="edit"
       data-cy="button-artifact-edit"
-      @click="handleEdit"
+      @click="artifactSaveStore.openPanel({})"
     />
-    <separator vertical />
     <text-button
       v-if="displayActions"
       text
@@ -23,7 +29,7 @@
       label="Delete"
       icon="delete"
       data-cy="button-artifact-delete"
-      @click="handleDelete"
+      @click="artifactApiStore.handleDelete(artifact)"
     />
   </flex-box>
 </template>
@@ -45,37 +51,13 @@ import {
   artifactSaveStore,
   artifactStore,
   permissionStore,
+  viewsStore,
 } from "@/hooks";
-import { FlexBox, TextButton, Separator } from "@/components/common";
+import { FlexBox, TextButton } from "@/components/common";
 
 const displayActions = computed(() =>
   permissionStore.isAllowed("project.edit_data")
 );
 
 const artifact = computed(() => artifactStore.selectedArtifact);
-
-/**
- * Attempts to delete the selected artifact.
- */
-function handleDelete(): void {
-  if (!artifact.value) return;
-
-  artifactApiStore.handleDelete(artifact.value!, {
-    onSuccess: () => appStore.closeSidePanels(),
-  });
-}
-
-/**
- * Opens the artifact creator.
- */
-function handleEdit(): void {
-  artifactSaveStore.openPanel({});
-}
-
-/**
- * Opens the artifact body display.
- */
-function handleViewBody(): void {
-  appStore.openDetailsPanel("displayArtifactBody");
-}
 </script>

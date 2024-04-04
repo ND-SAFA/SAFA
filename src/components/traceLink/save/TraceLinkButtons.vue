@@ -1,15 +1,13 @@
 <template>
-  <flex-box b="2">
-    <trace-link-approval
-      v-if="traceLink"
-      :trace="traceLink"
-      deletable
-      @approve="handleClose"
-      @decline="handleClose"
-      @unreview="handleClose"
-      @delete="handleClose"
-    />
-  </flex-box>
+  <trace-link-approval
+    v-if="traceLink"
+    :trace="traceLink"
+    deletable
+    @approve="handleClose"
+    @decline="handleClose"
+    @unreview="handleClose"
+    @delete="handleClose"
+  />
 </template>
 
 <script lang="ts">
@@ -24,7 +22,6 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { appStore, traceStore } from "@/hooks";
-import { FlexBox } from "@/components/common";
 import TraceLinkApproval from "./TraceLinkApproval.vue";
 
 const traceLink = computed(() => traceStore.selectedTraceLink);

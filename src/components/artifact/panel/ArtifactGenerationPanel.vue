@@ -1,6 +1,6 @@
 <template>
   <details-panel panel="generateArtifact">
-    <panel-card>
+    <panel-card title="Generate Artifacts">
       <q-btn-group flat class="q-mb-md">
         <text-button
           v-bind="buttonProps('single')"
@@ -109,9 +109,8 @@ function buttonProps(option: "single" | "multiple") {
 
   return {
     text: !selected,
-    outlined: selected,
-    color: "primary",
-    class: selected ? "nav-mode-selected" : "",
+    color: selected ? undefined : "text",
+    class: selected ? "button-group-selected text-primary" : "",
   };
 }
 

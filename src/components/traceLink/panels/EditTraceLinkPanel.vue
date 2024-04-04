@@ -1,6 +1,6 @@
 <template>
   <details-panel panel="editTrace" data-cy="panel-trace-edit">
-    <flex-box b="2">
+    <template #actions>
       <text-button
         text
         label="View Trace Link"
@@ -8,8 +8,8 @@
         data-cy="button-trace-view"
         @click="appStore.openDetailsPanel('displayTrace')"
       />
-    </flex-box>
-    <panel-card>
+    </template>
+    <panel-card title="Save Trace Link">
       <text-input
         v-model="editTraceStore.editedTrace.explanation"
         label="Explanation"

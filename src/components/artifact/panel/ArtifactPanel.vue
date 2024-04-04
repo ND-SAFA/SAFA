@@ -1,6 +1,8 @@
 <template>
   <details-panel panel="displayArtifact">
-    <artifact-buttons />
+    <template #actions>
+      <artifact-buttons />
+    </template>
     <artifact-content />
     <artifact-traces />
     <artifact-documents />

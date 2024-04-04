@@ -1,6 +1,6 @@
 <template>
   <details-panel panel="saveTrace" data-cy="panel-trace-save">
-    <panel-card>
+    <panel-card title="Save Trace Link">
       <artifact-input
         v-model="traceSaveStore.targetIds"
         multiple

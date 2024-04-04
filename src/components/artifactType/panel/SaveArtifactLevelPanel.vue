@@ -1,13 +1,13 @@
 <template>
   <details-panel panel="saveArtifactLevel" data-cy="panel-save-artifact-type">
-    <flex-box b="2">
+    <template #actions>
       <text-button
         text
         label="View Type"
         icon="artifact"
         @click="appStore.openDetailsPanel('displayArtifactLevel')"
       />
-    </flex-box>
+    </template>
 
     <panel-card v-if="artifactLevel" data-cy="panel-artifact-type-options">
       <flex-box align="center" justify="between">

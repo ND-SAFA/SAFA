@@ -48,7 +48,7 @@ const colorOptions = computed(() =>
       text: !selected,
       outlined: selected,
       style: `color: ${color}`,
-      class: selected ? "nav-mode-selected" : "",
+      class: selected ? "button-group-selected" : "",
     };
   })
 );

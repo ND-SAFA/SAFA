@@ -3,6 +3,7 @@
     :model-value="itemFields.length > 0"
     :label="title"
     :class="className"
+    style="border-width: 0 0 0 2px !important; border-radius: 0 !important"
   >
     <artifact-delta-button
       v-for="{ name, id } in itemFields"
@@ -47,9 +48,7 @@ const title = computed(
   () => `${itemCount.value} ${capitalize(props.deltaType)}`
 );
 
-const className = computed(
-  () => `rounded q-mb-sm bd-${getEnumColor(props.deltaType)}`
-);
+const className = computed(() => `q-mb-sm bd-${getEnumColor(props.deltaType)}`);
 
 /**
  * Converts all delta artifacts and traces into a list of select options.

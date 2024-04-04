@@ -1,13 +1,14 @@
 <template>
   <details-panel panel="saveArtifact" data-cy="panel-artifact-save">
-    <text-button
-      text
-      label="View Artifact"
-      b="2"
-      icon="artifact"
-      @click="appStore.openDetailsPanel('displayArtifact')"
-    />
-    <panel-card>
+    <template #actions>
+      <text-button
+        text
+        label="View Artifact"
+        icon="artifact"
+        @click="appStore.openDetailsPanel('displayArtifact')"
+      />
+    </template>
+    <panel-card title="Save Artifact">
       <save-artifact-inputs />
       <template #actions>
         <save-artifact-buttons />

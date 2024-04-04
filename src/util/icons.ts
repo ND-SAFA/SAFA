@@ -82,6 +82,7 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-folder-plus-outline";
     case "create-trace":
       return "mdi-ray-start-end";
+    case "graph-add":
     case "generate":
       return "mdi-creation";
     case "generate-artifacts":
@@ -156,8 +157,6 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-image-filter-center-focus-strong";
     case "graph-refresh":
       return "mdi-refresh";
-    case "graph-add":
-      return "mdi-shape-plus";
     case "nav-toggle":
       return "mdi-menu-open";
     case "nav-home":

@@ -45,7 +45,8 @@
         @click="appStore.openDetailsPanel('summarizeArtifact')"
       />
       <q-fab-action
-        :label="drawMode ? 'Cancel Draw Mode' : 'Draw Links'"
+        v-if="isTreeMode"
+        :label="drawMode ? 'Cancel Draw Mode' : 'Draw Trace Link'"
         :icon="drawMode ? getIcon('cancel') : getIcon('trace')"
         class="bg-background"
         data-cy="button-fab-draw-trace"

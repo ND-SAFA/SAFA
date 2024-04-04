@@ -1,5 +1,5 @@
 <template>
-  <panel-card :title="title" :subtitle="subtitle" :minimal="props.minimal">
+  <panel-card :minimal="props.minimal">
     <template #title-actions>
       <text-button
         v-if="addMode"
@@ -44,7 +44,7 @@
 
       <template #cell-actions="{ row }: { row: MembershipSchema }">
         <icon-button
-          v-if="sessionStore.superuser"
+          v-if="permissionStore.isSuperuser"
           icon="security"
           tooltip="Create superuser"
           data-cy="button-member-superuser"
@@ -86,7 +86,7 @@ import {
   MemberTableProps,
   PermissionType,
 } from "@/types";
-import { capitalizeSentence, membersColumns } from "@/util";
+import { membersColumns } from "@/util";
 import {
   adminApiStore,
   memberApiStore,
@@ -114,7 +114,6 @@ const addMode = ref(false);
 
 const name = computed(() => props.entity.entityType?.toLowerCase() || "");
 const itemName = computed(() => `${name.value} member`);
-const title = computed(() => capitalizeSentence(itemName.value) + "s");
 
 const entityType = computed(() => props.entity.entityType || "PROJECT");
 
@@ -139,12 +138,6 @@ const displayMemberActions = computed(() =>
 const rows = computed(() => membersStore.getMembers(entityType.value));
 
 const userEmail = computed(() => sessionStore.user?.email);
-
-const subtitle = computed(() =>
-  addMode.value
-    ? `Invite a new ${name.value} member.`
-    : `Manage and invite ${name.value} members.`
-);
 
 /**
  * Loads the project's members.

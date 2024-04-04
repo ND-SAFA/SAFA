@@ -6,8 +6,7 @@
       icon="back"
       @click="navigateTo(Routes.ORG)"
     />
-    <separator vertical />
-    <q-btn-dropdown flat auto-close label="Switch Teams">
+    <q-btn-dropdown flat auto-close label="Teams">
       <flex-box column align="center" x="2" y="2">
         <text-button
           v-for="t in orgStore.org.teams"
@@ -18,7 +17,6 @@
         />
       </flex-box>
     </q-btn-dropdown>
-    <separator v-if="displayEdit" vertical />
     <text-button
       v-if="displayEdit"
       text
@@ -27,7 +25,6 @@
       data-cy="button-team-edit"
       @click="handleEdit"
     />
-    <separator v-if="displayDelete" vertical />
     <text-button
       v-if="displayDelete"
       text
@@ -59,7 +56,7 @@ import {
   teamStore,
 } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
-import { FlexBox, TextButton, Separator } from "@/components/common";
+import { FlexBox, TextButton } from "@/components/common";
 
 const team = computed(() => teamStore.team);
 

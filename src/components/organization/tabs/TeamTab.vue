@@ -1,5 +1,5 @@
 <template>
-  <panel-card title="Teams" :subtitle="subtitle">
+  <panel-card>
     <template #title-actions>
       <text-button
         v-if="addMode"
@@ -20,7 +20,7 @@
       :loading="loading"
       row-key="id"
       item-name="team"
-      @row:add="addMode = true"
+      @row:add="handleOpen"
       @row:delete="teamApiStore.handleDelete"
     >
       <template #cell-actions="{ row }">
@@ -33,7 +33,7 @@
         />
       </template>
     </selector-table>
-    <save-team-inputs v-else @submit="addMode = false" />
+    <save-team-inputs v-else @submit="handleClose" />
   </panel-card>
 </template>
 
@@ -50,7 +50,13 @@ export default {
 import { computed, ref } from "vue";
 import { TeamSchema } from "@/types";
 import { teamColumns } from "@/util";
-import { memberApiStore, sessionStore, teamApiStore, teamStore } from "@/hooks";
+import {
+  memberApiStore,
+  saveTeamStore,
+  sessionStore,
+  teamApiStore,
+  teamStore,
+} from "@/hooks";
 import { navigateTo, QueryParams, Routes } from "@/router";
 import {
   PanelCard,
@@ -81,15 +87,20 @@ const selectedTeams = computed({
   },
 });
 
-const subtitle = computed(() =>
-  addMode.value ? "Create a new team." : "Manage teams and permissions."
-);
+/**
+ * Opens the add team form and resets entered data.
+ */
+function handleOpen() {
+  addMode.value = true;
+  saveTeamStore.$reset();
+}
 
 /**
  * Closes the add team form and resets entered data.
  */
 function handleClose() {
   addMode.value = false;
+  saveTeamStore.$reset();
 }
 
 /**

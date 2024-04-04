@@ -1,5 +1,5 @@
 <template>
-  <panel-card :color="panelColor" :title="panelTitle">
+  <panel-card :color="panelColor">
     <stepper
       v-if="!permissionStore.isDemo || !getVersionApiStore.loadLoading"
       v-model="currentStep"
@@ -78,8 +78,6 @@ const currentStep = ref(1);
 const steps = ref([defaultProjectStep(), defaultVersionStep()]);
 const selectedProject = ref<IdentifierSchema>();
 const selectedVersion = ref<VersionSchema>();
-
-const panelTitle = computed(() => (props.minimal ? undefined : "My Projects"));
 
 const isProjectStep = computed(() => currentStep.value === 1);
 const isVersionStep = computed(() => currentStep.value === 2);

@@ -4,7 +4,11 @@
       :parts="smallWindow ? '12' : '6'"
       :class="smallWindow ? 'full-width' : ''"
     >
-      <panel-card class="q-ma-sm" title="Create Project">
+      <panel-card
+        class="q-ma-sm"
+        title="Create New Project"
+        subtitle="Import collections of code files, documents, or other artifacts."
+      >
         <flex-box :column="smallWindow" full-width>
           <tab-list v-model="tab" :tabs="tabs" :vertical="!smallWindow">
             <template #name>

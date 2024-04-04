@@ -1,13 +1,10 @@
 <template>
-  <panel-card
-    :title="title"
-    subtitle="View recent transactions for this organization."
-  >
+  <panel-card>
     <groupable-table
       :columns="transactionsColumns"
       :rows="transactions"
       row-key="id"
-      item-name="Transaction"
+      item-name="transaction"
       default-sort-desc
       default-sort-by="timestamp"
     >
@@ -42,10 +39,6 @@ import { PanelCard, SelectInput, GroupableTable } from "@/components/common";
 const modeOptions = ["All", "Monthly"];
 
 const mode = ref<"All" | "Monthly">("Monthly");
-
-const title = computed(() =>
-  mode.value === "All" ? "All Transactions" : "Monthly Transactions"
-);
 
 const transactions = computed(() =>
   mode.value == "All" ? orgStore.allTransactions : orgStore.monthlyTransactions

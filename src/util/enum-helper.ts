@@ -178,10 +178,7 @@ export function ownerTypeOptions(): SelectOption<ProjectOwnerType>[] {
  * @return display names for project creator tabs.
  */
 export function creatorTabOptions(): SelectOption<CreatorSectionTab>[] {
-  return [
-    createOption("name", "Project Details"),
-    createOption("data", "Import Data"),
-  ];
+  return [createOption("name", "Details"), createOption("data", "Data")];
 }
 
 /**

@@ -4,7 +4,7 @@
       :parts="smallWindow ? '12' : '6'"
       :class="smallWindow ? 'full-width' : ''"
     >
-      <panel-card class="q-ma-sm" title="Project Configuration">
+      <panel-card class="q-ma-sm" title="Create Project">
         <flex-box :column="smallWindow" full-width>
           <tab-list v-model="tab" :tabs="tabs" :vertical="!smallWindow">
             <template #name>

@@ -33,6 +33,7 @@ class ModelCache:
                 logger.info(f"Creating model {model_name} in cache.")
                 kwargs = DictUtil.update_kwarg_values(kwargs, cache_folder=cache_dir)
                 use_cache = True
+            print(model_name)
             model = model_type(model_name, **kwargs)
             if use_cache:
                 ModelCache.MODEL_MAP[model_name] = model

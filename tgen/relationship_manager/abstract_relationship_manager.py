@@ -275,9 +275,9 @@ class AbstractRelationshipManager:
         """
         df_kwargs = {}
         if len(content) == 0:
-            return
-
-        if isinstance(content, dict):
+            entries = []
+            df_kwargs["columns"] = [ArtifactKeys.ID.value, ArtifactKeys.CONTENT.value]
+        elif isinstance(content, dict):
             entries = [EnumDict({ArtifactKeys.ID: content_id, ArtifactKeys.CONTENT: content}) for content_id, content in
                        content.items()]
         else:
@@ -299,7 +299,7 @@ class AbstractRelationshipManager:
         content_map_path = object_paths[RelationshipManagerObjects.CONTENT_MAP]
         self.save_content_to_csv(content_map_path, self._content_map)
         relationship_map_path = object_paths[RelationshipManagerObjects.RELATIONSHIP_MAP]
-        self.save_content_to_csv(relationship_map_path, self._content_map)
+        self.save_content_to_csv(relationship_map_path, self._relationship_map)
         self.__state_changed_since_last_save = False
 
     def get_object_paths(self) -> Dict[RelationshipManagerObjects, str]:
@@ -316,12 +316,15 @@ class AbstractRelationshipManager:
         :param file_path: The path to find CSV at.
         :return: Map of artifact ID to its content.
         """
-        content_df = pd.read_csv(file_path)
-        if ArtifactKeys.CONTENT.value in content_df.columns:
-            content_map = {content_row[ArtifactKeys.ID.value]: content_row[ArtifactKeys.CONTENT.value]
-                           for _, content_row in content_df.iterrows()}
-        else:
-            content_map = list(content_df[ArtifactKeys.ID.value])
+        try:
+            content_df = pd.read_csv(file_path)
+            if ArtifactKeys.CONTENT.value in content_df.columns:
+                content_map = {content_row[ArtifactKeys.ID.value]: content_row[ArtifactKeys.CONTENT.value]
+                               for _, content_row in content_df.iterrows()}
+            else:
+                content_map = list(content_df[ArtifactKeys.ID.value])
+        except Exception:
+            content_map = {}
         return content_map
 
     @staticmethod

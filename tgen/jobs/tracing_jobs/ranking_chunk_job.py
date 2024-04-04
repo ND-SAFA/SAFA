@@ -3,8 +3,10 @@ from copy import deepcopy
 
 from typing import Dict, Union, List
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.status import Status
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
@@ -51,14 +53,18 @@ class RankingChunkJob(AbstractJob):
         """
         # ORIGINAL RANKING JOB
         logger.log_with_title("Starting regular ranking job.")
+        export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
+        base_export_dir = FileUtil.safely_join_paths(export_dir, "base")
         base_ranking_kwargs = DictUtil.update_kwarg_values(
             self.ranking_kwargs, selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD_NORMALIZED_CHILDREN,
-            link_threshold=RankingChunkJob.MIN_THRESHOLD)
+            link_threshold=RankingChunkJob.MIN_THRESHOLD, export_dir=base_export_dir)
         base_ranking_job = self.create_ranking_job(relationship_manager=self.relationship_manager_type.value(),
                                                    **base_ranking_kwargs)
         base_results = base_ranking_job.run()
 
-        with_filter_kwargs = DictUtil.update_kwarg_values(base_ranking_kwargs, filter=SupportedFilter.SIMILARITY_THRESHOLD)
+        chunk_export_dir = FileUtil.safely_join_paths(export_dir, "chunks")
+        with_filter_kwargs = DictUtil.update_kwarg_values(base_ranking_kwargs, filter=SupportedFilter.SIMILARITY_THRESHOLD,
+                                                          export_dir=chunk_export_dir)
 
         # RANKING WITH CHUNKS
         logger.log_with_title("Starting ranking job with Chunks.")

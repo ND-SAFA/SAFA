@@ -1,6 +1,5 @@
 from typing import Dict
 
-from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
@@ -85,10 +84,8 @@ class CreateClustersStep(AbstractPipelineStep[HGenArgs, HGenState]):
         state.cluster_dataset = cluster_state.cluster_artifact_dataset
         state.cluster2artifacts = cluster_map
 
-        max_cohesion = Cluster.weight_average_pairwise_sim_with_size(1, cluster_max_size)
-        state.cluster2cohesion = {cluster_id: (cluster.size_weighted_sim / max_cohesion if cluster.avg_pairwise_sim else max_cohesion)
+        state.cluster2cohesion = {cluster_id: (cluster.avg_pairwise_sim if cluster.avg_pairwise_sim else 1)
                                   for cluster_id, cluster in cluster_state.final_cluster_map.items()}
-
         if cluster_state.seed2artifacts:
             state.seed2artifact_ids = cluster_state.seed2artifacts
             state.cluster_id2seeds = cluster_state.cluster_id_2seeds

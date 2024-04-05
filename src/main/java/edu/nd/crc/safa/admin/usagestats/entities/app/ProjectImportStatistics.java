@@ -16,6 +16,7 @@ public class ProjectImportStatistics {
      */
     private ImportStatisticsSingle fromGithubProper;
 
+    /** Total number of imports performed */
     private int totalPerformed;
 
     public ProjectImportStatistics() {

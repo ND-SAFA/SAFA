@@ -166,9 +166,9 @@ public class ProgressSummaryCalculator {
         GithubIntegrationStatistics.GithubIntegrationStatisticsSingle total = github.getTotal();
         GithubIntegrationStatistics.GithubIntegrationStatisticsSingle withTracking = github.getWithProperTracking();
 
-        total.setPercent((double) total.getAccounts() / accounts.getCreated());
-        withTracking.setPercent((double) withTracking.getAccounts() / accounts.getHaveProperProgressTracking());
-        withTracking.setAverageTime(withTracking.getAverageTime() / withTracking.getAccounts());
+        total.setPercent(safeDivide(total.getAccounts(), accounts.getCreated()));
+        withTracking.setPercent(safeDivide(withTracking.getAccounts(), accounts.getHaveProperProgressTracking()));
+        withTracking.setAverageTime((long) safeDivide(withTracking.getAverageTime(), withTracking.getAccounts()));
     }
 
     private static void calculateAveragesImport(UserProgressSummaryAppEntity summaryObj) {
@@ -180,12 +180,13 @@ public class ProgressSummaryCalculator {
         ProjectImportStatistics.ImportStatisticsSingle fromGithub = imports.getFromGithub();
         ProjectImportStatistics.ImportStatisticsSingle fromGithubProper = imports.getFromGithubProper();
 
-        total.setPercent((double) total.getAccounts() / accounts.getCreated());
-        fromGithub.setPercent((double) fromGithub.getAccounts() / github.getTotal().getAccounts());
-        fromGithub.setAverageTime(fromGithub.getAverageTime() / fromGithub.getAccounts());
-        fromGithubProper.setPercent((double) fromGithubProper.getAccounts()
-                / github.getWithProperTracking().getAccounts());
-        fromGithubProper.setAverageTime(fromGithubProper.getAverageTime() / fromGithubProper.getAccounts());
+        total.setPercent(safeDivide(total.getAccounts(), accounts.getCreated()));
+        fromGithub.setPercent(safeDivide(fromGithub.getAccounts(), github.getTotal().getAccounts()));
+        fromGithub.setAverageTime((long) safeDivide(fromGithub.getAverageTime(), fromGithub.getAccounts()));
+        fromGithubProper.setPercent(
+                safeDivide(fromGithubProper.getAccounts(), github.getWithProperTracking().getAccounts()));
+        fromGithubProper.setAverageTime(
+                (long) safeDivide(fromGithubProper.getAverageTime(), fromGithubProper.getAccounts()));
     }
 
     private static void calculateAveragesGeneration(UserProgressSummaryAppEntity summaryObj) {
@@ -197,12 +198,21 @@ public class ProgressSummaryCalculator {
         GenerationStatistics.GenerationStatisticsSingle fromImport = generations.getFromImport();
         GenerationStatistics.GenerationStatisticsSingle fromImportProper = generations.getFromImportProper();
 
-        total.setPercent((double) total.getAccounts() / accounts.getCreated());
-        fromImport.setPercent((double) fromImport.getAccounts() / imports.getTotal().getAccounts());
-        fromImport.setAverageTime(fromImport.getAverageTime() / fromImport.getAccounts());
-        fromImportProper.setPercent((double) fromImportProper.getAccounts()
-                / imports.getFromGithubProper().getAccounts());
-        fromImportProper.setAverageTime(fromImportProper.getAverageTime() / fromImportProper.getAccounts());
+        total.setPercent(safeDivide(total.getAccounts(), accounts.getCreated()));
+        fromImport.setPercent(safeDivide(fromImport.getAccounts(), imports.getTotal().getAccounts()));
+        fromImport.setAverageTime((long) safeDivide(fromImport.getAverageTime(), fromImport.getAccounts()));
+        fromImportProper.setPercent(
+                safeDivide(fromImportProper.getAccounts(), imports.getFromGithubProper().getAccounts()));
+        fromImportProper.setAverageTime(
+                (long) safeDivide(fromImportProper.getAverageTime(), fromImportProper.getAccounts()));
+    }
+
+    private static double safeDivide(double a, double b) {
+        if (b == 0) {
+            return -1;
+        } else {
+            return a / b;
+        }
     }
 
 }

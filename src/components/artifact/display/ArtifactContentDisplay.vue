@@ -1,5 +1,9 @@
 <template>
-  <q-splitter v-if="showSummary" v-model="splitterModel" :horizontal="!isCode">
+  <q-splitter
+    v-if="showSummary"
+    v-model="splitterModel"
+    :horizontal="!isCode || smallWindow"
+  >
     <template #before>
       <div class="q-mr-md">
         <typography variant="caption" value="Summary" />
@@ -12,7 +16,7 @@
       </div>
     </template>
     <template #after>
-      <div class="q-ml-md">
+      <div :class="smallWindow ? '' : 'q-ml-sm'">
         <typography variant="caption" value="Content" />
         <typography
           :variant="isCode ? 'code' : 'expandable'"
@@ -49,9 +53,12 @@ export default {
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { ArtifactProps } from "@/types";
+import { useScreen } from "@/hooks";
 import { Typography } from "@/components/common";
 
 const props = defineProps<ArtifactProps>();
+
+const { smallWindow } = useScreen();
 
 const splitterModel = ref(40);
 

@@ -7,6 +7,7 @@
     @mousedown="mouseDownTime = new Date().getTime()"
     @mouseup="mouseUpTime = new Date().getTime()"
     @click="handleClick"
+    @touchend="handleClick"
   >
     <flex-box
       v-if="props.title"

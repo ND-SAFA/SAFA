@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="!layoutStore.isTableMode">
+  <flex-box v-if="!layoutStore.isTableMode && !smallWindow">
     <separator vertical inset nav x="1" />
     <icon-button
       v-for="definition in viewButtons"
@@ -34,8 +34,11 @@ import {
   layoutApiStore,
   layoutStore,
   permissionStore,
+  useScreen,
 } from "@/hooks";
 import { IconButton, FlexBox, Separator } from "@/components/common";
+
+const { smallWindow } = useScreen();
 
 const viewButtons = computed(() => [
   {

@@ -22,7 +22,7 @@
           :options="options"
           label="Row Types"
           b=""
-          class="q-mr-sm table-input"
+          class="q-mr-sm q-mb-sm table-input"
           data-cy="input-trace-table-row-types"
         />
         <multiselect-input
@@ -34,7 +34,7 @@
           :options="options"
           label="Column Types"
           b=""
-          class="table-input"
+          class="table-input q-mb-sm"
           data-cy="input-trace-table-col-types"
         />
       </template>

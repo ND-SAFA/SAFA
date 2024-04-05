@@ -5,7 +5,7 @@
 
     <div
       v-if="isTableMode"
-      class="q-pa-lg bg-background"
+      class="q-pa-sm bg-background"
       style="min-height: inherit"
     >
       <tab-list v-model="tab" :tabs="tabs">

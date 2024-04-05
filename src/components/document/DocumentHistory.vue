@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="layoutStore.mode !== 'tim'" align="center">
+  <flex-box v-if="layoutStore.mode !== 'tim' && !smallWindow" align="center">
     <separator vertical inset nav x="1" />
     <icon-button
       :disabled="!documentStore.hasPreviousHistory"
@@ -28,6 +28,8 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { documentStore, layoutStore } from "@/hooks";
+import { documentStore, layoutStore, useScreen } from "@/hooks";
 import { FlexBox, IconButton, Separator } from "@/components";
+
+const { smallWindow } = useScreen();
 </script>

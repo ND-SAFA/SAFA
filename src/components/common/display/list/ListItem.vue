@@ -4,6 +4,7 @@
     :v-ripple="!!props.to"
     :to="props.to"
     :data-cy="dataCy"
+    :dense="smallWindow"
     @click="emit('click')"
   >
     <q-tooltip v-if="!!props.tooltip">
@@ -50,9 +51,12 @@
         />
         <slot name="subtitle" />
       </q-item-label>
+      <div v-if="smallWindow" class="q-ml-auto" @click.stop="">
+        <slot name="actions" />
+      </div>
     </q-item-section>
     <q-item-section
-      v-if="!!slots.actions"
+      v-if="!!slots.actions && !smallWindow"
       :class="props.actionCols ? `col-${props.actionCols}` : 'width-fit'"
     >
       <div @click.stop="">
@@ -74,6 +78,7 @@ export default {
 <script setup lang="ts">
 import { computed, useSlots } from "vue";
 import { ListItemProps } from "@/types";
+import { useScreen } from "@/hooks";
 import FlexBox from "@/components/common/display/content/FlexBox.vue";
 import { Typography, Separator } from "../content";
 import { Icon } from "../icon";
@@ -85,6 +90,7 @@ const emit = defineEmits<{
 }>();
 
 const slots = useSlots();
+const { smallWindow } = useScreen();
 
 const itemClickable = computed(() => !!(props.clickable || props.to));
 

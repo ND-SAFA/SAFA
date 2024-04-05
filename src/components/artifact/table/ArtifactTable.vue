@@ -27,7 +27,7 @@
           :options="typeOptions"
           label="Visible Types"
           b=""
-          class="q-mr-sm table-input"
+          class="table-input q-mb-sm q-mr-sm"
           data-cy="input-trace-table-types"
         />
         <select-input
@@ -40,7 +40,7 @@
           option-value="id"
           label="Visible Artifacts"
           b=""
-          class="q-mr-sm table-input"
+          class="table-input q-mb-sm q-mr-sm"
           data-cy="input-trace-table-count"
         />
         <multiselect-input
@@ -54,14 +54,14 @@
           option-to-value
           option-value="id"
           option-label="name"
-          class="table-input"
+          class="table-input q-mb-sm q-mr-sm"
           data-cy="input-delta-type"
           b=""
         />
         <q-btn-group
           v-if="!documentStore.isBaseDocument"
           flat
-          class="q-mx-sm nav-mode-select"
+          class="q-mb-sm nav-mode-select"
         >
           <text-button
             label="Current View"

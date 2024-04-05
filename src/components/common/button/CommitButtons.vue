@@ -1,5 +1,5 @@
 <template>
-  <flex-box>
+  <flex-box v-if="!smallWindow">
     <icon-button
       tooltip="Undo changes"
       icon="undo"
@@ -29,7 +29,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { commitApiStore, commitStore } from "@/hooks";
+import { commitApiStore, commitStore, useScreen } from "@/hooks";
 import { FlexBox } from "@/components/common/display";
 import IconButton from "./IconButton.vue";
+
+const { smallWindow } = useScreen();
 </script>

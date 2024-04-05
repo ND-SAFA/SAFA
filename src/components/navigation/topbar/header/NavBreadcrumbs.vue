@@ -93,6 +93,6 @@ const pageDescription = computed(
 );
 
 const displayPageTitle = computed(
-  () => !displayProjectOptions.value && !!pageTitle.value
+  () => !displayProjectOptions.value && !!pageTitle.value && !collapsed.value
 );
 </script>

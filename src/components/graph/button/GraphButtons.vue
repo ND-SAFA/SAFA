@@ -1,6 +1,6 @@
 <template>
   <q-page-sticky
-    v-if="!layoutStore.isTableMode"
+    v-if="!layoutStore.isTableMode && !smallWindow"
     position="top-right"
     class="artifact-fab"
   >
@@ -39,10 +39,12 @@ import {
   layoutApiStore,
   layoutStore,
   permissionStore,
+  useScreen,
 } from "@/hooks";
-import { IconButton } from "@/components/common";
-import FlexBox from "@/components/common/display/content/FlexBox.vue";
+import { IconButton, FlexBox } from "@/components/common";
 import VisibleTypeButtons from "./VisibleTypeButtons.vue";
+
+const { smallWindow } = useScreen();
 
 const viewButtons = computed(() => [
   {

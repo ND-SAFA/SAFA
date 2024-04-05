@@ -10,7 +10,7 @@
         @click="emit('toggle-fullscreen')"
       />
     </flex-box>
-    <flex-box align="center" t="2">
+    <flex-box wrap align="center" t="2">
       <select-input
         v-model="groupBy"
         outlined
@@ -20,10 +20,12 @@
         :options="inputOptions"
         option-value="name"
         option-label="label"
+        class="q-mr-sm q-mb-sm"
         option-to-value
         data-cy="artifact-table-group-by"
       />
       <select-input
+        v-if="displayOptions"
         v-model="sortBy"
         outlined
         clearable
@@ -33,7 +35,7 @@
         option-value="name"
         option-label="label"
         option-to-value
-        class="q-ml-sm"
+        class="q-mr-sm q-mb-sm"
         data-cy="artifact-table-sort-by"
       >
         <template #prepend>
@@ -47,8 +49,15 @@
           </div>
         </template>
       </select-input>
-      <separator v-if="!!slots['header-right']" vertical class="q-mx-sm" />
-      <slot name="header-right" />
+      <slot v-if="displayOptions" name="header-right" />
+      <icon-button
+        v-if="smallWindow"
+        tooltip="Toggle more options"
+        class="q-mb-sm"
+        color="text"
+        :icon="collapsed ? 'down' : 'up'"
+        @click="collapsed = !collapsed"
+      />
     </flex-box>
     <slot name="header-bottom" />
   </div>
@@ -64,12 +73,12 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, useSlots } from "vue";
+import { computed, ref } from "vue";
 import { GroupableTableHeaderProps } from "@/types";
-import { useVModel } from "@/hooks";
+import { useScreen, useVModel } from "@/hooks";
 import { Searchbar, SelectInput } from "@/components/common/input";
 import { IconButton } from "@/components/common/button";
-import { FlexBox, Separator } from "@/components/common/display";
+import { FlexBox } from "@/components/common/display";
 
 const props = defineProps<GroupableTableHeaderProps>();
 
@@ -81,16 +90,20 @@ const emit = defineEmits<{
   (e: "toggle-fullscreen"): void;
 }>();
 
+const { smallWindow } = useScreen();
+
+const collapsed = ref(true);
+
 const searchText = useVModel(props, "searchText");
 const sortBy = useVModel(props, "sortBy");
 const sortDesc = useVModel(props, "sortDesc");
 const groupBy = useVModel(props, "groupBy");
-
-const slots = useSlots();
 
 const inputOptions = computed(() =>
   props.columns
     .filter(({ name }) => name !== "actions")
     .map(({ name, label }) => ({ name, label }))
 );
+
+const displayOptions = computed(() => !smallWindow.value || !collapsed.value);
 </script>

@@ -3,7 +3,7 @@
     bordered
     side="right"
     :model-value="drawerOpen"
-    :breakpoint="0"
+    :breakpoint="500"
     :width="width"
     :class="className"
   >

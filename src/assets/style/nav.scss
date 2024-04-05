@@ -15,8 +15,9 @@
 
 // Navigation - Inputs
 
-.nav-mode-selected {
+.button-group-selected {
   background-color: $color-background !important;
+  border-radius: $default-border-radius !important;
 }
 
 .nav-input {
@@ -40,12 +41,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    width: 80%
-  }
-
-  &.nav-search {
-    min-width: 200px;
-    width: 30vw;
+    max-width: 75%;
   }
 
   &.nav-document {
@@ -65,7 +61,7 @@
   &.nav-search-prompt {
     width: 600px;
     min-width: 130px !important;
-    max-width: 35vw;
+    max-width: 30vw;
   }
 }
 
@@ -85,6 +81,10 @@
     & > .q-field__inner > .q-field__control {
       border-bottom-left-radius: 0;
       border-top-left-radius: 0;
+
+      &:before {
+        border-left: none;
+      }
     }
   }
 }
@@ -98,7 +98,7 @@
   max-width: 300px;
   border: 1px solid transparent;
   transition: border 0.3s;
-  border-radius: 4px;
+  border-radius: $default-border-radius;
 
   .q-field__label {
     font-size: 16px;
@@ -130,12 +130,16 @@
   &.q-field--highlighted {
     background-color: $color-background !important;
   }
+
+  &.nav-view {
+    max-width: 400px !important;
+  }
 }
 
 // Navigation - Topbar
 
 .nav-topbar {
-  border-left: 1px solid rgba(0, 0, 0, 0.12);
+  //border-left: 1px solid rgba(0, 0, 0, 0.12);
   min-height: 70px;
 }
 
@@ -161,7 +165,7 @@
 
 .nav-mode-select {
   .q-btn--outline:before {
-    border-radius: 4px;
+    border-radius: $default-border-radius;
   }
 }
 
@@ -214,6 +218,20 @@
 
   &.clickable {
     height: 42pt;
+  }
+}
+
+.q-drawer-container:not(.q-drawer--mini-animate) .q-drawer--mini .q-item {
+  margin: 4px;
+}
+
+.q-item.q-link {
+  margin: 8px;
+  border-radius: $default-border-radius;
+  transition: margin 0.1s;
+
+  &.q-router-link--active {
+    background-color: $color-background !important;
   }
 }
 

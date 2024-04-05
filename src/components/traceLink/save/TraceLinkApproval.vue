@@ -1,5 +1,10 @@
 <template>
-  <flex-box v-if="displayActions" justify="between" class="width-max">
+  <flex-box
+    v-if="displayActions"
+    justify="between"
+    align="center"
+    class="width-max"
+  >
     <flex-box align="center" justify="center">
       <icon-button
         v-if="showUnreview"
@@ -29,7 +34,7 @@
       />
     </flex-box>
     <flex-box v-if="props.deletable">
-      <separator v-if="showApprove || showDecline" vertical />
+      <separator v-if="showApprove || showDecline" vertical x="1" />
       <text-button
         text
         label="Edit"
@@ -37,7 +42,6 @@
         data-cy="button-trace-edit"
         @click="handleEdit"
       />
-      <separator vertical />
       <text-button
         text
         label="Delete"

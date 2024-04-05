@@ -1,6 +1,8 @@
 <template>
   <details-panel panel="displayArtifactLevel" data-cy="panel-artifact-type">
-    <artifact-level-buttons />
+    <template #actions>
+      <artifact-level-buttons />
+    </template>
     <artifact-level-content />
     <artifact-level-traces />
     <artifact-level-artifacts />

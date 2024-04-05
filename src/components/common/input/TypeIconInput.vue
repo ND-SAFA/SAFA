@@ -44,7 +44,7 @@ const iconOptions = computed(() =>
       value: icon,
       text: !selected,
       outlined: selected,
-      class: selected ? "nav-mode-selected" : "",
+      class: selected ? "button-group-selected" : "",
     };
   })
 );

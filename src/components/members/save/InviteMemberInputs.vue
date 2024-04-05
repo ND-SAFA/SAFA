@@ -1,5 +1,8 @@
 <template>
   <div class="long-input q-mx-auto">
+    <typography variant="subtitle" value="Invite Members" />
+    <separator b="2" />
+    <typography secondary :value="subtitle" el="p" b="4" />
     <text-input
       v-model="userEmail"
       label="Email"
@@ -62,8 +65,10 @@ import {
   SelectInput,
   TextButton,
   FlexBox,
+  MultiselectInput,
+  Typography,
+  Separator,
 } from "@/components/common";
-import MultiselectInput from "@/components/common/input/MultiselectInput.vue";
 
 const props = defineProps<InviteMemberInputsProps>();
 
@@ -76,6 +81,11 @@ const roles = memberRoleOptions();
 const entityIds = ref<string[]>([]);
 const userEmail = ref("");
 const userRole = ref<MemberRole>();
+
+const subtitle = computed(
+  () =>
+    `Invite new members to this ${props.entity.entityType?.toLowerCase()}. Members must already have an account with SAFA.`
+);
 
 const submitLabel = computed(
   () => `Invite to ${props.entity.entityType?.toLowerCase() || ""}`

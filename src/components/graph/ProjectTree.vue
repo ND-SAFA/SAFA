@@ -1,32 +1,7 @@
 <template>
-  <div v-if="displayPopup" class="cy-popup full-height full-width">
-    <div class="q-mx-auto width-fit q-pa-md text-center">
-      <panel-card
-        v-if="projectStore.isProjectDefined"
-        title="Welcome to SAFA!"
-        subtitle="Create an artifact to get started."
-      >
-        <text-button
-          text
-          icon="add"
-          label="Create Artifact"
-          @click="appStore.openDetailsPanel('saveArtifact')"
-        />
-      </panel-card>
-      <panel-card
-        v-else
-        title="Welcome to SAFA!"
-        subtitle="Create a project to get started."
-      >
-        <text-button
-          text
-          icon="add"
-          label="Create Project"
-          @click="navigateTo(Routes.PROJECT_CREATOR)"
-        />
-      </panel-card>
-    </div>
-  </div>
+  <empty-graph-buttons />
+  <graph-buttons />
+  <graph-fab />
 
   <cytoscape
     id="cytoscape-artifact"
@@ -102,13 +77,12 @@ import {
   cyStore,
   traceApiStore,
   traceMatrixApiStore,
-  projectStore,
 } from "@/hooks";
-import { navigateTo, Routes } from "@/router";
-import { PanelCard, TextButton } from "@/components/common";
+import { Routes } from "@/router";
 import { Cytoscape } from "./base";
 import { ArtifactNode, TraceLink, ArtifactMenu } from "./artifact";
 import { TimNode, TimLink, TimMenu } from "./tim";
+import { EmptyGraphButtons, GraphButtons, GraphFab } from "./button";
 
 const currentRoute = useRoute();
 
@@ -141,10 +115,6 @@ const traceLinks = computed(() =>
 
 const artifactTypes = computed(() => timStore.artifactTypes);
 const traceMatrices = computed(() => timStore.traceMatrices);
-
-const displayPopup = computed(
-  () => !appStore.isLoading && artifactTypes.value.length === 0
-);
 
 const className = computed(() => {
   if (!isInView.value) {

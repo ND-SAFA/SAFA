@@ -1,8 +1,5 @@
 <template>
-  <panel-card
-    title="Data File Upload"
-    subtitle="Select files to upload to the current project version."
-  >
+  <panel-card subtitle="Select files to upload to the current project version.">
     <project-files-input v-model="files" data-cy="input-files-version" />
     <switch-input v-model="replaceAllArtifacts" label="Replace all artifacts" />
     <template #actions>

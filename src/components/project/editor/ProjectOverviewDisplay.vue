@@ -60,16 +60,19 @@ const props = defineProps<{ hideTitle?: boolean; hideOverflow?: boolean }>();
 // const editMode = computed(() => appStore.popups.editProject);
 // const editedIdentifier = computed(() => identifierSaveStore.editedIdentifier);
 
-// Hide the description if it is just a copy of the generated specification.
 const displayDescription = computed(
   () =>
-    !!projectStore.project.description &&
+    // If there is no specification, show the description.
+    !projectStore.project.specification &&
+    // If the description is the same as the specification, hide it.
     projectStore.project.description.length !==
       projectStore.project.specification?.length
 );
 
 const description = computed(
-  () => projectStore.project.description || "No Description."
+  () =>
+    projectStore.project.description ||
+    "This project does not have a description."
 );
 
 const specification = computed(() => projectStore.project.specification);

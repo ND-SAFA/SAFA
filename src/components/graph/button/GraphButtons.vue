@@ -1,18 +1,23 @@
 <template>
-  <flex-box v-if="!layoutStore.isTableMode && !smallWindow">
-    <separator vertical inset nav x="1" />
-    <icon-button
-      v-for="definition in viewButtons"
-      :key="definition.label"
-      color="text"
-      :tooltip="definition.label"
-      :icon="definition.icon"
-      :disabled="definition.disabled"
-      :data-cy="definition.dataCy"
-      @click="definition.handler"
-    />
-    <separator vertical inset nav x="1" />
-  </flex-box>
+  <q-page-sticky
+    v-if="!layoutStore.isTableMode && !smallWindow"
+    position="top-right"
+    class="artifact-fab"
+  >
+    <flex-box column x="2" y="2" align="end">
+      <visible-type-buttons class="q-mb-sm q-mr-xs" />
+      <icon-button
+        v-for="definition in viewButtons"
+        :key="definition.label"
+        color="text"
+        :tooltip="definition.label"
+        :icon="definition.icon"
+        :disabled="definition.disabled"
+        :data-cy="definition.dataCy"
+        @click="definition.handler"
+      />
+    </flex-box>
+  </q-page-sticky>
 </template>
 
 <script lang="ts">
@@ -36,7 +41,8 @@ import {
   permissionStore,
   useScreen,
 } from "@/hooks";
-import { IconButton, FlexBox, Separator } from "@/components/common";
+import { IconButton, FlexBox } from "@/components/common";
+import VisibleTypeButtons from "./VisibleTypeButtons.vue";
 
 const { smallWindow } = useScreen();
 

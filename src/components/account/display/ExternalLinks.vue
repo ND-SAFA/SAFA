@@ -4,9 +4,9 @@
       <flex-box column>
         <text-button
           text
-          color="primary"
-          label="Getting Started"
-          icon="onboarding"
+          color="gradient"
+          label="Generate Docs"
+          icon="generate-artifacts"
           @click="handleOnboarding"
         />
         <text-button

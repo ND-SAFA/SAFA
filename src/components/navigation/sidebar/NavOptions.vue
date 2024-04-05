@@ -1,4 +1,5 @@
 <template>
+  <onboarding-callout />
   <list :items="options">
     <template v-for="item in options" :key="item.label">
       <separator v-if="item.divider" />
@@ -30,6 +31,7 @@ import { NavOption } from "@/types";
 import { appStore, projectStore } from "@/hooks";
 import { QueryParams, Routes } from "@/router";
 import { List, ListItem, Separator } from "@/components/common";
+import { OnboardingCallout } from "@/components/onboarding";
 
 const currentRoute = useRoute();
 
@@ -61,7 +63,6 @@ const options = computed(() => {
       iconTitle: !sidebarOpen.value ? "View" : undefined,
       icon: "nav-artifact",
       disabled: hideProjectOptions.value,
-      divider: true,
       path: { path: Routes.ARTIFACT, query },
       color: Routes.ARTIFACT === currentRoute.path ? "primary" : "text",
     },

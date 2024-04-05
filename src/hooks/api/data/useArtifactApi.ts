@@ -4,6 +4,7 @@ import { computed, ref, watch } from "vue";
 import { ArtifactApiHook, ArtifactSchema, IOHandlerCallback } from "@/types";
 import { ENABLED_FEATURES } from "@/util";
 import {
+  appStore,
   artifactCommitApiStore,
   artifactSaveStore,
   artifactStore,
@@ -132,6 +133,7 @@ export const useArtifactApi = defineStore(
               artifactStore.deleteArtifacts([artifact]);
               traceStore.deleteTraceLinks(relatedTraces);
               selectionStore.clearSelections();
+              appStore.closeSidePanels();
             },
             {
               ...callbacks,

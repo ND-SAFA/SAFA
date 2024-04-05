@@ -8,16 +8,6 @@
     :class="className"
   >
     <div class="q-pa-sm q-mb-md bg-background">
-      <flex-box justify="between" align="center">
-        <typography color="primary" variant="subtitle" :value="title" />
-        <icon-button
-          icon="cancel"
-          tooltip="Close panel"
-          data-cy="button-close-details"
-          @click="handleClose"
-        />
-      </flex-box>
-      <separator />
       <delta-panel />
       <document-panel />
       <project-overview-panel />
@@ -27,10 +17,10 @@
       <trace-link-panel />
       <save-trace-link-panel />
       <edit-trace-link-panel />
-      <generate-trace-link-panel />
       <artifact-level-panel />
       <save-artifact-level-panel />
       <trace-matrix-panel />
+      <generate-trace-link-panel />
       <artifact-generation-panel />
       <artifact-summarization-panel />
     </div>
@@ -48,13 +38,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { appStore, selectionStore, useScreen } from "@/hooks";
-import {
-  IconButton,
-  Typography,
-  FlexBox,
-  Separator,
-} from "@/components/common";
+import { appStore, useScreen } from "@/hooks";
 import { DeltaPanel } from "@/components/delta/panel";
 import { DocumentPanel } from "@/components/document";
 import {
@@ -86,43 +70,6 @@ const className = computed(
   () => `bg-background nav-panel nav-panel-${openState.value}`
 );
 
-const title = computed(() => {
-  switch (openState.value) {
-    case "delta":
-      return "Version Delta";
-    case "document":
-      return "Save View";
-    case "displayArtifact":
-      return "Artifact";
-    case "displayArtifactBody":
-      return "Artifact Body";
-    case "saveArtifact":
-      return "Save Artifact";
-    case "generateArtifact":
-      return "Generate Artifacts";
-    case "summarizeArtifact":
-      return "Summarize Artifacts";
-    case "displayTrace":
-      return "Trace Link";
-    case "saveTrace":
-      return "Create Trace Link";
-    case "editTrace":
-      return "Edit Trace Link";
-    case "generateTrace":
-      return "Generate Trace Links";
-    case "displayArtifactLevel":
-      return "Artifact Type";
-    case "saveArtifactLevel":
-      return "Save Artifact Type";
-    case "displayTraceMatrix":
-      return "Trace Matrix";
-    case "displayProject":
-      return "Project Overview";
-    default:
-      return "";
-  }
-});
-
 const width = computed(() => {
   if (smallWindow.value) {
     return 500;
@@ -144,11 +91,4 @@ const width = computed(() => {
     return 500;
   }
 });
-
-/**
- * Toggles whether the details panel is open.
- */
-function handleClose(): void {
-  selectionStore.clearSelections();
-}
 </script>

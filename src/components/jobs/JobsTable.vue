@@ -1,5 +1,5 @@
 <template>
-  <panel-card :title="panelTitle">
+  <panel-card>
     <data-table
       :columns="jobColumns"
       :expanded="expanded"
@@ -40,9 +40,6 @@ import JobRow from "./JobRow.vue";
 
 const props = defineProps<JobTableProps>();
 
-const panelTitle = computed(() =>
-  props.displayProjectJobs ? "Project Jobs" : "Recent Jobs"
-);
 const rows = computed(() =>
   props.displayProjectJobs ? jobStore.projectJobs : jobStore.jobs
 );

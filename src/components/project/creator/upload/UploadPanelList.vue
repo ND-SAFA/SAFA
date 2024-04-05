@@ -1,6 +1,6 @@
 <template>
   <div>
-    <list :bordered="panels.length > 0" class="q-mb-lg">
+    <list class="q-mb-lg">
       <upload-panel
         v-for="(panel, idx) in panels"
         :key="idx"

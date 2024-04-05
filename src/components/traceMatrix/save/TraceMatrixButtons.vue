@@ -1,5 +1,5 @@
 <template>
-  <flex-box v-if="permissionStore.isAllowed('project.edit_data')" b="2">
+  <flex-box v-if="permissionStore.isAllowed('project.edit_data')">
     <text-button text icon="delete" label="Delete" @click="handleDelete" />
   </flex-box>
 </template>

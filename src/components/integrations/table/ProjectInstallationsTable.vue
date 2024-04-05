@@ -1,11 +1,11 @@
 <template>
-  <panel-card title="Data Integrations" :subtitle="subtitle">
+  <panel-card :title="title" :subtitle="subtitle">
     <template #title-actions>
       <text-button
         v-if="addOpen"
         text
         icon="cancel"
-        label="Cancel import"
+        label="Cancel"
         @click="addOpen = false"
       />
     </template>
@@ -15,6 +15,7 @@
       addable
       :columns="installationsColumns"
       :rows="rows"
+      item-name="integration"
       row-key="installationId"
       @row:add="addOpen = true"
     >
@@ -54,10 +55,10 @@ const addOpen = ref(false);
 
 const rows = computed(() => integrationsApiStore.installations);
 
+const title = computed(() => (addOpen.value ? "Add Integration" : undefined));
+
 const subtitle = computed(() =>
-  addOpen.value
-    ? "Configure a new integration source."
-    : "View data integration sources and synchronize data between them."
+  addOpen.value ? "Configure a new integration source." : undefined
 );
 
 /**

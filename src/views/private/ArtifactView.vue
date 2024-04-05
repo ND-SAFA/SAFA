@@ -1,7 +1,6 @@
 <template>
   <private-page full-window graph class="bg-neutral">
     <project-tree />
-    <graph-fab />
 
     <div
       v-if="isTableMode"
@@ -39,7 +38,6 @@ import { layoutStore } from "@/hooks";
 import {
   ArtifactTable,
   PrivatePage,
-  GraphFab,
   TabList,
   TraceTable,
   ProjectTree,

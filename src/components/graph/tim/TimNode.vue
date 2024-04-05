@@ -31,7 +31,7 @@
         />
         <separator v-if="displayActions" class="full-width q-my-xs" />
         <icon-button
-          v-if="displayActions"
+          v-if="displayActions && ENABLED_FEATURES.GENERATE_SUMMARIES"
           tooltip="Summarize artifacts"
           icon="generate-summaries"
           color="gradient"
@@ -67,7 +67,7 @@ import {
   TimNodeCytoElement,
   TimNodeProps,
 } from "@/types";
-import { sanitizeNodeId } from "@/util";
+import { ENABLED_FEATURES, sanitizeNodeId } from "@/util";
 import {
   timStore,
   appStore,

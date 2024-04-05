@@ -6,7 +6,7 @@
     </template>
     <tab-list v-model="tab" :tabs="tabs">
       <template #overview>
-        <project-overview-display />
+        <project-overview-display hide-title />
       </template>
       <template #members>
         <project-member-table />

@@ -1,6 +1,8 @@
 <template>
   <details-panel panel="displayTraceMatrix">
-    <trace-matrix-buttons />
+    <template #actions>
+      <trace-matrix-buttons />
+    </template>
     <trace-matrix-content />
     <trace-matrix-traces />
     <trace-matrix-artifacts />

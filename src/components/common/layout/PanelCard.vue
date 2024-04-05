@@ -45,6 +45,7 @@
         el="p"
         b="4"
         :value="props.subtitle"
+        secondary
       />
 
       <slot v-if="expanded" />

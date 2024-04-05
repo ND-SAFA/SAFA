@@ -36,7 +36,7 @@
         @click="appStore.openDetailsPanel('generateArtifact')"
       />
       <q-fab-action
-        v-if="displayGenerateActions"
+        v-if="displayGenerateActions && ENABLED_FEATURES.GENERATE_SUMMARIES"
         label="Summarize Artifacts"
         :icon="getIcon('generate-summaries')"
         color="gradient"
@@ -45,7 +45,8 @@
         @click="appStore.openDetailsPanel('summarizeArtifact')"
       />
       <q-fab-action
-        :label="drawMode ? 'Cancel Draw Mode' : 'Draw Links'"
+        v-if="isTreeMode"
+        :label="drawMode ? 'Cancel Draw Mode' : 'Draw Trace Link'"
         :icon="drawMode ? getIcon('cancel') : getIcon('trace')"
         class="bg-background"
         data-cy="button-fab-draw-trace"
@@ -89,7 +90,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import { getIcon } from "@/util";
+import { ENABLED_FEATURES, getIcon } from "@/util";
 import {
   appStore,
   artifactSaveStore,

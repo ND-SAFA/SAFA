@@ -1,5 +1,13 @@
 <template>
   <details-panel panel="displayArtifactBody">
+    <template #actions>
+      <text-button
+        text
+        label="Artifact"
+        icon="artifact"
+        @click="appStore.openDetailsPanel('displayArtifact')"
+      />
+    </template>
     <artifact-body />
   </details-panel>
 </template>
@@ -14,6 +22,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { DetailsPanel } from "@/components/common";
+import { appStore } from "@/hooks";
+import { DetailsPanel, TextButton } from "@/components/common";
 import { ArtifactBody } from "@/components/artifact/display";
 </script>

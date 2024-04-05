@@ -1,5 +1,19 @@
 <template>
   <div class="long-input q-mx-auto">
+    <div v-if="!saveTeamStore.isUpdate">
+      <typography variant="subtitle" value="Create Team" />
+      <separator b="2" />
+      <typography
+        secondary
+        value="
+          Create a new team within this organization.
+          Teams are used to group members and projects together
+          with specific access permissions.
+        "
+        el="p"
+        b="4"
+      />
+    </div>
     <text-input
       v-model="editedTeam.name"
       label="Team Name"
@@ -30,7 +44,13 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { appStore, saveTeamStore, teamApiStore } from "@/hooks";
-import { FlexBox, TextButton, TextInput } from "@/components/common";
+import {
+  FlexBox,
+  Separator,
+  TextButton,
+  TextInput,
+  Typography,
+} from "@/components/common";
 
 const emit = defineEmits<{
   (e: "submit"): void;

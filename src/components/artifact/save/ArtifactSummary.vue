@@ -62,6 +62,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
+import { ENABLED_FEATURES } from "@/util";
 import {
   artifactGenerationApiStore,
   artifactStore,
@@ -74,8 +75,10 @@ import {
   TextInput,
 } from "@/components/common";
 
-const displayActions = computed(() =>
-  permissionStore.isAllowed("project.generate")
+const displayActions = computed(
+  () =>
+    permissionStore.isAllowed("project.generate") &&
+    ENABLED_FEATURES.GENERATE_SUMMARIES
 );
 
 const artifact = computed(() => artifactStore.selectedArtifact);

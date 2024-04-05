@@ -20,6 +20,10 @@
           data-cy="input-new-email"
         />
         <password-input v-model="password" data-cy="input-new-password" />
+        <!--        <q-checkbox v-model="emailConsent" class="q-mb-md">-->
+        <!--          <typography value="I agree to receive marketing emails." />-->
+        <!--          <typography value=" Privacy Policy" />-->
+        <!--        </q-checkbox>-->
       </div>
 
       <typography
@@ -80,6 +84,7 @@ import {
 
 const email = ref("");
 const password = ref("");
+// const emailConsent = ref(false);
 
 /**
  * Navigates to the login page.
@@ -96,5 +101,8 @@ function handleCreateAccount() {
     email: email.value,
     password: password.value,
   });
+  email.value = "";
+  password.value = "";
+  // emailConsent.value = false;
 }
 </script>

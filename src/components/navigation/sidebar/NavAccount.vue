@@ -10,8 +10,8 @@
       to=""
       title="Send Feedback"
       icon="feedback"
-      color="secondary"
       clickable
+      tooltip="Send Feedback"
       @click="handleFeedback"
     />
 
@@ -59,10 +59,11 @@ const options = computed<NavOption[]>(() => [
     subtitle: orgStore.org.name,
     path: Routes.ORG,
     color: Routes.ORG === currentRoute.path ? "primary" : "text",
+    tooltip: orgStore.org.name,
   },
   {
     label: "My Account",
-    subtitle: sessionStore.user?.email,
+    subtitle: sessionStore.userEmail,
     icon: "account",
     path: Routes.ACCOUNT,
     color: Routes.ACCOUNT === currentRoute.path ? "primary" : "text",

@@ -8,7 +8,6 @@
       data-cy="button-org-edit"
       @click="handleEdit"
     />
-    <separator v-if="displayDelete" vertical />
     <text-button
       v-if="displayDelete"
       text
@@ -39,7 +38,7 @@ import {
   permissionStore,
   saveOrgStore,
 } from "@/hooks";
-import { FlexBox, TextButton, Separator } from "@/components/common";
+import { FlexBox, TextButton } from "@/components/common";
 
 const displayEdit = computed(() =>
   permissionStore.isAllowed("org.edit", orgStore.org)

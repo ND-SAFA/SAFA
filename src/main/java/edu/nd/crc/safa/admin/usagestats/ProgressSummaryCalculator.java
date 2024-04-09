@@ -167,6 +167,7 @@ public class ProgressSummaryCalculator {
         GithubIntegrationStatistics.GithubIntegrationStatisticsSingle withTracking = github.getWithProperTracking();
 
         total.setPercent(safeDivide(total.getAccounts(), accounts.getCreated()));
+        total.setAverageTime(-1);
         withTracking.setPercent(safeDivide(withTracking.getAccounts(), accounts.getHaveProperProgressTracking()));
         withTracking.setAverageTime((long) safeDivide(withTracking.getAverageTime(), withTracking.getAccounts()));
     }
@@ -181,6 +182,7 @@ public class ProgressSummaryCalculator {
         ProjectImportStatistics.ImportStatisticsSingle fromGithubProper = imports.getFromGithubProper();
 
         total.setPercent(safeDivide(total.getAccounts(), accounts.getCreated()));
+        total.setAverageTime(-1);
         fromGithub.setPercent(safeDivide(fromGithub.getAccounts(), github.getTotal().getAccounts()));
         fromGithub.setAverageTime((long) safeDivide(fromGithub.getAverageTime(), fromGithub.getAccounts()));
         fromGithubProper.setPercent(
@@ -199,6 +201,7 @@ public class ProgressSummaryCalculator {
         GenerationStatistics.GenerationStatisticsSingle fromImportProper = generations.getFromImportProper();
 
         total.setPercent(safeDivide(total.getAccounts(), accounts.getCreated()));
+        total.setAverageTime(-1);
         fromImport.setPercent(safeDivide(fromImport.getAccounts(), imports.getTotal().getAccounts()));
         fromImport.setAverageTime((long) safeDivide(fromImport.getAverageTime(), fromImport.getAccounts()));
         fromImportProper.setPercent(

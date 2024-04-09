@@ -387,6 +387,9 @@ public class GithubProjectCreationJob extends CommitJob {
             newArtifacts,
             logger
         );
+
+        // The summarization above commits the artifacts, so there's no need for the job to do it again later
+        newArtifacts.clear();
     }
 
     @Override

@@ -172,3 +172,9 @@ checkstyleMain {
     ignoreFailures = false
     maxWarnings = 0
 }
+
+idea {
+    module {
+        downloadJavadoc = true
+    }
+}

@@ -78,7 +78,7 @@ public class ProgressSummaryCalculator {
             return;
         }
 
-        importStats.setTotalPerformed(userStats.getProjectImports());
+        importStats.setTotalPerformed(importStats.getTotalPerformed() + userStats.getProjectImports());
 
         ProjectImportStatistics.ImportStatisticsSingle total = importStats.getTotal();
         total.setAccounts(total.getAccounts() + 1);

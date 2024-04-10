@@ -1,5 +1,5 @@
 <template>
-  <panel-card :title="project.name">
+  <panel-card :title="name">
     <template #title-actions>
       <text-button
         v-if="editMode"
@@ -84,6 +84,8 @@ import SaveProjectInputs from "./SaveProjectInputs.vue";
 const editMode = computed(() => appStore.popups.editProject);
 
 const project = computed(() => projectStore.project);
+
+const name = computed(() => projectStore.project.name || "No Project");
 
 const versionLabel = computed(
   () => `Version ${versionToString(project.value.projectVersion)}`

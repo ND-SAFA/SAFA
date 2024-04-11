@@ -26,6 +26,7 @@
       :title="option.label"
       :to="option.path"
       :tooltip="option.tooltip"
+      :action-cols="2"
     />
   </div>
 </template>
@@ -61,15 +62,26 @@ const options = computed<NavOption[]>(() => [
     color: Routes.ORG === currentRoute.path ? "primary" : "text",
     tooltip: orgStore.org.name,
   },
+  ...(permissionStore.isSuperuser
+    ? [
+        {
+          label: "Admin",
+          subtitle: permissionStore.isSuperuserActive
+            ? "Superuser Active"
+            : "Superuser Inactive",
+          icon: "admin",
+          path: Routes.ADMIN,
+          color: permissionStore.isSuperuserActive ? "secondary" : "text",
+          tooltip: "Admin Controls",
+        } as NavOption,
+      ]
+    : []),
   {
     label: "My Account",
     subtitle: sessionStore.userEmail,
-    icon: permissionStore.isSuperuserActive ? "admin" : "account",
+    icon: "account",
     path: Routes.ACCOUNT,
-    color:
-      Routes.ACCOUNT === currentRoute.path || permissionStore.isSuperuserActive
-        ? "primary"
-        : "text",
+    color: Routes.ACCOUNT === currentRoute.path ? "primary" : "text",
     tooltip: sessionStore.userEmail,
   },
 ]);

@@ -66,9 +66,6 @@ const options = computed<NavOption[]>(() => [
     ? [
         {
           label: "Admin",
-          subtitle: permissionStore.isSuperuserActive
-            ? "Superuser Active"
-            : "Superuser Inactive",
           icon: "admin",
           path: Routes.ADMIN,
           color: permissionStore.isSuperuserActive ? "secondary" : "text",

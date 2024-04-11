@@ -2,7 +2,6 @@
   <flex-box justify="center">
     <flex-item parts="12" class="q-mr-md">
       <log-out />
-      <admin-controls />
       <integrations-accounts />
       <theme-controller />
       <update-password />
@@ -30,6 +29,5 @@ import {
   UpdatePassword,
   ThemeController,
   LogOut,
-  AdminControls,
 } from "@/components/account/save";
 </script>

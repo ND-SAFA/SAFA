@@ -1,13 +1,11 @@
 <template>
   <panel-card v-if="permissionStore.isSuperuser" title="Admin Controls">
-    <expansion-item label="Toggle Superuser Mode">
-      <q-toggle v-model="adminApiStore.activeSuperuser" class="q-mr-md">
-        <template #default>
-          <typography value="Superuser mode" el="div" />
-          <typography secondary value="Enables all permissions" />
-        </template>
-      </q-toggle>
-    </expansion-item>
+    <q-toggle v-model="adminApiStore.activeSuperuser" class="q-mr-md">
+      <template #default>
+        <typography value="Superuser mode" el="div" />
+        <typography secondary value="Enables all permissions" />
+      </template>
+    </q-toggle>
     <expansion-item label="Create Account">
       <text-input v-model="adminCreateEmail" label="Email" />
       <text-input v-model="adminCreatePassword" label="Password" />

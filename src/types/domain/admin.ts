@@ -49,17 +49,17 @@ interface GithubIntegrationStatisticsSchema {
   /**
    * Statistics for all accounts.
    */
-  total: GithubIntegrationStatisticsSchema;
+  total: GithubIntegrationStatisticsSingleSchema;
   /**
    * Statistics for all accounts with proper tracking.
    */
-  withProperTracking: GithubIntegrationStatisticsSchema;
+  withProperTracking: GithubIntegrationStatisticsSingleSchema;
 }
 
 /**
  * Defines the schema for statistics of accounts that have integrated with github.
  */
-interface GithubIntegrationStatisticsSchema {
+interface GithubIntegrationStatisticsSingleSchema {
   /**
    * Number of accounts with github integrated.
    */
@@ -131,15 +131,15 @@ interface GenerationStatisticsSchema {
   /**
    * Statistics for all accounts.
    */
-  total: GenerationStatisticsSchema;
+  total: GenerationStatisticsSingleSchema;
   /**
    * Statistics for all accounts with a project imported.
    */
-  fromImport: GenerationStatisticsSchema;
+  fromImport: GenerationStatisticsSingleSchema;
   /**
    * Statistics for all accounts with a project imported and with proper tracking.
    */
-  fromImportProper: GenerationStatisticsSchema;
+  fromImportProper: GenerationStatisticsSingleSchema;
   /**
    * Total number of generations that have been performed.
    */
@@ -153,7 +153,7 @@ interface GenerationStatisticsSchema {
 /**
  * Defines the schema for statistics of accounts that have generated.
  */
-interface GenerationStatisticsSchema {
+interface GenerationStatisticsSingleSchema {
   /**
    * Number of accounts that have performed a hierarchy generation.
    */

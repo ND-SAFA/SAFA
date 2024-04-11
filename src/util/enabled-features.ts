@@ -13,4 +13,6 @@ export const ENABLED_FEATURES = {
   GENERATE_SUMMARIES: false,
 
   SIGN_UP: true,
+
+  ONBOARDING_STATS_TEST: true,
 };

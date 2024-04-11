@@ -17,3 +17,4 @@ export * from "./hgen";
 export * from "./subtree";
 export * from "./organizations";
 export * from "./billing";
+export * from "./admin";

@@ -215,6 +215,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-shield-lock";
     case "payment":
       return "mdi-credit-card-outline";
+    case "admin":
+      return "mdi-account-supervisor-circle";
     default:
       return "";
   }

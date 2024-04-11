@@ -44,7 +44,7 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { NavOption } from "@/types";
 import { FEEDBACK_LINK } from "@/util";
-import { orgStore, sessionStore } from "@/hooks";
+import { orgStore, permissionStore, sessionStore } from "@/hooks";
 import { Routes } from "@/router";
 import { ListItem } from "@/components/common";
 import SavingIcon from "./SavingIcon.vue";
@@ -64,9 +64,12 @@ const options = computed<NavOption[]>(() => [
   {
     label: "My Account",
     subtitle: sessionStore.userEmail,
-    icon: "account",
+    icon: permissionStore.isSuperuserActive ? "admin" : "account",
     path: Routes.ACCOUNT,
-    color: Routes.ACCOUNT === currentRoute.path ? "primary" : "text",
+    color:
+      Routes.ACCOUNT === currentRoute.path || permissionStore.isSuperuserActive
+        ? "primary"
+        : "text",
     tooltip: sessionStore.userEmail,
   },
 ]);

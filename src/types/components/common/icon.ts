@@ -99,7 +99,8 @@ export type IconVariant =
   | "onboarding"
   | "changelog"
   | "security"
-  | "payment";
+  | "payment"
+  | "admin";
 
 /**
  * Defines props for an icon.

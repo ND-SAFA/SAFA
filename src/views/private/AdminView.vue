@@ -35,7 +35,7 @@
               el="p"
             />
             <typography
-              :value="stats.github.withProperTracking.percent + '%'"
+              :value="stats.github.withProperTracking.percent + ' %'"
               el="p"
             />
             <typography
@@ -61,7 +61,7 @@
           <flex-item>
             <typography :value="stats.imports.totalPerformed" el="p" />
             <typography :value="stats.imports.total.accounts" el="p" />
-            <typography :value="stats.imports.total.percent + '%'" el="p" />
+            <typography :value="stats.imports.total.percent + ' %'" el="p" />
             <typography
               :value="displayDuration(stats.imports.total.averageTime)"
               el="p"
@@ -71,7 +71,7 @@
               el="p"
             />
             <typography
-              :value="stats.imports.fromGithubProper.percent + '%'"
+              :value="stats.imports.fromGithubProper.percent + ' %'"
               el="p"
             />
             <typography
@@ -109,7 +109,10 @@
             <typography :value="stats.generations.totalGenerations" el="p" />
             <typography :value="stats.generations.linesGeneratedOn" el="p" />
             <typography :value="stats.generations.total.accounts" el="p" />
-            <typography :value="stats.generations.total.percent + '%'" el="p" />
+            <typography
+              :value="stats.generations.total.percent + ' %'"
+              el="p"
+            />
             <typography
               :value="displayDuration(stats.generations.total.averageTime)"
               el="p"
@@ -119,7 +122,7 @@
               el="p"
             />
             <typography
-              :value="stats.generations.fromImportProper.percent + '%'"
+              :value="stats.generations.fromImportProper.percent + ' %'"
               el="p"
             />
             <typography

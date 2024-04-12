@@ -30,6 +30,8 @@ import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubRepositoryFileType;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
+import edu.nd.crc.safa.features.github.entities.events.GithubProjectImportedEvent;
+import edu.nd.crc.safa.features.github.entities.events.ProjectSummarizedEvent;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
@@ -51,6 +53,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * Responsible for providing step implementations for importing a GitHub project:
@@ -391,6 +394,16 @@ public class GithubProjectCreationJob extends CommitJob {
 
     @Override
     protected void afterJob(boolean success) throws Exception {
+        if (success) {
+            ApplicationEventPublisher eventPublisher = getServiceProvider().getEventPublisher();
+            Project project = getProjectVersion().getProject();
+
+            eventPublisher.publishEvent(new GithubProjectImportedEvent(this, user, project, githubIdentifier));
+            if (importSettings.isSummarize()) {
+                eventPublisher.publishEvent(new ProjectSummarizedEvent(this, user, project));
+            }
+        }
+
         if (importSettings.isSummarize()) {
             EmailService emailService = getServiceProvider().getEmailService();
             emailService.sendGenerationFinished(getUser().getEmail(), getProjectVersion(), success);

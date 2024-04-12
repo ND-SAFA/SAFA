@@ -76,6 +76,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.TaskExecutor;
@@ -198,6 +199,8 @@ public class ServiceProvider {
     private JobLauncher jobLauncher; // Not final because runtime changes on test vs dev.
     // Email
     private EmailService emailService;
+    // Events
+    private ApplicationEventPublisher eventPublisher;
 
     @PostConstruct
     public void postInit() {

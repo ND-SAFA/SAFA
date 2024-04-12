@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.config;
 
 import edu.nd.crc.safa.features.notifications.members.ActiveMembersInterceptor;
+import edu.nd.crc.safa.features.notifications.security.PermissionCheckInterceptor;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,8 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         ActiveMembersInterceptor activeMembersInterceptor = new ActiveMembersInterceptor();
-        registration.interceptors(activeMembersInterceptor);
+        PermissionCheckInterceptor permissionCheckInterceptor = new PermissionCheckInterceptor();
+        registration.interceptors(activeMembersInterceptor, permissionCheckInterceptor);
     }
 
     @Override

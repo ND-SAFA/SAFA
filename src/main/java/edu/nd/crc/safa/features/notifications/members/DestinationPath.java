@@ -14,8 +14,14 @@ public class DestinationPath {
      * The ID of the topic (e.g. /user/abc123 = abc123).
      */
     private final UUID topicId;
+    /**
+     * The original path (e.g. /topic/project/abc123 = /topic/project/abc123)
+     */
+    private final String fullPath;
 
     public DestinationPath(String path) {
+        this.fullPath = path;
+
         String[] parts = path.split("/");
         if (parts[1].equals("topic")) {
             this.topic = parts[2];
@@ -28,5 +34,10 @@ public class DestinationPath {
 
     public boolean isTopic(String channelName) {
         return this.topic.equals(channelName);
+    }
+
+    @Override
+    public String toString() {
+        return this.fullPath;
     }
 }

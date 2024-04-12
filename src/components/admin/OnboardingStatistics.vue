@@ -28,7 +28,7 @@
           el="p"
         />
         <typography
-          :value="displayDuration(stats.github.withProperTracking.averageTime)"
+          :value="convertDuration(stats.github.withProperTracking.averageTime)"
           el="p"
         />
       </flex-item>
@@ -50,7 +50,7 @@
         <typography :value="stats.imports.total.accounts" el="p" />
         <typography :value="stats.imports.total.percent + ' %'" el="p" />
         <typography
-          :value="displayDuration(stats.imports.total.averageTime)"
+          :value="convertDuration(stats.imports.total.averageTime)"
           el="p"
         />
         <typography :value="stats.imports.fromGithubProper.accounts" el="p" />
@@ -59,7 +59,7 @@
           el="p"
         />
         <typography
-          :value="displayDuration(stats.imports.fromGithubProper.averageTime)"
+          :value="convertDuration(stats.imports.fromGithubProper.averageTime)"
           el="p"
         />
       </flex-item>
@@ -93,7 +93,7 @@
         <typography :value="stats.generations.total.accounts" el="p" />
         <typography :value="stats.generations.total.percent + ' %'" el="p" />
         <typography
-          :value="displayDuration(stats.generations.total.averageTime)"
+          :value="convertDuration(stats.generations.total.averageTime)"
           el="p"
         />
         <typography
@@ -106,7 +106,7 @@
         />
         <typography
           :value="
-            displayDuration(stats.generations.fromImportProper.averageTime)
+            convertDuration(stats.generations.fromImportProper.averageTime)
           "
           el="p"
         />
@@ -136,4 +136,13 @@ const stats = ref<UserProgressSummarySchema>();
 onMounted(async () => {
   stats.value = await getOnboardingStatistics();
 });
+
+/**
+ * Converts the duration (in seconds) to a human readable format.
+ * @param duration - The duration in seconds.
+ * @returns The human readable duration.
+ */
+function convertDuration(duration: number) {
+  return displayDuration(duration * 1000);
+}
 </script>

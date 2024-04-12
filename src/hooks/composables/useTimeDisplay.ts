@@ -1,6 +1,7 @@
 import { computed, ref, watch } from "vue";
 import { defineStore } from "pinia";
 import { TimeDisplayHook, TimeDisplayProps } from "@/types";
+import { displayDuration } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
@@ -58,14 +59,10 @@ export function useTimeDisplay(props: TimeDisplayProps): TimeDisplayHook {
     }
 
     const duration = Math.max(endTime.value - startTime.value, 0);
-    const hours = Math.floor(duration / 3600000);
-    const minutes = Math.floor((duration % 3600000) / 60000);
-    const hoursDisplay = `${hours} Hour${hours === 1 ? "" : "s"}`;
-    const minutesDisplay = `${minutes} Minute${minutes === 1 ? "" : "s"}`;
 
     repeat.value = !props.getEnd();
 
-    return hours ? `${hoursDisplay}, ${minutesDisplay}` : minutesDisplay;
+    return displayDuration(duration);
   });
 
   watch(

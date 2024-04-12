@@ -1,3 +1,4 @@
+import { UserProgressSummarySchema } from "@/types";
 import { buildRequest } from "@/api";
 
 /**
@@ -22,4 +23,11 @@ export async function activateSuperuser(): Promise<void> {
  */
 export async function deactivateSuperuser(): Promise<void> {
   await buildRequest<void>("deactivateSuperuser").put();
+}
+
+/**
+ * Retrieves the statistics for the user progress in the app.
+ */
+export async function getOnboardingStatistics(): Promise<UserProgressSummarySchema> {
+  return buildRequest<UserProgressSummarySchema>("onboardingStatistics").get();
 }

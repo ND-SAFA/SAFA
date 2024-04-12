@@ -6,7 +6,7 @@ import {
   sessionApiStore,
 } from "@/hooks/api";
 import { appStore, sessionStore } from "@/hooks/core";
-import { projectStore } from "@/hooks/management";
+import { permissionStore, projectStore } from "@/hooks/management";
 import { QueryParams, Routes } from "@/router/routes";
 
 type RouteChecks = Record<
@@ -82,6 +82,15 @@ export const routerBeforeChecks: RouteChecks = {
     } else if (status === PaymentStatus.cancel) {
       await billingApiStore.handleCancelPayment(sessionId);
     }
+
+    return { path: Routes.HOME };
+  },
+  async checkSuperuserStatus(to) {
+    const requiresSuperuser = to.matched.some(
+      ({ meta }) => meta.requiresSuperuser
+    );
+
+    if (!requiresSuperuser || permissionStore.isSuperuser) return;
 
     return { path: Routes.HOME };
   },

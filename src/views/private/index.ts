@@ -8,3 +8,4 @@ export { default as MyOrganizationView } from "./MyOrganizationView.vue";
 export { default as MyTeamView } from "./MyTeamView.vue";
 export { default as ProjectSelectorView } from "./ProjectSelectorView.vue";
 export { default as SearchView } from "./SearchView.vue";
+export { default as AdminView } from "./AdminView.vue";

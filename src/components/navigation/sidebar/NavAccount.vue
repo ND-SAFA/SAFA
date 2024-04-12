@@ -26,6 +26,8 @@
       :title="option.label"
       :to="option.path"
       :tooltip="option.tooltip"
+      :class="option.class"
+      :action-cols="2"
     />
   </div>
 </template>
@@ -44,7 +46,7 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { NavOption } from "@/types";
 import { FEEDBACK_LINK } from "@/util";
-import { orgStore, sessionStore } from "@/hooks";
+import { orgStore, permissionStore, sessionStore } from "@/hooks";
 import { Routes } from "@/router";
 import { ListItem } from "@/components/common";
 import SavingIcon from "./SavingIcon.vue";
@@ -59,7 +61,7 @@ const options = computed<NavOption[]>(() => [
     subtitle: orgStore.org.name,
     path: Routes.ORG,
     color: Routes.ORG === currentRoute.path ? "primary" : "text",
-    tooltip: orgStore.org.name,
+    tooltip: "My Organization: " + orgStore.org.name,
   },
   {
     label: "My Account",
@@ -67,8 +69,20 @@ const options = computed<NavOption[]>(() => [
     icon: "account",
     path: Routes.ACCOUNT,
     color: Routes.ACCOUNT === currentRoute.path ? "primary" : "text",
-    tooltip: sessionStore.userEmail,
+    tooltip: "My Account: " + sessionStore.userEmail,
   },
+  ...(permissionStore.isSuperuser
+    ? [
+        {
+          label: "Admin Controls",
+          icon: "admin",
+          path: Routes.ADMIN,
+          color: permissionStore.isSuperuserActive ? "primary" : "text",
+          class: permissionStore.isSuperuserActive ? "bd-primary" : "",
+          tooltip: "Admin Controls",
+        } as NavOption,
+      ]
+    : []),
 ]);
 
 /**

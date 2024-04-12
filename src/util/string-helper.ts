@@ -130,3 +130,17 @@ export function versionToString(currentVersion?: VersionSchema): string {
 export function sanitizeNodeId(id?: string): string {
   return id?.replace(/^[^a-z]+|[^\w:.-]+/gi, "") || "";
 }
+
+/**
+ * Converts a duration in ms to a displayable string.
+ * @param duration - The duration in ms.
+ * @return The displayable duration.
+ */
+export function displayDuration(duration: number): string {
+  const hours = Math.floor(duration / 3600000);
+  const minutes = Math.floor((duration % 3600000) / 60000);
+  const hoursDisplay = `${hours} Hour${hours === 1 ? "" : "s"}`;
+  const minutesDisplay = `${minutes} Minute${minutes === 1 ? "" : "s"}`;
+
+  return hours ? `${hoursDisplay}, ${minutesDisplay}` : minutesDisplay;
+}

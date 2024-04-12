@@ -15,6 +15,7 @@ import {
   SearchView,
   UploadStatusView,
   MyTeamView,
+  AdminView,
 } from "@/views";
 
 /**
@@ -37,6 +38,8 @@ export enum Routes {
   TEAM = "/team",
   SEARCH = "/search",
   PAYMENT = "/payment",
+
+  ADMIN = "/admin",
 
   DEMO = "/demo",
 }
@@ -184,6 +187,15 @@ export const routes: Array<RouteRecordRaw> = [
     component: HomeView,
     meta: {
       requiresProject: true,
+    },
+  },
+  // Admin
+  {
+    path: Routes.ADMIN,
+    name: "Admin",
+    component: AdminView,
+    meta: {
+      requiresSuperuser: true,
     },
   },
   // Demo

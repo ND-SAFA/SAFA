@@ -66,7 +66,7 @@ public class PermissionCheckInterceptor implements ChannelInterceptor {
 
         TopicPermissionCheckFunction permissionCheckFunction = securedTopics.get(topic);
 
-        if (permissionCheckFunction.canSubscribe(getSafaUser(user), proxy.getDestination())) {
+        if (canSubscribe(getSafaUser(user), path, permissionCheckFunction)) {
             return message;
         } else {
             logger.warn("Attempt by {} to subscribe to {} which they do not have permission to view",
@@ -75,7 +75,18 @@ public class PermissionCheckInterceptor implements ChannelInterceptor {
         }
     }
 
+    private boolean canSubscribe(IUser user, DestinationPath path, TopicPermissionCheckFunction permissionFunction) {
+        try {
+            return permissionFunction.canSubscribe(getSafaUser(user), path);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private SafaUser getSafaUser(IUser iUser) {
+        if (iUser instanceof SafaUser) {
+            return (SafaUser) iUser;
+        }
         return ServiceProvider.getInstance().getSafaUserService().getUserById(iUser.getUserId());
     }
 }

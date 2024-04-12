@@ -1,5 +1,8 @@
 <template>
-  <panel-card :title="props.hideTitle ? undefined : 'Project Summary'">
+  <panel-card :title="props.hideTitle ? undefined : name">
+    <template v-if="!props.hideTitle" #title-actions>
+      <typography secondary :value="versionLabel" />
+    </template>
     <div class="overflow-auto" :style="hideOverflow ? 'max-height: 40vh' : ''">
       <typography
         v-if="!!specification && displayDescription"
@@ -52,6 +55,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
 import { PanelCard, Typography } from "@/components/common";
 
@@ -67,6 +71,12 @@ const displayDescription = computed(
     // If the description is the same as the specification, hide it.
     projectStore.project.description.length !==
       projectStore.project.specification?.length
+);
+
+const name = computed(() => projectStore.project.name || "Project Overview");
+
+const versionLabel = computed(
+  () => `Version ${versionToString(projectStore.project.projectVersion)}`
 );
 
 const description = computed(

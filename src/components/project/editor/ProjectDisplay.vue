@@ -1,5 +1,5 @@
 <template>
-  <panel-card :title="project.name">
+  <panel-card :title="name">
     <template #title-actions>
       <text-button
         v-if="editMode"
@@ -64,7 +64,13 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { versionToString } from "@/util";
-import { appStore, projectStore, timStore } from "@/hooks";
+import {
+  appStore,
+  artifactStore,
+  projectStore,
+  timStore,
+  traceStore,
+} from "@/hooks";
 import {
   PanelCard,
   AttributeChip,
@@ -79,19 +85,21 @@ const editMode = computed(() => appStore.popups.editProject);
 
 const project = computed(() => projectStore.project);
 
+const name = computed(() => projectStore.project.name || "No Project");
+
 const versionLabel = computed(
   () => `Version ${versionToString(project.value.projectVersion)}`
 );
 
 const artifactTypeLabel = computed(
-  () => `${project.value.artifactTypes.length} Artifact Types`
+  () => `${timStore.artifactTypes.length} Artifact Types`
 );
 
 const artifactLabel = computed(
-  () => `${project.value.artifacts.length} Artifacts`
+  () => `${artifactStore.allArtifacts.length} Artifacts`
 );
 
-const traceLabel = computed(() => `${project.value.traces.length} Trace Links`);
+const traceLabel = computed(() => `${traceStore.allTraces.length} Trace Links`);
 
 const artifactTypeMap = computed(() =>
   Object.entries(

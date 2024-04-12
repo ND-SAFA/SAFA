@@ -24,6 +24,7 @@
     <text-button
       v-bind="buttonProps(options.table)"
       :hide-label="smallWindow"
+      :disabled="artifactStore.allArtifacts.length === 0"
       label="Table"
       data-cy="button-nav-table"
       icon="view-table"

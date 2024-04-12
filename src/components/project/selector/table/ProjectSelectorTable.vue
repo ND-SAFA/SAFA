@@ -72,6 +72,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 import {
   IdentifierSchema,
   MemberEntitySchema,
@@ -89,6 +90,7 @@ import {
   teamApiStore,
   teamStore,
 } from "@/hooks";
+import { Routes } from "@/router";
 import { SelectorTable, IconButton, Typography } from "@/components/common";
 import { InviteMemberModal } from "@/components/members";
 
@@ -100,6 +102,8 @@ const emit = defineEmits<{
    */
   (e: "selected", project: IdentifierSchema | undefined): void;
 }>();
+
+const currentRoute = useRoute();
 
 const selected = ref<IdentifierSchema | undefined>();
 const projectInviteId = ref<string>();
@@ -180,6 +184,15 @@ watch(
   () => props.open,
   (open) => {
     if (!open) return;
+
+    handleReload();
+  }
+);
+
+watch(
+  () => currentRoute.path,
+  (path) => {
+    if (path !== Routes.PROJECT_CREATOR) return;
 
     handleReload();
   }

@@ -79,6 +79,8 @@ public class PermissionCheckInterceptor implements ChannelInterceptor {
         try {
             return permissionFunction.canSubscribe(getSafaUser(user), path);
         } catch (Exception e) {
+            logger.info("Error checking if user can subscribe to topic. User: {}, topic: {}, error: {}",
+                    user.getEmail(), path, e.getMessage());
             return false;
         }
     }

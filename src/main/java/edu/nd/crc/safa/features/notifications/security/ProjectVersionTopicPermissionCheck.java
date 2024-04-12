@@ -8,6 +8,6 @@ import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
  */
 public class ProjectVersionTopicPermissionCheck extends MembershipEntityTopicPermissionCheck {
     public ProjectVersionTopicPermissionCheck() {
-        super(ProjectPermission.VIEW, id -> ServiceProvider.getInstance().getProjectService().getProjectById(id));
+        super(ProjectPermission.VIEW, id -> ServiceProvider.getInstance().getVersionService().getVersionById(id));
     }
 }

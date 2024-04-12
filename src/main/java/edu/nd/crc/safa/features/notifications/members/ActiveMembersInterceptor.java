@@ -6,6 +6,7 @@ import edu.nd.crc.safa.features.notifications.Topic;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
@@ -38,7 +39,7 @@ public class ActiveMembersInterceptor implements ChannelInterceptor {
      * @param sent    Whether the message being processed has already sent.
      */
     @Override
-    public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
+    public void postSend(@NotNull Message<?> message, @NotNull MessageChannel channel, boolean sent) {
         try {
             MessageProxy proxy = new MessageProxy(message, channel);
             if (sent && proxy.hasCommand(commandsToHandle)) {

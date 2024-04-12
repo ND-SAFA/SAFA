@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.notifications.security.JobTopicPermissionCheck;
 import edu.nd.crc.safa.features.notifications.security.NoTopicPermissionCheck;
 import edu.nd.crc.safa.features.notifications.security.ProjectTopicPermissionCheck;
@@ -50,14 +49,5 @@ public enum Topic {
             map.put(topic.getName(), topic);
         }
         return map;
-    }
-
-    /**
-     * Shortened name for {@link ServiceProvider#getInstance()}
-     *
-     * @return The service provider instance
-     */
-    private static ServiceProvider sp() {
-        return ServiceProvider.getInstance();
     }
 }

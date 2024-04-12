@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TopicCreator {
     public static String getProjectTopic(UUID id) {
-        return String.format("/topic/project/%s", id);
+        return Topic.PROJECT.getFormattedPath() + "/" + id;
     }
 
     /**
@@ -18,7 +18,7 @@ public class TopicCreator {
      * @return Destination for all updates to project version.
      */
     public static String getVersionTopic(UUID id) {
-        return String.format("/topic/version/%s", id);
+        return Topic.VERSION.getFormattedPath() + "/" + id;
     }
 
     /**
@@ -28,7 +28,7 @@ public class TopicCreator {
      * @return Destination for all job updates.
      */
     public static String getJobTopic(UUID jobId) {
-        return String.format("/topic/jobs/%s", jobId);
+        return Topic.JOBS.getFormattedPath() + "/" + jobId;
     }
 
     /**
@@ -38,6 +38,6 @@ public class TopicCreator {
      * @return Destination for direct messages to users.
      */
     public static String getUserTopic(UUID userId) {
-        return String.format("/users/%s/updates", userId);
+        return Topic.USERS.getFormattedPath() + "/" + userId + "/updates";
     }
 }

@@ -29,6 +29,33 @@ public enum Topic {
     private static final Map<String, Topic> reverseLookupMap = buildReverseLookup();
 
     /**
+     * Get the full path of this topic in its formatted form
+     *
+     * @return The formatted path
+     */
+    public String getFormattedPath() {
+        if (this.prefix.isEmpty()) {
+            return "/" + this.name;
+        } else {
+            return "/" + this.prefix + "/" + this.name;
+        }
+    }
+
+    /**
+     * Get a formatted version of the topic's prefix. For topics with no prefix,
+     * the name of the topic is treated as the prefix
+     *
+     * @return The formatted prefix
+     */
+    public String getFormattedPrefix() {
+        if (this.prefix.isEmpty()) {
+            return "/" + this.name;
+        } else {
+            return "/" + this.prefix;
+        }
+    }
+
+    /**
      * Get a topic definition based on the topic name
      *
      * @param topicName The name of the topic

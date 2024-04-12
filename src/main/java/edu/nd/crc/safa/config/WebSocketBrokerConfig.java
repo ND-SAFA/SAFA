@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.config;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import edu.nd.crc.safa.features.notifications.Topic;
 import edu.nd.crc.safa.features.notifications.members.ActiveMembersInterceptor;
@@ -42,24 +42,16 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker(getTopicPrefixes());
-        config.setUserDestinationPrefix(formatTopic(Topic.USERS.getName()));
-        config.setApplicationDestinationPrefixes(formatTopic(Topic.APP.getName()));
+        config.setUserDestinationPrefix(Topic.USERS.getFormattedPrefix());
+        config.setApplicationDestinationPrefixes(Topic.APP.getFormattedPrefix());
     }
 
     private static String[] getTopicPrefixes() {
-        List<String> prefixes = new ArrayList<>();
+        Set<String> prefixes = new HashSet<>();
         for (Topic topic : Topic.values()) {
-            String prefix = topic.getPrefix();
-            if (prefix.isEmpty()) {
-                prefix = topic.getName();
-            }
-            prefixes.add(formatTopic(prefix));
+            prefixes.add(topic.getFormattedPrefix());
         }
         return prefixes.toArray(new String[0]);
-    }
-
-    private static String formatTopic(String topicUnformatted) {
-        return "/" + topicUnformatted;
     }
 
     @Override

@@ -1,5 +1,9 @@
 package edu.nd.crc.safa.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.nd.crc.safa.features.notifications.Topic;
 import edu.nd.crc.safa.features.notifications.members.ActiveMembersInterceptor;
 import edu.nd.crc.safa.features.notifications.security.PermissionCheckInterceptor;
 
@@ -37,9 +41,25 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/users");
-        config.setUserDestinationPrefix("/users");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker(getTopicPrefixes());
+        config.setUserDestinationPrefix(formatTopic(Topic.USERS.getName()));
+        config.setApplicationDestinationPrefixes(formatTopic(Topic.APP.getName()));
+    }
+
+    private static String[] getTopicPrefixes() {
+        List<String> prefixes = new ArrayList<>();
+        for (Topic topic : Topic.values()) {
+            String prefix = topic.getPrefix();
+            if (prefix.isEmpty()) {
+                prefix = topic.getName();
+            }
+            prefixes.add(formatTopic(prefix));
+        }
+        return prefixes.toArray(new String[0]);
+    }
+
+    private static String formatTopic(String topicUnformatted) {
+        return "/" + topicUnformatted;
     }
 
     @Override

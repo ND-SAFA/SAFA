@@ -18,6 +18,7 @@ import lombok.Getter;
 @Getter
 public enum Topic {
     USERS("", "users", NoTopicPermissionCheck::new),
+    APP("", "app", NoTopicPermissionCheck::new),
     JOBS("topic", "jobs", JobTopicPermissionCheck::new),
     VERSION("topic", "version",
             () -> new MembershipEntityTopicPermissionCheck(ProjectPermission.VIEW,

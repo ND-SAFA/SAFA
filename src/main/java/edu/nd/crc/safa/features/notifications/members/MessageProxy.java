@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.notifications.members;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.notifications.Topic;
 import edu.nd.crc.safa.features.users.entities.IUser;
 
 import lombok.Data;
@@ -70,7 +71,7 @@ public class MessageProxy {
      * @param topic The topic to check if the message is heading to.
      * @return True if message heading to destination in topic.
      */
-    public boolean isTopic(String topic) {
+    public boolean isTopic(Topic topic) {
         return getDestination().isTopic(topic);
     }
 

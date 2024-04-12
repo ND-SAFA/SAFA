@@ -2,6 +2,8 @@ package edu.nd.crc.safa.features.notifications.members;
 
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.notifications.Topic;
+
 import lombok.Data;
 
 @Data
@@ -32,8 +34,8 @@ public class DestinationPath {
         }
     }
 
-    public boolean isTopic(String channelName) {
-        return this.topic.equals(channelName);
+    public boolean isTopic(Topic topic) {
+        return this.topic.equals(topic.getName());
     }
 
     @Override

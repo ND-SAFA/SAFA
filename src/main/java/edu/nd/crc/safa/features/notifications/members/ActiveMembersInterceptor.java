@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.notifications.members;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.notifications.Topic;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AllArgsConstructor;
@@ -55,7 +56,7 @@ public class ActiveMembersInterceptor implements ChannelInterceptor {
      */
     private void handleMessage(MessageProxy proxy) {
         if (proxy.isCommand(StompCommand.SUBSCRIBE)) {
-            if (proxy.isTopic("project")) {
+            if (proxy.isTopic(Topic.PROJECT)) {
                 projectStore.subscribe(new ProjectSubscriptionMessage(proxy));
             }
         } else if (proxy.isCommand(StompCommand.UNSUBSCRIBE)) {

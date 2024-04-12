@@ -1,6 +1,6 @@
 <template>
   <panel-card v-if="permissionStore.isSuperuser" title="Admin Controls">
-    <q-toggle v-model="adminApiStore.activeSuperuser" class="q-mr-md">
+    <q-toggle v-model="adminApiStore.activeSuperuser" class="q-ma-md">
       <template #default>
         <typography value="Superuser mode" el="div" />
         <typography secondary value="Enables all permissions" />

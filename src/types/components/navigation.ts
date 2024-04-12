@@ -40,6 +40,10 @@ export interface NavOption {
    * The tooltip to display on option when hovered.
    */
   tooltip?: string;
+  /**
+   * Additional classes to display.
+   */
+  class?: string;
 }
 
 /**

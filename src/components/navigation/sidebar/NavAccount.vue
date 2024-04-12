@@ -26,6 +26,7 @@
       :title="option.label"
       :to="option.path"
       :tooltip="option.tooltip"
+      :class="option.class"
       :action-cols="2"
     />
   </div>
@@ -60,27 +61,28 @@ const options = computed<NavOption[]>(() => [
     subtitle: orgStore.org.name,
     path: Routes.ORG,
     color: Routes.ORG === currentRoute.path ? "primary" : "text",
-    tooltip: orgStore.org.name,
+    tooltip: "My Organization: " + orgStore.org.name,
   },
-  ...(permissionStore.isSuperuser
-    ? [
-        {
-          label: "Admin",
-          icon: "admin",
-          path: Routes.ADMIN,
-          color: permissionStore.isSuperuserActive ? "secondary" : "text",
-          tooltip: "Admin Controls",
-        } as NavOption,
-      ]
-    : []),
   {
     label: "My Account",
     subtitle: sessionStore.userEmail,
     icon: "account",
     path: Routes.ACCOUNT,
     color: Routes.ACCOUNT === currentRoute.path ? "primary" : "text",
-    tooltip: sessionStore.userEmail,
+    tooltip: "My Account: " + sessionStore.userEmail,
   },
+  ...(permissionStore.isSuperuser
+    ? [
+        {
+          label: "Admin Controls",
+          icon: "admin",
+          path: Routes.ADMIN,
+          color: permissionStore.isSuperuserActive ? "primary" : "text",
+          class: permissionStore.isSuperuserActive ? "bd-primary" : "",
+          tooltip: "Admin Controls",
+        } as NavOption,
+      ]
+    : []),
 ]);
 
 /**

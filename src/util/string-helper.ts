@@ -133,7 +133,8 @@ export function sanitizeNodeId(id?: string): string {
 
 /**
  * Converts a duration in ms to a displayable string.
- * @param duration
+ * @param duration - The duration in ms.
+ * @return The displayable duration.
  */
 export function displayDuration(duration: number): string {
   const hours = Math.floor(duration / 3600000);

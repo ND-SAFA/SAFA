@@ -24,7 +24,7 @@
       <flex-item>
         <typography :value="stats.github.withProperTracking.accounts" el="p" />
         <typography
-          :value="stats.github.withProperTracking.percent + ' %'"
+          :value="convertPercent(stats.github.withProperTracking.percent)"
           el="p"
         />
         <typography
@@ -48,14 +48,17 @@
       <flex-item>
         <typography :value="stats.imports.totalPerformed" el="p" />
         <typography :value="stats.imports.total.accounts" el="p" />
-        <typography :value="stats.imports.total.percent + ' %'" el="p" />
+        <typography
+          :value="convertPercents(tats.imports.total.percent)"
+          el="p"
+        />
         <typography
           :value="convertDuration(stats.imports.total.averageTime)"
           el="p"
         />
         <typography :value="stats.imports.fromGithubProper.accounts" el="p" />
         <typography
-          :value="stats.imports.fromGithubProper.percent + ' %'"
+          :value="convertPercent(stats.imports.fromGithubProper.percent)"
           el="p"
         />
         <typography
@@ -91,7 +94,10 @@
         <typography :value="stats.generations.totalGenerations" el="p" />
         <typography :value="stats.generations.linesGeneratedOn" el="p" />
         <typography :value="stats.generations.total.accounts" el="p" />
-        <typography :value="stats.generations.total.percent + ' %'" el="p" />
+        <typography
+          :value="convertPercent(stats.generations.total.percent)"
+          el="p"
+        />
         <typography
           :value="convertDuration(stats.generations.total.averageTime)"
           el="p"
@@ -101,7 +107,7 @@
           el="p"
         />
         <typography
-          :value="stats.generations.fromImportProper.percent + ' %'"
+          :value="convertPercent(stats.generations.fromImportProper.percent)"
           el="p"
         />
         <typography
@@ -144,5 +150,14 @@ onMounted(async () => {
  */
 function convertDuration(duration: number) {
   return displayDuration(duration * 1000);
+}
+
+/**
+ * Converts the percent (out of 1) to a human readable format.
+ * @param percent - The percent (out of 1).
+ * @returns The human readable percent.
+ */
+function convertPercent(percent: number) {
+  return (percent * 100).toFixed(2) + " %";
 }
 </script>

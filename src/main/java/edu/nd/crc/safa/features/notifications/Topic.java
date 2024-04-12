@@ -6,10 +6,10 @@ import java.util.function.Supplier;
 
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.notifications.security.JobTopicPermissionCheck;
-import edu.nd.crc.safa.features.notifications.security.MembershipEntityTopicPermissionCheck;
 import edu.nd.crc.safa.features.notifications.security.NoTopicPermissionCheck;
+import edu.nd.crc.safa.features.notifications.security.ProjectTopicPermissionCheck;
+import edu.nd.crc.safa.features.notifications.security.ProjectVersionTopicPermissionCheck;
 import edu.nd.crc.safa.features.notifications.security.TopicPermissionCheckFunction;
-import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,12 +20,8 @@ public enum Topic {
     USERS("", "users", NoTopicPermissionCheck::new),
     APP("", "app", NoTopicPermissionCheck::new),
     JOBS("topic", "jobs", JobTopicPermissionCheck::new),
-    VERSION("topic", "version",
-            () -> new MembershipEntityTopicPermissionCheck(ProjectPermission.VIEW,
-                    id -> sp().getVersionService().getVersionById(id))),
-    PROJECT("topic", "project",
-            () -> new MembershipEntityTopicPermissionCheck(ProjectPermission.VIEW,
-                    id -> sp().getProjectService().getProjectById(id)));
+    VERSION("topic", "version", ProjectVersionTopicPermissionCheck::new),
+    PROJECT("topic", "project", ProjectTopicPermissionCheck::new);
 
     private final String prefix;
     private final String name;

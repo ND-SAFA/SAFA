@@ -49,7 +49,7 @@
         <typography :value="stats.imports.totalPerformed" el="p" />
         <typography :value="stats.imports.total.accounts" el="p" />
         <typography
-          :value="convertPercents(tats.imports.total.percent)"
+          :value="convertPercent(stats.imports.total.percent)"
           el="p"
         />
         <typography

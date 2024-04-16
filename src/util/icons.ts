@@ -217,6 +217,10 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-credit-card-outline";
     case "admin":
       return "mdi-account-supervisor-circle";
+    case "comment":
+      return "mdi-comment-text-outline";
+    case "flag":
+      return "mdi-flag";
     default:
       return "";
   }

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS usage_statistics
 (
     id                      BINARY(16)    NOT NULL PRIMARY KEY,
-    user_id                 VARCHAR(255)  CHARACTER SET utf8mb3 NOT NULL,
+    user_id                 VARCHAR(255)  NOT NULL,
     project_imports         INT,
     project_summarizations  INT,
     project_generations     INT,

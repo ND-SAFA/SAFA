@@ -221,6 +221,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-comment-text-outline";
     case "flag":
       return "mdi-flag";
+    case "health":
+      return "mdi-heart-pulse";
     default:
       return "";
   }

@@ -102,7 +102,8 @@ export type IconVariant =
   | "payment"
   | "admin"
   | "comment"
-  | "flag";
+  | "flag"
+  | "health";
 
 /**
  * Defines props for an icon.

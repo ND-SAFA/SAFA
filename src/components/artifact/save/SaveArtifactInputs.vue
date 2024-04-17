@@ -66,6 +66,23 @@
     />
 
     <attribute-list-input :artifact="store.editedArtifact" />
+
+    <expansion-item
+      v-if="ENABLED_FEATURES.NASA_ARTIFACT_HEALTH"
+      label="Artifact Health"
+    >
+      <q-banner
+        v-for="check in EXAMPLE_ARTIFACT_HEALTH"
+        :key="check.label"
+        dense
+      >
+        <flex-box align="center">
+          <separator vertical :color="check.color" r="2" style="width: 2px" />
+          <icon size="sm" :variant="check.icon" :color="check.color" />
+          <typography :value="check.label" l="2" />
+        </flex-box>
+      </q-banner>
+    </expansion-item>
   </div>
 </template>
 
@@ -80,6 +97,7 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { IconVariant } from "@/types";
 import { ENABLED_FEATURES } from "@/util";
 import {
   artifactGenerationApiStore,
@@ -93,6 +111,38 @@ import {
   TextInput,
   IconButton,
 } from "@/components/common";
+import ExpansionItem from "@/components/common/display/list/ExpansionItem.vue";
+import Icon from "@/components/common/display/icon/Icon.vue";
+import Typography from "@/components/common/display/content/Typography.vue";
+import Separator from "@/components/common/display/content/Separator.vue";
+import FlexBox from "@/components/common/display/content/FlexBox.vue";
+
+const EXAMPLE_ARTIFACT_HEALTH = [
+  {
+    icon: "health" as IconVariant,
+    label: "[Conflicting Requirement]",
+    color: "negative",
+    action: () => {},
+  },
+  {
+    icon: "edit" as IconVariant,
+    label: "[Suggested edit]",
+    color: "secondary",
+    action: () => {},
+  },
+  {
+    icon: "warning" as IconVariant,
+    label: "[Missing terminology]",
+    color: "negative",
+    action: () => {},
+  },
+  {
+    icon: "flag" as IconVariant,
+    label: "[Ambiguous terminology]",
+    color: "secondary",
+    action: () => {},
+  },
+];
 
 const store = computed(() => artifactSaveStore);
 

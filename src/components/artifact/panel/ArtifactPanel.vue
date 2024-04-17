@@ -4,7 +4,8 @@
       <artifact-buttons />
     </template>
     <artifact-content />
-    <artifact-traces />
+    <artifact-context v-if="ENABLED_FEATURES.NASA_ARTIFACT_RELATIONS" />
+    <artifact-traces v-else />
     <artifact-documents />
     <artifact-errors />
   </details-panel>
@@ -20,12 +21,14 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { ENABLED_FEATURES } from "@/util";
 import { DetailsPanel } from "@/components/common";
 import {
   ArtifactContent,
   ArtifactDocuments,
   ArtifactTraces,
   ArtifactErrors,
+  ArtifactContext,
 } from "@/components/artifact/display";
 import { ArtifactButtons } from "@/components/artifact/save";
 </script>

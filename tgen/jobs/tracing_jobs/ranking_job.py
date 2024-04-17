@@ -38,7 +38,7 @@ class RankingJob(AbstractJob):
     """
 
     def __init__(self, dataset_creator: PromptDatasetCreator = None, dataset: PromptDataset = None,
-                 ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM, layer_ids: Tuple[str, str] = None,
+                 ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM, layer_ids: List[str] = None,
                  select_top_predictions: bool = DEFAULT_SELECT_TOP_PREDICTIONS, log_results: bool = True,
                  relationship_manager: AbstractRelationshipManager = None,
                  relationship_manager_type: SupportedRelationshipManager = SupportedRelationshipManager.EMBEDDING,
@@ -104,7 +104,8 @@ class RankingJob(AbstractJob):
         export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
         if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
             export_dir = FileUtil.safely_join_paths(export_dir, RankingJob._get_run_dir(child_type, parent_type))
-        layer_dataset = PromptDataset(artifact_df=selected_artifacts, project_summary=self.dataset.project_summary)
+        layer_dataset = PromptDataset(artifact_df=selected_artifacts, trace_dataset=dataset.trace_dataset,
+                                      project_summary=self.dataset.project_summary)
         if not self.relationship_manager and self.relationship_manager_type:
             model_name = DictUtil.get_kwarg_values(self.ranking_kwargs, model_name=None)
             kwargs = DictUtil.update_kwarg_values({}, model_name=model_name) if model_name else {}
@@ -115,6 +116,7 @@ class RankingJob(AbstractJob):
                                     export_dir=export_dir,
                                     types_to_trace=types_to_trace,
                                     relationship_manager=self.relationship_manager,
+                                    re_rank_children=True,
                                     **self.ranking_kwargs)
         logger.info(f"Starting to trace: {pipeline_args.run_name}")
 

@@ -8,7 +8,8 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDINGS_SCORE_WEIGHT, DEFAULT_EMBEDDING_MODEL, \
     DEFAULT_EXPLANATION_SCORE_WEIGHT, DEFAULT_LINK_THRESHOLD, DEFAULT_MAX_CONTEXT_ARTIFACTS, DEFAULT_PARENT_MIN_THRESHOLD, \
-    DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT
+    DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT, \
+    DEFAULT_CROSS_ENCODER_MODEL
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
@@ -71,6 +72,10 @@ class RankingArgs(PipelineArgs):
     """
     embedding_model_name: str = DEFAULT_EMBEDDING_MODEL
     """
+    - ranking_model_name: The model whose predictions are used to re-rank children.
+    """
+    ranking_model_name: str = DEFAULT_CROSS_ENCODER_MODEL
+    """
     - parent_thresholds: The threshold used to establish parents from (primary, secondary and min)
     """
     parent_thresholds: Tuple[float, float, float] = (DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_PARENT_MIN_THRESHOLD,
@@ -104,6 +109,10 @@ class RankingArgs(PipelineArgs):
     - relationship_manager: If provided, will be used in the sorting step if using an transformer sorter
     """
     relationship_manager: AbstractRelationshipManager = None
+    """
+    - re_rank_children: If True, will re rank the children using a cross encoder
+    """
+    re_rank_children: bool = False
 
     def save(self, obj: Any, file_name: str) -> str:
         """

@@ -1,11 +1,11 @@
 from abc import abstractmethod
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Callable, Dict, List, Type, Union
 
 import pandas as pd
 from pandas._typing import Axes, Dtype
 from pandas.core.internals.construction import dict_to_mgr
+from typing import Any, Callable, Dict, List, Type, Union
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -89,7 +89,9 @@ class AbstractProjectDataFrame(pd.DataFrame):
         row_as_dict = EnumDict(row_as_dict)
         index = row_as_dict.get(self.index_name(), len(self.index))
         if index not in self:
-            self.assert_columns([col for col in row_as_dict.keys()])
+            required_columns = [col for col in self.required_column_names() if col in row_as_dict.keys()]
+            columns = required_columns + [col for col in row_as_dict if col not in self.required_column_names()]
+            self.assert_columns(columns)
             if self.columns.empty:
                 mgr = dict_to_mgr({key: [val] for key, val in row_as_dict.items()}, None, None)
                 object.__setattr__(self, "_mgr", mgr)

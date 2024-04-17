@@ -1,9 +1,10 @@
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from tgen.common.constants.ranking_constants import DEFAULT_CROSS_ENCODER_MODEL
+from tgen.common.util.list_util import ListUtil
 from tgen.models.model_properties import ModelTask
 from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
 
@@ -31,7 +32,8 @@ class CrossEncoderManager(AbstractRelationshipManager):
         :param include_ids: If True, includes the ids in the content for scoring.
         :return: The scores between each artifact in ids1 with those in ids2 in a similarity matrix.
         """
-        scores = iter(self.__calculate_scores(ids1, ids2, include_ids))
+        pairs = [(id1, id2) for id1 in ids1 for id2 in ids2]
+        scores = iter(self.calculate_scores(pairs, include_ids))
         similarity_matrix = np.empty((len(ids1), len(ids2)))
         for i, id1 in enumerate(ids1):
             for j, id2 in enumerate(ids2):
@@ -39,19 +41,19 @@ class CrossEncoderManager(AbstractRelationshipManager):
                 similarity_matrix[i, j] = score
         return similarity_matrix
 
-    def __calculate_scores(self, ids1: List[str], ids2: List[str], include_ids: bool = False) -> List[float]:
+    def calculate_scores(self, id_pairs: List[Tuple[str, str]], include_ids: bool = False) -> List[float]:
         """
-        Calculates the relationship score between each artifact in ids1 and id2.
-        :param ids1: List of ids to compare with ids2.
-        :param ids2: List of ids to compare with ids1.
+        Calculates the relationship score between each artifact pair..
+        :param id_pairs: List of tuples of id pairs to compare.
         :param include_ids: If True, includes the ids in the content for scoring.
         :return: A list of scores corresponding to each pair comparison.
         """
         batch_size = DEFAULT_ENCODING_BATCH_SIZE
-        artifact_contents1 = self.get_artifact_contents(ids1, include_ids)
-        artifact_contents2 = self.get_artifact_contents(ids2, include_ids)
-        artifact_combinations = [[artifact_contents1[i], artifact_contents2[j]] for i, id1 in enumerate(ids1)
-                                 for j, id2 in enumerate(ids2) if not self.relationship_exists(id1, id2)]
+        ids1, ids2 = ListUtil.unzip(id_pairs)
+        artifact_content1 = self.get_artifact_contents(ids1, include_ids=include_ids)
+        artifact_content2 = self.get_artifact_contents(ids2, include_ids=include_ids)
+        artifact_combinations = [[artifact_content1[i], artifact_content2[i]]
+                                 for i, (id1, id2) in enumerate(id_pairs) if not self.relationship_exists(id1, id2)]
         show_progress_bar = self._determine_show_progress_bar(artifact_combinations, "Calculating sim scores for artifacts...",
                                                               batch_size)
         scores = self.get_model().predict(artifact_combinations, batch_size=batch_size, show_progress_bar=show_progress_bar)

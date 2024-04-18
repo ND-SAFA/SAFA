@@ -63,8 +63,7 @@ export default {
 <script setup lang="ts">
 import { ref } from "vue";
 import { layoutStore } from "@/hooks";
-import { PanelCard, IconButton } from "@/components/common";
-import ListItem from "@/components/common/display/list/ListItem.vue";
+import { IconButton, ListItem } from "@/components/common";
 
 const currentMessage = ref("");
 

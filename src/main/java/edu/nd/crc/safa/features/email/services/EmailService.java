@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.email.services;
 
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 /**
@@ -29,29 +30,33 @@ public interface EmailService {
      *
      * @param recipient The email of the recipient
      * @param projectVersion The project version the job was running on
+     * @param jobEntity The job that ran the generation. May be null
      */
-    void sendGenerationCompleted(String recipient, ProjectVersion projectVersion);
+    void sendGenerationCompleted(String recipient, ProjectVersion projectVersion, JobDbEntity jobEntity);
 
     /**
      * Send an email indicating that a generation job failed.
      *
      * @param recipient The email of the recipient
      * @param projectVersion The project version the job was running on
+     * @param jobEntity The job that ran the generation. May be null
      */
-    void sendGenerationFailed(String recipient, ProjectVersion projectVersion);
+    void sendGenerationFailed(String recipient, ProjectVersion projectVersion, JobDbEntity jobEntity);
 
     /**
      * Send an email indicating that a generation job finished.
      *
      * @param recipient The email of the recipient
      * @param projectVersion The project version the job was running on
+     * @param jobEntity The job that ran the generation. May be null
      * @param success Whether the generation finished successfully
      */
-    default void sendGenerationFinished(String recipient, ProjectVersion projectVersion, boolean success) {
+    default void sendGenerationFinished(String recipient, ProjectVersion projectVersion,
+                                        JobDbEntity jobEntity, boolean success) {
         if (success) {
-            sendGenerationCompleted(recipient, projectVersion);
+            sendGenerationCompleted(recipient, projectVersion, jobEntity);
         } else {
-            sendGenerationFailed(recipient, projectVersion);
+            sendGenerationFailed(recipient, projectVersion, jobEntity);
         }
     }
 }

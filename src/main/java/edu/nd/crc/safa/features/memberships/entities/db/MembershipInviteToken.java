@@ -29,6 +29,7 @@ public class MembershipInviteToken {
     private UUID id;
 
     @Column
+    @JdbcTypeCode(SqlTypes.BINARY)
     private UUID entity_id;
 
     @Column

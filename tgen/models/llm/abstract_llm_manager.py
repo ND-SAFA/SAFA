@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from typing import Any, Dict, Generic, List, Set, Type, TypeVar, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
@@ -17,10 +18,18 @@ from tgen.prompts.prompt_args import PromptArgs
 AIObject = TypeVar("AIObject")
 
 
+class PromptRoles:
+    USER = "user"
+    ASSISTANT = "assistant"
+
+
 class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
     """
     Interface for all AI utility classes.
     """
+
+    ROLE_KEY = "role"
+    CONTENT_KEY = "content"
 
     def __init__(self, llm_args: AbstractLLMArgs, prompt_args: PromptArgs, state: State = None):
         """
@@ -72,6 +81,15 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
                                                                                   raise_exception=False)
         translated_response = self.translate_to_response(completion_type, llm_response, **params)
         return translated_response
+
+    def convert_prompt_to_message(self, prompt: str, role: str = PromptRoles.USER) -> Dict[str, str]:
+        """
+        Converts a prompt to the expected format for messages between the user and assistant.
+        :param prompt: The prompt/content of the message.
+        :param role: The role specifies if the message is from the user or assistant.
+        :return: Dictionary containing message content and role.
+        """
+        return {self.ROLE_KEY: role, self.CONTENT_KEY: prompt}
 
     @abstractmethod
     def make_completion_request_impl(self, raise_exception: bool = True, original_responses: List = None,

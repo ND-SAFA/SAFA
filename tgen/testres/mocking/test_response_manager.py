@@ -1,4 +1,5 @@
 from copy import deepcopy
+
 from typing import Any, Callable, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import COLON, EMPTY_STRING, NEW_LINE
@@ -12,7 +13,6 @@ from tgen.common.util.prompt_util import PromptUtil
 DEFAULT_SCORE = 0.5
 DEFAULT_EXPLANATION = "EXPLANATION"
 SUMMARY_TAGS = {"summary", "descrip"}
-
 
 
 class TestAIManager:
@@ -183,7 +183,7 @@ class TestAIManager:
         if self.library == "openai":
             return [m["content"] for m in kwargs["messages"]]
         elif self.library == "anthropic":
-            return [kwargs["prompt"]]
+            return [kwargs["messages"]["content"]]
 
     def on_test_end(self) -> None:
         n_used = self.start_index

@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import javax.annotation.PostConstruct;
 
+import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.email.entities.InfobipProperties;
+import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -46,6 +48,9 @@ public class InfobipEmailServiceImpl implements EmailService {
     @Value("${fend.base}")
     private String fendBase;
 
+    @Value("${bend.base}")
+    private String bendBase;
+
     @Value("${fend.reset-email-path}")
     private String resetPasswordUrl;
 
@@ -84,7 +89,7 @@ public class InfobipEmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendGenerationCompleted(String recipient, ProjectVersion projectVersion) {
+    public void sendGenerationCompleted(String recipient, ProjectVersion projectVersion, JobDbEntity jobEntity) {
         sendTemplatedEmail(List.of(recipient), InfobipProperties.EmailType.GENERATION_COMPLETED,
             Map.of(
                 "jobName", projectVersion.getProject().getName(),
@@ -94,14 +99,14 @@ public class InfobipEmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendGenerationFailed(String recipient, ProjectVersion projectVersion) {
+    public void sendGenerationFailed(String recipient, ProjectVersion projectVersion, JobDbEntity jobEntity) {
         sendTemplatedEmail(List.of(recipient), InfobipProperties.EmailType.GENERATION_FAILED,
             Map.of(
                 "jobName", projectVersion.getProject().getName()
             )
         );
         sendSimpleEmail("generate@safa.ai", "Customer generation failed",
-            makeFailedGenerationText(projectVersion));
+            makeFailedGenerationText(projectVersion, jobEntity));
     }
 
     private void sendSimpleEmail(String recipient, String subject, String text) {
@@ -170,7 +175,7 @@ public class InfobipEmailServiceImpl implements EmailService {
         return fendBase + "/project?version=" + projectVersion.getId();
     }
 
-    private String makeFailedGenerationText(ProjectVersion projectVersion) {
+    private String makeFailedGenerationText(ProjectVersion projectVersion, JobDbEntity jobEntity) {
         Team team = projectVersion.getProject().getOwningTeam();
         Organization organization = team.getOrganization();
         Project project = projectVersion.getProject();
@@ -180,6 +185,15 @@ public class InfobipEmailServiceImpl implements EmailService {
                 + ", paymentTier=" + organization.getPaymentTier() + "\n"
             + "Team: name=" + team.getName() + ", id=" + team.getId() + "\n"
             + "Project: name=" + project.getName() + ", id=" + project.getId() + "\n"
-            + "Project version: number=" + projectVersion + ", id=" + projectVersion.getId();
+            + "Project version: number=" + projectVersion + ", id=" + projectVersion.getId() + "\n"
+            + "Job Log Link: " + makeJobLogLink(jobEntity);
+    }
+
+    private String makeJobLogLink(JobDbEntity jobEntity) {
+        if (jobEntity == null) {
+            return "None (no job run)";
+        }
+
+        return bendBase + AppRoutes.Jobs.Logs.BY_JOB_ID.replace("{jobId}", jobEntity.getId().toString());
     }
 }

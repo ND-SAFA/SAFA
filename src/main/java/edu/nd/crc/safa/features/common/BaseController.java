@@ -8,6 +8,7 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
+import edu.nd.crc.safa.utilities.exception.ExpiredTokenException;
 import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 
 import lombok.AccessLevel;
@@ -113,6 +114,12 @@ public abstract class BaseController {
     @ExceptionHandler(MissingPermissionException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public MissingPermissionException handleMissingPermission(MissingPermissionException ex) {
+        return ex;
+    }
+
+    @ExceptionHandler(ExpiredTokenException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExpiredTokenException handleExpiredToken(ExpiredTokenException ex) {
         return ex;
     }
 

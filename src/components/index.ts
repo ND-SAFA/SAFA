@@ -16,3 +16,4 @@ export * from "./settings";
 export * from "./organization";
 export * from "./onboarding";
 export * from "./admin";
+export * from "./chat";

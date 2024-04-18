@@ -47,7 +47,7 @@ import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
-import edu.nd.crc.safa.features.memberships.services.MemberService;
+import edu.nd.crc.safa.features.memberships.services.MembershipService;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
@@ -109,7 +109,7 @@ public class ServiceProvider {
     private final ProjectSummaryService projectSummaryService;
     // Members
     private final UserProjectMembershipRepository userProjectMembershipRepository;
-    private final MemberService memberService;
+    private final MembershipService membershipService;
     private final TeamMembershipService teamMembershipService;
     private final OrganizationMembershipService orgMembershipService;
     private final ProjectMembershipService projectMembershipService;

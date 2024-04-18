@@ -18,7 +18,7 @@ import edu.nd.crc.safa.features.documents.services.DocumentService;
 import edu.nd.crc.safa.features.errors.services.CommitErrorRetrievalService;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
-import edu.nd.crc.safa.features.memberships.services.MemberService;
+import edu.nd.crc.safa.features.memberships.services.MembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.permissions.entities.Permission;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
@@ -63,7 +63,7 @@ public class ProjectRetrievalService {
 
     private final ArtifactService artifactService;
     private final TraceService traceService;
-    private final MemberService memberService;
+    private final MembershipService membershipService;
     private final DocumentService documentService;
     private final CurrentDocumentService currentDocumentService;
     private final TypeService typeService;
@@ -91,7 +91,7 @@ public class ProjectRetrievalService {
         ProjectEntities entities = retrieveProjectEntitiesAtProjectVersion(projectVersion, user);
 
         // Project Entities
-        List<MembershipAppEntity> projectMembers = this.memberService.getAppEntities(projectVersion, user);
+        List<MembershipAppEntity> projectMembers = this.membershipService.getAppEntities(projectVersion, user);
 
         // Documents
         List<DocumentAppEntity> documents = this.documentService.getAppEntities(projectVersion, user);

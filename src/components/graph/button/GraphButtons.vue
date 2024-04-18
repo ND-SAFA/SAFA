@@ -1,6 +1,6 @@
 <template>
   <q-page-sticky
-    v-if="!layoutStore.isTableMode && !smallWindow"
+    v-if="layoutStore.isTimMode || layoutStore.isTreeMode"
     position="top-right"
     class="artifact-fab"
   >

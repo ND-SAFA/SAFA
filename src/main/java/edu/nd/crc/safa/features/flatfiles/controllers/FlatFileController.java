@@ -1,7 +1,6 @@
 package edu.nd.crc.safa.features.flatfiles.controllers;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -59,7 +58,7 @@ public class FlatFileController extends BaseController {
         @RequestParam("files") Optional<List<MultipartFile>> files,
         @RequestParam(required = false, defaultValue = "false") boolean asCompleteSet,
         @RequestParam(required = false, defaultValue = "false") boolean summarizeArtifacts)
-        throws SafaError, IOException {
+        throws SafaError {
 
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId)
@@ -79,7 +78,7 @@ public class FlatFileController extends BaseController {
         FlatFileProjectBuilder.build(args, getServiceProvider());
 
         if (summarizeArtifacts) {
-            getServiceProvider().getEmailService().sendGenerationCompleted(user.getEmail(), projectVersion);
+            getServiceProvider().getEmailService().sendGenerationCompleted(user.getEmail(), projectVersion, null);
         }
 
         return getServiceProvider().getProjectRetrievalService().getProjectAppEntity(projectVersion);

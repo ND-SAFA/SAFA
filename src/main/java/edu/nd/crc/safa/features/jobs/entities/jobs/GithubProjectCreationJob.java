@@ -393,7 +393,7 @@ public class GithubProjectCreationJob extends CommitJob {
     }
 
     @Override
-    protected void afterJob(boolean success) throws Exception {
+    protected void afterJob(boolean success) {
         if (success) {
             ApplicationEventPublisher eventPublisher = getServiceProvider().getEventPublisher();
             Project project = getProjectVersion().getProject();
@@ -406,7 +406,7 @@ public class GithubProjectCreationJob extends CommitJob {
 
         if (importSettings.isSummarize()) {
             EmailService emailService = getServiceProvider().getEmailService();
-            emailService.sendGenerationFinished(getUser().getEmail(), getProjectVersion(), success);
+            emailService.sendGenerationFinished(getUser().getEmail(), getProjectVersion(), getJobDbEntity(), success);
         }
     }
 
@@ -438,7 +438,7 @@ public class GithubProjectCreationJob extends CommitJob {
         while (!locations.isEmpty()) {
             String currentLocation = locations.poll();
 
-            GithubGraphQlTreeObjectsResponse response = null;
+            GithubGraphQlTreeObjectsResponse response;
             StringBuilder locationLogBuilder = new StringBuilder();
             try {
                 locationLogBuilder.append("## Retrieving files from *").append(currentLocation).append("*\n\n");

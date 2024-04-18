@@ -9,6 +9,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.github.entities.app.GithubAccessCredentialsDTO;
 import edu.nd.crc.safa.features.github.entities.app.GithubSelfResponseDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubAccessCredentials;
+import edu.nd.crc.safa.features.github.entities.events.GithubLinkedEvent;
 import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.utils.GithubControllerUtils;
@@ -19,6 +20,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,18 +40,21 @@ public class GithubCredentialsController extends BaseController {
     private final GithubConnectionService githubConnectionService;
     private final GithubAccessCredentialsRepository githubAccessCredentialsRepository;
     private final GithubControllerUtils githubControllerUtils;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public GithubCredentialsController(ResourceBuilder resourceBuilder,
                                        SafaUserService safaUserService,
                                        GithubConnectionService githubConnectionService,
                                        GithubAccessCredentialsRepository githubAccessCredentialsRepository,
                                        ServiceProvider serviceProvider,
-                                       GithubControllerUtils githubControllerUtils) {
+                                       GithubControllerUtils githubControllerUtils,
+                                       ApplicationEventPublisher applicationEventPublisher) {
         super(resourceBuilder, serviceProvider);
         this.safaUserService = safaUserService;
         this.githubConnectionService = githubConnectionService;
         this.githubAccessCredentialsRepository = githubAccessCredentialsRepository;
         this.githubControllerUtils = githubControllerUtils;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @PostMapping(AppRoutes.Github.Credentials.REGISTER)
@@ -76,6 +81,8 @@ public class GithubCredentialsController extends BaseController {
             credentials.setGithubHandler(selfResponseDTO.getLogin());
             credentials.setUser(user);
             githubAccessCredentialsRepository.save(credentials);
+
+            applicationEventPublisher.publishEvent(new GithubLinkedEvent(this, user));
         });
     }
 

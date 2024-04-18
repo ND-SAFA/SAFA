@@ -14,6 +14,7 @@ import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
+import edu.nd.crc.safa.features.users.entities.AccountCreatedEvent;
 import edu.nd.crc.safa.features.users.entities.app.UserAppEntity;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
@@ -22,6 +23,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,6 +45,8 @@ public class SafaUserService {
     private final SafaUserRepository safaUserRepository;
     private final OrganizationService organizationService;
     private final PermissionService permissionService;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
     private final Predicate<String> httpThreadPredicate = Pattern
         .compile("http(?:s-jsse)?-nio-\\S{1,20}-exec-\\d+")
         .asMatchPredicate();
@@ -84,6 +88,8 @@ public class SafaUserService {
         safaUser.setPersonalOrgId(personalOrg.getId());
         safaUser.setDefaultOrgId(personalOrg.getId());
         safaUser = this.safaUserRepository.save(safaUser);  // Save again so it gets the org id
+
+        applicationEventPublisher.publishEvent(new AccountCreatedEvent(this, safaUser));
 
         return safaUser;
     }

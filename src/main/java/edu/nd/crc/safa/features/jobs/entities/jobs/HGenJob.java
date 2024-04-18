@@ -5,6 +5,7 @@ import edu.nd.crc.safa.features.billing.services.CostEstimationService;
 import edu.nd.crc.safa.features.billing.services.TransactionService;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.generation.GenerationPerformedEvent;
 import edu.nd.crc.safa.features.generation.hgen.HGenRequest;
 import edu.nd.crc.safa.features.generation.hgen.HGenService;
 import edu.nd.crc.safa.features.jobs.entities.IJobStep;
@@ -70,6 +71,11 @@ public class HGenJob extends GenerationJob {
     @Override
     public void afterJob(boolean success) throws Exception {
         super.afterJob(success);
+
+        if (success) {
+            getServiceProvider().getEventPublisher()
+                    .publishEvent(new GenerationPerformedEvent(this, getUser(), projectVersion, hGenRequest));
+        }
 
         if (billingTransaction != null) {
             TransactionService transactionService = getServiceProvider().getTransactionService();

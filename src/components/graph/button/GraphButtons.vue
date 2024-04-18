@@ -39,12 +39,9 @@ import {
   layoutApiStore,
   layoutStore,
   permissionStore,
-  useScreen,
 } from "@/hooks";
 import { IconButton, FlexBox } from "@/components/common";
 import VisibleTypeButtons from "./VisibleTypeButtons.vue";
-
-const { smallWindow } = useScreen();
 
 const viewButtons = computed(() => [
   {

@@ -13,6 +13,8 @@ import edu.nd.crc.safa.features.memberships.entities.db.ProjectMembership;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
 import edu.nd.crc.safa.features.notifications.builders.EntityChangeBuilder;
 import edu.nd.crc.safa.features.notifications.services.NotificationService;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipType;
 import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.IRole;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
@@ -171,4 +173,23 @@ public class ProjectMembershipService implements IMembershipService {
         return userProjectMembershipRepo.findById(membershipId).map(m -> m);
     }
 
+    /**
+     * Returns the individually invited members of the project.
+     *
+     * @param project Project whose members are returned.
+     * @return List of members with whom the project is directly shared
+     */
+    public List<MembershipAppEntity> getProjectMemberships(Project project) {
+        List<IEntityMembership> projectMembers = this.getMembershipsForEntity(project);
+        return projectMembers
+            .stream()
+            .map(m -> {
+                MembershipAppEntity membershipAppEntity = new MembershipAppEntity();
+                membershipAppEntity.setEntityType(MembershipType.PROJECT);
+                membershipAppEntity.setEntityId(project.getId());
+                membershipAppEntity.setEmail(m.getUser().getEmail());
+                membershipAppEntity.setRole(m.getRole().name());
+                return membershipAppEntity;
+            }).collect(Collectors.toList());
+    }
 }

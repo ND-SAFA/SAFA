@@ -91,7 +91,8 @@ public class ProjectRetrievalService {
         ProjectEntities entities = retrieveProjectEntitiesAtProjectVersion(projectVersion, user);
 
         // Project Entities
-        List<MembershipAppEntity> projectMembers = this.membershipService.getAppEntities(projectVersion, user);
+        List<MembershipAppEntity> projectMembers =
+                this.membershipService.getMembershipsInProject(projectVersion.getProject(), user);
 
         // Documents
         List<DocumentAppEntity> documents = this.documentService.getAppEntities(projectVersion, user);

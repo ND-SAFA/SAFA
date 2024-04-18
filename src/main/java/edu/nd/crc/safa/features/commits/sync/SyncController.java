@@ -72,7 +72,8 @@ public class SyncController extends BaseController {
                 break;
             case MEMBERS:
                 List<MembershipAppEntity> projectMemberAppEntities =
-                    getServiceProvider().getMembershipService().getAppEntitiesByIds(projectVersion, user, entityIds);
+                    getServiceProvider().getMembershipService()
+                            .getAppEntitiesByIds(projectVersion.getProject(), user, entityIds);
                 projectAppEntity.setMembers(projectMemberAppEntities);
                 break;
             case TYPES:

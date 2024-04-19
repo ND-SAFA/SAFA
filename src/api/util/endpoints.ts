@@ -212,6 +212,25 @@ export enum Endpoint {
   deleteCheckoutSession = "stripe/cancel/:sessionId",
   getAllTransactions = "billing/transactions/:orgId",
   getMonthlyTransactions = "billing/transactions/:orgId/month",
+
+  // Artifact Health
+
+  getHealthChecks = "projects/versions/:versionId/artifacts/:artifactId/health",
+  generateHealthChecks = "projects/versions/:versionId/artifacts/health",
+
+  // Comments
+
+  getComments = "projects/versions/:versionId/artifacts/:artifactId/comment",
+  createComment = "projects/versions/:versionId/artifacts/:artifactId/comment",
+  editComment = "projects/versions/:versionId/artifacts/comment/:commentId",
+  deleteComment = "projects/versions/:versionId/artifacts/comment/:commentId",
+  resolveComment = "projects/versions/:versionId/artifacts/comment/:commentId/resolve",
+
+  // Chat
+
+  createChat = "projects/versions/:versionId/chat",
+  getChats = "projects/versions/:versionId/chat",
+  createChatMessage = "projects/versions/:versionId/chat/:chatId/message",
 }
 
 /**

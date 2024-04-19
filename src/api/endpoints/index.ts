@@ -26,3 +26,6 @@ export * from "./organization-api";
 export * from "./delta-api";
 export * from "./admin-api";
 export * from "./billing-api";
+export * from "./health-api";
+export * from "./comment-api";
+export * from "./chat-api";

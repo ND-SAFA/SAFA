@@ -23,7 +23,11 @@ export interface ChatMessageSchema {
 /**
  * Represents a chat dialogue between SAFA and a user.
  */
-export interface ChatDialogueSchema {
+export interface ProjectChatSchema {
+  /**
+   * Unique identifier for the chat.
+   */
+  id: string;
   /**
    * All chat messages.
    */

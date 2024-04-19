@@ -1,6 +1,11 @@
 package edu.nd.crc.safa.config;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import edu.nd.crc.safa.features.notifications.Topic;
 import edu.nd.crc.safa.features.notifications.members.ActiveMembersInterceptor;
+import edu.nd.crc.safa.features.notifications.security.PermissionCheckInterceptor;
 
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +29,8 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         ActiveMembersInterceptor activeMembersInterceptor = new ActiveMembersInterceptor();
-        registration.interceptors(activeMembersInterceptor);
+        PermissionCheckInterceptor permissionCheckInterceptor = new PermissionCheckInterceptor();
+        registration.interceptors(activeMembersInterceptor, permissionCheckInterceptor);
     }
 
     @Override
@@ -35,9 +41,17 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/users");
-        config.setUserDestinationPrefix("/users");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker(getTopicPrefixes());
+        config.setUserDestinationPrefix(Topic.USERS.getFormattedPrefix());
+        config.setApplicationDestinationPrefixes(Topic.APP.getFormattedPrefix());
+    }
+
+    private static String[] getTopicPrefixes() {
+        Set<String> prefixes = new HashSet<>();
+        for (Topic topic : Topic.values()) {
+            prefixes.add(topic.getFormattedPrefix());
+        }
+        return prefixes.toArray(new String[0]);
     }
 
     @Override

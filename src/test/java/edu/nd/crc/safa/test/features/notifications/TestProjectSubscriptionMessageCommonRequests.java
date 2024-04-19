@@ -2,6 +2,7 @@ package edu.nd.crc.safa.test.features.notifications;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,11 @@ class TestProjectSubscriptionMessageCommonRequests extends ApplicationBaseTest {
             .and("Creating new user.")
             .actions(a -> a
                 .createNewUser(otherUserName, otherUserName, false, this))
+            .and("Root User: Sharing project with new user")
+            .request((s, r) -> r.project().shareProject(s.getProject("project"), otherUserName, ProjectRole.VIEWER))
+            .and()
+            .notifications((s, n) -> n
+                    .getEntityMessage(getCurrentUser()))
             .and("New User: Subscribing to new project and saving project message.")
             .notifications((s, n) -> n
                 .subscribeToProject(s.getIUser(otherUserName), s.getProject("project"))

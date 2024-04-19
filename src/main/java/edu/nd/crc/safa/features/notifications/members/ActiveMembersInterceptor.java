@@ -2,9 +2,11 @@ package edu.nd.crc.safa.features.notifications.members;
 
 import java.util.List;
 
+import edu.nd.crc.safa.features.notifications.Topic;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.Message;
@@ -37,7 +39,7 @@ public class ActiveMembersInterceptor implements ChannelInterceptor {
      * @param sent    Whether the message being processed has already sent.
      */
     @Override
-    public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
+    public void postSend(@NotNull Message<?> message, @NotNull MessageChannel channel, boolean sent) {
         try {
             MessageProxy proxy = new MessageProxy(message, channel);
             if (sent && proxy.hasCommand(commandsToHandle)) {
@@ -55,7 +57,7 @@ public class ActiveMembersInterceptor implements ChannelInterceptor {
      */
     private void handleMessage(MessageProxy proxy) {
         if (proxy.isCommand(StompCommand.SUBSCRIBE)) {
-            if (proxy.isTopic("project")) {
+            if (proxy.isTopic(Topic.PROJECT)) {
                 projectStore.subscribe(new ProjectSubscriptionMessage(proxy));
             }
         } else if (proxy.isCommand(StompCommand.UNSUBSCRIBE)) {

@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.versions.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -134,5 +135,15 @@ public class VersionService {
             newEntry.setApprovedCount(traceEntry.getApprovedCount());
             traceMatrixService.updateEntry(newEntry);
         }
+    }
+
+    /**
+     * Retrieve a project version by its ID
+     *
+     * @param versionId The ID of the project version
+     * @return The project version with that ID
+     */
+    public ProjectVersion getVersionById(UUID versionId) {
+        return projectVersionRepository.findByVersionId(versionId);
     }
 }

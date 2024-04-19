@@ -183,7 +183,7 @@ class TestAIManager:
         if self.library == "openai":
             return [m["content"] for m in kwargs["messages"]]
         elif self.library == "anthropic":
-            return [kwargs["messages"]["content"]]
+            return [kwargs["messages"][0]["content"]]
 
     def on_test_end(self) -> None:
         n_used = self.start_index

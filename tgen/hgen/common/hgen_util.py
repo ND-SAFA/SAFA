@@ -1,8 +1,8 @@
 import os
 import re
-from typing import Dict, List, Set, Tuple, Union
 
 import pandas as pd
+from typing import Dict, List, Set, Tuple, Union
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
@@ -15,7 +15,6 @@ from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.models.llm.llm_task import LLMCompletionType
@@ -61,7 +60,7 @@ class HGenUtil:
             predictions = LLMTrainer.predict_from_prompts(llm_manager=llm_manager, prompt_builder=prompt_builder,
                                                           save_and_load_path=load_path).predictions
         else:
-            dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
+            dataset_manager = TrainerDatasetManager.create_from_datasets(eval=dataset)
             trainer = LLMTrainer(LLMTrainerState(llm_manager=llm_manager,
                                                  trainer_dataset_manager=dataset_manager,
                                                  prompt_builders=prompt_builder,

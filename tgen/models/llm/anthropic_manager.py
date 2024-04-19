@@ -1,5 +1,6 @@
-import anthropic
 from typing import Dict, List, Optional, Set, Tuple, TypedDict, Union
+
+import anthropic
 
 from tgen.common.constants import anthropic_constants, environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
@@ -93,7 +94,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         if isinstance(prompts, str):
             prompts = [prompts]
 
-        prompts = [self.convert_prompt_to_message(p) if not isinstance(p, dict) else p for p in prompts]
+        prompts = [[self.convert_prompt_to_message(p) if not isinstance(p, dict) else p
+                    for p in (convo if isinstance(convo, List) else [convo])] for convo in prompts]
         anthropic_client = get_client()
 
         def thread_work(payload: Tuple[int, str]) -> Dict:
@@ -103,7 +105,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             :return: None
             """
             index, prompt = payload
-            prompt_params = {**params, AnthropicParams.MESSAGES: [prompt]}
+            prompt_params = {**params, AnthropicParams.MESSAGES: prompt}
             local_response = anthropic_client.messages.create(**prompt_params)
             return local_response
 
@@ -116,13 +118,15 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                                                          raise_exception=raise_exception,
                                                                          rpm=anthropic_constants.ANTHROPIC_MAX_RPM)
         close_client(anthropic_client)
+        if raise_exception and global_state.exception:
+            raise global_state.exception
 
         self._handle_exceptions(global_state)
         global_responses = global_state.results
         for i, res in enumerate(global_responses):
-            if "error" in res:
+            if isinstance(res, Exception):
                 if raise_exception:
-                    raise Exception(self._extract_response(res))
+                    raise res
                 global_state.failed_responses.add(i)
         if retries is not None:
             global_responses = self._combine_original_responses_and_retries(global_responses, original_responses, retries)
@@ -175,9 +179,9 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         """
         response = AttrDict()
         if response_text:
-            response["content"] = [{"text": response_text}]
+            response["content"] = [AttrDict({"text": response_text})]
         if exception:
-            response["error"] = {"message": exception.args[0]}
+            response["error"] = exception
         return response
 
     @staticmethod
@@ -187,10 +191,10 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :param res: The response.
         :return: The LLM response or the error msg if exception occurred
         """
-        if isinstance(res, anthropic.types.message.Message):
+        if hasattr(res, "content"):
             return res.content[0].text
         else:
-            return Exception(res["error"]["message"])
+            return Exception(res["error"])
 
     @staticmethod
     def _get_log_prob(completion: str) -> Dict[str, float]:

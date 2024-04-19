@@ -7,7 +7,6 @@ from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, ArtifactKeys, LayerKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
@@ -37,9 +36,9 @@ class VSMSorter(iSorter):
                                                                 [child_tag_name for target in child_ids]})
         layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [child_tag_name], LayerKeys.TARGET_TYPE: [parent_tag_name]})
 
-        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: TraceDataset(artifact_df=artifact_df,
-                                                                                                             trace_df=TraceDataFrame(),
-                                                                                                             layer_df=layer_df)})
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets(eval=TraceDataset(artifact_df=artifact_df,
+                                                                                               trace_df=TraceDataFrame(),
+                                                                                               layer_df=layer_df))
         vsm_job = VSMJob(trainer_dataset_manager=trainer_dataset_manager, select_predictions=False)
         job_result = vsm_job.run()
         assert job_result.status == Status.SUCCESS, f"Sorting using VSM failed. {job_result.body}"

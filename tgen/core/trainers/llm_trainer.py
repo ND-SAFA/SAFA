@@ -1,8 +1,8 @@
 import json
 from collections import OrderedDict
-from typing import Any, Dict, List, Union, Optional, Tuple
 
 from openai.api_resources.fine_tune import FineTune
+from typing import Any, Dict, List, Union, Optional, Tuple
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
@@ -137,7 +137,7 @@ class LLMTrainer(AbstractTrainer):
                                      PromptKeys.COMPLETION: [EMPTY_STRING for _ in prompts],
                                      PromptKeys.PROMPT_BUILDER_ID: [prompt_builder.id for _ in prompts]})
         dataset = PromptDataset(prompt_df=prompt_df)
-        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets(eval=dataset)
         initial_state = LLMTrainerState(llm_manager=llm_manager, prompt_builders=prompt_builder,
                                         trainer_dataset_manager=trainer_dataset_manager)
         trainer = LLMTrainer(initial_state)

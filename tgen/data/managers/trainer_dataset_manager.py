@@ -1,12 +1,12 @@
 import os
 from collections import OrderedDict
-from typing import Dict, List, Optional, Union
 
 import pandas as pd
 from datasets import disable_caching
+from typing import Dict, List, Optional, Union
 
 from tgen.common.util.base_object import BaseObject
-from tgen.common.util.enum_util import EnumUtil
+from tgen.common.util.enum_util import EnumUtil, EnumDict
 from tgen.common.util.override import overrides
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
@@ -96,12 +96,14 @@ class TrainerDatasetManager(BaseObject):
             eval_dataset_creator=dataset_creators_map.get(DatasetRole.EVAL, None))
 
     @staticmethod
-    def create_from_datasets(dataset_map: Dict[DatasetRole, Union[iDataset, List[iDataset]]]) -> "TrainerDatasetManager":
+    def create_from_datasets(dataset_map: Dict[DatasetRole, Union[iDataset, List[iDataset]]] = None,
+                             **datasets_as_kwargs) -> "TrainerDatasetManager":
         """
         Creates instance containing dataset for each mapped role.
         :param dataset_map: The map of roles to data to set in instance.
         :return: TrainerDatasetManager with initialized data.
         """
+        dataset_map = EnumDict(datasets_as_kwargs) if not dataset_map else dataset_map
         trainer_dataset_manager = TrainerDatasetManager()
         for role in DatasetRole:
             if role not in dataset_map:

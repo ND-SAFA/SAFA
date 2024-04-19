@@ -1,9 +1,11 @@
 import os
 from abc import ABC
 from dataclasses import dataclass
+
 from typing import Any, Dict, Optional, Type, Union
 
 from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
+from tgen.common.constants.job_constants import SAVE_DATASET_SPLITS_DEFAULT
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.override import overrides
 from tgen.common.util.reflection_util import ReflectionUtil
@@ -23,16 +25,18 @@ from tgen.variables.definition_variable import DefinitionVariable
 class AbstractTrainerJob(AbstractJob, ABC):
 
     def __init__(self, model_manager: ModelManager, trainer_dataset_manager: TrainerDatasetManager, trainer_args: dataclass,
-                 task: TrainerTask, job_args: JobArgs = None, **kwargs):
+                 task: TrainerTask, job_args: JobArgs = None, save_dataset_splits: bool = SAVE_DATASET_SPLITS_DEFAULT, **kwargs):
         """
         The base job class for tracing jobs
         :param job_args: the arguments for the job
         :param model_manager: the manages the model necessary for the job
         :param trainer_dataset_manager: manages all datasets for the trainer
         :param trainer_args: other arguments needed for the trainer
+        :param save_dataset_splits: If True, saves the dataset splits to the output_dir
         :param task: The task being performed by the trainer.
         """
         super().__init__(job_args=job_args, model_manager=model_manager)
+        self.save_dataset_splits = save_dataset_splits
         self.task = task
         self.trainer_dataset_manager = trainer_dataset_manager
         self.trainer_args = trainer_args
@@ -44,7 +48,7 @@ class AbstractTrainerJob(AbstractJob, ABC):
         Runs the trainer job
         :return: The result of the job
         """
-        if self.job_args.save_dataset_splits:
+        if self.save_dataset_splits:
             CreateDatasetsJob(self.trainer_dataset_manager, self.job_args).run()
         if self.task == TrainerTask.TRAIN:
             trainer = self.get_trainer(**kwargs)

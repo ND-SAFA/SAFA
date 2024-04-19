@@ -1,15 +1,15 @@
 from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.util.file_util import FileUtil
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
+from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
 from tgen.jobs.data_jobs.export_artifacts_job import ExportArtifactsJob
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.test_data_manager import TestDataManager
-from tgen.common.util.file_util import FileUtil
 from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.test_data_manager import TestDataManager
 
 
 class TestExportArtifactsJob(BaseJobTest):
@@ -51,4 +51,5 @@ class TestExportArtifactsJob(BaseJobTest):
         job_args = ObjectCreator.create(JobArgs)
         trainer_dataset_manager = ObjectCreator.create(TrainerDatasetManager)
         trace_project_creator: TraceDatasetCreator = trainer_dataset_manager.get_creator(DatasetRole.TRAIN)
-        return ExportArtifactsJob(trace_project_creator, job_args, **kwargs)
+        job_args.dataset_creator = trace_project_creator
+        return ExportArtifactsJob(job_args, **kwargs)

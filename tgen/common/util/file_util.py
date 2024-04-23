@@ -3,15 +3,15 @@ import pickle
 import shutil
 from copy import deepcopy
 from os.path import splitext
+from typing import Any, Callable, Dict, IO, List, Optional, Tuple, Type, Union
 
 import numpy as np
 import yaml
-from typing import Any, Callable, Dict, IO, List, Optional, Tuple, Type, Union
 from yaml.dumper import Dumper
 from yaml.loader import Loader, SafeLoader
 
 from tgen.common.constants.code_extensions import CODE_EXTENSIONS, CODE_FILENAMES
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH, SPACE
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH, SPACE, PERIOD
 from tgen.common.constants.path_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, MODEL_PARAM, OUTPUT_PATH_PARAM, PROJ_PATH, \
     ROOT_PATH_PARAM, \
     USER_SYM
@@ -193,7 +193,7 @@ class FileUtil:
                     if k in path:
                         path = path.replace(k, v)
             path = os.path.expanduser(path)
-            if (USER_SYM in path or path.startswith(F_SLASH)) and use_abs_paths:
+            if (USER_SYM in path or path.startswith(F_SLASH) or path.startswith(PERIOD)) and use_abs_paths:
                 path = FileUtil.get_path_relative_to_proj_path(path)
             return path
 

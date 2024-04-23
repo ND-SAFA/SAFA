@@ -33,7 +33,6 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param args: The arguments to the ranking pipeline
         :param state: The current state of the ranking pipeline
         """
-        args.generate_explanations = False
         if not args.generate_explanations:
             return
         parsed_predictions = self._generate_predictions(args, state)

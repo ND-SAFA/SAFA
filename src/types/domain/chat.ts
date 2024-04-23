@@ -7,11 +7,11 @@ export interface ChatMessageSchema {
    */
   id: string;
   /**
-   * The user's message.
+   * Whether this is a user created message.
    */
   userMessage: boolean;
   /**
-   * SAFA AI's response.
+   * The message content.
    */
   message: string;
   /**
@@ -19,6 +19,8 @@ export interface ChatMessageSchema {
    */
   artifactIds: string[];
 }
+
+export type ChatPermissionType = "owner" | "reader" | "editor";
 
 /**
  * Represents a chat dialogue between SAFA and a user.
@@ -35,7 +37,7 @@ export interface ProjectChatSchema {
   /**
    * Restricts available actions on chat.
    */
-  permission: "owner" | "reader" | "editor";
+  permission: ChatPermissionType;
   /**
    * All chat messages.
    */

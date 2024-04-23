@@ -29,6 +29,14 @@ export interface ProjectChatSchema {
    */
   id: string;
   /**
+   * Title of chat.
+   */
+  title: string;
+  /**
+   * Restricts available actions on chat.
+   */
+  permission: "owner" | "reader" | "editor";
+  /**
    * All chat messages.
    */
   messages: ChatMessageSchema[];

@@ -229,7 +229,9 @@ export enum Endpoint {
   // Chat
 
   createChat = "projects/versions/:versionId/chat",
+  deleteChat = "projects/versions/:versionId/chat/:chatId",
   getChats = "projects/versions/:versionId/chat",
+  getChatMessages = "projects/versions/:versionId/chat/:chatId",
   createChatMessage = "projects/versions/:versionId/chat/:chatId/message",
 }
 

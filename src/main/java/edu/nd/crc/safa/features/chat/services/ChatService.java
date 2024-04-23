@@ -33,12 +33,14 @@ public class ChatService {
      * @param title          The title of the chat.
      * @return Chat created
      */
-    public Chat createNewChat(SafaUser user, ProjectVersion projectVersion, String title) {
+    @NotNull
+    public ChatDTO createNewChat(SafaUser user, ProjectVersion projectVersion, String title) {
         Chat chat = new Chat();
         chat.setOwner(user);
         chat.setProjectVersion(projectVersion);
         chat.setTitle(title);
-        return chatRepository.save(chat);
+        chat = chatRepository.save(chat);
+        return ChatDTO.fromChat(chat, ChatSharePermission.OWNER);
     }
 
     /**
@@ -49,13 +51,13 @@ public class ChatService {
      * @param projectVersion The project version being queried in chat.
      * @return The updated chat.
      */
-    public Chat updateChat(ChatDTO chatDTO, SafaUser user, ProjectVersion projectVersion) {
+    public ChatDTO updateChat(ChatDTO chatDTO, SafaUser user, ProjectVersion projectVersion) {
         Chat chat = getChatById(chatDTO.getId());
         if (!chat.isOwner(user)) {
             throw new SafaError("Chat is not owned by user making request.");
         }
 
-        verifyChatPermission(chat, user, ChatSharePermission.EDIT);
+        ChatSharePermission permission = verifyChatPermission(chat, user, ChatSharePermission.EDIT);
 
         String userTitle = chatDTO.getTitle();
         if (userTitle == null || userTitle.isBlank()) {
@@ -65,7 +67,8 @@ public class ChatService {
         chat.setTitle(userTitle);
         chat.setProjectVersion(projectVersion);
 
-        return chatRepository.save(chat);
+        chat = chatRepository.save(chat);
+        return ChatDTO.fromChat(chat, permission);
     }
 
     /**
@@ -74,13 +77,17 @@ public class ChatService {
      * @param user The user whose chats are queried for.
      * @return Chats owned by or shared with user.
      */
-    public List<Chat> getUserChats(SafaUser user) {
-        List<Chat> ownedChats = chatRepository.findByOwner(user);
-        List<ChatShare> sharedChats = chatShareRepository.findByUser(user);
-
-        List<Chat> userChats = new ArrayList<>(ownedChats);
-        userChats.addAll(sharedChats.stream().map(ChatShare::getChat).toList());
-        return userChats;
+    public List<ChatDTO> getUserChats(SafaUser user) {
+        List<ChatDTO> ownedChats = chatRepository.findByOwner(user)
+            .stream().map(c -> ChatDTO.fromChat(c, ChatSharePermission.OWNER)).toList();
+        List<ChatDTO> chatDTOS = new ArrayList<>(ownedChats);
+        List<ChatDTO> sharedChats = chatShareRepository
+            .findByUser(user)
+            .stream()
+            .map(cs -> ChatDTO.fromChat(cs.getChat(), cs.getPermission()))
+            .toList();
+        chatDTOS.addAll(sharedChats);
+        return chatDTOS;
     }
 
     /**
@@ -104,10 +111,10 @@ public class ChatService {
      * @param user                The user whose permission is checked.
      * @param requestedPermission The minimum acceptable permission
      */
-    public void verifyChatPermission(Chat chat, SafaUser user, ChatSharePermission requestedPermission) {
+    public ChatSharePermission verifyChatPermission(Chat chat, SafaUser user, ChatSharePermission requestedPermission) {
         Optional<ChatShare> chatShareOptional = chatShareRepository.findByChatAndUser(chat, user);
         if (chat.isOwner(user)) {
-            return;
+            return ChatSharePermission.OWNER;
         }
 
         if (chatShareOptional.isEmpty()) {
@@ -118,6 +125,7 @@ public class ChatService {
         if (!chatPermission.hasPermission(requestedPermission)) {
             throw new SafaError("User does not have sufficient permissions to chat.");
         }
+        return chatShare.getPermission();
     }
 
     /**

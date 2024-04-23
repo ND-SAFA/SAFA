@@ -3,6 +3,7 @@ package edu.nd.crc.safa.features.chat.entities.dtos;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
+import edu.nd.crc.safa.features.chat.entities.persistent.ChatSharePermission;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +23,10 @@ public class ChatDTO {
      */
     @NotNull
     private UUID versionId;
+    /**
+     *
+     */
+    private ChatSharePermission permission;
 
     /**
      * Creates DTO (application entity) from Chat (persistent entity).
@@ -29,11 +34,12 @@ public class ChatDTO {
      * @param chat The persisted chat to copy fields to DTO.
      * @return ChatDTO with fields copied from Chat.
      */
-    public static ChatDTO fromChat(Chat chat) {
+    public static ChatDTO fromChat(Chat chat, ChatSharePermission permission) {
         ChatDTO chatDTO = new ChatDTO();
         chatDTO.setId(chat.getId());
         chatDTO.setTitle(chat.getTitle());
         chatDTO.setVersionId(chat.getProjectVersion().getVersionId());
+        chatDTO.setPermission(permission);
         return chatDTO;
     }
 }

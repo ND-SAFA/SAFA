@@ -7,7 +7,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
-import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
@@ -39,7 +38,7 @@ public class ChatController extends BaseController {
      * @return New Chat.
      */
     @PostMapping(AppRoutes.Chat.CHAT_CREATE)
-    public Chat createChat(@RequestBody @Valid ChatDTO chatDTO) {
+    public ChatDTO createChat(@RequestBody @Valid ChatDTO chatDTO) {
         SafaUser currentUser = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = fetchAssociatedProjectVersion(chatDTO, currentUser);
         String userTitle = chatDTO.getTitle();
@@ -55,7 +54,7 @@ public class ChatController extends BaseController {
      * @return Updated chat.
      */
     @PutMapping(AppRoutes.Chat.CHAT_UPDATE)
-    public Chat updateChat(@RequestBody @Valid ChatDTO chatDTO) {
+    public ChatDTO updateChat(@RequestBody @Valid ChatDTO chatDTO) {
         SafaUser currentUser = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = fetchAssociatedProjectVersion(chatDTO, currentUser);
         return this.getServiceProvider().getChatService().updateChat(chatDTO, currentUser, projectVersion);
@@ -67,7 +66,7 @@ public class ChatController extends BaseController {
      * @return List of chats accessible to user.
      */
     @GetMapping(AppRoutes.Chat.CHAT_GET)
-    public List<Chat> getUserChats() {
+    public List<ChatDTO> getUserChats() {
         SafaUser currentUser = getCurrentUser();
         return this.getServiceProvider().getChatService().getUserChats(currentUser);
     }

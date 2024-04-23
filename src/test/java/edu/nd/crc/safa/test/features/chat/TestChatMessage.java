@@ -7,10 +7,10 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatMessageDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageRequest;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageResponse;
-import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
 import edu.nd.crc.safa.features.chat.entities.persistent.GenChatResponse;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -55,7 +55,7 @@ class TestChatMessage extends GenerationalTest {
         List<UUID> artifactIds = List.of(artifactAdded.getId());
 
         // create chat
-        Chat chat = getServiceProvider().getChatService().createNewChat(currentUser, projectVersion, chatTitle);
+        ChatDTO chat = getServiceProvider().getChatService().createNewChat(currentUser, projectVersion, chatTitle);
 
         // verify no messages in chat.
         List<ChatMessageDTO> chatMessages = SafaRequest
@@ -116,8 +116,8 @@ class TestChatMessage extends GenerationalTest {
      */
     private void verifyResponseMessage(ChatMessageDTO message, String responseText, List<UUID> artifactIds) {
         assertThat(message.getId()).isNotNull();
-        assertThat(message.getUserMessage()).isNull();
-        assertThat(message.getResponseMessage()).isEqualTo(responseText);
+        assertThat(message.isUser()).isFalse();
+        assertThat(message.getMessage()).isEqualTo(responseText);
         List<UUID> messageArtifactIds = message.getArtifactIds();
         assertThat(messageArtifactIds.size()).isEqualTo(artifactIds.size());
         for (UUID artifactId : artifactIds) {
@@ -133,8 +133,8 @@ class TestChatMessage extends GenerationalTest {
      */
     private void verifyUserMessage(ChatMessageDTO message, String userMessageText) {
         assertThat(message.getId()).isNotNull();
-        assertThat(message.getUserMessage()).isEqualTo(userMessageText);
-        assertThat(message.getResponseMessage()).isNull();
+        assertThat(message.isUser()).isTrue();
+        assertThat(message.getMessage()).isEqualTo(userMessageText);
         assertThat(message.getArtifactIds().size()).isEqualTo(0);
     }
 }

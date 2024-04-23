@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum ChatSharePermission {
     READ(0),
-    EDIT(1);
+    EDIT(1),
+    OWNER(2);
 
     /**
      * Value used to compare priviledges.

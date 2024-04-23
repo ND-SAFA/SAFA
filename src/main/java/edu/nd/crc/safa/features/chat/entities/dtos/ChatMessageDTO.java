@@ -19,13 +19,12 @@ public class ChatMessageDTO {
     /**
      * The user message in chat.
      */
-    @Nullable
-    private String userMessage;
+    private boolean isUser;
     /**
      * The AI message in chat.
      */
     @Nullable
-    private String responseMessage;
+    private String message;
     /**
      * Artifact ids associated with message.
      */
@@ -41,7 +40,7 @@ public class ChatMessageDTO {
     public static ChatMessageDTO asResponseMessage(ChatMessage chatMessage, List<UUID> artifactIds) {
         return new ChatMessageDTO(
             chatMessage.getId(),
-            null,
+            false,
             chatMessage.getContent(),
             artifactIds);
     }
@@ -55,8 +54,8 @@ public class ChatMessageDTO {
     public static ChatMessageDTO asUserMessage(ChatMessage chatMessage) {
         return new ChatMessageDTO(
             chatMessage.getId(),
+            true,
             chatMessage.getContent(),
-            null,
             new ArrayList<>());
     }
 }

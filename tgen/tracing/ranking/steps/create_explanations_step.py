@@ -125,7 +125,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         prompt_builder.add_prompt(MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
                                                       data_type=MultiArtifactPrompt.DataType.TRACES,
                                                       include_ids=True,
-                                                      prompt_prefix=PromptUtil.as_markdown_header("ARTIFACTS")
+                                                      prompt_start=PromptUtil.as_markdown_header("ARTIFACTS")
                                                       ))
         task_prompt: QuestionnairePrompt = SupportedPrompts.EXPLANATION_TASK.value
         score_prompt = task_prompt.get_prompt_by_primary_tag(RANKING_SCORE_TAG)

@@ -28,7 +28,7 @@ class RankingState(State):
     # IO
     export_path: str = None
 
-    def get_current_entries(self) -> Optional[List[Dict]]:
+    def get_current_entries(self) -> Optional[List[EnumDict]]:
         """
         Gets the current children entries
         :return: The current children entries

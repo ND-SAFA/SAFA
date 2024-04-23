@@ -275,6 +275,23 @@ class AbstractProjectDataFrame(pd.DataFrame):
         for id_, val in zip(ids2update, new_values):
             self.update_value(column2update, id_, val)
 
+    @staticmethod
+    def update_or_add_values(original_df: "AbstractProjectDataFrame", rows_to_update: List[EnumDict],
+                             ids_to_update: List[Any] = None) -> "AbstractProjectDataFrame":
+        """
+        Updates the values if the row already exists, else adds it to the dataframe.
+        :param original_df: The original dataframe to update.
+        :param rows_to_update: List of rows to update.
+        :param ids_to_update: List of ids, corresponding to the rows, to update.
+        :return: A dataframe containing updated values.
+        """
+        assert original_df.index_name() or ids_to_update, "Must provide a list of corresponding ids if no index name"
+        ids = [row[original_df.index_name()] for row in rows_to_update] if not ids_to_update else ids_to_update
+        existing_ids = set(ids).intersection(original_df.index)
+        original_df.remove_rows(list(existing_ids))
+        updated_rows_df = original_df.__class__(rows_to_update)
+        return original_df.concat(*[original_df, updated_rows_df])
+
     def update_index(self, new_ids: List[Any]) -> "AbstractProjectDataFrame":
         """
         Updates the indices of the data frame to the new values.

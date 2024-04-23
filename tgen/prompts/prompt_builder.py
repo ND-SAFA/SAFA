@@ -1,8 +1,8 @@
 import uuid
 from typing import Any, Dict, List
 
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.str_util import StrUtil
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.artifact_prompt import ArtifactPrompt

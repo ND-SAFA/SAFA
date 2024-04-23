@@ -1,7 +1,6 @@
 import uuid
 from collections.abc import Generator
 from copy import deepcopy
-
 from typing import List, Tuple, Dict, Union
 
 from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
@@ -222,8 +221,8 @@ class ProjectSummarizer(BaseObject):
                                                                 f"to be a {QuestionnairePrompt.__class__.__name__}"
         content_prompt = SupportedPrompts.PROJECT_SUMMARY_CONTEXT_ARTIFACTS.value if self.dataset \
             else SupportedPrompts.PROJECT_SUMMARY_CONTEXT_VERSIONS.value
-        prompt_prefix = BODY_ARTIFACT_TITLE if self.dataset else BODY_VERSION_TITLE
-        artifacts_prompt = MultiArtifactPrompt(prompt_prefix=prompt_prefix,
+        prompt_start = BODY_ARTIFACT_TITLE if self.dataset else BODY_VERSION_TITLE
+        artifacts_prompt = MultiArtifactPrompt(prompt_start=prompt_start,
                                                build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                xml_tags=ArtifactPrompt.DEFAULT_XML_TAGS
                                                if self.dataset else {"versions": ["id", "body"]},

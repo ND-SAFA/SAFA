@@ -3,7 +3,7 @@ from tgen.common.objects.artifact import Artifact
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.contradictions.common_choices import CommonChoices
 from tgen.contradictions.contradiction_decision_nodes import SupportedContradictionDecisionNodes
-from tgen.contradictions.contradictions_detector import ContradictionsDetector
+from tgen.contradictions.contradictions_detector_with_tree import ContradictionsDetectorWithTree
 from tgen.contradictions.contradictions_tree_builder import ContradictionsTreeBuilder
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
@@ -37,7 +37,7 @@ class TestContradictionsDetector(BaseTest):
         trace_df = TraceDataFrame({TraceKeys.SOURCE: [link[0] for link in links], TraceKeys.TARGET: [link[1] for link in links]})
         trace_dataset = TraceDataset(artifact_df, trace_df, LayerDataFrame({LayerKeys.SOURCE_TYPE: [self.LAYER_ID],
                                                                             LayerKeys.TARGET_TYPE: [self.LAYER_ID]}))
-        detector = ContradictionsDetector(trace_dataset)
+        detector = ContradictionsDetectorWithTree(trace_dataset)
         results = detector.detect_all()
         for i, link in enumerate(links):
             expected_outcome = expected_outcomes[i]
@@ -53,8 +53,9 @@ class TestContradictionsDetector(BaseTest):
         responses = [get_response_for_req(r) for r in [R1, R2]]
         responses.extend([self.fake_question_answers for i in range(2)])
         test_ai_manager.set_responses(responses)
-        path = ContradictionsDetector.detect_single_pair(Artifact(id="1", content=get_artifact_content(R1), layer_id=self.LAYER_ID),
-                                                         Artifact(id="2", content=get_artifact_content(R2), layer_id=self.LAYER_ID))
+        path = ContradictionsDetectorWithTree.detect_single_pair(
+            Artifact(id="1", content=get_artifact_content(R1), layer_id=self.LAYER_ID),
+            Artifact(id="2", content=get_artifact_content(R2), layer_id=self.LAYER_ID))
         self.assertEqual(path.get_final_decision(), SupportedContradictionDecisionNodes.IDEM_CONTRADICTION.value.description)
 
     def fake_question_answers(self, prompt: str):

@@ -1,13 +1,14 @@
 from dataclasses import dataclass
-
-from typing import Any, Dict
+from typing import Any, Dict, Type
 
 from tgen.common.constants.job_constants import SAVE_OUTPUT_DEFAULT
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.param_specs import ParamSpecs
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.tdatasets.idataset import iDataset
+from tgen.pipeline.pipeline_args import PipelineArgs
 
 
 @dataclass
@@ -61,3 +62,15 @@ class JobArgs(BaseObject):
         :return: the job args as kwargs
         """
         return {attr_name: getattr(self, attr_name) for attr_name in dir(self) if not attr_name.startswith("__")}
+
+    def get_args_for_pipeline(self, pipeline_args_class: Type[PipelineArgs]) -> Dict[str, Any]:
+        """
+        Gets job args that are needed for the pipeline.
+        :param pipeline_args_class: The pipeline args class.
+        :return: A dictionary mapping param name to value for all job args that are in the pipeline args.
+        """
+        job_args_dict = DataclassUtil.convert_to_dict(self)
+        constructor_param_names = ParamSpecs.create_from_method(pipeline_args_class.__init__).param_names
+        args4pipeline = {name: val for name, val in job_args_dict.items()
+                         if name in constructor_param_names and name != "dataset_creator"}
+        return args4pipeline

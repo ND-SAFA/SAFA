@@ -8,8 +8,8 @@ import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
-import edu.nd.crc.safa.utilities.exception.ExpiredTokenException;
 import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
+import edu.nd.crc.safa.utilities.exception.InvalidTokenException;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -117,9 +117,9 @@ public abstract class BaseController {
         return ex;
     }
 
-    @ExceptionHandler(ExpiredTokenException.class)
+    @ExceptionHandler(InvalidTokenException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ExpiredTokenException handleExpiredToken(ExpiredTokenException ex) {
+    public InvalidTokenException handleExpiredToken(InvalidTokenException ex) {
         return ex;
     }
 

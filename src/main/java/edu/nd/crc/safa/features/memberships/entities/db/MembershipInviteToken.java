@@ -40,8 +40,12 @@ public class MembershipInviteToken {
     private String role;
 
     public MembershipInviteToken(IEntityWithMembership entity, IRole role) {
-        this.entityId = entity.getId();
-        this.role = role.name();
+        this(entity.getId(), role.name());
+    }
+
+    public MembershipInviteToken(UUID entityId, String role) {
+        this.entityId = entityId;
+        this.role = role;
         this.expiration = LocalDateTime.now().plusWeeks(1);
     }
 

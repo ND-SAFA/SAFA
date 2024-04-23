@@ -8,9 +8,8 @@ import edu.nd.crc.safa.features.memberships.entities.db.MembershipInviteToken;
 import edu.nd.crc.safa.features.memberships.repositories.MembershipInviteTokenRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.IRole;
-import edu.nd.crc.safa.features.projects.entities.app.SafaItemNotFoundError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
-import edu.nd.crc.safa.utilities.exception.ExpiredTokenException;
+import edu.nd.crc.safa.utilities.exception.InvalidTokenException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,9 +26,36 @@ public class MembershipInviteService {
      *
      * @param entity The entity to invite to
      * @param role The role for the new user
+     * @param asUser The user doing the sharing
      * @return The generated token
      */
-    public MembershipInviteToken generateSharingToken(IEntityWithMembership entity, IRole role) {
+    public MembershipInviteToken generateSharingToken(IEntityWithMembership entity, IRole role, SafaUser asUser) {
+        membershipService.requireEditMembersPermission(entity, asUser);
+        return generateSharingTokenNoPermissionCheck(entity, role);
+    }
+
+    /**
+     * Generate a new invite token
+     *
+     * @param entityId The id of the entity to invite to
+     * @param roleName The role for the new user
+     * @param asUser The user doing the sharing
+     * @return The generated token
+     */
+    public MembershipInviteToken generateSharingToken(UUID entityId, String roleName, SafaUser asUser) {
+        IEntityWithMembership entity = membershipService.getEntity(entityId);
+        IRole role = membershipService.getRoleForEntity(entity, roleName);
+        return generateSharingToken(entity, role, asUser);
+    }
+
+    /**
+     * Generate a new invite token without doing a permission check
+     *
+     * @param entity The entity to invite to
+     * @param role The role for the new user
+     * @return The generated token
+     */
+    public MembershipInviteToken generateSharingTokenNoPermissionCheck(IEntityWithMembership entity, IRole role) {
         MembershipInviteToken token = new MembershipInviteToken(entity, role);
         return tokenRepo.save(token);
     }
@@ -43,7 +69,7 @@ public class MembershipInviteService {
      */
     public IEntityMembership useToken(MembershipInviteToken token, SafaUser user) {
         if (token.getExpiration().isBefore(LocalDateTime.now())) {
-            throw new ExpiredTokenException(token.getExpiration());
+            throw new InvalidTokenException();
         }
 
         IEntityWithMembership entity = membershipService.getEntity(token.getEntityId());
@@ -63,8 +89,17 @@ public class MembershipInviteService {
      * @return The newly created membership
      */
     public IEntityMembership useToken(UUID tokenId, SafaUser user) {
-        MembershipInviteToken token = tokenRepo.findById(tokenId)
-                .orElseThrow(() -> new SafaItemNotFoundError("No token with the given ID found"));
+        MembershipInviteToken token = tokenRepo.findById(tokenId).orElseThrow(InvalidTokenException::new);
         return useToken(token, user);
+    }
+
+    /**
+     * Delete a token by its ID
+     *
+     * @param tokenId The ID of the token
+     */
+    public void deleteToken(UUID tokenId) {
+        MembershipInviteToken token = tokenRepo.findById(tokenId).orElseThrow(InvalidTokenException::new);
+        tokenRepo.delete(token);
     }
 }

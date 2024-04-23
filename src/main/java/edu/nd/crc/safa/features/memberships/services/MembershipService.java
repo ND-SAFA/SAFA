@@ -151,6 +151,17 @@ public class MembershipService {
     }
 
     /**
+     * Throw an exception if the user doesn't have permission to edit memberships
+     * in the given entity
+     *
+     * @param entity Entity with memberships to check
+     * @param user The user trying to edit memberships
+     */
+    public void requireEditMembersPermission(IEntityWithMembership entity, SafaUser user) {
+        permissionService.requirePermission(getEditMembersPermission(entity), entity, user);
+    }
+
+    /**
      * Convenience function to update the role of a user. This function will first delete the original
      * membership and then create a new one with the new role, so the returned membership will not have
      * the same ID as the one supplied

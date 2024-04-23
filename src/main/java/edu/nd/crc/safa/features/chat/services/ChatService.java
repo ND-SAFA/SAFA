@@ -110,6 +110,7 @@ public class ChatService {
      * @param chat                The chat to check permission against.
      * @param user                The user whose permission is checked.
      * @param requestedPermission The minimum acceptable permission
+     * @return The permission level that user has on the chat.
      */
     public ChatSharePermission verifyChatPermission(Chat chat, SafaUser user, ChatSharePermission requestedPermission) {
         Optional<ChatShare> chatShareOptional = chatShareRepository.findByChatAndUser(chat, user);

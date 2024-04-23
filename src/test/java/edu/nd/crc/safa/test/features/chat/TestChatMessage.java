@@ -72,7 +72,7 @@ class TestChatMessage extends GenerationalTest {
         request.setMessage(userMessageText);
 
         SendChatMessageResponse response = SafaRequest
-            .withRoute(AppRoutes.Chat.Message.MESSAGE_CREATE)
+            .withRoute(AppRoutes.Chat.Message.MESSAGE_SEND)
             .withCustomReplacement("chatId", chat.getId())
             .postWithJsonObject(request, SendChatMessageResponse.class);
 

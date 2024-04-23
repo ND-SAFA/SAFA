@@ -31,7 +31,8 @@ public class ChatDTO {
     /**
      * Creates DTO (application entity) from Chat (persistent entity).
      *
-     * @param chat The persisted chat to copy fields to DTO.
+     * @param chat       The persisted chat to copy fields to DTO.
+     * @param permission The permission to attach to chat.
      * @return ChatDTO with fields copied from Chat.
      */
     public static ChatDTO fromChat(Chat chat, ChatSharePermission permission) {

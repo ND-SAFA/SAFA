@@ -33,7 +33,7 @@ public class ChatMessageController extends BaseController {
      * @param chatId                 ID of chat where message is being sent.
      * @return Saved user and response messages.
      */
-    @PostMapping(AppRoutes.Chat.Message.MESSAGE_CREATE)
+    @PostMapping(AppRoutes.Chat.Message.MESSAGE_SEND)
     public SendChatMessageResponse sendMessageInChat(@RequestBody SendChatMessageRequest sendChatMessageRequest,
                                                      @PathVariable UUID chatId) {
         SafaUser currentUser = getCurrentUser();

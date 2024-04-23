@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.chat.entities.dtos;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -30,11 +31,16 @@ public class ChatMessageDTO {
      */
     @NotNull
     private List<UUID> artifactIds;
+    /**
+     * Timestamp of when this was created.
+     */
+    private LocalDateTime created;
 
     /**
      * Creates DTO from response message.
      *
      * @param chatMessage The response message in chat.
+     * @param artifactIds The artifact ids used in response.
      * @return DTO with copied fields.
      */
     public static ChatMessageDTO asResponseMessage(ChatMessage chatMessage, List<UUID> artifactIds) {
@@ -42,7 +48,8 @@ public class ChatMessageDTO {
             chatMessage.getId(),
             false,
             chatMessage.getContent(),
-            artifactIds);
+            artifactIds,
+            chatMessage.getCreated());
     }
 
     /**
@@ -56,6 +63,7 @@ public class ChatMessageDTO {
             chatMessage.getId(),
             true,
             chatMessage.getContent(),
-            new ArrayList<>());
+            new ArrayList<>(),
+            chatMessage.getCreated());
     }
 }

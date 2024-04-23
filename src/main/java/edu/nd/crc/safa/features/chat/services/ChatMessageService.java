@@ -76,7 +76,8 @@ public class ChatMessageService {
         Map<UUID, List<ChatMessageArtifact>> message2artifacts = ProjectDataStructures
             .groupEntitiesByProperty(chatMessageArtifacts, c -> c.getMessage().getId());
         for (ChatMessage chatMessage : chatMessages) {
-            List<ChatMessageArtifact> messageArtifacts = message2artifacts.getOrDefault(chatMessage.getId(), new ArrayList<>());
+            List<ChatMessageArtifact> messageArtifacts = message2artifacts.getOrDefault(chatMessage.getId(),
+                new ArrayList<>());
             ChatMessageDTO dto = createChatMessageDTO(chatMessage, messageArtifacts);
             chatMessageDTOS.add(dto);
         }
@@ -110,7 +111,8 @@ public class ChatMessageService {
             .stream()
             .map(GenerationArtifact::new)
             .toList();
-        GenChatResponse genChatResponse = genApi.generateChatResponse(userMessage.getContent(), chatMessages, genArtifacts);
+        GenChatResponse genChatResponse = genApi.generateChatResponse(
+            userMessage.getContent(), chatMessages, genArtifacts);
         responseMessage.setContent(genChatResponse.getMessage());
 
         responseMessage = chatMessageRepository.save(responseMessage);

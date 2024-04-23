@@ -73,9 +73,8 @@ public class AppRoutes {
         public static final String CHAT_DELETE = BY_ID;
 
         public static class Message {
-            private static final String ROOT = BY_ID + "/messages";
-            public static final String MESSAGE_CREATE = ROOT;
-            public static final String MESSAGE_GET = ROOT;
+            public static final String MESSAGE_SEND = BY_ID + "/send";
+            public static final String MESSAGE_GET = BY_ID + "/messages";
         }
     }
 

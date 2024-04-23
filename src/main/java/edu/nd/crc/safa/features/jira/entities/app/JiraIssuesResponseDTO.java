@@ -12,4 +12,6 @@ import lombok.Data;
 public class JiraIssuesResponseDTO {
 
     private List<JiraIssueDTO> issues;
+    private int maxResults;
+    private int total;
 }

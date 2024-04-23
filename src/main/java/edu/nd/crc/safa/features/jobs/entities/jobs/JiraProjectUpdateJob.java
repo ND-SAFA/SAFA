@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.jobs.entities.jobs;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -8,7 +9,7 @@ import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jira.entities.api.JiraIdentifier;
 import edu.nd.crc.safa.features.jira.entities.api.JiraImportSettings;
-import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraProject;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -35,7 +36,7 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
 
     @Override
     public ProjectEntities retrieveJiraEntities() {
-        JiraIssuesResponseDTO dto = jiraConnectionService.retrieveUpdatedJIRAIssues(
+        List<JiraIssueDTO> issues = jiraConnectionService.retrieveUpdatedJIRAIssues(
             getCredentials(),
             getJiraIdentifier().getOrgId(),
             this.getJiraIdentifier().getJiraProjectId(),
@@ -43,7 +44,7 @@ public class JiraProjectUpdateJob extends CreateProjectViaJiraJob {
 
         return this.getServiceProvider()
             .getJiraParsingService()
-            .parseProjectEntitiesFromIssues(dto.getIssues());
+            .parseProjectEntitiesFromIssues(issues);
     }
 
     @Override

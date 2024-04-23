@@ -1,7 +1,5 @@
 package edu.nd.crc.safa.features.jira.services;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -12,12 +10,12 @@ import edu.nd.crc.safa.features.jira.entities.app.JiraAccessCredentialsDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraAuthResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraCredentialsRequestBodyDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraInstallationDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectPermissionDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
-import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.WebApiUtils;
@@ -46,7 +44,6 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     private final JiraAccessCredentialsRepository accessCredentialsRepository;
 
     private final WebClient webClient;
-    private final JiraProjectRepository jiraProjectRepository;
 
     @Value("${integrations.jira.client-id}")
     private String clientId;
@@ -57,12 +54,9 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     @Value("${integrations.jira.redirect-link}")
     private String redirectLink;
 
-    public JiraConnectionServiceImpl(JiraProjectRepository jiraProjectRepository,
-                                     JiraAccessCredentialsRepository accessCredentialsRepository,
-                                     WebClient webClient) {
+    public JiraConnectionServiceImpl(JiraAccessCredentialsRepository accessCredentialsRepository, WebClient webClient) {
         this.webClient = webClient;
         this.accessCredentialsRepository = accessCredentialsRepository;
-        this.jiraProjectRepository = jiraProjectRepository;
     }
 
     public Optional<JiraAccessCredentials> getJiraCredentials(SafaUser user) {
@@ -151,8 +145,8 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials,
-                                                    UUID orgId, Long jiraProjectId) {
+    public List<JiraIssueDTO> retrieveJIRAIssues(JiraAccessCredentials credentials,
+                                                 UUID orgId, Long jiraProjectId) {
 
         String jqlQuery = String.format("project=%s", jiraProjectId);
 
@@ -160,10 +154,10 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     }
 
     @Override
-    public JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
-                                                           UUID orgId,
-                                                           Long jiraProjectId,
-                                                           Date timestamp) {
+    public List<JiraIssueDTO> retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
+                                                        UUID orgId,
+                                                        Long jiraProjectId,
+                                                        Date timestamp) {
 
         String updateDate = new SimpleDateFormat(JIRA_ISSUE_UPDATE_DATE_FORMAT).format(timestamp);
         String jqlQuery = String.format(
@@ -245,11 +239,21 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         ).orElseThrow(() -> new SafaError("Error while trying to use access code"));
     }
 
-    private String encodeValue(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    public List<JiraIssueDTO> getJIRAIssues(JiraAccessCredentials credentials, UUID orgId, String jqlQuery) {
+        JiraIssuesResponseDTO response = getJIRAIssuesStartingAt(credentials, orgId, jqlQuery, 0);
+        List<JiraIssueDTO> issues = response.getIssues();
+        int totalIssues = response.getTotal();
+
+        while (issues.size() < totalIssues) {
+            response = getJIRAIssuesStartingAt(credentials, orgId, jqlQuery, issues.size());
+            issues.addAll(response.getIssues());
+        }
+
+        return issues;
     }
 
-    public JiraIssuesResponseDTO getJIRAIssues(JiraAccessCredentials credentials, UUID orgId, String jqlQuery) {
+    private JiraIssuesResponseDTO getJIRAIssuesStartingAt(JiraAccessCredentials credentials, UUID orgId,
+                                                          String jqlQuery, int startingAt) {
         String baseUri = this.buildApiRequestURI(orgId, ApiRoute.ISSUES);
 
         return WebApiUtils.blockOptional(
@@ -258,6 +262,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
                 .uri(baseUri, builder ->
                     builder
                         .queryParam("jql", jqlQuery)
+                        .queryParam("startAt", startingAt)
                         .queryParam("fields")
                         .build()
                 )

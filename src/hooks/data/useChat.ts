@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 
 import { ProjectChatSchema } from "@/types";
+import { removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 
 /**
@@ -12,6 +13,10 @@ export const useChat = defineStore("useChat", {
     currentChat: undefined as ProjectChatSchema | undefined,
   }),
   actions: {
+    initializeChats(chats: ProjectChatSchema[]): void {
+      this.chats = chats;
+      this.currentChat = chats[0];
+    },
     /**
      * Switch the current chat.
      * @param chat - The chat to switch to.
@@ -43,10 +48,12 @@ export const useChat = defineStore("useChat", {
      * Update the current chat with new data.
      * @param chat - The chat data to update.
      */
-    updateCurrentChat(chat: Partial<ProjectChatSchema>): void {
-      if (!this.currentChat) return;
+    updateChat(chat: ProjectChatSchema): void {
+      this.chats = [...removeMatches(this.chats, "id", [chat.id]), chat];
 
-      this.currentChat = { ...this.currentChat, ...chat };
+      if (chat.id === this.currentChat?.id) {
+        this.currentChat = chat;
+      }
     },
   },
 });

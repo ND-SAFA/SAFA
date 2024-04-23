@@ -2,7 +2,14 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { ChatApiHook, ChatMessageSchema } from "@/types";
-import { useApi } from "@/hooks";
+import { chatStore, projectStore, useApi } from "@/hooks";
+import {
+  createProjectChat,
+  createProjectChatMessage,
+  deleteProjectChat,
+  getProjectChatMessages,
+  getProjectChats,
+} from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -13,15 +20,55 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
 
   const loading = computed(() => chatApi.loading);
 
-  async function handleGetProjectChats() {}
+  async function handleGetProjectChats() {
+    await chatApi.handleRequest(async () => {
+      chatStore.initializeChats(await getProjectChats(projectStore.versionId));
+    }, {});
+  }
 
-  async function handleGetProjectChat(chatId: string) {}
+  async function handleGetProjectChat(chatId: string) {
+    await chatApi.handleRequest(async () => {
+      chatStore.updateChat(
+        await getProjectChatMessages(projectStore.versionId, chatId)
+      );
+    }, {});
+  }
 
-  async function handleCreateProjectChat() {}
+  async function handleCreateProjectChat(message: ChatMessageSchema) {
+    await chatApi.handleRequest(async () => {
+      chatStore.addChat(
+        await createProjectChat(projectStore.versionId, message)
+      );
+    }, {});
+  }
 
-  async function handleDeleteProjectChat() {}
+  async function handleDeleteProjectChat() {
+    await chatApi.handleRequest(async () => {
+      const chatId = chatStore.currentChat?.id;
+      if (!chatId) return;
 
-  async function handleSendChatMessage(message: ChatMessageSchema) {}
+      await deleteProjectChat(projectStore.versionId, chatId);
+
+      chatStore.deleteChat(chatId);
+    }, {});
+  }
+
+  async function handleSendChatMessage(message: ChatMessageSchema) {
+    await chatApi.handleRequest(async () => {
+      if (!chatStore.currentChat) return;
+
+      const createdMessage = await createProjectChatMessage(
+        projectStore.versionId,
+        chatStore.currentChat.id,
+        message
+      );
+
+      chatStore.updateChat({
+        ...chatStore.currentChat,
+        messages: [...chatStore.currentChat.messages, createdMessage],
+      });
+    }, {});
+  }
 
   return {
     loading,

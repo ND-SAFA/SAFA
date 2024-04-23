@@ -21,7 +21,7 @@ export interface ChatApiHook {
   /**
    * Creates a new chat for the current project, and sets it as the current chat.
    */
-  handleCreateProjectChat(): Promise<void>;
+  handleCreateProjectChat(message: ChatMessageSchema): Promise<void>;
   /**
    * Deletes a chat for the current project.
    * If the chat is the current chat, the current chat will be set to the next most recent.

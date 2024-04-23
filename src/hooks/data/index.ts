@@ -11,3 +11,4 @@ export { default as integrationsStore } from "./useIntegrations";
 export { default as attributesStore } from "./useAttributes";
 export { default as membersStore } from "./useMembers";
 export { default as searchStore } from "./useSearch";
+export { default as chatStore } from "./useChat";

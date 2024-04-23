@@ -7,3 +7,4 @@ export * from "./searchApi";
 export * from "./traceApi";
 export * from "./traceMatrixApi";
 export * from "./warningApi";
+export * from "./chatApi";

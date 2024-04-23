@@ -101,5 +101,4 @@ public class ChatController extends BaseController {
             .withPermissions(Set.of(ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE))
             .get();
     }
-
 }

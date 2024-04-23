@@ -34,6 +34,9 @@ public class ChatShare {
     @JdbcTypeCode(SqlTypes.BINARY)
     @Column
     private UUID id;
+    /**
+     * The chat being shared.
+     */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -41,6 +44,9 @@ public class ChatShare {
         nullable = false
     )
     private Chat chat;
+    /**
+     * The user who the chat is shared with.
+     */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -48,6 +54,9 @@ public class ChatShare {
         nullable = false
     )
     private SafaUser user;
+    /**
+     * The permission level associated with shared chat.
+     */
     @Column
     @Enumerated(EnumType.STRING)
     @JdbcType(VarcharJdbcType.class)

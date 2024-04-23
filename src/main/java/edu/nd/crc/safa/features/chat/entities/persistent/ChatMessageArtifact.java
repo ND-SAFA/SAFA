@@ -30,6 +30,9 @@ public class ChatMessageArtifact {
     @JdbcTypeCode(SqlTypes.BINARY)
     @Column
     private UUID id;
+    /**
+     * Message referencing artifact.
+     */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -37,6 +40,9 @@ public class ChatMessageArtifact {
         nullable = false
     )
     private ChatMessage message;
+    /**
+     * Artifact referenced in message.
+     */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(

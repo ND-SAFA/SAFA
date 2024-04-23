@@ -4,8 +4,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class CreateChatMessageDTO {
+public class SendChatMessageRequest {
 
+    /**
+     * The user message in chat.
+     */
     @NotNull
     private String message;
 }

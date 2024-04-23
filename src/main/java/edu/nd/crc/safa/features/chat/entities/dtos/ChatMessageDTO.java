@@ -16,10 +16,19 @@ import lombok.Data;
 public class ChatMessageDTO {
     @NotNull
     private UUID id;
+    /**
+     * The user message in chat.
+     */
     @Nullable
     private String userMessage;
+    /**
+     * The AI message in chat.
+     */
     @Nullable
-    private String message;
+    private String responseMessage;
+    /**
+     * Artifact ids associated with message.
+     */
     @NotNull
     private List<UUID> artifactIds;
 

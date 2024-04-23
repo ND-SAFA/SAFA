@@ -6,8 +6,8 @@ import java.util.UUID;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatMessageDTO;
-import edu.nd.crc.safa.features.chat.entities.dtos.CreateChatMessageDTO;
-import edu.nd.crc.safa.features.chat.entities.dtos.SendMessageResponseDTO;
+import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageRequest;
+import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageResponse;
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
@@ -29,18 +29,18 @@ public class ChatMessageController extends BaseController {
     /**
      * Sends message in chat.
      *
-     * @param createChatMessageDTO DTO containing user message being sent in chat.
-     * @param chatId               ID of chat where message is being sent.
+     * @param sendChatMessageRequest DTO containing user message being sent in chat.
+     * @param chatId                 ID of chat where message is being sent.
      * @return Saved user and response messages.
      */
     @PostMapping(AppRoutes.Chat.Message.MESSAGE_CREATE)
-    public SendMessageResponseDTO sendMessageInChat(@RequestBody CreateChatMessageDTO createChatMessageDTO,
-                                                    @PathVariable UUID chatId) {
+    public SendChatMessageResponse sendMessageInChat(@RequestBody SendChatMessageRequest sendChatMessageRequest,
+                                                     @PathVariable UUID chatId) {
         SafaUser currentUser = getCurrentUser();
         ServiceProvider serviceProvider = this.getServiceProvider();
         Chat chat = serviceProvider.getChatService().getChatById(chatId);
         return serviceProvider.getChatMessageService().sendChatMessage(chat,
-            createChatMessageDTO.getMessage(),
+            sendChatMessageRequest.getMessage(),
             currentUser);
     }
 

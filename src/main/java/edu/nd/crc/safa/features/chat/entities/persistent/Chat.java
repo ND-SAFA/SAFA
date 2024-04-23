@@ -33,7 +33,9 @@ public class Chat {
     @JdbcTypeCode(SqlTypes.BINARY)
     @Column
     private UUID id;
-
+    /**
+     * The project version whose artifact's are accessed during chat.
+     */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(
@@ -42,7 +44,9 @@ public class Chat {
     )
     @JsonIgnore
     private ProjectVersion projectVersion;
-
+    /**
+     * The owner of the chat.
+     */
     @ManyToOne
     @JdbcTypeCode(SqlTypes.VARCHAR)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -51,7 +55,9 @@ public class Chat {
         nullable = false
     )
     private SafaUser owner;
-
+    /**
+     * Display name of chat.
+     */
     @Column
     private String title;
 

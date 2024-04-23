@@ -8,6 +8,9 @@ public enum ChatSharePermission {
     READ(0),
     EDIT(1);
 
+    /**
+     * Value used to compare priviledges.
+     */
     private final int level;
 
     /**

@@ -12,8 +12,14 @@ import lombok.Data;
 public class ChatDTO {
     @Nullable
     private UUID id;
+    /**
+     * Display name of chat.
+     */
     @Nullable
     private String title;
+    /**
+     * ID of version being accessed during chat.
+     */
     @NotNull
     private UUID versionId;
 

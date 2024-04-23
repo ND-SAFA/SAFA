@@ -39,18 +39,15 @@ public class GenApi implements ITraceGenerationController {
     /**
      * Sends request to GEN to response to chat message.
      *
-     * @param message      User message to respond to.
-     * @param chatMessages Previous messages in chat.
-     * @param artifacts    Projects artifacts used in context.
+     * @param userMessageContent User message to respond to.
+     * @param chatMessages       Previous messages in chat.
+     * @param artifacts          Projects artifacts used in context.
      * @return Gen chat response.
      */
-    public GenChatResponse generateChatResponse(String message,
+    public GenChatResponse generateChatResponse(String userMessageContent,
                                                 List<ChatMessage> chatMessages,
                                                 List<GenerationArtifact> artifacts) {
-        GenChatRequest request = new GenChatRequest();
-        request.setArtifacts(artifacts);
-        request.setMessages(chatMessages);
-        request.setMessage(message);
+        GenChatRequest request = new GenChatRequest(userMessageContent, artifacts, chatMessages);
         String chatEndpoint = TGenConfig.getEndpoint("chat");
         return genApiController.sendGenRequest(chatEndpoint, request, GenChatResponse.class);
     }

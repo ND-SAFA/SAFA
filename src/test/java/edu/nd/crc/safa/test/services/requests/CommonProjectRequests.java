@@ -7,7 +7,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.controllers.ProjectController;
@@ -63,7 +62,7 @@ public class CommonProjectRequests {
                                           String email,
                                           ProjectRole role,
                                           ResultMatcher resultMatcher) {
-        ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
+        MembershipAppEntity request = new MembershipAppEntity(email, role.name());
         return SafaRequest
             .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
             .withEntityId(project.getProjectId())

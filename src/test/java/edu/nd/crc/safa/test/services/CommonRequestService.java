@@ -20,6 +20,7 @@ public class CommonRequestService {
         return new GenCommonRequests();
     }
 
+
     public CommonUserRequests user() {
         return new CommonUserRequests(this.state);
     }

@@ -121,13 +121,10 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     public <T> T postWithJsonObject(Object body, Class<T> responseClass) {
-        try {
-            JSONObject responseJson = postWithResponseParser(body, ResponseParser::jsonCreator);
-            return objectMapper.readValue(responseJson.toString(), responseClass);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        JSONObject responseJson = postWithResponseParser(body, ResponseParser::jsonCreator);
+        return parse(responseJson, responseClass);
     }
+
 
     public JSONObject postWithJsonObject(Object body, ResultMatcher resultMatcher) {
         return postWithResponseParser(body, ResponseParser::jsonCreator, resultMatcher);
@@ -140,6 +137,12 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     public <T> T postAndParseResponse(Object body, TypeReference<T> type, ResultMatcher resultMatcher) {
         return postWithResponseParser(body, resp -> this.jacksonParse(resp, type), resultMatcher);
     }
+
+    public <T> T putWithJsonObject(Object body, Class<T> responseClass) {
+        JSONObject response = putWithJsonObject(body);
+        return parse(response, responseClass);
+    }
+
 
     public JSONObject putWithJsonObject(Object body, ResultMatcher resultMatcher) {
         return putWithResponseParser(body, resultMatcher, ResponseParser::jsonCreator);
@@ -378,5 +381,13 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     public SafaRequest withQueryParam(String paramName, String paramValue) {
         queryParams.add(paramName, paramValue);
         return this;
+    }
+
+    private <T> T parse(JSONObject res, Class<T> responseClass) {
+        try {
+            return objectMapper.readValue(res.toString(), responseClass);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

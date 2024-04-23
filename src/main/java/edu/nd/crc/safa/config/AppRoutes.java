@@ -64,6 +64,21 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Chat {
+        private static final String ROOT = "/chat";
+        public static final String CHAT_GET = ROOT;
+        public static final String CHAT_CREATE = ROOT;
+        public static final String CHAT_UPDATE = ROOT;
+        private static final String BY_ID = ROOT + "/{chatId}";
+        public static final String CHAT_DELETE = BY_ID;
+
+        public static class Message {
+            public static final String MESSAGE_CREATE = BY_ID;
+            public static final String MESSAGE_GET = BY_ID + "/messages";
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Delta {
         public static final String CALCULATE_PROJECT_DELTA = Projects.ROOT
             + "/delta/{baselineVersionId}/{targetVersionId}";
@@ -167,10 +182,10 @@ public class AppRoutes {
     public static class Projects {
         protected static final String ROOT = "/projects";
         public static final String BY_ID = ROOT + "/{projectId}";
+        public static final String TRANSFER_OWNERSHIP = BY_ID + "/transfer";
         public static final String GET_PROJECTS = ROOT;
         public static final String DELETE_PROJECT_BY_ID = ROOT + "/{projectId}";
         public static final String CREATE_OR_UPDATE_PROJECT_META = ROOT;
-        public static final String TRANSFER_OWNERSHIP = BY_ID + "/transfer";
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Membership {
@@ -339,8 +354,8 @@ public class AppRoutes {
         public static class Transaction {
             public static final String ROOT = Billing.ROOT + "/transactions";
             public static final String BY_ORG = ROOT + "/{orgId}";
-            public static final String MONTHLY = ROOT + "/month";
             public static final String BY_ORG_MONTHLY = BY_ORG + "/month";
+            public static final String MONTHLY = ROOT + "/month";
         }
     }
 

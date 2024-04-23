@@ -4,7 +4,11 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.TGenConfig;
+import edu.nd.crc.safa.features.chat.entities.gen.GenChatRequest;
+import edu.nd.crc.safa.features.chat.entities.persistent.ChatMessage;
+import edu.nd.crc.safa.features.chat.entities.persistent.GenChatResponse;
 import edu.nd.crc.safa.features.common.RequestService;
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.TGenStatus;
 import edu.nd.crc.safa.features.generation.common.TGenTask;
@@ -31,6 +35,25 @@ public class GenApi implements ITraceGenerationController {
     private final ArtifactSummaryApi artifactSummaryApi;
     private final GenerateLinksApi generateLinksApi;
     private final GenApiController genApiController;
+
+    /**
+     * Sends request to GEN to response to chat message.
+     *
+     * @param message      User message to respond to.
+     * @param chatMessages Previous messages in chat.
+     * @param artifacts    Projects artifacts used in context.
+     * @return Gen chat response.
+     */
+    public GenChatResponse generateChatResponse(String message,
+                                                List<ChatMessage> chatMessages,
+                                                List<GenerationArtifact> artifacts) {
+        GenChatRequest request = new GenChatRequest();
+        request.setArtifacts(artifacts);
+        request.setMessages(chatMessages);
+        request.setMessage(message);
+        String chatEndpoint = TGenConfig.getEndpoint("chat");
+        return genApiController.sendGenRequest(chatEndpoint, request, GenChatResponse.class);
+    }
 
     /**
      * Generates project summary.

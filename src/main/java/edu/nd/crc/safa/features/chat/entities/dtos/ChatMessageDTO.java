@@ -32,8 +32,8 @@ public class ChatMessageDTO {
     public static ChatMessageDTO asResponseMessage(ChatMessage chatMessage, List<UUID> artifactIds) {
         return new ChatMessageDTO(
             chatMessage.getId(),
-            chatMessage.getMessage(),
             null,
+            chatMessage.getContent(),
             artifactIds);
     }
 
@@ -46,8 +46,8 @@ public class ChatMessageDTO {
     public static ChatMessageDTO asUserMessage(ChatMessage chatMessage) {
         return new ChatMessageDTO(
             chatMessage.getId(),
+            chatMessage.getContent(),
             null,
-            chatMessage.getMessage(),
             new ArrayList<>());
     }
 }

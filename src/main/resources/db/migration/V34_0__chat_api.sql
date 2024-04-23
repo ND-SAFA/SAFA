@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS chat_message
     chat_id   BINARY(16) NOT NULL,
     is_user   BOOL,
     author_id VARCHAR(255) CHARACTER SET utf8mb3,
-    position  INT        NOT NULL,
-    message   MEDIUMTEXT,
+    created   DATETIME,
+    content   MEDIUMTEXT,
     CONSTRAINT chat_message_chat_id_fk FOREIGN KEY (chat_id) REFERENCES chat (id) ON DELETE CASCADE,
     CONSTRAINT chat_message_author_id_fk FOREIGN KEY (author_id) REFERENCES safa_user (user_id) ON DELETE CASCADE
 );

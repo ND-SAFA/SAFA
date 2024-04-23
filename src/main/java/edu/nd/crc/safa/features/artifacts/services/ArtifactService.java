@@ -78,7 +78,13 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
         return versionToAppEntity(artifactAtVersion);
     }
 
-    private List<ArtifactAppEntity> versionToAppEntity(List<ArtifactVersion> artifactVersions) {
+    /**
+     * Converts list of artifact versions to app entities.
+     *
+     * @param artifactVersions Artifact versions entities to convert.
+     * @return List of artifact app entities.
+     */
+    public List<ArtifactAppEntity> versionToAppEntity(List<ArtifactVersion> artifactVersions) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         for (ArtifactVersion artifactVersion : artifactVersions) {
             ArtifactAppEntity artifactAppEntity = this.artifactVersionRepository

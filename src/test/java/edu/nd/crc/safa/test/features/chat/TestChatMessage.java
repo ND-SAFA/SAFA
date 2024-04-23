@@ -8,8 +8,8 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatMessageDTO;
-import edu.nd.crc.safa.features.chat.entities.dtos.CreateChatMessageDTO;
-import edu.nd.crc.safa.features.chat.entities.dtos.SendMessageResponseDTO;
+import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageRequest;
+import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageResponse;
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
 import edu.nd.crc.safa.features.chat.entities.persistent.GenChatResponse;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -34,6 +34,7 @@ class TestChatMessage extends GenerationalTest {
         String artifactBody = "artifact body";
         String artifactType = "artifact type";
         String userMessageText = "this is the user message.";
+        String artifactName = "RE-8";
         String responseText = "Response";
         String chatTitle = "Hello";
 
@@ -43,12 +44,14 @@ class TestChatMessage extends GenerationalTest {
         ArtifactAppEntity artifact = new ArtifactAppEntity();
         artifact.setBody(artifactBody);
         artifact.setType(artifactType);
+        artifact.setName(artifactName);
         ArtifactAppEntity artifactAdded = this.rootBuilder.actions(a -> a.commit(
                 CommitBuilder
                     .withVersion(projectVersion)
                     .withAddedArtifact(artifact)
             ).getArtifact(ModificationType.ADDED, 0))
             .get();
+        List<String> artifactNames = List.of(artifactAdded.getName());
         List<UUID> artifactIds = List.of(artifactAdded.getId());
 
         // create chat
@@ -62,16 +65,16 @@ class TestChatMessage extends GenerationalTest {
         assertThat(chatMessages.size()).isEqualTo(0);
 
         // mock: chat response
-        mockChatResponse(responseText, artifactIds);
+        mockChatResponse(responseText, artifactNames);
 
         // step 1 - create message
-        CreateChatMessageDTO request = new CreateChatMessageDTO();
+        SendChatMessageRequest request = new SendChatMessageRequest();
         request.setMessage(userMessageText);
 
-        SendMessageResponseDTO response = SafaRequest
+        SendChatMessageResponse response = SafaRequest
             .withRoute(AppRoutes.Chat.Message.MESSAGE_CREATE)
             .withCustomReplacement("chatId", chat.getId())
-            .postWithJsonObject(request, SendMessageResponseDTO.class);
+            .postWithJsonObject(request, SendChatMessageResponse.class);
 
         // verify response
         ChatMessageDTO userMessage = response.getUserMessage();
@@ -95,12 +98,12 @@ class TestChatMessage extends GenerationalTest {
      * Mocks the GEN response.
      *
      * @param responseContent The content of the response message.
-     * @param artifactIds     The artifact ids selected my GEN.
+     * @param artifactNames   Names of artifacts.
      */
-    private void mockChatResponse(String responseContent, List<UUID> artifactIds) {
+    private void mockChatResponse(String responseContent, List<String> artifactNames) {
         GenChatResponse genResponse = new GenChatResponse();
         genResponse.setMessage(responseContent);
-        genResponse.setArtifactIds(artifactIds);
+        genResponse.setArtifactIds(artifactNames);
         getServer().setResponse(genResponse);
     }
 
@@ -114,7 +117,7 @@ class TestChatMessage extends GenerationalTest {
     private void verifyResponseMessage(ChatMessageDTO message, String responseText, List<UUID> artifactIds) {
         assertThat(message.getId()).isNotNull();
         assertThat(message.getUserMessage()).isNull();
-        assertThat(message.getMessage()).isEqualTo(responseText);
+        assertThat(message.getResponseMessage()).isEqualTo(responseText);
         List<UUID> messageArtifactIds = message.getArtifactIds();
         assertThat(messageArtifactIds.size()).isEqualTo(artifactIds.size());
         for (UUID artifactId : artifactIds) {
@@ -131,7 +134,7 @@ class TestChatMessage extends GenerationalTest {
     private void verifyUserMessage(ChatMessageDTO message, String userMessageText) {
         assertThat(message.getId()).isNotNull();
         assertThat(message.getUserMessage()).isEqualTo(userMessageText);
-        assertThat(message.getMessage()).isNull();
+        assertThat(message.getResponseMessage()).isNull();
         assertThat(message.getArtifactIds().size()).isEqualTo(0);
     }
 }

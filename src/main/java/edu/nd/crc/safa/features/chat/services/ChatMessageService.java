@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatMessageDTO;
-import edu.nd.crc.safa.features.chat.entities.dtos.SendMessageResponseDTO;
+import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageResponse;
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatMessage;
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatMessageArtifact;
@@ -43,7 +43,7 @@ public class ChatMessageService {
      * @param author  The author of the message
      * @return The response from the AI.
      */
-    public SendMessageResponseDTO sendChatMessage(Chat chat, String message, SafaUser author) {
+    public SendChatMessageResponse sendChatMessage(Chat chat, String message, SafaUser author) {
         List<ChatMessage> chatMessages = chatMessageRepository.findByChatOrderByCreatedAsc(chat);
 
         ChatMessage userMessage = new ChatMessage();
@@ -57,7 +57,7 @@ public class ChatMessageService {
 
         ChatMessageDTO responseMessage = generateChatResponse(userMessage, chatMessages, chat.getProjectVersion());
 
-        return new SendMessageResponseDTO(
+        return new SendChatMessageResponse(
             ChatMessageDTO.asUserMessage(userMessage),
             responseMessage
         );
@@ -103,8 +103,8 @@ public class ChatMessageService {
         List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
             .retrieveVersionEntitiesByProjectVersion(projectVersion);
         artifactService.versionToAppEntity(artifactVersions);
-        Map<UUID, List<ArtifactVersion>> artifactId2version = ProjectDataStructures.groupEntitiesByProperty(
-            artifactVersions, ArtifactVersion::getBaseEntityId);
+        Map<String, List<ArtifactVersion>> artifactId2version = ProjectDataStructures.groupEntitiesByProperty(
+            artifactVersions, ArtifactVersion::getName);
 
         List<GenerationArtifact> genArtifacts = artifactVersions
             .stream()
@@ -117,17 +117,21 @@ public class ChatMessageService {
 
         ChatMessage finalResponseMessage = responseMessage; // variables used in lambda must be final.
         List<ChatMessageArtifact> chatMessageArtifacts = genChatResponse.getArtifactIds().stream()
-            .map(artifactId -> {
+            .map(artifactName -> {
                 ChatMessageArtifact chatMessageArtifact = new ChatMessageArtifact();
                 chatMessageArtifact.setMessage(finalResponseMessage);
-                Artifact artifact = artifactId2version.get(artifactId).get(0).getArtifact();
+                Artifact artifact = artifactId2version.get(artifactName).get(0).getArtifact();
                 chatMessageArtifact.setArtifact(artifact);
                 return chatMessageArtifact;
             }).toList();
+        List<UUID> chatMessageArtifactIds = chatMessageArtifacts
+            .stream()
+            .map(c -> c.getArtifact().getArtifactId())
+            .toList();
 
         chatMessageArtifactRepository.saveAll(chatMessageArtifacts);
 
-        return ChatMessageDTO.asResponseMessage(responseMessage, genChatResponse.getArtifactIds());
+        return ChatMessageDTO.asResponseMessage(responseMessage, chatMessageArtifactIds);
     }
 
     /**

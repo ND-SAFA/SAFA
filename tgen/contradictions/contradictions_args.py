@@ -10,4 +10,5 @@ class ContradictionsArgs(PipelineArgs):
     """
      :param llm_manager: The LLM manager to use to make decisions.
     """
+    max_context: int = None
     llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)

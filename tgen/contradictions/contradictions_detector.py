@@ -1,7 +1,6 @@
 from typing import Dict, List, Optional
 
 from tgen.common.constants.deliminator_constants import COMMA
-from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -10,18 +9,17 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.contradictions.common_choices import CommonChoices
 from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.core.trainers.llm_trainer import LLMTrainer
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys, LayerKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.prompt_response_manager import PromptResponseManager
-from tgen.tracing.ranking.common.ranking_args import RankingArgs
-from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
+from tgen.tracing.context_finder import ContextFinder
 
 
 class ContradictionsDetector:
@@ -42,9 +40,10 @@ class ContradictionsDetector:
         assert req_id in self.args.dataset.artifact_df, "Unknown requirement"
 
         artifact_df = self.args.dataset.artifact_df
-        all_relationships = self._find_related_artifacts(req_id, artifact_df)
+        id2context, all_relationships = ContextFinder.find_related_artifacts(req_id, self.args.dataset,
+                                                                             max_context=self.args.max_context,
+                                                                             base_export_dir=self.args.export_dir)
         trace_df = self.args.dataset.trace_dataset.trace_df if self.args.dataset.trace_dataset else TraceDataFrame()
-        id2context = {req_id: [artifact_df.get_artifact(trace[TraceKeys.parent_label()]) for trace in all_relationships]}
         conflicting_ids = self._perform_detections(req_id, id2context)
         if not self.args.dataset.trace_dataset:
             requirement_type = artifact_df.get_artifact(req_id)[ArtifactKeys.LAYER_ID]
@@ -62,7 +61,8 @@ class ContradictionsDetector:
         :return: The output from the LLM.
         """
         requirement = self.args.dataset.artifact_df.get_artifact(req_id)
-        context_prompt = ContextPrompt(id2context, prompt_start=PromptUtil.as_markdown_header("Related Information"))
+        context_prompt = ContextPrompt(id2context, prompt_start=PromptUtil.as_markdown_header("Related Information"),
+                                       build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN, include_ids=True)
         requirement_prompt = ArtifactPrompt(prompt_start=PromptUtil.as_markdown_header("Requirement"))
         instructions_prompt = Prompt("Consider whether the following requirement is inconsistent or contradictory with any of the "
                                      "related pieces of information. ")
@@ -92,34 +92,6 @@ class ContradictionsDetector:
         if len(conflicting_ids) == 1 and conflicting_ids[0].lower() == CommonChoices.NO:
             return CommonChoices.NO
         return conflicting_ids
-
-    def _find_related_artifacts(self, req_id: str, artifact_df: ArtifactDataFrame) -> List[Trace]:
-        """
-        Identifies related artifacts to the requirement.
-        :param req_id: The id of the requirement to find related artifacts for.
-        :param artifact_df: The dataframe containing all artifacts.
-        :return: A list of traces to related artifacts.
-        """
-        requirement = self.args.dataset.artifact_df.get_artifact(req_id)
-        children_ids = [req_id]
-        all_relationships = []
-        for layer in artifact_df.get_artifact_types():
-            layer_artifacts = artifact_df.get_artifacts_by_type(layer)
-            parent_ids = [a_id for a_id in layer_artifacts.index if a_id != req_id]
-            export_dir = FileUtil.safely_join_paths(self.args.export_dir, layer)
-            ranking_args = RankingArgs(dataset=self.args.dataset,
-                                       parent_ids=parent_ids,
-                                       children_ids=children_ids,
-                                       export_dir=export_dir,
-                                       types_to_trace=(layer, requirement[ArtifactKeys.LAYER_ID]),
-                                       generate_explanations=False)
-            logger.info(f"Starting to find related {layer} to requirement {req_id}")
-
-            pipeline = EmbeddingRankingPipeline(ranking_args)
-            pipeline.run()
-            selected_entries = pipeline.state.get_current_entries()
-            all_relationships.extend(selected_entries)
-        return all_relationships
 
     @staticmethod
     def _add_traces_to_df(selected_entries: List[Trace], trace_df: TraceDataFrame) -> TraceDataFrame:

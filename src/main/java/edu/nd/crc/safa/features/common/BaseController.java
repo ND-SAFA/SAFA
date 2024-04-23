@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.utilities.ExecutorDelegate;
 import edu.nd.crc.safa.utilities.exception.ExternalAPIException;
 import edu.nd.crc.safa.utilities.exception.InvalidTokenException;
+import edu.nd.crc.safa.utilities.exception.UserError;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -120,6 +121,12 @@ public abstract class BaseController {
     @ExceptionHandler(InvalidTokenException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public InvalidTokenException handleExpiredToken(InvalidTokenException ex) {
+        return ex;
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public UserError handleUserError(UserError ex) {
         return ex;
     }
 

@@ -328,6 +328,19 @@ public class MembershipService {
         return new SafaItemNotFoundError("No entity with the given ID found.");
     }
 
+    /**
+     * Get all entity memberships for a user
+     *
+     * @param user The user
+     * @param entityId The entity to search in
+     * @return Memberships the user has in the entity
+     */
+    public List<IRole> getUserRoles(SafaUser user, UUID entityId) {
+        IEntityWithMembership entity = getEntity(entityId);
+        IMembershipService membershipService = getSpecificMembershipService(entity);
+        return membershipService.getRolesForUser(user, entity);
+    }
+
     @Data
     @AllArgsConstructor
     private static class ConfigForType {

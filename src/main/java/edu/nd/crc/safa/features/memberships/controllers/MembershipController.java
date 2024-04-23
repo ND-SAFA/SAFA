@@ -10,9 +10,11 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.MembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.db.IRole;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
+import edu.nd.crc.safa.utilities.exception.UserError;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,9 +59,17 @@ public class MembershipController extends BaseController {
      * @return The newly created membership
      */
     @PostMapping(AppRoutes.Memberships.BY_ENTITY_ID)
-    public MembershipAppEntity createNewMembership(@PathVariable UUID entityId,
-                                                   @RequestBody MembershipAppEntity newMembership) {
+    public MembershipAppEntity createNewMembership(
+            @PathVariable UUID entityId,
+            @RequestBody MembershipAppEntity newMembership
+    ) throws UserError {
         SafaUser newMember = safaUserService.getUserByEmail(newMembership.getEmail());
+
+        List<IRole> userRoles = membershipService.getUserRoles(newMember, entityId);
+        if (userRoles.isEmpty()) {
+            throw new UserError("User is not yet a member of this entity and must be invited first.");
+        }
+
         IEntityMembership membership =
                 membershipService.createMembership(entityId, newMembership.getRole(), newMember, getCurrentUser());
         return new MembershipAppEntity(membership);
@@ -76,8 +86,11 @@ public class MembershipController extends BaseController {
      * @return The new membership entity
      */
     @PutMapping(AppRoutes.Memberships.BY_ENTITY_ID_AND_MEMBERSHIP_ID)
-    public MembershipAppEntity modifyMembership(@PathVariable UUID entityId, @PathVariable UUID membershipId,
-                                                @RequestBody MembershipAppEntity membership) {
+    public MembershipAppEntity modifyMembership(
+            @PathVariable UUID entityId,
+            @PathVariable UUID membershipId,
+            @RequestBody MembershipAppEntity membership
+    ) {
         IEntityMembership updatedMembership =
                 membershipService.updateMembership(entityId, membershipId, membership.getRole(), getCurrentUser());
         return new MembershipAppEntity(updatedMembership);
@@ -105,8 +118,11 @@ public class MembershipController extends BaseController {
      * @param userEmail The email of the user
      */
     @DeleteMapping(AppRoutes.Memberships.BY_ENTITY_ID)
-    public void deleteAllMembershipsForUser(@PathVariable UUID entityId, @RequestParam(required = false) UUID userId,
-                                            @RequestParam(required = false) String userEmail) {
+    public void deleteAllMembershipsForUser(
+            @PathVariable UUID entityId,
+            @RequestParam(required = false) UUID userId,
+            @RequestParam(required = false) String userEmail
+    ) {
         SafaUser member;
         if (userId != null) {
             member = getServiceProvider().getSafaUserService().getUserById(userId);

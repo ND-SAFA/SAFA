@@ -30,7 +30,7 @@ public class MembershipInviteToken {
 
     @Column
     @JdbcTypeCode(SqlTypes.BINARY)
-    private UUID entity_id;
+    private UUID entityId;
 
     @Column
     private LocalDateTime expiration;
@@ -40,7 +40,7 @@ public class MembershipInviteToken {
     private String role;
 
     public MembershipInviteToken(IEntityWithMembership entity, IRole role) {
-        this.entity_id = entity.getId();
+        this.entityId = entity.getId();
         this.role = role.name();
         this.expiration = LocalDateTime.now().plusWeeks(1);
     }

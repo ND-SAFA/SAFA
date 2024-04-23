@@ -132,7 +132,7 @@ public class MembershipService {
     public IEntityMembership createMembership(UUID entityId, String roleName, SafaUser forUser, SafaUser asUser) {
         IEntityWithMembership entity = getEntity(entityId);
         permissionService.requirePermission(getEditMembersPermission(entity), entity, asUser);
-        IRole role = getRole(entity, roleName);
+        IRole role = getRoleForEntity(entity, roleName);
         return createMembership(forUser, entity, role);
     }
 
@@ -164,7 +164,7 @@ public class MembershipService {
     public IEntityMembership updateMembership(UUID entityId, UUID membershipId, String roleName, SafaUser asUser) {
         IEntityWithMembership entity = getEntity(entityId);
         permissionService.requirePermission(getEditMembersPermission(entity), entity, asUser);
-        IRole role = getRole(entity, roleName);
+        IRole role = getRoleForEntity(entity, roleName);
         IMembershipService membershipService = getSpecificMembershipService(entity);
         IEntityMembership currentMembership = membershipService.getMembershipById(membershipId);
         SafaUser editedUser = deleteMembership(currentMembership, entity);
@@ -249,7 +249,7 @@ public class MembershipService {
      * @param role The name of the role to look up
      * @return The role
      */
-    private IRole getRole(IEntityWithMembership entity, String role) {
+    public IRole getRoleForEntity(IEntityWithMembership entity, String role) {
         return getTypeConfigForEntity(entity).getRoleParseFunction().apply(role);
     }
 

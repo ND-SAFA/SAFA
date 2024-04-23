@@ -13,7 +13,6 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.utilities.exception.ExpiredTokenException;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class MembershipInviteService {
 
     private final MembershipInviteTokenRepository tokenRepo;
+    private final MembershipService membershipService;
 
     /**
      * Generate a new invite token
@@ -46,8 +46,13 @@ public class MembershipInviteService {
             throw new ExpiredTokenException(token.getExpiration());
         }
 
-        // TODO add membership
-        throw new NotImplementedException();
+        IEntityWithMembership entity = membershipService.getEntity(token.getEntityId());
+        IRole role = membershipService.getRoleForEntity(entity, token.getRole());
+        IEntityMembership membership = membershipService.createMembership(user, entity, role);
+
+        tokenRepo.delete(token);
+
+        return membership;
     }
 
     /**

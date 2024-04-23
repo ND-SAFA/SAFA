@@ -1,6 +1,5 @@
 import os
 from dataclasses import dataclass, field
-
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from tgen.common.constants import environment_constants
@@ -9,7 +8,7 @@ from tgen.common.constants.model_constants import get_best_default_llm_manager_l
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDINGS_SCORE_WEIGHT, DEFAULT_EMBEDDING_MODEL, \
     DEFAULT_EXPLANATION_SCORE_WEIGHT, DEFAULT_LINK_THRESHOLD, DEFAULT_MAX_CONTEXT_ARTIFACTS, DEFAULT_PARENT_MIN_THRESHOLD, \
     DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT, \
-    DEFAULT_CROSS_ENCODER_MODEL
+    DEFAULT_CROSS_ENCODER_MODEL, DEFAULT_SCALED_THRESHOLD
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
@@ -113,6 +112,10 @@ class RankingArgs(PipelineArgs):
     - re_rank_children: If True, will re rank the children using a cross encoder
     """
     re_rank_children: bool = False
+    """
+    use_rag: If True, uses optimal parameters for RAG
+    """
+    use_rag: bool = False
 
     def save(self, obj: Any, file_name: str) -> str:
         """
@@ -185,3 +188,7 @@ class RankingArgs(PipelineArgs):
             self.run_name = self.get_run_name(self.child_type(), self.children_ids, self.parent_type(), self.parent_ids)
         super().__post_init__()
         self.embedding_model_name = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else self.embedding_model_name
+        if self.use_rag:
+            self.re_rank_children = True
+            self.selection_method = SupportedSelectionMethod.SELECT_BY_THRESHOLD_SCALED
+            self.link_threshold = DEFAULT_SCALED_THRESHOLD

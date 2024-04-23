@@ -18,8 +18,8 @@ from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
-from tgen.tracing.ranking.selectors.selection_by_threshold_normalized_children import SelectByThresholdNormalizedChildren
 from tgen.tracing.ranking.selectors.selection_by_threshold_scaled_across_all import SelectByThresholdScaledAcrossAll
+from tgen.tracing.ranking.selectors.selection_by_threshold_scaled_by_artifact import SelectByThresholdNormalizedChildren
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 

@@ -1,7 +1,7 @@
 import json
+from typing import Dict, List, Optional, Tuple, Set, Union
 
 import numpy as np
-from typing import Dict, List, Optional, Tuple, Set, Union
 
 from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.common.logging.logger_manager import logger
@@ -346,3 +346,51 @@ class RankingUtil:
         :return: A list of scores corresponding to the trace entries.
         """
         return [entry[TraceKeys.SCORE] for entry in trace_entries]
+
+    @staticmethod
+    def normalized_scores_by_individual_artifacts(artifact2traces: Dict[str, List[Trace]],
+                                                  min_score: float = None) -> List[Trace]:
+        """
+        Normalizes all scores based on the min and max of the parent
+        :param artifact2traces: A dictionary mapping parent id to list of children entries
+        :param min_score: The minimum score in the range (uses the minimum child score if none if provided.
+        :return: None
+        """
+        for artifact, trace_entries in artifact2traces.items():
+            scores = RankingUtil.get_scores(trace_entries)
+            sorted_scores = sorted(scores)
+            min_child_score = sorted_scores[0] if min_score is None else min_score
+            max_child_score = sorted_scores[-1]
+            for entry in trace_entries:
+                score = MathUtil.convert_to_new_range(entry[TraceKeys.SCORE], (min_child_score, max_child_score), (0, 1))
+                entry[TraceKeys.SCORE] = score
+
+    @staticmethod
+    def select_traces_by_threshold(candidate_entries: List[Trace], threshold: float) -> List[Trace]:
+        """
+        Filters the candidate links based on score threshold
+        :param candidate_entries: Candidate trace entries
+        :param threshold: The threshold to filter by
+        :return: filtered list of entries
+        """
+        return [c for c in candidate_entries if TraceKeys.SCORE in c and c[TraceKeys.SCORE] >= threshold]
+
+    @staticmethod
+    def select_traces_by_artifact(artifact2traces: Dict[str, List[Trace]],
+                                  threshold: float,
+                                  threshold_based_on_dist: bool = False) -> List[Trace]:
+        """
+        Normalizes all scores based on the min and max of the parent
+        :param artifact2traces: A dictionary mapping parent id to list of children entries
+        :param threshold: The maximum threshold allowed.
+        :param threshold_based_on_dist: If True, calculates a threshold based on the distribution of the data.
+        :return: None
+        """
+        selected_entries = []
+        new_threshold = threshold
+        for parent, children in artifact2traces.items():
+            if threshold_based_on_dist:
+                new_threshold = RankingUtil.calculate_threshold_from_std(children, sigma=0.5)
+                new_threshold = min(new_threshold, threshold)
+            selected_entries.extend(RankingUtil.select_traces_by_threshold(children, new_threshold))
+        return selected_entries

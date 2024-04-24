@@ -1,6 +1,5 @@
 import json
 from copy import deepcopy
-
 from typing import Dict, Union, List
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
@@ -56,7 +55,7 @@ class RankingChunkJob(AbstractJob):
         export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
         base_export_dir = FileUtil.safely_join_paths(export_dir, "base")
         base_ranking_kwargs = DictUtil.update_kwarg_values(
-            self.ranking_kwargs, selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD_NORMALIZED_CHILDREN,
+            self.ranking_kwargs, selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD_SCALED,
             link_threshold=RankingChunkJob.MIN_THRESHOLD, export_dir=base_export_dir)
         base_ranking_job = self.create_ranking_job(relationship_manager=self.relationship_manager_type.value(),
                                                    **base_ranking_kwargs)

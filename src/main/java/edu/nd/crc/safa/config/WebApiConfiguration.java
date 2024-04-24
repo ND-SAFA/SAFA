@@ -4,7 +4,6 @@ import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepos
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.services.GithubConnectionServiceImpl;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
-import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionServiceImpl;
 
@@ -38,15 +37,13 @@ public class WebApiConfiguration {
     private static final Integer WEBCLIENT_MAX_MEMORY = 256 * 1024 * 1024;
     private static final Logger log = LoggerFactory.getLogger(WebApiConfiguration.class);
 
-    private JiraProjectRepository jiraProjectRepository;
-
     private JiraAccessCredentialsRepository jiraAccessCredentialsRepository;
 
     private GithubAccessCredentialsRepository githubAccessCredentialsRepository;
 
     @Bean
     public JiraConnectionService jiraConnectionService() {
-        return new JiraConnectionServiceImpl(jiraProjectRepository, jiraAccessCredentialsRepository, webClient());
+        return new JiraConnectionServiceImpl(jiraAccessCredentialsRepository, webClient());
     }
 
     @Bean
@@ -58,11 +55,9 @@ public class WebApiConfiguration {
         return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
             log.info("Request: {} {}", clientRequest.method(), clientRequest.url());
 
-            clientRequest.headers().forEach((name, values) -> {
-                values.forEach(value -> {
-                    log.info("{}={}", name, value);
-                });
-            });
+            clientRequest.headers().forEach((name, values) ->
+                values.forEach(value ->
+                    log.info("{}={}", name, value)));
 
             return Mono.just(clientRequest);
         });

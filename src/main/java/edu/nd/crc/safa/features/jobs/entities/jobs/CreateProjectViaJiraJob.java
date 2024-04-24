@@ -107,7 +107,7 @@ public class CreateProjectViaJiraJob extends CommitJob {
         Long jiraProjectId = this.jiraIdentifier.getJiraProjectId();
         UUID orgId = jiraIdentifier.getOrgId();
         this.jiraProjectResponse = jiraConnectionService.retrieveJIRAProject(credentials, orgId, jiraProjectId);
-        this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, orgId, jiraProjectId).getIssues();
+        this.issues = jiraConnectionService.retrieveJIRAIssues(credentials, orgId, jiraProjectId);
 
         logger.log("Jira project '%s' successfully retrieved. %d issues will be imported",
             jiraProjectResponse.getName(), issues.size());

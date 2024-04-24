@@ -8,7 +8,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.jira.entities.app.JiraAccessCredentialsDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraAuthResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraInstallationDTO;
-import edu.nd.crc.safa.features.jira.entities.app.JiraIssuesResponseDTO;
+import edu.nd.crc.safa.features.jira.entities.app.JiraIssueDTO;
 import edu.nd.crc.safa.features.jira.entities.app.JiraProjectResponseDTO;
 import edu.nd.crc.safa.features.jira.entities.db.JiraAccessCredentials;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -72,7 +72,7 @@ public interface JiraConnectionService {
      * @param jiraProjectId The JIRA project id.
      * @return JIRA issues for the given project
      */
-    JiraIssuesResponseDTO retrieveJIRAIssues(JiraAccessCredentials credentials, UUID orgId, Long jiraProjectId);
+    List<JiraIssueDTO> retrieveJIRAIssues(JiraAccessCredentials credentials, UUID orgId, Long jiraProjectId);
 
     /**
      * Retrieve updated issues associated with a JIRA project after a certain timestamp
@@ -83,10 +83,10 @@ public interface JiraConnectionService {
      * @param timestamp     Timestamp after which issues were updated
      * @return JIRA the updated issues for the given project
      */
-    JiraIssuesResponseDTO retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
-                                                    UUID orgId,
-                                                    Long jiraProjectId,
-                                                    Date timestamp);
+    List<JiraIssueDTO> retrieveUpdatedJIRAIssues(JiraAccessCredentials credentials,
+                                                 UUID orgId,
+                                                 Long jiraProjectId,
+                                                 Date timestamp);
 
     /**
      * Check whether the 'ADMINISTER_PROJECTS' permissions is set for a given user and project id.

@@ -6,6 +6,7 @@ from datasets import Metric, list_metrics
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 from tgen.metrics.average_true_links_metrics import AverageTrueLinksMetric
+from tgen.metrics.classification_metrics import ClassificationMetrics
 from tgen.metrics.confusion_matrix_at_threshold_metric import ConfusionMatrixAtThresholdMetric
 from tgen.metrics.lag_metric import LagMetric
 from tgen.metrics.map_at_k_metric import MapAtKMetric
@@ -13,7 +14,6 @@ from tgen.metrics.map_metric import MapMetric
 from tgen.metrics.pos_link_indices import PositiveLinkIndices
 from tgen.metrics.precision_at_recall_metric import PrecisionAtRecallMetric
 from tgen.metrics.precision_at_threshold_metric import PrecisionAtKMetric
-from tgen.metrics.precision_metric import ClassificationMetrics
 from tgen.metrics.specificity_metric import SpecificityMetric
 
 metric_suffix = "Metric"

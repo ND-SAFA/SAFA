@@ -76,6 +76,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
 
         epochs = int(self.args.num_train_epochs)
         logger.info(f"Total Epochs: {epochs}")
+        training_metrics = []
         for epoch in range(epochs):
             logger.info(f"Starting Epoch {epoch + 1}")
             epoch_loss = 0
@@ -103,8 +104,9 @@ class STTrainer(HuggingFaceTrainer, ABC):
             epoch_loss /= n_samples
             logger.info(f"Average Step Loss: {epoch_loss}")
             self.evaluate_if_save(evaluator)
+            training_metrics.append({"epoch": epoch + 1, "loss": epoch_loss})
 
-        return TrainOutput(metrics={}, training_loss=self.state.total_flos, global_step=self.state.global_step)
+        return TrainOutput(metrics=training_metrics, training_loss=self.state.total_flos, global_step=self.state.global_step)
 
     @overrides(HuggingFaceTrainer)
     def predict(self, dataset_role: DatasetRole, **kwargs) -> PredictionOutput:

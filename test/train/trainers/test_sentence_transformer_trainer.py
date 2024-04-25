@@ -7,7 +7,7 @@ import numpy as np
 from tgen.common.constants.hugging_face_constants import POS_LINK, SMALL_EMBEDDING_MODEL
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st.st_loss_functions import SupportedSTLossFunctions
-from tgen.core.trainers.st_embedding_trainer import STTrainer
+from tgen.core.trainers.st_embedding_trainer import STEmbeddingTrainer, STTrainer
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.model_manager import ModelManager
@@ -23,7 +23,8 @@ class TestSentenceTransformerTrainer(TestCase):
         """
         n_epochs = 2
         trainer = self.create_trainer(trainer_args_kwargs={"num_train_epochs": n_epochs})
-        training_metrics = trainer.perform_training().metrics["records"]
+        training_output = trainer.perform_training()
+        training_metrics = training_output.metrics
         self.assert_valid_metrics(self, training_metrics, n_epochs)
 
     def test_prediction(self):
@@ -91,7 +92,7 @@ class TestSentenceTransformerTrainer(TestCase):
         trainer_dataset_manager = DatasetCreatorTUtil.create_trainer_dataset_manager(val_percentage=0.4,
                                                                                      **trainer_dataset_manager_kwargs)
         trainer_args_kwargs = HuggingFaceArgs(TEST_OUTPUT_DIR, **trainer_args_kwargs)
-        trainer = STTrainer(trainer_args_kwargs, model_manager, trainer_dataset_manager, **trainer_kwargs)
+        trainer = STEmbeddingTrainer(trainer_args_kwargs, model_manager, trainer_dataset_manager, **trainer_kwargs)
         return trainer
 
     @staticmethod

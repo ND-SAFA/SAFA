@@ -54,7 +54,7 @@ def get_metric_path(metric_name: str) -> str:
         if metric_name.lower() in list_metrics():
             path = metric_name
         else:
-            raise NameError("Metric %s is unknown" % metric_name)
+            raise NameError(f"Metric %s is unknown: `{metric_name}`")
     return path
 
 

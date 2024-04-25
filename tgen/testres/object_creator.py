@@ -35,7 +35,7 @@ class ObjectCreator:
     trainer_args_definition = {
         "output_dir": TEST_OUTPUT_DIR,
         "num_train_epochs": 1,
-        "metrics": ["f", "map"]
+        "metrics": ["classification", "map"]
     }
     job_args_definition = {"output_dir": TEST_OUTPUT_DIR}
     api_project_reader = {

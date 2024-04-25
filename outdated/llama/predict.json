@@ -26,8 +26,7 @@
             "metrics": [
               "map",
               "map_at_k",
-              "f",
-              "precision"
+              "classification"
             ],
             "skip_save": false,
             "use_balanced_batches": true,

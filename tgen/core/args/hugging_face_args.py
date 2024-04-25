@@ -25,6 +25,7 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
     # Trainer
+    dataloader_prefetch_factor = None
     full_determinism = True
     train_epochs_range: List = None
     num_train_epochs: int = N_EPOCHS_DEFAULT

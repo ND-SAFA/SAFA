@@ -82,4 +82,5 @@ class STEmbeddingTrainer(STTrainer):
         Creates the loss function from its defined class.
         :return: The loss function.
         """
+        # using MLP losses because it's assumed that embeddings will always be compared via cosine similarity.
         return create_loss_function(SupportedMLPLosses, self.trainer_args.st_loss_function, "mse")

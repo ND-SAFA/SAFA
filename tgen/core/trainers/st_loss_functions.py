@@ -9,4 +9,3 @@ class SupportedMLPLosses(SupportedEnum):
     WEIGHTED_MSE = WeightedMSE
     MAE = nn.L1Loss
     CROSS_ENTROPY = nn.BCELoss
-    COSINE = nn.CosineEmbeddingLoss

@@ -6,8 +6,8 @@ import numpy as np
 
 from tgen.common.constants.hugging_face_constants import POS_LINK, SMALL_EMBEDDING_MODEL
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.trainers.st.st_loss_functions import SupportedSTLossFunctions
 from tgen.core.trainers.st_embedding_trainer import STEmbeddingTrainer, STTrainer
+from tgen.core.trainers.st_loss_functions import SupportedMLPLosses
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.model_manager import ModelManager
@@ -39,7 +39,7 @@ class TestSentenceTransformerTrainer(TestCase):
         """
         Tests ability to define loss functions on sentence transformer trainer.
         """
-        for loss_function in SupportedSTLossFunctions:
+        for loss_function in SupportedMLPLosses:
             trainer = self.create_trainer(trainer_args_kwargs={"num_train_epochs": 1, "st_loss_function": loss_function.name})
             training_metrics = trainer.perform_training().metrics
             self.verify_training_metrics(self, training_metrics, 1)
@@ -58,8 +58,8 @@ class TestSentenceTransformerTrainer(TestCase):
         pos_link_indices = [i for i, link_id in enumerate(link_ids) if
                             train_dataset.trace_df.get_link(link_id)[TraceKeys.LABEL] == POS_LINK]
 
-        train_output = trainer.perform_training()
-        train_losses = train_output.metrics["losses"]
+        train_metrics = trainer.perform_training().metrics
+        train_losses = [m["loss"] for m in train_metrics]
         max_loss_index = np.argmax(train_losses)
         self.assertIn(max_loss_index, pos_link_indices)  # indices of positive labels.
 

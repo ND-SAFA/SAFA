@@ -117,6 +117,4 @@ public class CommentService {
             throw new SafaError(message);
         }
     }
-
-
 }

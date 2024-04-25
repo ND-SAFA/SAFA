@@ -3,7 +3,6 @@ from tgen.tracing.ranking.clustering_ranking_pipeline import ClusteringRankingPi
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
 from tgen.tracing.ranking.search_pipeline import SearchPipeline
-from tgen.tracing.ranking.test_ranking_pipeline import TestRankingPipeline
 
 
 class SupportedRankingPipelines(SupportedEnum):
@@ -14,4 +13,3 @@ class SupportedRankingPipelines(SupportedEnum):
     EMBEDDING = EmbeddingRankingPipeline
     SEARCH = SearchPipeline
     CLUSTERING = ClusteringRankingPipeline
-    TEST = TestRankingPipeline

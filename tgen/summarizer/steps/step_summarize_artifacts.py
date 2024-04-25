@@ -1,9 +1,6 @@
 from trace import Trace
 from typing import Dict, List, Set, Tuple
 
-from tarjan import tarjan
-from tarjan.tc import tc
-
 from tgen.common.util.dict_util import DictUtil
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
@@ -42,34 +39,16 @@ class StepSummarizeArtifacts(AbstractPipelineStep[SummarizerArgs, SummarizerStat
         :param trace_df: Contains the trace links for the project.
         :return: Mapping of each artifact id to the order it must be summarized in.
         """
-        parent2children = {}
-        artifact_ids = set()
-        for trace in trace_df.get_links(true_only=True):
-            child = trace[TraceKeys.child_label()]
-            parent = trace[TraceKeys.parent_label()]
-            if parent not in parent2children:
-                parent2children[parent] = []
-            parent2children[parent].append(child)
-            artifact_ids.update({parent, child})
-
-        for a_id in artifact_ids:
-            if a_id not in parent2children:
-                parent2children[a_id] = []
-
-        tc_output = tc(parent2children)  # 'SpecObject/SpecObject.ss'
-        tc_order = tarjan(parent2children)
-        artifact2deps = {k: set(v) for k, v in tc_output.items()}
+        possible_links = trace_df.get_links(true_only=True)
+        max_depth = len(possible_links)
+        remaining_artifacts = trace_df.get_artifact_ids(linked_only=True)
         order = {}
-        i = 0
-        while len(artifact2deps) > 0:
-            next_in_batch = set([k for k, v in artifact2deps.items() if len(v) == 0])
-            if len(next_in_batch) == 0:
-                next_in_batch = tc_order[0]
-            order.update({a_id: i for a_id in next_in_batch})
-            artifact2deps = {k: v.difference(next_in_batch) for k, v in artifact2deps.items() if k not in next_in_batch}
-            tc_order = [[a_id for a_id in a_batch if a_id not in next_in_batch] for a_batch in tc_order]
-            tc_order = [a_batch for a_batch in tc_order if len(a_batch) > 0]
-            i += 1
+        for d in range(max_depth):
+            leaves, possible_links = StepSummarizeArtifacts.find_leaves(possible_links, remaining_artifacts)
+            if not leaves:
+                break
+            for leaf in leaves:
+                order[leaf] = d
         return order
 
     @staticmethod

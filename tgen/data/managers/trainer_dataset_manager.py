@@ -111,7 +111,7 @@ class TrainerDatasetManager(BaseObject):
                 datasets = dataset if isinstance(dataset, list) else [dataset]
                 for d in datasets:
                     assert isinstance(d, iDataset), f"Unexpected type of dataset {type(d)}"
-                trainer_dataset_manager[role] = dataset
+                trainer_dataset_manager._datasets[role] = dataset
         return trainer_dataset_manager
 
     @overrides(BaseObject)
@@ -292,8 +292,7 @@ class TrainerDatasetManager(BaseObject):
         :param dataset_role: The role to check a data for.
         :return: Boolean representing whether data exist for role
         """
-        query = self._dataset_creators.get(dataset_role, None) or self._datasets.get(dataset_role, None)
-        return query is not None
+        return self._dataset_creators.get(dataset_role, None) or self._datasets.get(dataset_role, None)
 
     def __repr__(self) -> str:
         """

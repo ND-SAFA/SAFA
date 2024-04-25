@@ -1,8 +1,8 @@
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 
@@ -112,10 +112,7 @@ class DataFrameUtil:
         :return: The column value if exists, otherwise None is returned.
         """
         potential_value = row.get(col_name, default_value)
-        value = DataFrameUtil.get_optional_value(potential_value, allow_empty)
-        if value is None:
-            return value if default_value is None else default_value
-        return value
+        return DataFrameUtil.get_optional_value(potential_value, allow_empty)
 
     @staticmethod
     def get_optional_value(potential_value: Any, allow_empty: bool = True) -> Optional[Any]:

@@ -60,7 +60,7 @@ class TestCommentCrud extends ApplicationBaseTest {
         // Step - Update content of comment.
         CommentUpdateRequestDTO commentUpdateRequest = new CommentUpdateRequestDTO(newContent);
         CommentDTO commentUpdated = SafaRequest
-            .withRoute(AppRoutes.Comments.COMMENT_UPDATE)
+            .withRoute(AppRoutes.Comments.COMMENT_UPDATE_CONTENT)
             .withCustomReplacement("commentId", commentCreated.getId())
             .putWithJsonObject(commentUpdateRequest, CommentDTO.class);
         verifyCommentContent(commentUpdated, newContent, currentUser, projectVersion);

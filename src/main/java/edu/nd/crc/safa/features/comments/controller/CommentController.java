@@ -70,7 +70,7 @@ public class CommentController extends BaseController {
      * @param commentId               ID of comment to update.
      * @return DTO of updated comment.
      */
-    @PutMapping(AppRoutes.Comments.COMMENT_UPDATE)
+    @PutMapping(AppRoutes.Comments.COMMENT_UPDATE_CONTENT)
     public CommentDTO updateCommentContent(@RequestBody CommentUpdateRequestDTO commentUpdateRequestDTO,
                                            @PathVariable UUID commentId) {
         SafaUser currentUser = getCurrentUser();
@@ -91,7 +91,13 @@ public class CommentController extends BaseController {
      */
     @PutMapping(AppRoutes.Comments.COMMENT_RESOLVE)
     public void resolveComment(@PathVariable UUID commentId) {
+        SafaUser currentUser = getCurrentUser();
         CommentService commentService = this.getServiceProvider().getCommentService();
+        Comment comment = commentService.getCommentById(commentId);
+        getResourceBuilder()
+            .withVersion(comment.getVersion())
+            .asUser(currentUser)
+            .withPermission(ProjectPermission.EDIT);
         commentService.resolveComment(commentId);
     }
 

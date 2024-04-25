@@ -37,7 +37,7 @@ public class Comment {
     /**
      * The text of the comment.
      */
-    @Column
+    @Column(columnDefinition = "mediumtext")
     @Lob
     private String content;
     /**
@@ -45,12 +45,14 @@ public class Comment {
      */
     @Column
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     private CommentStatus status;
     /**
      * The type of comment
      */
     @Column
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
     private CommentType type;
     /**
      * Author of comment

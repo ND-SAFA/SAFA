@@ -85,6 +85,17 @@ public class CommentController extends BaseController {
     }
 
     /**
+     * Marks a comment as resolved.
+     *
+     * @param commentId ID of comment to mark as resolved.
+     */
+    @PutMapping(AppRoutes.Comments.COMMENT_RESOLVE)
+    public void resolveComment(@PathVariable UUID commentId) {
+        CommentService commentService = this.getServiceProvider().getCommentService();
+        commentService.resolveComment(commentId);
+    }
+
+    /**
      * Deletes comment with given ID.
      *
      * @param commentId ID of comment to delete.

@@ -21,9 +21,10 @@ import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
-class TestCommentCreate extends ApplicationBaseTest {
+class TestCommentCrud extends ApplicationBaseTest {
 
     /**
      * Creates new comment, updates its content, and finally deletes it.
@@ -66,6 +67,17 @@ class TestCommentCreate extends ApplicationBaseTest {
 
         // Step - Verify one comment exists with new content.
         verifyArtifactComments(artifactCreated.getId(), List.of(newContent));
+
+        // Step - Resolve comment.
+        SafaRequest
+            .withRoute(AppRoutes.Comments.COMMENT_RESOLVE)
+            .withCustomReplacement("commentId", commentCreated.getId())
+            .putWithJsonObject(new JSONObject());
+
+        // Step - Verify resolution in status.
+        ArtifactCommentResponseDTO resolveResponse = verifyArtifactComments(artifactCreated.getId(),
+            List.of(newContent));
+        assertThat(resolveResponse.getComments().get(0).getStatus()).isEqualTo(CommentStatus.RESOLVED);
 
         // Step - delete
         SafaRequest
@@ -116,8 +128,8 @@ class TestCommentCreate extends ApplicationBaseTest {
      * @param commentBodies Expect list of comment bodies in order expected to be found.
      * @throws Exception If error occurs while retrieving comments.
      */
-    private void verifyArtifactComments(UUID artifactId,
-                                        List<String> commentBodies) throws Exception {
+    private ArtifactCommentResponseDTO verifyArtifactComments(UUID artifactId,
+                                                              List<String> commentBodies) throws Exception {
         ArtifactCommentResponseDTO artifactComments = getArtifactComments(artifactId);
         assertThat(artifactComments.getComments().size()).isEqualTo(commentBodies.size());
         assertThat(artifactComments.getFlags().size()).isZero();
@@ -125,6 +137,7 @@ class TestCommentCreate extends ApplicationBaseTest {
         for (int i = 0; i < commentBodies.size(); i++) {
             assertThat(artifactComments.getComments().get(i).getContent()).isEqualTo(commentBodies.get(i));
         }
+        return artifactComments;
     }
 
     /**

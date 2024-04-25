@@ -32,6 +32,7 @@ public class CommentService {
      * @param projectVersion          Project version this comment was created in.
      * @return DTO.
      */
+    @NotNull
     public CommentDTO createConversationComment(CommentCreateRequestDTO commentCreateRequestDTO,
                                                 SafaUser author,
                                                 ProjectVersion projectVersion) {
@@ -58,10 +59,9 @@ public class CommentService {
      * @param content The new content.
      * @return Updated DTO.
      */
+    @NotNull
     public CommentDTO updateCommentContent(SafaUser user, Comment comment, String content) {
-        if (!comment.isAuthor(user)) {
-            throw new SafaError("Only author of comment is able to edit content.");
-        }
+        verifyCommentAuthor(user, comment, "Only author of comment is able to edit content.");
         comment.setContent(content);
         comment = commentRepository.save(comment);
         return CommentDTO.fromComment(comment);
@@ -75,11 +75,19 @@ public class CommentService {
      */
     public void deleteComment(SafaUser user, UUID commentId) {
         Comment comment = getCommentById(commentId);
-
-        if (!comment.isAuthor(user)) {
-            throw new SafaError("Only comment author is able to delete comment.");
-        }
+        verifyCommentAuthor(user, comment, "Only comment author is able to delete comment.");
         commentRepository.delete(comment);
+    }
+
+    /**
+     * Marks comment as resolved.
+     *
+     * @param commentId Id of comment to resolve.
+     */
+    public void resolveComment(UUID commentId) {
+        Comment comment = getCommentById(commentId);
+        comment.setStatus(CommentStatus.RESOLVED);
+        this.commentRepository.save(comment);
     }
 
     /**
@@ -96,4 +104,19 @@ public class CommentService {
         }
         return commentOptional.get();
     }
+
+    /**
+     * Verifies that given user is author of comment.
+     *
+     * @param user    The user to check against author of comment.
+     * @param comment The comment to verify.
+     * @param message The message in error if user is not author.
+     */
+    public void verifyCommentAuthor(SafaUser user, Comment comment, String message) {
+        if (!comment.isAuthor(user)) {
+            throw new SafaError(message);
+        }
+    }
+
+
 }

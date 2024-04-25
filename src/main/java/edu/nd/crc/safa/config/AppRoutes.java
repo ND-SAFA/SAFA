@@ -62,6 +62,7 @@ public class AppRoutes {
     public static class Comments {
         public static final String COMMENT_CREATE = "/comments";
         public static final String COMMENT_GET = "/comments/artifact/{artifactId}";
+        public static final String COMMENT_RESOLVE = "/comments/{commentId}/resolve";
         private static final String BY_ID = "/comments/{commentId}";
         public static final String COMMENT_UPDATE = BY_ID;
         public static final String COMMENT_DELETE = BY_ID;

@@ -73,6 +73,21 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Chat {
+        private static final String ROOT = "/chat";
+        public static final String CHAT_GET = ROOT;
+        public static final String CHAT_CREATE = ROOT;
+        public static final String CHAT_UPDATE = ROOT;
+        private static final String BY_ID = ROOT + "/{chatId}";
+        public static final String CHAT_DELETE = BY_ID;
+
+        public static class Message {
+            public static final String MESSAGE_SEND = BY_ID + "/send";
+            public static final String MESSAGE_GET = BY_ID + "/messages";
+        }
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Delta {
         public static final String CALCULATE_PROJECT_DELTA = Projects.ROOT
             + "/delta/{baselineVersionId}/{targetVersionId}";

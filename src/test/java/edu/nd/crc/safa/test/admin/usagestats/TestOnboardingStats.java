@@ -61,6 +61,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 public class TestOnboardingStats extends AbstractGithubGraphqlTest {
 
+    private final List<UserDef> users = createUsers();
+    private final Map<String, UUID> userProjects = new HashMap<>();
     @Autowired
     private SafaUserService userService;
     @Autowired
@@ -77,21 +79,10 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
     private ProjectService projectService;
     @Autowired
     private ArtifactVersionRepository artifactVersionRepository;
-
     @MockBean
     private GithubConnectionService githubConnectionService;
     @MockBean
     private GenApi genApi;
-
-    @Data
-    @AllArgsConstructor
-    private static class UserDef {
-        private String username;
-        private String password;
-    }
-
-    private final List<UserDef> users = createUsers();
-    private final Map<String, UUID> userProjects = new HashMap<>();
 
     private List<UserDef> createUsers() {
         List<UserDef> users = new ArrayList<>(15);
@@ -117,15 +108,15 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
         }
 
         Mockito.doReturn(new GithubAccessCredentialsDTO())
-                .when(githubConnectionService).useAccessCode(Mockito.anyString());
+            .when(githubConnectionService).useAccessCode(Mockito.anyString());
         Mockito.doReturn(new GithubSelfResponseDTO())
-                .when(githubConnectionService).getSelf(Mockito.any());
+            .when(githubConnectionService).getSelf(Mockito.any());
         Mockito.doAnswer(call -> githubCredentialsRepo.findByUser(call.getArgument(0)))
-                .when(githubConnectionService).getGithubCredentials(Mockito.any());
+            .when(githubConnectionService).getGithubCredentials(Mockito.any());
         Mockito.doAnswer(this::getProjectSummary)
-                .when(genApi).generateProjectSummary(Mockito.any(), Mockito.any());
+            .when(genApi).generateProjectSummary(Mockito.any(), Mockito.any());
         Mockito.doAnswer(this::getHierarchy)
-                .when(genApi).generateHierarchy(Mockito.any(), Mockito.any());
+            .when(genApi).generateHierarchy(Mockito.any(), Mockito.any());
     }
 
     private HGenResponse getHierarchy(InvocationOnMock invocationOnMock) {
@@ -193,7 +184,8 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
     private UserProgressSummaryAppEntity getOnboardingStats() throws Exception {
         rootBuilder.authorize(a -> a.loginDefaultUser(this));
         return SafaRequest.withRoute(AppRoutes.Statistics.ONBOARDING_ALL_USERS)
-                .getAsType(new TypeReference<>(){});
+            .getAsType(new TypeReference<>() {
+            });
     }
 
     private void verifyAccount(int index) {
@@ -202,7 +194,7 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
         EmailVerificationToken token = verificationTokenRepository.findByUserUserId(user.getUserId());
 
         SafaRequest.withRoute(AppRoutes.Accounts.VERIFY_ACCOUNT)
-                .postWithJsonObject(new SafaUserController.AccountVerificationDTO(token.getToken()));
+            .postWithJsonObject(new SafaUserController.AccountVerificationDTO(token.getToken()));
     }
 
     private void removeProperTracking(int index) {
@@ -217,8 +209,8 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
         System.out.println("Connect github " + index);
         becomeUser(index);
         SafaRequest.withRoute(AppRoutes.Github.Credentials.REGISTER)
-                .withPathVariable("accessCode", "token")
-                .postWithoutBody(status().is2xxSuccessful());
+            .withPathVariable("accessCode", "token")
+            .postWithoutBody(status().is2xxSuccessful());
     }
 
     private void importProject(int index) throws IOException {
@@ -232,9 +224,9 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
 
         GithubImportDTO importDTO = new GithubImportDTO();
         JobAppEntity job = SafaRequest.withRoute(AppRoutes.Github.Import.BY_NAME)
-                .withPathVariable("repositoryName", "repo")
-                .withPathVariable("owner", "owner")
-                .postWithJsonObject(importDTO, JobAppEntity.class);
+            .withPathVariable("repositoryName", "repo")
+            .withPathVariable("owner", "owner")
+            .postWithJsonObject(importDTO, JobAppEntity.class);
 
         userProjects.put(users.get(index).getUsername(), job.getProjectId());
     }
@@ -253,16 +245,16 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
 
         List<ArtifactVersion> artifactVersions = artifactVersionRepository.findByProjectVersion(projectVersion);
         List<UUID> artifactIds = artifactVersions.stream()
-                .map(a -> a.getArtifact().getArtifactId())
-                .toList();
+            .map(a -> a.getArtifact().getArtifactId())
+            .toList();
 
         HGenRequest hGenRequest = new HGenRequest();
         hGenRequest.setArtifacts(artifactIds);
         hGenRequest.setTargetTypes(List.of("type1", "type2"));
 
         SafaRequest.withRoute(AppRoutes.HGen.GENERATE)
-                .withVersion(projectVersion)
-                .postWithJsonObject(hGenRequest);
+            .withVersion(projectVersion)
+            .postWithJsonObject(hGenRequest);
 
     }
 
@@ -296,5 +288,12 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
         }
 
         return range;
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class UserDef {
+        private String username;
+        private String password;
     }
 }

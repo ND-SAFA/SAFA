@@ -10,6 +10,8 @@ import edu.nd.crc.safa.features.attributes.services.AttributeValueService;
 import edu.nd.crc.safa.features.billing.services.BillingService;
 import edu.nd.crc.safa.features.billing.services.CostEstimationService;
 import edu.nd.crc.safa.features.billing.services.TransactionService;
+import edu.nd.crc.safa.features.chat.services.ChatMessageService;
+import edu.nd.crc.safa.features.chat.services.ChatService;
 import edu.nd.crc.safa.features.comments.CommentService;
 import edu.nd.crc.safa.features.comments.services.CommentRetrievalService;
 import edu.nd.crc.safa.features.commits.services.CommitService;
@@ -203,6 +205,9 @@ public class ServiceProvider {
     private EmailService emailService;
     // Events
     private ApplicationEventPublisher eventPublisher;
+    //chat
+    private ChatService chatService;
+    private ChatMessageService chatMessageService;
     // Comments
     private CommentService commentService;
     private CommentRetrievalService commentRetrievalService;

@@ -4,47 +4,63 @@
     class="q-pa-sm bg-background"
     style="min-height: inherit"
   >
-    <div style="width: 60vw; position: absolute; top: 12px; left: 20%">
-      <list-item v-for="message in messages" :key="message.id">
-        <flex-box b="1" full-width>
-          <div :class="message.userMessage ? undefined : 'bg-gradient'">
-            <icon
-              :color="message.userMessage ? 'primary' : undefined"
-              :variant="message.userMessage ? 'account' : 'generate'"
-              size="md"
-              class="q-mr-md"
-            />
-          </div>
-          <div class="full-width">
-            <typography
-              variant="subtitle"
-              :value="message.userMessage ? 'Tim' : 'SAFA'"
-            />
-            <typography
-              variant="expandable"
-              :value="message.message"
-              default-expanded
-            />
-            <flex-box>
-              <q-chip
-                v-for="artifactId in message.artifactIds"
-                :key="artifactId"
-                :label="artifactId"
-                class="q-mr-xs"
-                color="primary"
-                clickable
-                outline
-                icon="mdi-clipboard-text"
+    <div
+      style="
+        width: 50vw;
+        position: absolute;
+        top: 12px;
+        left: 25%;
+        max-height: 70vh;
+      "
+      class="overflow-auto"
+    >
+      <div v-if="!chatApiStore.loading">
+        <list-item v-for="message in formattedMessages" :key="message.id">
+          <flex-box b="1" full-width>
+            <div :class="message.iconClass">
+              <icon
+                :color="message.iconColor"
+                :variant="message.iconVariant"
+                size="md"
+                class="q-mr-md"
               />
-            </flex-box>
-          </div>
-        </flex-box>
-      </list-item>
+            </div>
+            <div class="full-width">
+              <typography variant="subtitle" :value="message.userName" />
+              <typography
+                variant="expandable"
+                :value="message.message"
+                default-expanded
+              />
+              <expansion-item
+                v-if="message.artifactIds.length > 0"
+                :label="message.referenceLabel"
+              >
+                <artifact-list-display
+                  :artifacts="message.artifacts"
+                  @click="
+                    (artifact) => selectionStore.selectArtifact(artifact.id)
+                  "
+                />
+              </expansion-item>
+            </div>
+          </flex-box>
+        </list-item>
+      </div>
+      <flex-box
+        v-if="chatApiStore.loading || chatApiStore.loadingResponse"
+        justify="center"
+        t="4"
+        style="height: 40px"
+      >
+        <q-circular-progress color="primary" indeterminate size="md" />
+      </flex-box>
     </div>
-    <div style="width: 60vw; position: absolute; bottom: 12px; left: 20%">
+    <div style="width: 50vw; position: absolute; bottom: 12px; left: 25%">
       <q-input
         v-model="currentMessage"
         outlined
+        :disable="chatApiStore.loading"
         placeholder="Ask a question"
         class="full-width bg-neutral"
         clearable
@@ -72,53 +88,57 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { ProjectChatSchema } from "@/types";
-import { layoutStore } from "@/hooks";
+import { computed, onMounted, ref } from "vue";
+import { ArtifactSchema, IconVariant } from "@/types";
+import {
+  artifactStore,
+  chatApiStore,
+  chatStore,
+  layoutStore,
+  selectionStore,
+  sessionStore,
+} from "@/hooks";
 import {
   IconButton,
   ListItem,
   Typography,
   Icon,
   FlexBox,
+  ExpansionItem,
 } from "@/components/common";
+import { ArtifactListDisplay } from "@/components/artifact";
 
-const EXAMPLE_CHAT: ProjectChatSchema = {
-  id: "1",
-  title: "GLM Coverage",
-  permission: "owner",
-  messages: [
-    {
-      id: "1",
-      userMessage: true,
-      message: "How is the GLM coverage ensured?",
-      artifactIds: [],
-    },
-    {
-      id: "2",
-      userMessage: false,
-      message:
-        "LIRD137 established the first coverage specification for the GLM.\n\n" +
-        "A change request (CCR01543) was issued to update the level two requirement, MRD222.\n\n" +
-        "MRD222 contains three children further refining the coverage requirements:\n" +
-        "MRD1256, MRD1262, MRD1254.",
-      artifactIds: [
-        "LIRD137",
-        "CCR1543",
-        "MRD222",
-        "MRD1256",
-        "MRD1262",
-        "MRD1264",
-      ],
-    },
-  ],
-};
-
-const messages = ref(EXAMPLE_CHAT.messages);
 const currentMessage = ref("");
 
+const messages = computed(() => chatStore.currentMessages);
+
+const formattedMessages = computed(() =>
+  messages.value.map((message) => ({
+    ...message,
+    iconClass: message.userMessage ? undefined : "bg-gradient",
+    iconColor: message.userMessage ? "primary" : undefined,
+    iconVariant: (message.userMessage ? "account" : "generate") as IconVariant,
+    userName: message.userMessage ? sessionStore.userEmail : "SAFA",
+    referenceLabel:
+      message.artifactIds.length === 1
+        ? `1 Reference`
+        : `${message.artifactIds.length} References`,
+    artifacts: message.artifactIds
+      .map(
+        (artifactId) =>
+          artifactStore.getArtifactById(artifactId) ||
+          artifactStore.getArtifactByName(artifactId) // TODO: remove after mockup
+      )
+      .filter((artifact) => !!artifact) as ArtifactSchema[],
+  }))
+);
+
+/**
+ * Sends a chat message to the server.
+ */
 function handleSendMessage() {
-  // TODO
+  chatApiStore.handleSendChatMessage(currentMessage.value);
+  currentMessage.value = "";
 }
 
 /**
@@ -129,4 +149,11 @@ function handleKeydown(e?: { key: string }) {
     handleSendMessage();
   }
 }
+
+/**
+ * Fetches the project chats when opened.
+ */
+onMounted(() => {
+  chatApiStore.handleGetProjectChats();
+});
 </script>

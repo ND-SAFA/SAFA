@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ProjectChatSchema } from "@/types";
+import { ChatMessageSchema, ProjectChatSchema } from "@/types";
 import { removeMatches } from "@/util";
 import { pinia } from "@/plugins";
 
@@ -12,6 +12,14 @@ export const useChat = defineStore("useChat", {
     chats: [] as ProjectChatSchema[],
     currentChat: undefined as ProjectChatSchema | undefined,
   }),
+  getters: {
+    /**
+     * @returns The current chat messages.
+     */
+    currentMessages(): ChatMessageSchema[] {
+      return this.currentChat?.messages || [];
+    },
+  },
   actions: {
     initializeChats(chats: ProjectChatSchema[]): void {
       this.chats = chats;

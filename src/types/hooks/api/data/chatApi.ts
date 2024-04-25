@@ -10,6 +10,10 @@ export interface ChatApiHook {
    */
   loading: ComputedRef<boolean>;
   /**
+   * Whether the chat api is currently loading a response message.
+   */
+  loadingResponse: ComputedRef<boolean>;
+  /**
    * Gets all chats for the current project.
    */
   handleGetProjectChats(): Promise<void>;
@@ -30,6 +34,7 @@ export interface ChatApiHook {
   handleDeleteProjectChat(chatId: string): Promise<void>;
   /**
    * Sends a chat message to the current chat.
+   * @param message - The message to send.
    */
-  handleSendChatMessage(message: ChatMessageSchema): Promise<void>;
+  handleSendChatMessage(message: string): Promise<void>;
 }

@@ -17,8 +17,10 @@ import { pinia } from "@/plugins";
  */
 export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
   const chatApi = useApi("chatApi");
+  const chatDialogApi = useApi("chatDialogApi");
 
   const loading = computed(() => chatApi.loading);
+  const loadingResponse = computed(() => chatDialogApi.loading);
 
   async function handleGetProjectChats() {
     await chatApi.handleRequest(async () => {
@@ -53,25 +55,40 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
     }, {});
   }
 
-  async function handleSendChatMessage(message: ChatMessageSchema) {
-    await chatApi.handleRequest(async () => {
-      if (!chatStore.currentChat) return;
+  async function handleSendChatMessage(message: string) {
+    await chatDialogApi.handleRequest(async () => {
+      const fullMessage = {
+        id: "",
+        userMessage: true,
+        message,
+        artifactIds: [],
+      };
 
-      const createdMessage = await createProjectChatMessage(
-        projectStore.versionId,
-        chatStore.currentChat.id,
-        message
-      );
+      if (!chatStore.currentChat) {
+        await handleCreateProjectChat(fullMessage);
+      } else {
+        chatStore.updateChat({
+          ...chatStore.currentChat,
+          messages: [...chatStore.currentChat.messages, fullMessage],
+        });
 
-      chatStore.updateChat({
-        ...chatStore.currentChat,
-        messages: [...chatStore.currentChat.messages, createdMessage],
-      });
+        const responseMessage = await createProjectChatMessage(
+          projectStore.versionId,
+          chatStore.currentChat.id,
+          fullMessage
+        );
+
+        chatStore.updateChat({
+          ...chatStore.currentChat,
+          messages: [...chatStore.currentChat.messages, responseMessage],
+        });
+      }
     }, {});
   }
 
   return {
     loading,
+    loadingResponse,
     handleGetProjectChats,
     handleGetProjectChat,
     handleCreateProjectChat,

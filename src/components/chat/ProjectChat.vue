@@ -53,7 +53,7 @@
       <q-page class="q-pa-md">
         <div
           v-if="!chatApiStore.loading"
-          style="width: 50vw; max-height: 70vh"
+          style="width: 60vw; max-height: 70vh"
           class="overflow-auto"
         >
           <list-item v-for="message in formattedMessages" :key="message.id">
@@ -76,6 +76,7 @@
                 <expansion-item
                   v-if="message.artifactIds.length > 0"
                   :label="message.referenceLabel"
+                  class="width-fit"
                 >
                   <artifact-list-display
                     :artifacts="message.artifacts"
@@ -96,7 +97,7 @@
         >
           <q-circular-progress color="primary" indeterminate size="md" />
         </flex-box>
-        <div style="width: 50vw; position: absolute; bottom: 12px">
+        <div style="width: 60vw; position: absolute; bottom: 20px">
           <q-input
             v-model="currentMessage"
             outlined

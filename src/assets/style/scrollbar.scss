@@ -12,7 +12,7 @@
 
 *::-webkit-scrollbar-thumb {
   background: $color-border !important;    /* color of the scroll thumb */
-  border-radius: 20px;       /* roundness of the scroll thumb */
+  border-radius: 20px !important;       /* roundness of the scroll thumb */
   border: 3px solid $color-neutral !important;  /* creates padding around scroll thumb */
 
   &:hover {

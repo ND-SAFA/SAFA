@@ -50,13 +50,17 @@
       </list-item>
     </q-drawer>
     <q-page-container>
-      <q-page class="q-pa-md">
+      <q-page>
         <div
           v-if="!chatApiStore.loading"
-          style="width: 60vw; max-height: 70vh"
-          class="overflow-auto"
+          style="max-width: 60vw; max-height: 70vh"
+          class="overflow-auto q-pa-md"
         >
-          <list-item v-for="message in formattedMessages" :key="message.id">
+          <list-item
+            v-for="(message, idx) in formattedMessages"
+            :id="`message-${idx}`"
+            :key="message.id"
+          >
             <flex-box b="1" full-width>
               <div :class="message.iconClass">
                 <icon
@@ -73,18 +77,20 @@
                   :value="message.message"
                   default-expanded
                 />
-                <expansion-item
-                  v-if="message.artifactIds.length > 0"
-                  :label="message.referenceLabel"
-                  class="width-fit"
-                >
-                  <artifact-list-display
-                    :artifacts="message.artifacts"
-                    @click="
-                      (artifact) => selectionStore.selectArtifact(artifact.id)
-                    "
-                  />
-                </expansion-item>
+                <q-card flat bordered class="width-fit">
+                  <expansion-item
+                    v-if="message.artifactIds.length > 0"
+                    :label="message.referenceLabel"
+                    class="width-fit"
+                  >
+                    <artifact-list-display
+                      :artifacts="message.artifacts"
+                      @click="
+                        (artifact) => selectionStore.selectArtifact(artifact.id)
+                      "
+                    />
+                  </expansion-item>
+                </q-card>
               </div>
             </flex-box>
           </list-item>
@@ -97,7 +103,10 @@
         >
           <q-circular-progress color="primary" indeterminate size="md" />
         </flex-box>
-        <div style="width: 60vw; position: absolute; bottom: 20px">
+        <div
+          style="max-width: 60vw; width: 100%; position: absolute; bottom: 20px"
+          class="full-width q-px-md"
+        >
           <q-input
             v-model="currentMessage"
             outlined
@@ -131,7 +140,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { ArtifactSchema, IconVariant } from "@/types";
 import {
   artifactStore,
@@ -204,4 +213,21 @@ function handleKeydown(e?: { key: string }) {
 onMounted(() => {
   chatApiStore.handleGetProjectChats();
 });
+
+/**
+ * Scrolls to the bottom of the chat when a new message is added.
+ */
+watch(
+  () => messages.value,
+  () => {
+    setTimeout(() => {
+      const chat = document.getElementById(
+        "message-" + (messages.value.length - 1)
+      );
+      if (chat) {
+        chat.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  }
+);
 </script>

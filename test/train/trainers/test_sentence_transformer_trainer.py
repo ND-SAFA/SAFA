@@ -7,7 +7,7 @@ import numpy as np
 from tgen.common.constants.hugging_face_constants import POS_LINK, SMALL_EMBEDDING_MODEL
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st_embedding_trainer import STEmbeddingTrainer, STTrainer
-from tgen.core.trainers.st_loss_functions import SupportedMLPLosses
+from tgen.core.trainers.st_loss_functions import SupportedSTLossFunctions
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.model_manager import ModelManager
@@ -39,7 +39,7 @@ class TestSentenceTransformerTrainer(TestCase):
         """
         Tests ability to define loss functions on sentence transformer trainer.
         """
-        for loss_function in SupportedMLPLosses:
+        for loss_function in SupportedSTLossFunctions:
             trainer = self.create_trainer(trainer_args_kwargs={"num_train_epochs": 1, "st_loss_function": loss_function.name})
             training_metrics = trainer.perform_training().metrics
             self.verify_training_metrics(self, training_metrics, 1)

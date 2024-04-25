@@ -7,7 +7,7 @@ from torch import cosine_similarity
 from tgen.common.util.override import overrides
 from tgen.common.util.tf_util import create_loss_function
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.trainers.st_loss_functions import SupportedMLPLosses
+from tgen.core.trainers.st_loss_functions import SupportedSTLossFunctions
 from tgen.core.trainers.st_trainer import STTrainer
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.models.model_manager import ModelManager
@@ -83,4 +83,4 @@ class STEmbeddingTrainer(STTrainer):
         :return: The loss function.
         """
         # using MLP losses because it's assumed that embeddings will always be compared via cosine similarity.
-        return create_loss_function(SupportedMLPLosses, self.trainer_args.st_loss_function, "mse")
+        return create_loss_function(SupportedSTLossFunctions, self.trainer_args.st_loss_function, "mse")

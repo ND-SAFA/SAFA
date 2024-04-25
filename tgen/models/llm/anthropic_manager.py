@@ -114,10 +114,9 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                                                          n_threads=anthropic_constants.ANTHROPIC_MAX_THREADS,
                                                                          max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS,
                                                                          raise_exception=raise_exception,
-                                                                         thread_delay=1)
+                                                                         rpm=anthropic_constants.ANTHROPIC_MAX_RPM)
+        close_client(anthropic_client)
 
-        if hasattr(anthropic_client, "_session"):
-            anthropic_client._session.close()
         self._handle_exceptions(global_state)
         global_responses = global_state.results
         for i, res in enumerate(global_responses):
@@ -200,10 +199,9 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         return log_probs
 
 
-def get_client(refresh: bool = False):
+def get_client():
     """
     Returns the current anthropic client.
-    :param refresh: Whether to re-create client regardless of whether a cached version exists.
     :return:  Returns the singleton anthropic client.
     """
     if environment_constants.IS_TEST:
@@ -211,3 +209,14 @@ def get_client(refresh: bool = False):
     else:
         assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
         return anthropic.Client(ANTHROPIC_KEY)
+
+
+def close_client(anthropic_client: anthropic.Client) -> None:
+    """
+    If anthropic client is given, then protected session is closed.
+    :param anthropic_client: Mock client or anthropic client.
+    :return: None
+    """
+    if hasattr(anthropic_client, "_session"):
+        anthropic_client._session.close()
+        logger.info("Anthropic connection has been closed.")

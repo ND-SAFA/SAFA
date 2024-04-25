@@ -1,5 +1,7 @@
+import gc
 import os
 
+import torch
 from sentence_transformers import SentenceTransformer
 
 from tgen.common.constants import environment_constants
@@ -44,3 +46,5 @@ class ModelCache:
         """
         logger.info("Clearing model cache.")
         ModelCache.MODEL_MAP = {}
+        gc.collect()
+        torch.cuda.empty_cache()

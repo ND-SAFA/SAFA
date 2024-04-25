@@ -1,5 +1,3 @@
-import time
-from queue import Queue
 from typing import Any, Iterable, List, Optional, Set
 
 from tqdm import tqdm
@@ -7,24 +5,26 @@ from tqdm import tqdm
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.constants.threading_constants import THREAD_SLEEP
 from tgen.common.logging.logger_manager import logger
+from tgen.common.threading.rate_limited_queue import RateLimitedQueue
 
 
 class MultiThreadState:
     def __init__(self, iterable: Iterable, title: str, retries: Set, collect_results: bool = False, max_attempts: int = 3,
-                 sleep_time: float = THREAD_SLEEP):
+                 sleep_time_on_error: float = THREAD_SLEEP, rpm: int = None):
         """
-        Creates the state to syncronize a multi-threaded job.
+        Creates the state to synchronize a multi-threaded job.
         :param iterable: List of items to perform work on.
         :param title: The title of the progress bar.
         :param retries: The indices of the iterable to retry.
-        :param collect_results: Whether to collect the resutls of the jobs.
+        :param collect_results: Whether to collect the results of the jobs.
         :param max_attempts: The maximum number of retries after exception is thrown.
-        :param sleep_time: The time to sleep after an exception has been thrown.
+        :param sleep_time_on_error: The time to sleep after an exception has been thrown.
+        :param rpm: Maximum rate of items per minute.
         """
         self.title = title
         self.iterable = list(enumerate(iterable))
         self.result_list = [None] * len(iterable)
-        self.item_queue = Queue()
+        self.item_queue = RateLimitedQueue(rpm)
         self.progress_bar = None
         self.successful: bool = True
         self.exception: Optional[Exception] = None
@@ -32,16 +32,16 @@ class MultiThreadState:
         self.failed_responses: Set[int] = set()
         self.results: Optional[List[Any]] = None
         self.collect_results = collect_results
-        self.sleep_time = sleep_time
+        self.sleep_time_on_error = sleep_time_on_error
         self.max_attempts = max_attempts
         self._init_retries(retries)
         self._init_progress_bar()
 
-    def has_work(self) -> bool:
+    def get_work(self) -> Any:
         """
         :return: Returns whether there is work to be performed and its still valid to do so.
         """
-        return not self.item_queue.empty() and self.successful
+        return self.item_queue.get()
 
     def should_attempt_work(self, attempts: int) -> bool:
         """
@@ -98,14 +98,21 @@ class MultiThreadState:
         """
         self.pause_work = True
         logger.exception(e)
-        logger.info(f"Request failed, retrying in {self.sleep_time} seconds.")
+        logger.info(f"Request failed, retrying in {self.sleep_time_on_error} seconds.")
+
+    def increase_interval(self) -> None:
+        """
+        Increases the interval to wait between items in queue.
+        :return: None
+        """
+        self.item_queue.increment_interval(.1)
 
     def _init_progress_bar(self) -> None:
         """
         Initializes the progress bar for the job.
         :return: None
         """
-        self.progress_bar = tqdm(total=self.item_queue.unfinished_tasks, desc=self.title, ncols=TQDM_NCOLS)
+        self.progress_bar = tqdm(total=len(self.item_queue), desc=self.title, ncols=TQDM_NCOLS)
 
     def _init_retries(self, retries: Set) -> None:
         """

@@ -25,21 +25,10 @@ class NpEncoder(json.JSONEncoder):
             from tgen.data.exporters.api_exporter import ApiExporter
             api_definition = ApiExporter(dataset=obj).export()
             return self.default(api_definition)
-        if isinstance(obj, uuid.UUID):
-            return str(obj)
-        if isinstance(obj, np.integer):
-            return int(obj)
-        if isinstance(obj, np.floating):
-            return float(obj)
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if isinstance(obj, set):
-            return list(obj)
-        if hasattr(obj, "_fields"):
-            instance_fields: Dict = ReflectionUtil.get_fields(obj)
-            return self.default(instance_fields)
-        if isinstance(obj, Enum):
-            return obj.name
+        from transformers.training_args import TrainingArguments
+        if isinstance(obj, TrainingArguments):
+            obj_vars = {k: self.default(v) for k, v in vars(obj.__class__).items() if not k.startswith("_")}
+            return obj_vars
         from tgen.common.util.base_object import BaseObject
         if isinstance(obj, BaseObject):
             obj_fields = ReflectionUtil.get_fields(obj)
@@ -47,14 +36,33 @@ class NpEncoder(json.JSONEncoder):
             for field_name, field_value in obj_fields.items():
                 new_fields[field_name] = self.default(field_value)
             return new_fields
-        if isinstance(obj, list) or isinstance(obj, tuple):
+        if isinstance(obj, uuid.UUID):
+            return str(obj)
+        elif isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, set):
+            return list(obj)
+        elif hasattr(obj, "_fields"):
+            instance_fields: Dict = ReflectionUtil.get_fields(obj)
+            return self.default(instance_fields)
+        elif isinstance(obj, Enum):
+            return obj.name
+        elif isinstance(obj, list) or isinstance(obj, tuple):
             return [self.default(v) for v in obj]
-        if isinstance(obj, dict):
+        elif isinstance(obj, dict):
             value = {self.default(k): self.default(v) for k, v in obj.items()}
             return value
-        if hasattr(obj, "__dict__") and not isinstance(obj, str):
+        elif hasattr(obj, "__dict__") and not isinstance(obj, str):
             instance_fields: Dict = ReflectionUtil.get_fields(obj)
-            return {self.default(k): self.default(v) for k, v in instance_fields.items()}
+            new_dict = {}
+            for k, v in instance_fields.items():
+                new_dict[self.default(k)] = self.default(v)
+            return new_dict
+
         return obj
 
 

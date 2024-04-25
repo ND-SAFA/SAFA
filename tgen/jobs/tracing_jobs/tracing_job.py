@@ -1,10 +1,9 @@
 from typing import Dict, List, Union
 
-from tgen.tracing.ranking.common.ranking_util import RankingUtil
+from tgen.common.objects.trace import Trace
 from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.common.objects.trace import Trace
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
@@ -18,8 +17,9 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
+from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
 
 
 class TracingJob(AbstractJob):
@@ -53,6 +53,7 @@ class TracingJob(AbstractJob):
         """
         trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
         dataset: TraceDataset = trainer_dataset_manager[DatasetRole.EVAL]
+        dataset.artifact_df.drop_large_files()
         prompt_dataset = PromptDataset(trace_dataset=dataset)
 
         prompt_builder = PromptBuilder(prompts=[SupportedPrompts.TGEN_CLASSIFICATION.value])

@@ -187,6 +187,9 @@ ALLOWED_CODE_EXTENSIONS = {
 
     # Zig
     '.zig',
+
+    # Custom,
+    '.ss'  # sub-systems
 }
 CODE_FILENAMES = {"MAKEFILE"}
 CODE_EXTENSIONS = {c.split(os.path.extsep)[-1].upper() for c in ALLOWED_CODE_EXTENSIONS}

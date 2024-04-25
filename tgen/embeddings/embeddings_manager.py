@@ -2,7 +2,7 @@ import logging
 import math
 import os
 import uuid
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -85,7 +85,7 @@ class EmbeddingsManager:
 
         return embedding_map
 
-    def get_embeddings(self, a_ids: List[Any], **kwargs) -> List[EmbeddingType]:
+    def get_embeddings(self, a_ids: Iterable[Any], **kwargs) -> List[EmbeddingType]:
         """
         Gets embeddings for list of artifact ids, creates embeddings if they do not exist yet.
         :param a_ids: Artifact ids whose embeddings are returned.

@@ -205,6 +205,17 @@ class TraceDataFrame(AbstractProjectDataFrame):
         parent_ids = list(query_df[TraceKeys.TARGET.value])
         return parent_ids
 
+    def get_children(self, artifact_id: str) -> List[str]:
+        """
+        Returns the parent artifact ids of given artifact.
+        :param artifact_id: Id of artifact to find parents for.
+        :return: Parent ids of artifact.
+        """
+        query_df = self[(self[TraceKeys.parent_label()] == artifact_id) & (
+                ~self[TraceKeys.SCORE.value].isna() | ~self[TraceKeys.LABEL.value].isna())]
+        child_ids = list(query_df[TraceKeys.SOURCE.value])
+        return child_ids
+
     def get_artifact_ids(self, artifact_role: TraceKeys = None, linked_only: bool = False) -> Set[str]:
         """
         Returns the artifact ids in the trace df.

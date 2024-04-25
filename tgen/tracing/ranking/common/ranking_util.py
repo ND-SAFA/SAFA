@@ -1,7 +1,7 @@
 import json
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
-from typing import Dict, List, Optional, Tuple, Set, Union
 
 from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
 from tgen.common.logging.logger_manager import logger
@@ -149,7 +149,7 @@ class RankingUtil:
                          grouped_links.items()}
         logger.log_title(title)
         for group_key, group_items in grouped_links.items():
-            logger.info(f"{group_key}:{group_items}")
+            logger.info(f"{group_key}:{len(group_items)}")
 
     @staticmethod
     def select_predictions_by_thresholds(trace_predictions: List[Trace], primary_threshold: float,

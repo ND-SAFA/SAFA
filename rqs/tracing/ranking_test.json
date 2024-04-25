@@ -4,8 +4,7 @@
       "jobs": [
         {
           "object_type": "RANKING",
-          "ranking_pipeline": "EMBEDDING",
-          "export_dir": "[OUTPUT_PATH]/embedding/[CURRENT_PROJECT]",
+          "ranking_pipeline": "TEST",
           "generate_explanations": "[GENERATE_EXPLANATIONS_BOOL_OPTIONAL]",
           "dataset_creator": {
             "object_type": "PROMPT",

@@ -231,8 +231,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
                 negative_links[link_id] = trace_df.link_as_dict(source_id=s_id, target_id=t_id, label=0)
 
         all_links = trace_df.to_dict(orient="index")
-        all_links.update(negative_links)
-        logger.info("Adding negative links to trace data frame...")
+        # all_links.update(negative_links)
+        # logger.info("Adding negative links to trace data frame...")
         trace_df = TraceDataFrame.from_dict(all_links, orient="index")
         logger.info("Done.")
         return trace_df

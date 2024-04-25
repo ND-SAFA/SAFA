@@ -109,7 +109,7 @@ public class TraceService implements IAppEntityService<TraceAppEntity> {
     ) {
         List<TraceLinkVersion> traceVersions = this.traceLinkVersionRepository.getTraceVersionsRelatedToArtifacts(
             artifactIds);
-        Map<UUID, List<TraceLinkVersion>> baseEntityTable = ProjectDataStructures.groupEntitiesByProperty(
+        Map<UUID, List<TraceLinkVersion>> baseEntityTable = ProjectDataStructures.createGroupLookup(
             traceVersions,
             TraceLinkVersion::getBaseEntityId
         );

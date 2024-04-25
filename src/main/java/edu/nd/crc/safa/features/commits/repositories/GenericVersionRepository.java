@@ -384,7 +384,7 @@ public abstract class GenericVersionRepository<
 
     private Map<UUID, List<VersionEntity>> groupEntityVersionsByEntityId(ProjectVersion projectVersion) {
         List<VersionEntity> versionEntities = this.retrieveVersionEntitiesByProject(projectVersion.getProject());
-        return ProjectDataStructures.groupEntitiesByProperty(versionEntities, IVersionEntity::getBaseEntityId);
+        return ProjectDataStructures.createGroupLookup(versionEntities, IVersionEntity::getBaseEntityId);
     }
 
     private VersionEntity instantiateVersionEntityFromAppEntity(ProjectVersion projectVersion,

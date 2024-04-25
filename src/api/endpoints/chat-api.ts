@@ -17,7 +17,7 @@ const EXAMPLE_PROJECT_CHAT: ProjectChatSchema = {
 };
 
 const EXAMPLE_NASA_CHAT: ProjectChatSchema = {
-  id: "1",
+  id: "2",
   title: "GLM Coverage",
   permission: "owner",
   messages: [
@@ -58,7 +58,11 @@ export async function createProjectChat(
   message: ChatMessageSchema
 ): Promise<ProjectChatSchema> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
-    return EXAMPLE_PROJECT_CHAT;
+    return {
+      ...EXAMPLE_PROJECT_CHAT,
+      id: Math.random().toString(),
+      messages: [message],
+    };
   }
   return buildRequest<ProjectChatSchema, "versionId", ChatMessageSchema>(
     "createChat",

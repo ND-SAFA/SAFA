@@ -1,81 +1,123 @@
 <template>
-  <div
+  <q-layout
     v-if="layoutStore.isChatMode"
-    class="q-pa-sm bg-background"
+    container
+    view="lHh Lpr lff"
     style="min-height: inherit"
+    class="bg-background"
   >
-    <div
-      style="
-        width: 50vw;
-        position: absolute;
-        top: 12px;
-        left: 25%;
-        max-height: 70vh;
-      "
-      class="overflow-auto"
+    <q-drawer
+      model-value
+      persistent
+      bordered
+      :breakpoint="0"
+      :width="260"
+      class="bg-background"
     >
-      <div v-if="!chatApiStore.loading">
-        <list-item v-for="message in formattedMessages" :key="message.id">
-          <flex-box b="1" full-width>
-            <div :class="message.iconClass">
-              <icon
-                :color="message.iconColor"
-                :variant="message.iconVariant"
-                size="md"
-                class="q-mr-md"
-              />
-            </div>
-            <div class="full-width">
-              <typography variant="subtitle" :value="message.userName" />
-              <typography
-                variant="expandable"
-                :value="message.message"
-                default-expanded
-              />
-              <expansion-item
-                v-if="message.artifactIds.length > 0"
-                :label="message.referenceLabel"
-              >
-                <artifact-list-display
-                  :artifacts="message.artifacts"
-                  @click="
-                    (artifact) => selectionStore.selectArtifact(artifact.id)
-                  "
-                />
-              </expansion-item>
-            </div>
-          </flex-box>
-        </list-item>
-      </div>
       <flex-box
-        v-if="chatApiStore.loading || chatApiStore.loadingResponse"
-        justify="center"
-        t="4"
-        style="height: 40px"
+        full-width
+        justify="between"
+        align="center"
+        t="1"
+        class="q-pa-sm"
       >
-        <q-circular-progress color="primary" indeterminate size="md" />
+        <typography variant="subtitle" value="Chats" />
+        <text-button
+          text
+          label="Create"
+          icon="add"
+          data-cy="button-add-attribute"
+          @click="handleCreateChat"
+        />
       </flex-box>
-    </div>
-    <div style="width: 50vw; position: absolute; bottom: 12px; left: 25%">
-      <q-input
-        v-model="currentMessage"
-        outlined
-        :disable="chatApiStore.loading"
-        placeholder="Ask a question"
-        class="full-width bg-neutral"
-        clearable
-        @keydown="handleKeydown"
+      <list-item
+        v-for="chat in chatStore.chats"
+        :key="chat.id"
+        :title="chat.title"
+        clickable
+        :focused="chatStore.currentChat?.id === chat.id"
+        :action-cols="1"
+        @click="chatStore.switchChat(chat)"
       >
-        <template #append>
+        <template #actions>
           <icon-button
-            icon="forward"
-            tooltip="Send message"
-            @click="handleSendMessage"
+            small
+            icon="delete"
+            tooltip="Delete chat"
+            @click="chatApiStore.handleDeleteProjectChat(chat.id)"
           />
         </template>
-      </q-input>
-    </div>
-  </div>
+      </list-item>
+    </q-drawer>
+    <q-page-container>
+      <q-page class="q-pa-md">
+        <div
+          v-if="!chatApiStore.loading"
+          style="width: 50vw; max-height: 70vh"
+          class="overflow-auto"
+        >
+          <list-item v-for="message in formattedMessages" :key="message.id">
+            <flex-box b="1" full-width>
+              <div :class="message.iconClass">
+                <icon
+                  :color="message.iconColor"
+                  :variant="message.iconVariant"
+                  size="md"
+                  class="q-mr-md"
+                />
+              </div>
+              <div class="full-width">
+                <typography variant="subtitle" :value="message.userName" />
+                <typography
+                  variant="expandable"
+                  :value="message.message"
+                  default-expanded
+                />
+                <expansion-item
+                  v-if="message.artifactIds.length > 0"
+                  :label="message.referenceLabel"
+                >
+                  <artifact-list-display
+                    :artifacts="message.artifacts"
+                    @click="
+                      (artifact) => selectionStore.selectArtifact(artifact.id)
+                    "
+                  />
+                </expansion-item>
+              </div>
+            </flex-box>
+          </list-item>
+        </div>
+        <flex-box
+          v-if="chatApiStore.loading || chatApiStore.loadingResponse"
+          justify="center"
+          t="4"
+          style="height: 40px"
+        >
+          <q-circular-progress color="primary" indeterminate size="md" />
+        </flex-box>
+        <div style="width: 50vw; position: absolute; bottom: 12px">
+          <q-input
+            v-model="currentMessage"
+            outlined
+            :disable="chatApiStore.loading"
+            placeholder="Ask a question"
+            class="full-width bg-neutral"
+            clearable
+            @keydown="handleKeydown"
+          >
+            <template #append>
+              <icon-button
+                icon="forward"
+                tooltip="Send message"
+                @click="handleSendMessage"
+              />
+            </template>
+          </q-input>
+        </div>
+      </q-page>
+    </q-page-container>
+  </q-layout>
 </template>
 
 <script lang="ts">
@@ -105,6 +147,7 @@ import {
   Icon,
   FlexBox,
   ExpansionItem,
+  TextButton,
 } from "@/components/common";
 import { ArtifactListDisplay } from "@/components/artifact";
 
@@ -139,6 +182,10 @@ const formattedMessages = computed(() =>
 function handleSendMessage() {
   chatApiStore.handleSendChatMessage(currentMessage.value);
   currentMessage.value = "";
+}
+
+function handleCreateChat() {
+  chatStore.currentChat = undefined;
 }
 
 /**

@@ -29,8 +29,10 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class CommentRetrievalService {
-    private static final Set<CommentType> TEXT_TYPES = Set.of(CommentType.CONVERSATION, CommentType.FLAG, CommentType.SUGGESTION);
-    private static final Set<CommentType> CONCEPT_TYPES = Set.of(CommentType.MATCHED_CONCEPT, CommentType.UNKNOWN_CONCEPT);
+    private static final Set<CommentType> TEXT_TYPES = Set.of(CommentType.CONVERSATION,
+        CommentType.FLAG, CommentType.SUGGESTION);
+    private static final Set<CommentType> CONCEPT_TYPES = Set.of(CommentType.MATCHED_CONCEPT,
+        CommentType.UNKNOWN_CONCEPT);
     private static final Set<CommentType> ARTIFACT_TYPES = Set.of(CommentType.CONTRADICTION);
     private static final Set<CommentType> MULTI_CONCEPT_TYPES = Set.of(CommentType.MULTI_MATCHED_CONCEPT);
 

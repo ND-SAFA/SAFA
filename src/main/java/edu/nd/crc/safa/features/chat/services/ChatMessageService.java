@@ -74,7 +74,7 @@ public class ChatMessageService {
         List<ChatMessage> chatMessages = chatMessageRepository.findByChatOrderByCreatedAsc(chat);
         List<ChatMessageDTO> chatMessageDTOS = new ArrayList<>();
         Map<UUID, List<ChatMessageArtifact>> message2artifacts = ProjectDataStructures
-            .groupEntitiesByProperty(chatMessageArtifacts, c -> c.getMessage().getId());
+            .createGroupLookup(chatMessageArtifacts, c -> c.getMessage().getId());
         for (ChatMessage chatMessage : chatMessages) {
             List<ChatMessageArtifact> messageArtifacts = message2artifacts.getOrDefault(chatMessage.getId(),
                 new ArrayList<>());
@@ -104,7 +104,7 @@ public class ChatMessageService {
         List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
             .retrieveVersionEntitiesByProjectVersion(projectVersion);
         artifactService.versionToAppEntity(artifactVersions);
-        Map<String, List<ArtifactVersion>> artifactId2version = ProjectDataStructures.groupEntitiesByProperty(
+        Map<String, ArtifactVersion> artifactId2version = ProjectDataStructures.createEntityLookup(
             artifactVersions, ArtifactVersion::getName);
 
         List<GenerationArtifact> genArtifacts = artifactVersions
@@ -122,7 +122,7 @@ public class ChatMessageService {
             .map(artifactName -> {
                 ChatMessageArtifact chatMessageArtifact = new ChatMessageArtifact();
                 chatMessageArtifact.setMessage(finalResponseMessage);
-                Artifact artifact = artifactId2version.get(artifactName).get(0).getArtifact();
+                Artifact artifact = artifactId2version.get(artifactName).getArtifact();
                 chatMessageArtifact.setArtifact(artifact);
                 return chatMessageArtifact;
             }).toList();

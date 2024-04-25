@@ -16,7 +16,7 @@ from tgen.common.util.file_util import FileUtil
 
 NodeType = AST
 EXCLUDES = ["tgen/tgen/testres", "tgen/test"]
-DIRECTORY_PATHS = [os.path.join(ROOT_PATH, "tgen")]
+DEFAULT_TGEN_PATH = os.path.join(ROOT_PATH, "tgen")
 IGNORED_PARAM_NAMES = ["self", "cls", "_"]
 DEFAULT_COMPLEXITY_THRESHOLD = 7
 
@@ -132,13 +132,17 @@ class FileNode:
         return errors
 
 
-def print_missing_headers(throw_error: bool = False) -> None:
+def print_missing_headers(paths: List[str] = None, throw_error: bool = False) -> None:
     """
     Finds all functions and methods not containing a doc-string.
+    :param paths: List of paths to check for missing docs.
     :param throw_error: Whether to throw error if invalid functions/methods found.
     :return: None
     """
-    for directory_path in DIRECTORY_PATHS:
+    if paths is None or len(paths) == 0:
+        paths = [DEFAULT_TGEN_PATH]
+        
+    for directory_path in paths:
         errors = calculate_missing_doc_map(directory_path)
 
     if len(errors) > 0:
@@ -226,16 +230,20 @@ def get_link(file_path: str, line_number):
     return display_path
 
 
-def print_complex_functions(threshold: int = DEFAULT_COMPLEXITY_THRESHOLD):
+def print_complex_functions(paths: List[str] = None, threshold: int = DEFAULT_COMPLEXITY_THRESHOLD):
     """
     Prints the complexity of functions exceed complexity threshold.
+    :param paths: List of paths to check for complex functions.
     :param threshold: The threshold of the complexity to filter by.
     :return: None.
     """
-    files = [f for directory_path in DIRECTORY_PATHS for f in FileUtil.get_all_paths(directory_path) if filter_files(f)]
+    if paths is None or len(paths) == 0:
+        paths = [DEFAULT_TGEN_PATH]
+    files = [f for directory_path in paths for f in FileUtil.get_all_paths(directory_path) if filter_files(f)]
     for file in files:
         get_module_complexity(file, threshold=threshold)
 
 
 if __name__ == "__main__":
-    print_missing_headers(throw_error=True)
+    direction_paths = sys.argv[1:]
+    print_missing_headers(direction_paths)

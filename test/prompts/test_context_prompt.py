@@ -1,13 +1,7 @@
 from copy import deepcopy
-from unittest import mock
-from unittest.mock import MagicMock
 
-import numpy as np
-
-from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.testres.base_tests.base_test import BaseTest

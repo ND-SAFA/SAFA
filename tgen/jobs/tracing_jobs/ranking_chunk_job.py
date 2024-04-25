@@ -1,9 +1,11 @@
 import json
 from copy import deepcopy
-from typing import Any, Dict, Tuple, Union
+from typing import Dict, Union, List
 
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
+from tgen.common.util.file_util import FileUtil
 from tgen.common.util.status import Status
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
@@ -13,6 +15,7 @@ from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
+from tgen.relationship_manager.supported_relationship_managers import SupportedRelationshipManager
 from tgen.tracing.ranking.filters.supported_filters import SupportedFilter
 from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
@@ -27,7 +30,8 @@ class RankingChunkJob(AbstractJob):
     MIN_THRESHOLD = 0.85
 
     def __init__(self, dataset_creator: PromptDatasetCreator = None, dataset: PromptDataset = None,
-                 layer_ids: Tuple[str, str] = None, **kwargs):
+                 layer_ids: List[str] = None,
+                 relationship_manager_type: SupportedRelationshipManager = SupportedRelationshipManager.EMBEDDING, **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
         :param dataset_creator: Creates the dataset to rank.
@@ -41,6 +45,7 @@ class RankingChunkJob(AbstractJob):
         self.dataset: PromptDataset = dataset
         self.layer_ids = layer_ids
         self.ranking_kwargs = kwargs
+        self.relationship_manager_type = relationship_manager_type
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
         """
@@ -49,12 +54,28 @@ class RankingChunkJob(AbstractJob):
         :return:
         """
         # ORIGINAL RANKING JOB
-        base_ranking_job, base_ranking_kwargs, base_results = self._perform_base_ranking()
-        chunk_ranking_kwargs = DictUtil.update_kwarg_values(base_ranking_kwargs, filter=SupportedFilter.SIMILARITY_THRESHOLD)
-        chunk_results = self._perform_chunk_ranking(base_ranking_job.embedding_manager, chunk_ranking_kwargs)
+        logger.log_with_title("Starting regular ranking job.")
+        export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
+        base_export_dir = FileUtil.safely_join_paths(export_dir, "base")
+        base_ranking_kwargs = DictUtil.update_kwarg_values(
+            self.ranking_kwargs, selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD_SCALED,
+            link_threshold=RankingChunkJob.MIN_THRESHOLD, export_dir=base_export_dir)
+        base_ranking_job = self.create_ranking_job(relationship_manager=self.relationship_manager_type.value(),
+                                                   **base_ranking_kwargs)
+        base_results = base_ranking_job.run()
+
+        chunk_export_dir = FileUtil.safely_join_paths(export_dir, "chunks")
+        with_filter_kwargs = DictUtil.update_kwarg_values(base_ranking_kwargs, filter=SupportedFilter.SIMILARITY_THRESHOLD,
+                                                          export_dir=chunk_export_dir)
+
+        # RANKING WITH CHUNKS
+        logger.log_with_title("Starting ranking job with Chunks.")
+        chunk_ranking_job = self.create_ranking_job(use_chunks=True, relationship_manager=base_ranking_job.relationship_manager,
+                                                    **with_filter_kwargs)
+        chunk_results: JobResult = chunk_ranking_job.run()
 
         # TODO clean this up once we stop experimenting
-        job_results = {"Base": base_results, "Chunks": chunk_results}
+        job_results = {"Chunks": chunk_results, "Base": base_results}
 
         self._display_results(job_results)
 

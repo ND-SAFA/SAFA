@@ -57,14 +57,27 @@ class CalculateCompositeScoreStep(AbstractPipelineStep[RankingArgs, RankingState
                                      if entry[TraceKeys.child_label()] in id2text_scores}
             # Question: are the scores different trace traces to those in parent2traces?
             parent_composite_scores = {}
-            for c_id, chunk_scores in id2chunk_scores.items():
-                child_scores = {CompositeScoreComponent.FULL_TEXT: a_id2full_text_scores[c_id],
-                                # Question: id2text_scores is used to filters keys so isn't it the same/
-                                CompositeScoreComponent.FULL_TEXT_FILTERED: id2text_scores[c_id],
+            for c_id, full_text_score in a_id2full_text_scores.items():
+                full_text_score_filtered = a_id2full_text_scores_filtered[c_id]
+                chunk_scores = a_id2chunk_scores.get(c_id, [full_text_score])
+                child_scores = {CompositeScoreComponent.FULL_TEXT: full_text_score,
+                                CompositeScoreComponent.FULL_TEXT_FILTERED: full_text_score_filtered,
                                 CompositeScoreComponent.MAX_CHUNK: max(chunk_scores)}
 
-                composite_score = CalculateCompositeScoreStep.calculate_composite_score(child_scores, chunk_scores, weights)
-                parent_composite_scores[c_id] = composite_score
+                # No chunks selected but the full text was
+                if not child_scores[CompositeScoreComponent.MAX_CHUNK] and child_scores[CompositeScoreComponent.FULL_TEXT_FILTERED]:
+                    child_scores[CompositeScoreComponent.MAX_CHUNK] = child_scores[CompositeScoreComponent.FULL_TEXT]
+                composite_score = sum([child_scores[e] * weights.get(e, 0) for e in CompositeScoreComponent if e in child_scores])
+
+                regular_vote = int(child_scores[CompositeScoreComponent.FULL_TEXT_FILTERED] is 0)
+                if c_id in a_id2chunk_scores:
+                    votes = 1 - ((chunk_scores.count(0) + regular_vote) / (len(chunk_scores) + 1))  # number of chunks above 0
+
+                else:
+                    votes = 1 - regular_vote  # no chunks so only use regular text
+                votes = MathUtil.convert_to_new_range(votes, (0, 1), (composite_score, 1))  # scale so only helps the composite score
+
+                parent_composite_scores[c_id] = composite_score + votes * weights[CompositeScoreComponent.CHUNK_VOTES]
             composite_scores[p_id] = list(parent_composite_scores.keys()), list(parent_composite_scores.values())
         return composite_scores
 

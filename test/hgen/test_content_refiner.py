@@ -4,10 +4,10 @@ from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MOD
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.common.content_refiner import ContentRefiner
 from tgen.hgen.common.duplicate_detector import DuplicateType
 from tgen.hgen.hgen_state import HGenState
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.testres.base_tests.base_test import BaseTest
 
 

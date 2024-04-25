@@ -1,6 +1,6 @@
 from tgen.clustering.base.cluster import Cluster
 from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.tracing.ranking.sorters.cluster_children_sorter import ClusterChildrenSorter
 

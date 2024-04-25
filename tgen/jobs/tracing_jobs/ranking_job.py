@@ -19,9 +19,10 @@ from tgen.data.exporters.safa_exporter import SafaExporter
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
+from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
+from tgen.relationship_manager.supported_relationship_managers import SupportedRelationshipManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
@@ -37,9 +38,10 @@ class RankingJob(AbstractJob):
     """
 
     def __init__(self, dataset_creator: PromptDatasetCreator = None, dataset: PromptDataset = None,
-                 ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM, layer_ids: Tuple[str, str] = None,
+                 ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM, layer_ids: List[str] = None,
                  select_top_predictions: bool = DEFAULT_SELECT_TOP_PREDICTIONS, log_results: bool = True,
-                 embeddings_manager: EmbeddingsManager = None,
+                 relationship_manager: AbstractRelationshipManager = None,
+                 relationship_manager_type: SupportedRelationshipManager = SupportedRelationshipManager.EMBEDDING,
                  **kwargs):
         """
         Uses dataset defined by role to sort and rank with big claude.
@@ -50,7 +52,7 @@ class RankingJob(AbstractJob):
         :param layer_ids: The layers to rank between.
         :param log_results: If True and true links are given, logs the results to the console.
         :param ranking_pipeline: The pipeline used to rank children to each parent.
-        :param embeddings_manager: If provided, will be used in the sorting step if using an embedding sorter
+        :param relationship_manager: If provided, will be used in the sorting step if using an embedding sorter
         """
         super().__init__()
         self.dataset_creator = dataset_creator
@@ -60,7 +62,8 @@ class RankingJob(AbstractJob):
         self.layer_ids = layer_ids
         self.ranking_kwargs = kwargs
         self.log_results = log_results
-        self.embedding_manager = embeddings_manager
+        self.relationship_manager = relationship_manager
+        self.relationship_manager_type = relationship_manager_type
         assert self.dataset.trace_dataset is not None or self.layer_ids, "Must specify parent-child layers or provide trace dataset"
 
     def _run(self, **kwargs) -> Union[Dict, AbstractTraceOutput]:
@@ -93,25 +96,33 @@ class RankingJob(AbstractJob):
         parent_type, child_type = types_to_trace
         parent_ids = list(dataset.artifact_df.get_artifacts_by_type(parent_type).index)
         children_ids = list(dataset.artifact_df.get_artifacts_by_type(child_type).index)
+        assert parent_ids and children_ids, f"Found {len(parent_ids)} parents and {len(children_ids)} children. " \
+                                            f"Expected at least one parent and child."
 
         if not self.select_top_predictions:
             DictUtil.update_kwarg_values(self.ranking_kwargs, selection_method=None)
         export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
         if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
             export_dir = FileUtil.safely_join_paths(export_dir, RankingJob._get_run_dir(child_type, parent_type))
-        layer_dataset = PromptDataset(artifact_df=selected_artifacts, project_summary=self.dataset.project_summary)
+        layer_dataset = PromptDataset(artifact_df=selected_artifacts, trace_dataset=dataset.trace_dataset,
+                                      project_summary=self.dataset.project_summary)
+        if not self.relationship_manager and self.relationship_manager_type:
+            model_name = DictUtil.get_kwarg_values(self.ranking_kwargs, model_name=None)
+            kwargs = DictUtil.update_kwarg_values({}, model_name=model_name) if model_name else {}
+            self.relationship_manager = self.relationship_manager_type.value(**kwargs)
         pipeline_args = RankingArgs(dataset=layer_dataset,
                                     parent_ids=parent_ids,
                                     children_ids=children_ids,
                                     export_dir=export_dir,
                                     types_to_trace=types_to_trace,
-                                    embeddings_manager=self.embedding_manager,
+                                    relationship_manager=self.relationship_manager,
+                                    re_rank_children=True,
                                     **self.ranking_kwargs)
         logger.info(f"Starting to trace: {pipeline_args.run_name}")
 
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         pipeline.run()
-        self.embedding_manager = pipeline.state.embedding_manager
+        self.relationship_manager = pipeline.state.relationship_manager
         selected_entries = pipeline.state.get_current_entries()
         scores = {TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET]): entry[TraceKeys.SCORE]
                   for entry in pipeline.state.candidate_entries}

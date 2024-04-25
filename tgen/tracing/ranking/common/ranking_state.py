@@ -5,8 +5,8 @@ from typing import Dict, List, Optional, Union
 
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.state import State
+from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
@@ -17,7 +17,7 @@ class RankingState(State):
 
     # sorting
     sorted_parent2children: Optional[Dict[str, List[EnumDict]]] = None
-    embedding_manager: EmbeddingsManager = None
+    relationship_manager: AbstractRelationshipManager = None
 
     # filtering
     filtered_parent2children: Optional[Dict[str, List[EnumDict]]] = None

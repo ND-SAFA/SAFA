@@ -206,6 +206,7 @@ class ContentGenerator:
                 if cluster2artifacts else set(self.state.source_dataset.artifact_df.index)
             task_prompt.response_manager = PromptResponseManager(
                 response_instructions_format=response_instructions_format,
+                optional_tag_ids={self.SOURCE_TAG_ID},
                 expected_responses={self.SOURCE_TAG_ID: sources},
                 id2tag={self.TARGET_TAG_ID: target_type_tag},
                 response_tag={target_type_tag: [self.SOURCE_TAG_ID]},

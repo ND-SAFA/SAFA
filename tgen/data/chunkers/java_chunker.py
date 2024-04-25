@@ -101,7 +101,8 @@ class JavaChunker(AbstractCodeChunker):
             return []
 
     @staticmethod
-    def _filter_irrelevant_children(parent_java_node: javatree.Node, all_children: List[javatree.Node]) -> List[javatree.Node]:
+    def _filter_irrelevant_children(parent_java_node: javatree.Node, all_children: List[javatree.Node]) -> List[
+        javatree.Node]:
         """
         Removes all the children that don't represent chunked nodes that are included in the javalang parser for unknown reasons
         :param parent_java_node: The parent node

@@ -2,6 +2,7 @@ import os.path
 from typing import List
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.param_specs import ParamSpecs
@@ -16,12 +17,14 @@ from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 
 class MultiLayerHGenJob(AbstractJob):
 
-    def __init__(self, starting_hgen_job: BaseHGenJob, target_types: List[str] = None, job_args: JobArgs = None):
+    def __init__(self, starting_hgen_job: BaseHGenJob, target_types: List[str] = None, job_args: JobArgs = None,
+                 save_on_failure_path: str = None):
         """
         Initializes the job with args needed for hierarchy generator
         :param starting_hgen_job: The initial hgen job to run to get the first layer of artifacts
         :param target_types: The list of target types going up the hierarchy
         :param job_args: The arguments need for the job
+        :param save_on_failure_path: Path to save state if failure occurs.
         """
         if target_types is None:
             target_types = []
@@ -30,6 +33,7 @@ class MultiLayerHGenJob(AbstractJob):
             # target types should not include start target type
             target_types.pop(0)
         self.target_types = target_types
+        self.save_on_failure_path = save_on_failure_path
         super().__init__(job_args)
 
     def _run(self) -> TraceDataset:
@@ -37,21 +41,35 @@ class MultiLayerHGenJob(AbstractJob):
         Runs all the hgen jobs, slowly progressing up the hierarchy
         :return: The final dataset created by the top level hgen job
         """
-        current_hgen_job = self.starting_hgen_job
-        current_hgen_job.result.experimental_vars = {"target_type": current_hgen_job.get_hgen_args().target_type}
+        self.starting_hgen_job.result.experimental_vars = {"target_type": self.starting_hgen_job.get_hgen_args().target_type}
 
         last_index = len(self.target_types) - 1
         add_seeds_as_artifacts = self.starting_hgen_job.hgen_args.add_seeds_as_artifacts
-        for i, next_target_type in enumerate(self.target_types):
-            if i == last_index:
-                current_hgen_job.hgen_args.add_seeds_as_artifacts = add_seeds_as_artifacts
+
+        global_target_types = [None, *self.target_types]
+        res_body = None
+        current_job = None
+        for i, target_type in enumerate(global_target_types):
+            if i == 0:
+                assert target_type is None
+                current_job = self.starting_hgen_job
             else:
-                current_hgen_job.hgen_args.add_seeds_as_artifacts = False
-            res = current_hgen_job.run()
+                current_job.hgen_args.add_seeds_as_artifacts = add_seeds_as_artifacts if i == last_index else False
+                target_type = global_target_types[i]
+                current_job = self.get_next_hgen_job(current_job, target_type)
+
+            res = current_job.run()
+            res_body = res.body
             if res.status != Status.SUCCESS:
+                if self.save_on_failure_path:
+                    current_job.hgen.state.export_dir = self.save_on_failure_path
+                    current_job.hgen.state.save(res.status.name.lower())
+                    logger.info(f"Saved state to:{self.save_on_failure_path}")
                 raise Exception(res.body)
-            current_hgen_job = self.get_next_hgen_job(current_hgen_job, next_target_type)
-        return current_hgen_job.run().body
+
+        if res_body is None:
+            raise Exception(f"Expected res body to not be none")
+        return res_body
 
     @staticmethod
     def get_next_hgen_job(current_hgen_job: BaseHGenJob, next_target_type: str) -> BaseHGenJob:

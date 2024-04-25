@@ -1,4 +1,3 @@
-import time
 from typing import Callable, List, Set
 
 from tgen.common.constants.threading_constants import THREAD_SLEEP
@@ -13,8 +12,8 @@ class ThreadUtil:
 
     @staticmethod
     def multi_thread_process(title: str, iterable: List, thread_work: Callable, n_threads: int, max_attempts: int = 1,
-                             collect_results: bool = False, thread_sleep: float = THREAD_SLEEP, thread_delay: float = None,
-                             retries: Set = None, raise_exception: bool = True) -> MultiThreadState:
+                             collect_results: bool = False, thread_sleep: float = THREAD_SLEEP,
+                             retries: Set = None, raise_exception: bool = True, rpm: int = None) -> MultiThreadState:
         """
         Performs distributed work over threads.
         :param title: The title of the work being done, used for logging.
@@ -24,22 +23,22 @@ class ThreadUtil:
         :param max_attempts: The maximum number of attempts before stopping thread entirely.
         :param collect_results: Whether to collect the output of each thread
         :param thread_sleep: The amount of time to sleep after an error occurs.
-        :param thread_delay: How much to delay the start of the thread
         :param retries: List of indices to retry if they failed initially.
         :param raise_exception: Throws an exception if one of the threads fails.
+        :param rpm: Maximum requests per minutes allowed.
         :return: None
         """
 
         global_state: MultiThreadState = MultiThreadState(iterable, title=title, retries=retries,
                                                           max_attempts=max_attempts, collect_results=collect_results,
-                                                          sleep_time=thread_sleep)
+                                                          sleep_time_on_error=thread_sleep, rpm=rpm)
 
         threads = []
         for i in range(n_threads):
-            t1 = ChildThread(global_state, thread_work, start_delay=thread_delay)
+            t1 = ChildThread(global_state, thread_work)
             threads.append(t1)
             t1.start()
-            time.sleep(thread_delay)  # also delay start of threads
+
         for t in threads:
             t.join()
 

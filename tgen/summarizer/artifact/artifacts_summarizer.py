@@ -1,5 +1,5 @@
 import uuid
-from typing import Dict, List, Optional, Set, Tuple, Union, Any
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import pandas as pd
 
@@ -14,7 +14,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.unique_id_manager import DeterministicUniqueIDManager
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.keys.structure_keys import StructuredKeys, ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
@@ -25,6 +25,7 @@ from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX, \
     NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX
 from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
+from tgen.summarizer.summarizer_util import SummarizerUtil
 from tgen.summarizer.summary import Summary
 
 
@@ -90,7 +91,7 @@ class ArtifactsSummarizer(BaseObject):
         indices2summarize = set()
         for i, artifact_info in enumerate(zip(bodies, ids)):
             content, a_id = artifact_info
-            if self.should_summarize(a_id=a_id):
+            if self.should_summarize(a_id=a_id, a_body=content):
                 order = summary_order.get(a_id, 0)
                 DictUtil.set_or_append_item(order2indices, order, i)
                 indices2summarize.add(i)
@@ -116,7 +117,7 @@ class ArtifactsSummarizer(BaseObject):
         :param a_id: The filename to use to determine if content is code or not
         :return: The summarization
         """
-        if not self.should_summarize(a_id):
+        if not self.should_summarize(a_id, a_body=content):
             return content
         prompt = self._create_prompt(content, a_id)
         summary = self._summarize(self.llm_manager, prompt)
@@ -145,13 +146,18 @@ class ArtifactsSummarizer(BaseObject):
         summaries = self.summarize_bulk(list(df[col2summarize]), filenames, use_content_if_unsummarized=False)
         return summaries
 
-    def should_summarize(self, a_id: str) -> bool:
+    def should_summarize(self, a_id: str, a_body: str) -> bool:
         """
         True if the artifact should be summarized else False.
         :param a_id: The artifact id.
+        :param a_body: The body of the artifact to summarize.
         :return: True if the artifact should be summarized else False.
         """
-        if self.code_or_above_limit_only and not FileUtil.is_code(a_id):
+        if self.code_or_above_limit_only:
+            if FileUtil.is_code(a_id):
+                return True
+            if SummarizerUtil.is_above_limit(a_body):
+                return True
             return False  # skip summarizing content below token limit unless code
         else:
             return True

@@ -2,20 +2,20 @@ import html
 import logging
 import os
 import re
-from typing import Dict, List, Set, Union, Optional, Tuple, Any
+from typing import Any, Dict, List, Set, Union
 
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.path_constants import RESPONSES_DIRNAME
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.core.trace_output.stage_eval import TracePredictions
-from tgen.models.llm.llm_responses import SupportedLLMResponses, GenerationResponse
+from tgen.models.llm.llm_responses import GenerationResponse, SupportedLLMResponses
 
 
 class LLMResponseUtil:
@@ -46,13 +46,14 @@ class LLMResponseUtil:
         return predictions
 
     @staticmethod
-    def parse(res: str, tag_name: str, is_nested: bool = False, raise_exception: bool = False, return_res_on_failure: bool = False) -> \
-            List[Union[str, Dict]]:
+    def parse(res: str, tag_name: str, is_nested: bool = False, is_optional: bool = False,
+              raise_exception: bool = False, return_res_on_failure: bool = False) -> List[Union[str, Dict]]:
         """
         Parses the LLM response for the given html tags
         :param res: The LLM response
         :param tag_name: The name of the tag to find
         :param is_nested: If True, the response contains nested tags so all Tag objects are returned, else just the single content
+        :param is_optional: If True, does not raise an exception if the parsing fails.
         :param raise_exception: if True, raises an exception if parsing fails
         :param return_res_on_failure: Whether to return original response on failure.
         :return: Either a list of tags (if nested) or the content inside the tag (not nested)
@@ -71,11 +72,12 @@ class LLMResponseUtil:
                     if c:
                         content.append(c)
             assert len(content) > 0, f"Found no tags ({tag_name}) in:\n{res}"
-        except Exception:
-            error = f"{NEW_LINE}Unable to parse {tag_name}"
-            logger.log_without_spam(level=logging.ERROR, msg=error)
-            if raise_exception:
-                raise Exception(error)
+        except Exception as e:
+            if not is_optional:
+                error = f"{NEW_LINE}Unable to parse {tag_name}"
+                logger.log_without_spam(level=logging.ERROR, msg=error)
+                if raise_exception:
+                    raise Exception(error)
             content = [res] if return_res_on_failure else []
         return [html.unescape(c) for c in content]
 

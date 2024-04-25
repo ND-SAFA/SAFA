@@ -7,9 +7,11 @@ from typing import Any, Dict, List, Union
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, UNDERSCORE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.enum_util import EnumUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
+from tgen.common.util.status import Status
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
@@ -94,7 +96,8 @@ class State(BaseObject):
 
         try:
             logger.info(f"Saving state for {step_name}")
-            step_num = len(self.completed_steps)
+            step_num = len(self.completed_steps) \
+                if not EnumUtil.get_enum_from_name(Status, step_name.upper(), raise_exception=False) else None
             save_path = self.get_path_to_state_checkpoint(self.export_dir, step_name, run_num, step_num)
             as_dict = {k: v for k, v in vars(self).items() if not attrs2ignore or k not in attrs2ignore}
             collapsed_paths = self.collapse_or_expand_paths(as_dict)

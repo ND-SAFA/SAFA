@@ -1,13 +1,13 @@
 import os
 from copy import deepcopy
 
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.jobs.predict_job import PredictJob
+from tgen.data.tdatasets.dataset_role import DatasetRole
+from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tgen.testres.definition_creator import DefinitionCreator
 from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 
@@ -33,6 +33,7 @@ class TestDefinitionCreator(BaseTest):
     }
     TRAINER_ARGS_DEFINITION = {"output_dir": TEST_OUTPUT_DIR}
     DEFINITION = {
+        "task": "PREDICT",
         "job_args": JOB_ARGS_DEFINITION,
         "model_manager": MODEL_MANAGER_DEFINITION,
         "trainer_dataset_manager": DATASET_MANAGER_DEFINITION,
@@ -48,7 +49,7 @@ class TestDefinitionCreator(BaseTest):
 
     def test_trainer_dataset_manager(self):
         definition = deepcopy(self.DEFINITION)
-        predict_job: PredictJob = DefinitionCreator.create(PredictJob, definition)
+        predict_job: HuggingFaceJob = DefinitionCreator.create(HuggingFaceJob, definition)
 
         # Verify trainer dataset manager
         self.verify_trainer_dataset_manager(predict_job.trainer_dataset_manager, DatasetRole.EVAL)
@@ -57,8 +58,12 @@ class TestDefinitionCreator(BaseTest):
         definition.pop("trainer_dataset_manager")
         for parent_key, parent_value in definition.items():
             parent_object = getattr(predict_job, parent_key)
-            for child_key, child_value in parent_value.items():
-                self.assertEqual(getattr(parent_object, child_key), child_value)
+            if isinstance(parent_value, dict):
+                for child_key, child_value in parent_value.items():
+                    parent_object_key = getattr(parent_object, child_key)
+                    self.assertEqual(parent_object_key, child_value)
+            elif isinstance(parent_value, str):
+                self.assertIn(parent_value, str(parent_object))
 
     def verify_trainer_dataset_manager(self, trainer_dataset_manager: TrainerDatasetManager,
                                        target_role: DatasetRole = DatasetRole.TRAIN):
@@ -68,6 +73,6 @@ class TestDefinitionCreator(BaseTest):
             self.assertIsNone(trainer_dataset_manager[dataset_role])
         dataset = trainer_dataset_manager[target_role]
 
-        self.assertEqual(len(dataset.pos_link_ids), 4)
-        self.assertEqual(len(dataset.neg_link_ids), 4)
+        self.assertEqual(len(dataset._pos_link_ids), 4)
+        self.assertEqual(len(dataset._neg_link_ids), 4)
         self.assertEqual(len(dataset.trace_df), 8)

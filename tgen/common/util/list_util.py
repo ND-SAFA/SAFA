@@ -1,11 +1,9 @@
-from typing import Iterable, List, Tuple, Union
+from typing import Any, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from scipy.stats import percentileofscore
 from tqdm import tqdm
-
-from tgen.common.constants.logging_constants import TQDM_NCOLS
 
 
 class ListUtil:
@@ -138,7 +136,7 @@ class ListUtil:
         :return: Returns both lists as a list of tuples if return_both, else only returns the list that was not used to sort.
         """
         sorted_list = sorted(zip(list1, list2), key=lambda item: item[list_to_sort_on], **kwargs)
-        list_to_return = 1-list_to_sort_on
+        list_to_return = 1 - list_to_sort_on
         return [item if return_both else item[list_to_return] for item in sorted_list]
 
     @staticmethod
@@ -153,3 +151,42 @@ class ListUtil:
             return [i[item_index] for i in zipped_list]
         else:
             return ListUtil.unzip(zipped_list, 0), ListUtil.unzip(zipped_list, 1)
+
+    @staticmethod
+    def safely_get_item(item_index: int, list_: List, default: Any = None) -> Any:
+        """
+        Safely gets an item from a list by checking that the list contains an item at the index, returns the default if not.
+        :param item_index: The index of the item to get.
+        :param list_: The list to get the item from.
+        :param default: Default value to return if index does not exist.
+        :return: The item from a list if it exists, returns the default if not.
+        """
+        required_length = item_index + 1 if item_index >= 0 else abs(item_index)
+        return list_[item_index] if len(list_) >= required_length else default
+
+    @staticmethod
+    def are_all_items_the_same(list_: List) -> bool:
+        """
+        Checks if all items in the list are the same.
+        :param list_: The list to check.
+        :return: True if all items in the list are the same else False.
+        """
+        try:
+            return len(set(list_)) == 1
+        except TypeError:  # not hashable
+            return all([item1 == item2 for item1 in list_ for item2 in list_])
+
+    @staticmethod
+    def append_if_exists(base_items: List[Any], new_possible_item: Optional[Any], as_new_list: bool = False) -> List[Any]:
+        """
+        Appends new item to list if it exists.
+        :param base_items: The base list to append to.
+        :param new_possible_item: The possible item to add to list.
+        :param as_new_list: Whether to create a new list, leaving the original list unaffected.
+        :return: List of items which new item appended if it existed.
+        """
+        if as_new_list:
+            base_items = [b for b in base_items]
+        if new_possible_item:
+            base_items.append(new_possible_item)
+        return base_items

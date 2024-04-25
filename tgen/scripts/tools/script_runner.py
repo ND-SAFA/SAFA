@@ -3,8 +3,14 @@ import sys
 
 from dotenv import load_dotenv
 
-ROOT_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..")
-ROOT_PATH = os.path.normpath(ROOT_PATH)
+RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
+
+sys.path.append(ROOT_PATH)
+assert os.path.exists(ROOT_PATH), ROOT_PATH
+load_dotenv()
+
+os.environ["DEPLOYMENT"] = "development"
+ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 
 
 def run_script_runner(script_rel_path: str):
@@ -22,16 +28,4 @@ def run_script_runner(script_rel_path: str):
 
 
 if __name__ == "__main__":
-    script_name, *envs = sys.argv[1:]
-    if ".env" not in envs:
-        envs.insert(0, ".env")
-    for env in envs:
-        env_path = os.path.join(ROOT_PATH, env)
-        assert os.path.isfile(env_path), f"{env_path} is not file."
-        load_dotenv(env_path)
-
-    assert os.path.exists(ROOT_PATH), ROOT_PATH
-    sys.path.append(ROOT_PATH)
-    os.environ["DEPLOYMENT"] = "development"
-    RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
-    run_script_runner(script_name)
+    run_script_runner(sys.argv[1])

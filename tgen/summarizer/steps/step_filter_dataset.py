@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import List, Union, Set
+from typing import List, Set, Union
 
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -19,7 +19,7 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         """
         artifact_df = state.dataset.artifact_df
         should_filter = args.include_subset_by_type or args.include_subset_by_dir
-        indices2remove = self.identify_indices_with_duplicate_content(artifact_df)
+        indices2remove = StepFilterDataset.identify_indices_with_duplicate_content(artifact_df)
         if should_filter:
             indices2remove.update({a_id for a_id in artifact_df.index if not (self.in_dirs(a_id, args.include_subset_by_dir)
                                                                               or self.is_file_type(a_id,

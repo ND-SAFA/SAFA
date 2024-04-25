@@ -4,8 +4,6 @@ import sys
 from os.path import dirname
 from typing import Any, Optional
 
-from huggingface_hub.utils import logging as hf_logging
-
 from tgen.common.constants.logging_constants import LOG_FORMAT
 from tgen.common.logging.logger_config import LoggerConfig
 from tgen.common.logging.tgen_logger import TGenLogger
@@ -71,6 +69,7 @@ class LoggerManager:
         """
         for module in sys.modules.keys():
             if module.startswith("transformers"):
+                from huggingface_hub.utils import logging as hf_logging
                 hf_logger = hf_logging.get_logger(module)
                 hf_logger.setLevel(logging.ERROR)
 

@@ -1,7 +1,7 @@
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_response_manager import PromptResponseManager, REQUIRE_ALL_TAGS
+from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 
@@ -38,11 +38,11 @@ DIFF_SUMMARY_TASKS = {
                       "Otherwise respond with 'no bug fixes'.",
                       PromptResponseManager(response_tag="bug-fixes")),
     8: QuestionPrompt("Now, using all your responses, summarize the changes that were made to the code. ",
-                      PromptResponseManager(response_tag="summary", required_tag_ids=REQUIRE_ALL_TAGS)),
+                      PromptResponseManager(response_tag="summary", required_tag_ids=USE_ALL_TAGS)),
     9: QuestionPrompt("Summarize how the changes may impact the system "
                       "Avoid speculation - "
                       "only include potential impacts that can be reasonably inferred from the information provided.",
-                      PromptResponseManager(response_tag="impact", required_tag_ids=REQUIRE_ALL_TAGS)),
+                      PromptResponseManager(response_tag="impact", required_tag_ids=USE_ALL_TAGS)),
 }
 ADDED_PROMPT = QuestionPrompt("Identify what new functionality was added in this code file",
                               PromptResponseManager(response_tag="new-func"))
@@ -74,7 +74,7 @@ CHANGE_SUMMARY_TASKS = {
                       PromptResponseManager(
                           value_formatter=lambda tag, val: [v.replace(NEW_LINE, EMPTY_STRING).strip() for v in val.split(COMMA)]
                           if tag == "filenames" or tag == "type" else val,
-                          required_tag_ids=REQUIRE_ALL_TAGS,
+                          required_tag_ids=USE_ALL_TAGS,
                           response_tag={"group": ["filenames", "change", "type"]},
                           response_instructions_format="Each group should be enclosed in {} "
                                                        "with the names of the related files in a comma-deliminated list inside of {}, "
@@ -84,13 +84,13 @@ CHANGE_SUMMARY_TASKS = {
     2: QuestionPrompt("Then, create a summary that gives an overview of all changes and the key highlights. "
                       "The goal of the summary is to consolidate all of the change analysis into a high-level overview that "
                       "captures the most important updates and focuses on communicating the key takeaways. ",
-                      PromptResponseManager(response_tag="low-level-summary", required_tag_ids=REQUIRE_ALL_TAGS)),
+                      PromptResponseManager(response_tag="low-level-summary", required_tag_ids=USE_ALL_TAGS)),
     3: QuestionPrompt("Finally, summarize the changes "
                       "but in non-technical terms for someone unfamiliar with the codebase. "
                       "Focus on aspects that are most important from a user's perspective, "
                       "based only on the information provided about the system and changes. "
                       "Do not make assumptions or guesses about impact that is not clear from the given information. ",
-                      PromptResponseManager(response_tag="user-level-summary", required_tag_ids=REQUIRE_ALL_TAGS)),
+                      PromptResponseManager(response_tag="user-level-summary", required_tag_ids=USE_ALL_TAGS)),
 }
 
 CHANGE_SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
@@ -103,5 +103,5 @@ IMPACTS_PROMPT = Prompt("TASK: Based on your understanding of the system, the ch
                         "Consider how the updates may impact "
                         "performance, reliability, security, sustainability, and usability. "
                         "Focus on identifying plausible effects using the information provided, but avoid speculation. ",
-                        PromptResponseManager(response_tag="potential-impact", required_tag_ids=REQUIRE_ALL_TAGS)
+                        PromptResponseManager(response_tag="potential-impact", required_tag_ids=USE_ALL_TAGS)
                         )

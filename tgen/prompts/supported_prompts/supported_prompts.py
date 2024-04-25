@@ -14,6 +14,7 @@ from tgen.prompts.supported_prompts.hgen_prompts import FORMAT_QUESTIONNAIRE, GE
 from tgen.prompts.supported_prompts.project_summary_prompts import OVERVIEW_SECTION_PROMPT, \
     FEATURE_SECTION_PROMPT, ENTITIES_SECTION_PROMPT, SUBSYSTEM_SECTION_PROMPT, DATA_FLOW_SECTION_PROMPT, \
     PROJECT_SUMMARY_CONTEXT_PROMPT_ARTIFACTS, PROJECT_SUMMARY_CONTEXT_PROMPT_VERSIONS
+from tgen.prompts.supported_prompts.requirements_contradiction_prompts import EXTRACT_CONSTITUENTS_PROMPT
 from tgen.prompts.supported_prompts.tracing_prompts import RANKING_GOAL, QUESTION1, QUESTION2
 
 
@@ -62,6 +63,9 @@ class SupportedPrompts(SupportedEnum):
 
     EXPLANATIONS_GOAL_INSTRUCTIONS = EXPLANATION_GOAL
     EXPLANATION_TASK = EXPLANATION_TASK_QUESTIONNAIRE
+
+    # ---------- REQ CONTRADICTION ANALYSIS ----------------
+    REQUIREMENT_EXTRACT_CONSTITUENTS = EXTRACT_CONSTITUENTS_PROMPT
 
     @DynamicClassAttribute
     def value(self) -> Prompt:

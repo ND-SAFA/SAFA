@@ -12,7 +12,7 @@ from tgen.core.args.hugging_face_args import HuggingFaceArgs
 @dataclass
 class JobResult(BaseObject):
     job_id: Union[UUID, str]
-    status: int = Status.UNKNOWN
+    status: Union[Status, int] = Status.UNKNOWN
     body: Any = None
     experimental_vars: Dict = field(default_factory=dict)
 

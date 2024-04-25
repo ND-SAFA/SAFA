@@ -1,4 +1,5 @@
-from collections import Callable, Counter
+from collections import Counter
+from typing import Callable
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.file_util import FileUtil

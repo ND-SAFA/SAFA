@@ -1,6 +1,5 @@
 import os
-from collections import Callable
-from typing import Dict, List
+from typing import Callable, Dict, List
 
 import mock
 import pandas as pd
@@ -48,7 +47,7 @@ class TestPromptDataset(BaseTest):
         recreated_dataset = creator.create()
         self.assertEqual(set(recreated_dataset.artifact_df.index), set(artifact_dataset.artifact_df.index))
         trace_dataset = datasets["dataset"]
-        creator = trace_dataset.as_creator(os.path.join(TEST_OUTPUT_DIR,  "dir2"))
+        creator = trace_dataset.as_creator(os.path.join(TEST_OUTPUT_DIR, "dir2"))
         recreated_dataset = creator.create()
         self.assertEqual(set(recreated_dataset.artifact_df.index), set(trace_dataset.artifact_df.index))
         for i, link in trace_dataset.trace_dataset.trace_df.itertuples():

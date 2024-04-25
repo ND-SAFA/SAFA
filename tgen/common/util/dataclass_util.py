@@ -22,7 +22,7 @@ def required_field(*, field_name: str, init=True, repr=True, hash=None, compare=
 
     It is an error to specify both default and default_factory.
     """
-    return Field(MISSING, lambda: RequiredField(field_name), init, repr, hash, compare, metadata)
+    return Field(MISSING, lambda: RequiredField(field_name), init, repr, hash, compare, metadata, kw_only=False)
 
 
 class RequiredField:

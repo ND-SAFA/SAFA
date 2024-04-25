@@ -47,6 +47,7 @@ public class CommentController extends BaseController {
         SafaUser currentUser = getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(commentCreateRequestDTO.getVersionId())
+            .asUser(currentUser)
             .withPermission(ProjectPermission.EDIT)
             .get();
 
@@ -84,17 +85,6 @@ public class CommentController extends BaseController {
     }
 
     /**
-     * Retrieves comments for artifact.
-     *
-     * @param artifactId ID of artifact whose comments are retrieved.
-     * @return Collection of comments on artifact.
-     */
-    @GetMapping(AppRoutes.Comments.COMMENT_GET)
-    public ArtifactCommentResponseDTO getArtifactComments(@PathVariable UUID artifactId) {
-        return getServiceProvider().getCommentRetrievalService().getArtifactComments(artifactId);
-    }
-
-    /**
      * Deletes comment with given ID.
      *
      * @param commentId ID of comment to delete.
@@ -103,5 +93,16 @@ public class CommentController extends BaseController {
     public void deleteComment(@PathVariable UUID commentId) {
         SafaUser currentUser = getCurrentUser();
         getServiceProvider().getCommentService().deleteComment(currentUser, commentId);
+    }
+
+    /**
+     * Retrieves comments for artifact.
+     *
+     * @param artifactId ID of artifact whose comments are retrieved.
+     * @return Collection of comments on artifact.
+     */
+    @GetMapping(AppRoutes.Comments.COMMENT_GET)
+    public ArtifactCommentResponseDTO getArtifactComments(@PathVariable UUID artifactId) {
+        return getServiceProvider().getCommentRetrievalService().getArtifactComments(artifactId);
     }
 }

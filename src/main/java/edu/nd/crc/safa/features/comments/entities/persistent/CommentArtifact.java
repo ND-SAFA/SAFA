@@ -41,6 +41,6 @@ public class CommentArtifact {
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "comment_id", nullable = false)
+    @JoinColumn(name = "artifact_id", nullable = false)
     private Artifact artifact;
 }

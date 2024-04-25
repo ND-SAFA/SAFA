@@ -121,12 +121,8 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     }
 
     public <T> T postWithJsonObject(Object body, Class<T> responseClass) {
-        try {
-            JSONObject responseJson = postWithResponseParser(body, ResponseParser::jsonCreator);
-            return objectMapper.readValue(responseJson.toString(), responseClass);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        JSONObject responseJson = postWithResponseParser(body, ResponseParser::jsonCreator);
+        return parse(responseJson, responseClass);
     }
 
     public JSONObject postWithJsonObject(Object body, ResultMatcher resultMatcher) {
@@ -147,6 +143,11 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
 
     public JSONObject putWithJsonObject(Object body) {
         return putWithJsonObject(body, status().is2xxSuccessful());
+    }
+
+    public <T> T putWithJsonObject(Object body, Class<T> responseClass) {
+        JSONObject response = putWithJsonObject(body);
+        return parse(response, responseClass);
     }
 
     public <T> T putAndParseResponse(Object body, TypeReference<T> type) {
@@ -239,6 +240,11 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
             localAuthorizationToken,
             responseParser
         );
+    }
+
+    public <T> T getAsType(Class<T> classType) throws Exception {
+        JSONObject jsonObject = getWithoutBody(status().is2xxSuccessful());
+        return parse(jsonObject, classType);
     }
 
     public <T> T getAsType(TypeReference<T> typeReference) throws Exception {
@@ -378,5 +384,13 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
     public SafaRequest withQueryParam(String paramName, String paramValue) {
         queryParams.add(paramName, paramValue);
         return this;
+    }
+
+    private <T> T parse(JSONObject res, Class<T> responseClass) {
+        try {
+            return objectMapper.readValue(res.toString(), responseClass);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -58,6 +58,8 @@ public class CommentDTO {
         dto.setStatus(comment.getStatus());
         dto.setUserId(comment.getAuthor().getUserId());
         dto.setVersionId(comment.getVersion().getVersionId());
+        dto.setTimeCreated(comment.getCreated());
+        dto.setTimeUpdated(comment.getUpdated());
         return dto;
     }
 

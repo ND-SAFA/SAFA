@@ -14,15 +14,16 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 @Data
 @Entity
@@ -37,6 +38,7 @@ public class Comment {
      * The text of the comment.
      */
     @Column
+    @Lob
     private String content;
     /**
      * Status of comment (e.g. active | resolved).
@@ -50,18 +52,6 @@ public class Comment {
     @Column
     @Enumerated(EnumType.STRING)
     private CommentType type;
-    /**
-     * Timestamp of when comment was created.
-     */
-    @CreatedDate
-    @Column
-    private LocalDateTime created;
-    /**
-     * Timestamp of when this comment was last updated.
-     */
-    @LastModifiedDate
-    @Column
-    private LocalDateTime updated;
     /**
      * Author of comment
      */
@@ -83,6 +73,16 @@ public class Comment {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "version_id", nullable = false)
     private ProjectVersion version;
+    /**
+     * Timestamp of when comment was created.
+     */
+    @Column
+    private LocalDateTime created;
+    /**
+     * Timestamp of when this comment was last updated.
+     */
+    @Column
+    private LocalDateTime updated;
 
     /**
      * Whether given user is author of comment.
@@ -92,5 +92,16 @@ public class Comment {
      */
     public boolean isAuthor(SafaUser user) {
         return this.author.getUserId().equals(user.getUserId());
+    }
+
+    @PrePersist
+    public void setCreated() {
+        this.created = LocalDateTime.now();
+        this.updated = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void setUpdated() {
+        this.updated = LocalDateTime.now();
     }
 }

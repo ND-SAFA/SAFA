@@ -17,15 +17,6 @@
       @click="appStore.openDetailsPanel('displayArtifactBody')"
     />
     <text-button
-      v-if="ENABLED_FEATURES.NASA_ARTIFACT_FLAG"
-      text
-      small
-      label="Flag"
-      icon="flag"
-      data-cy="button-artifact-flag"
-      @click="handleFlag"
-    />
-    <text-button
       v-if="ENABLED_FEATURES.NASA_ARTIFACT_COMMENT"
       text
       small
@@ -85,10 +76,6 @@ const displayActions = computed(() =>
 const artifact = computed(() => artifactStore.selectedArtifact);
 
 function handleComment() {
-  // TODO
-}
-
-function handleFlag() {
   // TODO
 }
 </script>

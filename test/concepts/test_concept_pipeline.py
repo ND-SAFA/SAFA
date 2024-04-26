@@ -4,12 +4,12 @@ from test.concepts.test_entity_matching import TestEntityMatching
 from test.concepts.utils import create_concept_args, create_concept_test_entities
 from tgen.concepts.concept_pipeline import ConceptPipeline
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestConceptPipeline(BaseTest):
-    @mock_openai
+    @mock_anthropic
     def test_concept_pipeline(self, ai_manager: TestAIManager) -> None:
         """
         Tests full execution of pipeline.

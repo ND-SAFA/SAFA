@@ -60,13 +60,13 @@ class EntityMatching(AbstractPipelineStep):
             seen_ids = set()
             entity_response = entity_prediction[entity_prompt_builder.prompts[-1].id]
             entity_matches = entity_response[self.MATCH_TAG]
-            for match_target in entity_matches:
-                match_source = entity_artifact[ArtifactKeys.ID]
-                if match_target not in concept_artifact_ids or match_target in seen_ids:
+            for matched_concept in entity_matches:
+                matched_entity = entity_artifact[ArtifactKeys.ID]
+                if matched_concept not in concept_artifact_ids or matched_concept in seen_ids:
                     continue
-                match_trace = Trace(source=match_source, target=match_target)
+                match_trace = Trace(source=matched_entity, target=matched_concept)
                 matches.append(match_trace)
-                seen_ids.add(match_target)
+                seen_ids.add(matched_concept)
             print(len(matches))
         state.predicted_matches = matches
 

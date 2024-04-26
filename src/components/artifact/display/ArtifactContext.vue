@@ -1,6 +1,6 @@
 <template>
   <div>
-    <panel-card title="Related Context" collapsable>
+    <panel-card title="Related Context" collapsable borderless>
       <template #title-actions>
         <text-button
           v-if="displayActions"

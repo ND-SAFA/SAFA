@@ -1,6 +1,6 @@
 import json
 from collections import OrderedDict
-from typing import Any, Dict, List, Union, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from openai.api_resources.fine_tune import FineTune
 
@@ -116,7 +116,7 @@ class LLMTrainer(AbstractTrainer):
 
     @staticmethod
     def predict_from_prompts(llm_manager: AbstractLLMManager,
-                             prompt_builder: PromptBuilder,
+                             prompt_builders: Union[PromptBuilder, List[PromptBuilder]] = None,
                              prompts: List[Prompt] = None,
                              save_and_load_path: str = EMPTY_STRING,
                              raise_exception: bool = True,
@@ -124,21 +124,25 @@ class LLMTrainer(AbstractTrainer):
         """
         Makes generation predictions from a list of prompts
         :param llm_manager: The llm manager to use for predictions
-        :param prompt_builder: The prompt builder to parse the response (or additionally create prompts)
+        :param prompt_builders: The prompt builder to parse the response (or additionally create prompts)
         :param prompts: The list of prompts to use unless built from prompt_builder
         :param save_and_load_path: Path used to load or save predictions
          :param raise_exception: If True, raises an exception if a response fails
         :param prompt_kwargs: Additional arguments used when building prompts (optionally)
         :return: The output from the predictions
         """
+        if not isinstance(prompt_builders, list):
+            prompt_builders = [prompt_builders]
         if not prompts:
-            prompts = [prompt_builder.build(llm_manager.prompt_args, **prompt_kwargs)[PromptKeys.PROMPT]]
+            prompts = [pb.build(llm_manager.prompt_args, **prompt_kwargs)[PromptKeys.PROMPT] for pb in prompt_builders]
+
+        prompt_builder_ids = [pb.id for pb in prompt_builders]
         prompt_df = PromptDataFrame({PromptKeys.PROMPT: prompts,
                                      PromptKeys.COMPLETION: [EMPTY_STRING for _ in prompts],
-                                     PromptKeys.PROMPT_BUILDER_ID: [prompt_builder.id for _ in prompts]})
+                                     PromptKeys.PROMPT_BUILDER_ID: prompt_builder_ids})
         dataset = PromptDataset(prompt_df=prompt_df)
         trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
-        initial_state = LLMTrainerState(llm_manager=llm_manager, prompt_builders=prompt_builder,
+        initial_state = LLMTrainerState(llm_manager=llm_manager, prompt_builders=prompt_builders,
                                         trainer_dataset_manager=trainer_dataset_manager)
         trainer = LLMTrainer(initial_state)
         return trainer.perform_prediction(save_and_load_path=save_and_load_path,

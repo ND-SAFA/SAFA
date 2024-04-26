@@ -1,7 +1,9 @@
 from typing import Dict, List
 
+from tgen.common.objects.artifact import Artifact
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 
@@ -31,14 +33,25 @@ def predict_artifact_prompt(artifact_content: str,
     return output.predictions[0][instructions_prompt.id]
 
 
-def predict_prompts(instruction_prompt: Prompt, content_prompts: List[str], llm_manager: AbstractLLMManager):
-    prompts = [Prompt(p) for p in content_prompts] + [instruction_prompt]
-    prompt_builder = PromptBuilder(prompts=prompts)
+def predict_entity_matching(instructions_prompt: Prompt,
+                            context_prompt: MultiArtifactPrompt,
+                            llm_manager: AbstractLLMManager,
+                            artifacts: List[Artifact]) -> Dict:
+    """
+    Predicts which entities are matching artifacts.
+    :param instructions_prompt:
+    :param context_prompt:
+    :param llm_manager:
+    :param artifacts:
+    :return:
+    """
+    prompt_builder = PromptBuilder(prompts=[context_prompt, instructions_prompt])
 
     # Get prediction from the LLM
     output = LLMTrainer.predict_from_prompts(
         llm_manager,
         prompt_builder,
+        artifacts=artifacts
     )
 
-    return output.predictions[0][instruction_prompt.id]
+    return output.predictions[0][instructions_prompt.id]

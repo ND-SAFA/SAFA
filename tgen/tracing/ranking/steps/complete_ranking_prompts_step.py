@@ -10,11 +10,11 @@ from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_responses import GenerationResponse
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
@@ -45,7 +45,7 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
                    for p_name in args.parent_ids]
         save_and_load_path = LLMResponseUtil.generate_response_save_and_load_path(
             state.get_path_to_state_checkpoint(args.export_dir), "ranking_response") if args.export_dir else args.export_dir
-        predictions = LLMTrainer.predict_from_prompts(llm_manager=args.ranking_llm_model_manager, prompt_builder=prompt_builder,
+        predictions = LLMTrainer.predict_from_prompts(llm_manager=args.ranking_llm_model_manager, prompt_builders=prompt_builder,
                                                       prompts=prompts, save_and_load_path=save_and_load_path).predictions
         task_prompt = prompt_builder.prompts[-1]
         parsed_answers = LLMResponseUtil.extract_predictions_from_response(predictions, response_prompt_ids=task_prompt.id,

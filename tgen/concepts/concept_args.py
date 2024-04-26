@@ -1,12 +1,18 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
+from tgen.common.constants.model_constants import get_best_default_llm_manager_short_context
 from tgen.common.objects.artifact import Artifact
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.pipeline_args import PipelineArgs
 
 
 @dataclass
 class ConceptArgs(PipelineArgs):
+    """"
+    LLM Manager used to complete prompts
+    """
+    llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_short_context)
     """
     DataFrame containing only concepts to match.
     """

@@ -6,7 +6,7 @@ from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestDirectConceptMatches(BaseTest):
-    N_MATCHES = 3
+    N_MATCHES = 4
 
     def test_direct_concept_matches(self):
         """
@@ -21,13 +21,16 @@ class TestDirectConceptMatches(BaseTest):
         self.assertEqual(self.N_MATCHES, len(state.direct_matches))
 
         match0 = state.direct_matches[0]
-        self.assertEqual("GS", match0["artifact_id"])
+        self.assertEqual("Ground Station (GS)", match0["artifact_id"])
 
         match1 = state.direct_matches[1]
-        self.assertEqual("Command", match1["artifact_id"])
+        self.assertEqual("GS", match1["artifact_id"])
 
         match2 = state.direct_matches[2]
-        self.assertEqual("Telemetry (TLM)", match2["artifact_id"])
+        self.assertEqual("Command", match2["artifact_id"])
+
+        match3 = state.direct_matches[3]
+        self.assertEqual("Telemetry (TLM)", match3["artifact_id"])
 
     def test_alt_name_extraction(self):
         """

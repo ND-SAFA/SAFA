@@ -5,12 +5,12 @@ from tgen.concepts.steps.extract_artifact_entities import EntityExtraction
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestEntityExtraction(BaseTest):
-    @mock_openai
+    @mock_anthropic
     def test_entity_extraction(self, ai_manager: TestAIManager) -> None:
         """
         Verifies that entities are extracted correctly and saved to state.
@@ -18,6 +18,8 @@ class TestEntityExtraction(BaseTest):
         test_entity_df = create_concept_test_entities()
 
         args = create_concept_args()
+        self.mock_entity_extraction(ai_manager, test_entity_df)
+
         step = EntityExtraction()
 
         state = ConceptState()

@@ -23,7 +23,7 @@ sentence-transformers==2.2.2
 tokenizers==0.15.2
 tiktoken==0.3.3
 tqdm==4.64.1
-transformers==4.38.0
+transformers==4.36.0
 typeguard==2.13.3
 typing==3.7.4.3
 typing_extensions==4.4.0

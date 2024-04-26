@@ -90,7 +90,7 @@ class TestArtifacteDataFrame(BaseTest):
                                            item_index=1)
             original_content = expected_chunked_artifacts[a_id]
             self.assertEqual(len(chunks), original_content.count(PERIOD))
-            self.assertEqual(". ".join(sorted_chunks), original_content)
+            self.assertEqual(". ".join(sorted_chunks) + PERIOD, original_content)
 
     def get_artifact_data_frame(self):
         return ArtifactDataFrame({ArtifactKeys.ID: ["s1", "s2.py"], ArtifactKeys.CONTENT: ["body1", "body2"],

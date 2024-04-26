@@ -361,6 +361,8 @@ class RankingUtil:
             sorted_scores = sorted(scores)
             min_child_score = sorted_scores[0] if min_score is None else min_score
             max_child_score = sorted_scores[-1]
+            if min_child_score == max_child_score:
+                min_child_score = 0
             for entry in trace_entries:
                 score = MathUtil.convert_to_new_range(entry[TraceKeys.SCORE], (min_child_score, max_child_score), (0, 1))
                 entry[TraceKeys.SCORE] = score

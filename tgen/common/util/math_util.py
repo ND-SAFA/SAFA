@@ -67,7 +67,7 @@ class MathUtil:
     @staticmethod
     def round_to_nearest_half(num: float, floor: bool = False, ceil: bool = False) -> float:
         """
-        Rounds the number to the nearest 0.5 (e.g. 1.6 -> 1.5, 1.4 -> 1.0)
+        Rounds the number to the nearest 0.5 (e.g. 1.6 -> 1.5, 1.4 -> 1.5)
         :param num: The number to round.
         :param floor: If True, floors the number.
         :param ceil: If True, ceils the number.

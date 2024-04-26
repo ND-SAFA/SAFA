@@ -100,7 +100,7 @@ class StrUtil:
     @staticmethod
     def split_sentences_by_punctuation(string: str, punctuation: str = PERIOD) -> List[str]:
         """
-        Splits sentences by punctuation
+        Splits sentences by end of sentence punctuation
         :param string: The string to split
         :param punctuation: The type of punctuation to split on
         :return: The string split into sentences
@@ -230,5 +230,6 @@ class StrUtil:
         :param input_string: The string to split.
         :return: List of substrings, divided using the punctuation.
         """
-        pattern = re.compile(r'[.!?;]+')
-        return [line for line in re.split(pattern, input_string) if line]
+        input_string += SPACE
+        pattern = re.compile(r'[.!?;]+ ')
+        return [line.strip() for line in re.split(pattern, input_string) if line.strip()]

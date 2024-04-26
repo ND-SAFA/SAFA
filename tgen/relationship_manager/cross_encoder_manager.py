@@ -1,6 +1,7 @@
+from typing import List, Dict, Tuple
+
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from typing import List, Dict, Tuple
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from tgen.common.constants.ranking_constants import DEFAULT_CROSS_ENCODER_MODEL
@@ -37,8 +38,7 @@ class CrossEncoderManager(AbstractRelationshipManager):
         similarity_matrix = np.empty((len(ids1), len(ids2)))
         for i, id1 in enumerate(ids1):
             for j, id2 in enumerate(ids2):
-                score = self.get_relationship(id1, id2) if self.relationship_exists(id1, id2) else next(scores)
-                similarity_matrix[i, j] = score
+                similarity_matrix[i, j] = next(scores)
         return similarity_matrix
 
     def calculate_scores(self, id_pairs: List[Tuple[str, str]], include_ids: bool = False) -> List[float]:
@@ -57,4 +57,9 @@ class CrossEncoderManager(AbstractRelationshipManager):
         show_progress_bar = self._determine_show_progress_bar(artifact_combinations, "Calculating sim scores for artifacts...",
                                                               batch_size)
         scores = self.get_model().predict(artifact_combinations, batch_size=batch_size, show_progress_bar=show_progress_bar)
-        return scores
+        scores = iter(scores)
+        all_scores = []
+        for id1, id2 in id_pairs:
+            score = self.get_relationship(id1, id2) if self.relationship_exists(id1, id2) else next(scores)
+            all_scores.append(score)
+        return all_scores

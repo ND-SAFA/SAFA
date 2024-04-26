@@ -6,7 +6,7 @@ from tgen.common.util.override import overrides
 from tgen.models.tokens.token_calculator import TokenCalculator
 
 
-class AbstractASTChunker(BaseObject, ABC):
+class AbstractTokenLimitChunker(BaseObject, ABC):
     """
     Handles chunking for python files
     """
@@ -47,5 +47,5 @@ class AbstractASTChunker(BaseObject, ABC):
         :param child_class_name: the name of the child class
         :return: the enum class mapping name to class
         """
-        from tgen.data.chunkers.ast_chunkers.supported_chunker import SupportedChunker
+        from tgen.data.chunkers.token_limit_chunkers.supported_chunker import SupportedChunker
         return SupportedChunker

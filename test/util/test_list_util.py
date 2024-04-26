@@ -15,3 +15,9 @@ class TestListUtil(BaseTest):
     def test_are_all_items_the_same(self):
         self.assertTrue(ListUtil.are_all_items_the_same([1, 1, 1]))
         self.assertFalse(ListUtil.are_all_items_the_same([1, 2, 1]))
+
+    def test_get_max_value_with_index(self):
+        list_ = [1, 3, 2, 3, 1]
+        index, max_val = ListUtil.get_max_value_with_index(list_)
+        self.assertEqual(max_val, max(list_))
+        self.assertEqual(index, list_.index(max(list_)))

@@ -5,6 +5,7 @@ from tgen.common.objects.artifact import Artifact
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
+from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -33,8 +34,9 @@ class LLMChunker(AbstractChunker):
         task_prompt: QuestionnairePrompt = SupportedPrompts.CHUNK_INSTRUCTIONS.value
         prompt_builder = PromptBuilder([task_prompt, ArtifactPrompt(include_id=False,
                                                                     use_summary=True)])
+        artifact_df = ArtifactDataFrame(artifacts2chunk)
         trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL:
-                                                                                  PromptDataset(artifact_df=artifacts2chunk)})
+                                                                                  PromptDataset(artifact_df=artifact_df)})
         trainer_state = LLMTrainerState(trainer_dataset_manager=trainer_dataset_manager,
                                         prompt_builders=prompt_builder,
                                         llm_manager=self.llm_manager)

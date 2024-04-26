@@ -1,5 +1,4 @@
 from copy import deepcopy
-
 from typing import Dict, List
 
 from tgen.common.util.dict_util import DictUtil
@@ -44,7 +43,7 @@ class SimilarityThresholdFilter(iFilter):
             for trace in traces:
                 child, score = trace[TraceKeys.child_label()], trace[TraceKeys.SCORE]
                 DictUtil.set_or_append_item(total_scores, child, score)
-        threshold_scores = {c_id: NpUtil.detect_outlier_scores(scores, sigma=1.5, ensure_at_least_one_detection=True)[1]
+        threshold_scores = {c_id: NpUtil.detect_outlier_scores(scores, sigma=1, ensure_at_least_one_detection=True)[1]
                             for c_id, scores in total_scores.items()}
         return threshold_scores
 

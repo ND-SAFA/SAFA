@@ -2,11 +2,11 @@ from copy import deepcopy
 from typing import List
 
 from tgen.common.constants.deliminator_constants import SPACE
-from tgen.data.chunkers.ast_chunkers.abstract_ast_chunker import AbstractASTChunker
+from tgen.data.chunkers.token_limit_chunkers.abstract_token_limit_chunker import AbstractTokenLimitChunker
 from tgen.models.tokens.token_calculator import TokenCalculator
 
 
-class NaturalLanguageChunker(AbstractASTChunker):
+class NaturalLanguageChunker(AbstractTokenLimitChunker):
     """
     Handles chunking NL text into chunks within a model's token limit
     """

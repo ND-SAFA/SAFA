@@ -1,7 +1,8 @@
+from typing import List, Tuple
+
 import numpy as np
 import pandas as pd
 from numpy import mean
-from typing import List, Tuple
 
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.math_util import MathUtil
@@ -81,13 +82,8 @@ class NpUtil:
             min_sigmas_allowed = MathUtil.round_to_nearest_half(min_sigmas, floor=True)
             lower_sigma = min(sigma, min_sigmas_allowed)
 
-        lower_limit = harmonic_mean - upper_sigma * scores.std()
-        upper_limit = harmonic_mean + lower_sigma * scores.std()
-
-        index = min([i for i, score in enumerate(scores) if score < upper_limit])
-        closest = scores[index]
-        if (upper_limit - closest) <= 0.02:
-            upper_limit = closest
+        lower_limit = harmonic_mean - lower_sigma * scores.std()
+        upper_limit = harmonic_mean + upper_sigma * scores.std()
 
         return lower_limit + epsilon, upper_limit - epsilon
 

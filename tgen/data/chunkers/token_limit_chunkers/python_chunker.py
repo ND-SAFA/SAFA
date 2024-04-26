@@ -6,8 +6,8 @@ from typing import List, Type, Union
 
 from tgen.common.constants.deliminator_constants import TAB
 from tgen.common.util.override import overrides
-from tgen.data.chunkers.ast_chunkers.abstract_code_chunker import AbstractCodeChunker
-from tgen.data.chunkers.ast_chunkers.chunked_node import ChunkedNode
+from tgen.data.chunkers.token_limit_chunkers.abstract_code_chunker import AbstractCodeChunker
+from tgen.data.chunkers.token_limit_chunkers.chunked_node import ChunkedNode
 
 ASTNode = Union[ast.AST, ast.stmt]
 

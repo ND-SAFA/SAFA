@@ -1,10 +1,9 @@
-from typing import Any, Dict, Iterable, List, Set, Tuple, Type, Union, Optional
+from typing import Any, Dict, Iterable, List, Set, Tuple, Type, Union
 
-from tgen.common.constants.deliminator_constants import UNDERSCORE
 from tgen.common.constants.anthropic_constants import ANTHROPIC_MAX_MODEL_TOKENS
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
+from tgen.common.objects.chunk import Chunk
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -102,19 +101,6 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         return self.get_row(artifact_id, throw_exception)
 
-    def get_chunk_by_id(self, chunk_id: Any, throw_exception: bool = False) -> str:
-        """
-        Gets the chunk with the associated chunk
-        :param chunk_id: The id of the chunk to get
-        :param throw_exception: If True, throws exception if chunk does not exist.
-        :return: The chunk if one is found with the specified params, else None
-        """
-        a_id = self.get_orig_id(chunk_id)
-        artifact = self.get_artifact(a_id, throw_exception)
-        if artifact:
-            chunk_num = self.get_chunk_num(chunk_id)
-            return artifact[ArtifactKeys.CHUNKS][chunk_num] if chunk_num else None
-
     def get_artifacts_from_trace(self, trace: EnumDict) -> Tuple[EnumDict, EnumDict]:
         """
         Gets the source and target artifacts from a trace dict
@@ -168,91 +154,6 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
             chunk_map = self.get_chunk_map(use_code_summary_only=use_code_summary_only)
             artifact_map.update(chunk_map)
         return artifact_map
-
-    def get_chunk_map(self, orig_artifact_ids: Set[str] = None, use_code_summary_only: bool = True) -> Dict[str, str]:
-        """
-        Gets a map of artifact id to a list of its chunks.
-        :param orig_artifact_ids: If provided, only retrieves chunks for given artifacts.
-        :param use_code_summary_only: If True, only uses the summary if the artifact is code and there are no chunks.
-        :return: Returns a map of artifact id to a list of its chunks.
-        """
-        orig_artifact_ids = set(self.index) if not orig_artifact_ids else orig_artifact_ids
-        chunk_map = {self.get_chunk_id(name, i): chunk for name, a in self.itertuples()
-                     for i, chunk in enumerate(Artifact.get_chunks(a, use_code_summary_only))
-                     if DataFrameUtil.get_optional_value_from_df(a, ArtifactKeys.CHUNKS) and name in orig_artifact_ids}
-        return chunk_map
-
-    def chunk(self, chunker: AbstractChunker = None, artifact_ids: Set[str] = None, unchunked_only: bool = True) -> Dict[
-        str, List[str]]:
-        """
-        Breaks artifacts in dataframe into smaller chunks.
-        :param chunker: The Chunker to use.
-        :param artifact_ids: Specific artifacts to chunk (all by default).
-        :param unchunked_only: If True, only chunks artifacts that dont already have chunks.
-        :return: Dictionary mapping artifact id to the chunks.
-        """
-        chunker = SentenceChunker() if not chunker else chunker
-        already_chunked = {i for i, a in self.itertuples()
-                           if len(StrUtil.split_by_punctuation(Artifact.get_summary_or_content(a))) == 1}
-        if unchunked_only:
-            already_chunked.update({i for i, a in self.itertuples()
-                                    if DataFrameUtil.get_optional_value_from_df(a, ArtifactKeys.CHUNKS)})
-        artifact_ids = set(self.index) if not artifact_ids else artifact_ids
-        artifact_ids = artifact_ids.difference(already_chunked)
-        artifacts2chunk = [a for _, a in self.filter_by_index(list(artifact_ids)).itertuples()]
-        chunks = chunker.chunk(artifacts2chunk)
-        self.update_values(ArtifactKeys.CHUNKS, [a[ArtifactKeys.ID] for a in artifacts2chunk], chunks)
-        return self.get_chunk_map(artifact_ids)
-
-    def get_orig_id(self, a_id: str) -> str:
-        """
-        Gets the id of the whole artifact.
-        :param a_id: The id of the artifact/chunk.
-        :return: The id of the whole artifact.
-        """
-        if a_id in self:
-            return a_id  # ensures this was the original id and not another id with an underscore
-        split_id = a_id.split(UNDERSCORE)
-        if len(split_id) > 1:
-            orig_id = UNDERSCORE.join(split_id[:-1])
-            return orig_id
-        raise NameError("Unknown artifact")
-
-    def is_chunk(self, a_id: str) -> bool:
-        """
-        Returns True if the artifact id is associated with a chunk else False.
-        :param a_id: The id of the artifact/chunk.
-        :return: True if the artifact id is associated with a chunk else False.
-        """
-        return self.get_chunk_num(a_id) is not None
-
-    def get_chunk_num(self, chunk_id: str) -> Optional[int]:
-        """
-        Gets the chunk number from the id.
-        :param chunk_id: The id of the chunk.
-        :return: The number of the chunk.
-        """
-        orig_id = self.get_orig_id(chunk_id)
-        artifact = self.get_artifact(orig_id)
-        assert artifact is not None, "Unknown artifact"
-        if orig_id == chunk_id:
-            return
-        try:
-            chunk_num = int(StrUtil.remove_substrings(chunk_id, [orig_id, UNDERSCORE]))
-            assert chunk_num < len(artifact[ArtifactKeys.CHUNKS])
-            return chunk_num
-        except (ValueError, AssertionError):
-            raise NameError("Chunk does not exist")
-
-    @staticmethod
-    def get_chunk_id(orig_id: str, chunk_num: int) -> str:
-        """
-        Creates an id for an artifact chunk.
-        :param orig_id: The id of the whole artifact.
-        :param chunk_num: The number of the chunk.
-        :return: An id for an artifact chunk.
-        """
-        return f"{orig_id}{UNDERSCORE}{chunk_num}"
 
     def to_artifacts(self) -> List[Artifact]:
         """
@@ -339,19 +240,6 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                 code_layers.add(artifact[ArtifactKeys.LAYER_ID])
         return code_layers
 
-    def _find_missing_summaries(self) -> Tuple[List, List]:
-        """
-        Finds artifacts that are missing summaries
-        :return: The ids and content of the missing summaries
-        """
-        ids = []
-        content = []
-        for i, artifact in self.itertuples():
-            if not DataFrameUtil.get_optional_value(artifact[ArtifactKeys.SUMMARY]):
-                ids.append(i)
-                content.append(artifact[ArtifactKeys.CONTENT])
-        return ids, content
-
     def drop_large_files(self) -> None:
         """
         Removes files that are too large for prompt from data frame.
@@ -377,3 +265,86 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
             if n_tokens > ANTHROPIC_MAX_MODEL_TOKENS:
                 large_file_ids.add(a_id)
         return large_file_ids
+
+    def chunk(self, chunker: AbstractChunker = None, artifact_ids: Set[str] = None,
+              unchunked_only: bool = True) -> Dict[str, List[str]]:
+        """
+        Breaks artifacts in dataframe into smaller chunks.
+        :param chunker: The Chunker to use.
+        :param artifact_ids: Specific artifacts to chunk (all by default).
+        :param unchunked_only: If True, only chunks artifacts that dont already have chunks.
+        :return: Dictionary mapping artifact id to the chunks.
+        """
+        chunker = SentenceChunker() if not chunker else chunker
+        already_chunked = {i for i, a in self.itertuples()
+                           if len(StrUtil.split_by_punctuation(Artifact.get_summary_or_content(a))) == 1}
+        if unchunked_only:
+            already_chunked.update({i for i, a in self.itertuples()
+                                    if DataFrameUtil.get_optional_value_from_df(a, ArtifactKeys.CHUNKS)})
+        artifact_ids = set(self.index) if not artifact_ids else artifact_ids
+        artifact_ids = artifact_ids.difference(already_chunked)
+        artifacts2chunk = [a for _, a in self.filter_by_index(list(artifact_ids)).itertuples()]
+        chunks = chunker.chunk(artifacts2chunk)
+        self.update_values(ArtifactKeys.CHUNKS, [a[ArtifactKeys.ID] for a in artifacts2chunk], chunks)
+        return self.get_chunk_map(artifact_ids)
+
+    def get_chunk_map(self, orig_artifact_ids: Set[str] = None, use_code_summary_only: bool = True) -> Dict[str, str]:
+        """
+        Gets a map of artifact id to a list of its chunks.
+        :param orig_artifact_ids: If provided, only retrieves chunks for given artifacts.
+        :param use_code_summary_only: If True, only uses the summary if the artifact is code and there are no chunks.
+        :return: Returns a map of artifact id to a list of its chunks.
+        """
+        orig_artifact_ids = set(self.index) if not orig_artifact_ids else orig_artifact_ids
+        chunk_map = {Chunk.get_chunk_id(name, i): chunk for name, a in self.itertuples()
+                     for i, chunk in enumerate(Artifact.get_chunks(a, use_code_summary_only))
+                     if DataFrameUtil.get_optional_value_from_df(a, ArtifactKeys.CHUNKS) and name in orig_artifact_ids}
+        return chunk_map
+
+    def get_artifact_from_chunk_id(self, c_id: str, id_only: bool = False, raise_exception: bool = False) -> Union[str, Artifact]:
+        """
+        Gets the id of the whole artifact.
+        :param c_id: The id of the artifact/chunk.
+        :param id_only: If True, only returns the id of the artifact.
+        :param raise_exception: If True, raises an exception if the artifact does not exist.
+        :return: The id of the whole artifact.
+        """
+        artifact = self.get_artifact(c_id)
+        if artifact is None:
+            a_id = Chunk.get_base_id(c_id)
+            artifact = self.get_artifact(a_id)
+        if artifact:
+            return artifact if not id_only else artifact[ArtifactKeys.ID]
+        if raise_exception:
+            raise KeyError("Unknown artifact")
+
+    def get_chunk_by_id(self, chunk_id: str, raise_exception: bool = False) -> str:
+        """
+        Gets the chunk number from the id.
+        :param chunk_id: The id of the chunk.
+        :param raise_exception: If True, raises exception if the chunk does not exist.
+        :return: The number of the chunk.
+        """
+        artifact = self.get_artifact_from_chunk_id(chunk_id, raise_exception=raise_exception)
+
+        if artifact:
+            chunk_num = Chunk.get_chunk_num(chunk_id, artifact[ArtifactKeys.ID])
+            chunks = artifact.get(ArtifactKeys.CHUNKS, [])
+            if chunk_num and chunk_num < len(chunks):
+                return chunks[chunk_num]
+
+        if raise_exception:
+            raise KeyError(f"Unknown artifact or chunk {chunk_id}")
+
+    def _find_missing_summaries(self) -> Tuple[List, List]:
+        """
+        Finds artifacts that are missing summaries
+        :return: The ids and content of the missing summaries
+        """
+        ids = []
+        content = []
+        for i, artifact in self.itertuples():
+            if not DataFrameUtil.get_optional_value(artifact[ArtifactKeys.SUMMARY]):
+                ids.append(i)
+                content.append(artifact[ArtifactKeys.CONTENT])
+        return ids, content

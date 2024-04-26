@@ -6,8 +6,8 @@ from javalang import tree as javatree
 from javalang.tree import Declaration, Import, PackageDeclaration
 
 from tgen.common.constants.deliminator_constants import BRACKET_CLOSE, BRACKET_OPEN, NEW_LINE, SEMI_COLON
-from tgen.data.chunkers.ast_chunkers.abstract_code_chunker import AbstractCodeChunker
-from tgen.data.chunkers.ast_chunkers.chunked_node import ChunkedNode
+from tgen.data.chunkers.token_limit_chunkers.abstract_code_chunker import AbstractCodeChunker
+from tgen.data.chunkers.token_limit_chunkers.chunked_node import ChunkedNode
 
 
 class UnknownNode:

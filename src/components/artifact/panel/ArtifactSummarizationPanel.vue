@@ -1,6 +1,6 @@
 <template>
   <details-panel panel="summarizeArtifact">
-    <panel-card title="Generate Summaries">
+    <panel-card title="Generate Summaries" borderless>
       <q-btn-group flat class="q-mb-md">
         <text-button
           v-bind="buttonProps('single')"

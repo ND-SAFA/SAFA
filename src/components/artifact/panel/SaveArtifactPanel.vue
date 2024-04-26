@@ -8,7 +8,7 @@
         @click="appStore.openDetailsPanel('displayArtifact')"
       />
     </template>
-    <panel-card title="Save Artifact">
+    <panel-card title="Save Artifact" borderless>
       <save-artifact-inputs />
       <template #actions>
         <save-artifact-buttons />

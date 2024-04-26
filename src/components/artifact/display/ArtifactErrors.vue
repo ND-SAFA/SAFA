@@ -4,6 +4,7 @@
     title="Warnings"
     data-cy="artifact-warnings"
     collapsable
+    borderless
   >
     <template #title-actions>
       <icon variant="warning" />

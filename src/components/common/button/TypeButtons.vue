@@ -2,7 +2,9 @@
   <q-card
     :bordered="visible"
     flat
-    :class="visible ? 'bd-primary' : 'bd-transparent'"
+    :class="
+      visible ? 'bd-text bg-transparent' : 'bd-transparent bg-transparent'
+    "
   >
     <q-btn-group flat>
       <icon-button
@@ -21,7 +23,7 @@
       <icon-button
         dense
         tooltip="Filter Types"
-        color="primary"
+        color="text"
         :icon="visible ? 'filter-close' : 'filter-open'"
         @click="visible = !visible"
       />

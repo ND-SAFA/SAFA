@@ -14,7 +14,7 @@
       :active-icon="getIcon('cancel')"
       :icon="drawMode ? getIcon('trace') : getIcon('graph-add')"
       :disable="draggingFab"
-      class="bg-background"
+      class="bg-neutral"
       data-cy="button-fab-toggle"
     >
       <q-fab-action
@@ -22,7 +22,7 @@
         label="Generate Trace Links"
         :icon="getIcon('generate-traces')"
         color="gradient"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-generate-trace"
         @click="appStore.openDetailsPanel('generateTrace')"
       />
@@ -31,7 +31,7 @@
         label="Generate Artifacts"
         :icon="getIcon('generate-artifacts')"
         color="gradient"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-generate-artifact"
         @click="appStore.openDetailsPanel('generateArtifact')"
       />
@@ -40,7 +40,7 @@
         label="Summarize Artifacts"
         :icon="getIcon('generate-summaries')"
         color="gradient"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-summarize-artifact"
         @click="appStore.openDetailsPanel('summarizeArtifact')"
       />
@@ -48,7 +48,7 @@
         v-if="isTreeMode"
         :label="drawMode ? 'Cancel Draw Mode' : 'Draw Trace Link'"
         :icon="drawMode ? getIcon('cancel') : getIcon('trace')"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-draw-trace"
         @click="cyStore.drawMode('toggle')"
       />
@@ -56,7 +56,7 @@
         v-if="isTreeMode"
         label="Create Trace Link"
         :icon="getIcon('create-trace')"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-create-trace"
         @click="appStore.openDetailsPanel('saveTrace')"
       />
@@ -64,7 +64,7 @@
         v-if="isTreeMode"
         label="Create Artifact"
         :icon="getIcon('create-artifact')"
-        class="bg-background"
+        class="bg-neutral"
         data-cy="button-fab-create-artifact"
         @click="artifactSaveStore.openPanel({ isNewArtifact: true })"
       />

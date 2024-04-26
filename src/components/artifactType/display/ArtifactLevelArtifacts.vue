@@ -1,5 +1,10 @@
 <template>
-  <panel-card v-if="artifacts.length > 0" :title="artifactsLabel" collapsable>
+  <panel-card
+    v-if="artifacts.length > 0"
+    :title="artifactsLabel"
+    collapsable
+    borderless
+  >
     <template #title-actions>
       <text-button
         text

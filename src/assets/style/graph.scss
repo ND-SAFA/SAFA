@@ -57,14 +57,14 @@ $graph-border-radius: 8px;
   border-width: 3px !important;
   border-radius: 10px;
   overflow: hidden;
-  background-color: $color-background;
+  background-color: $color-neutral;
   cursor: pointer;
   // Helps the graph not get fuzzy when adding a shadow on hover.
-  box-shadow: 1px 3px 8px rgba(0,0,0,0) !important;
+  box-shadow: 2px 5px 9px rgba(0,0,0,0) !important;
 
   &:hover, &.cy-node-selected {
-    background-color: $color-neutral;
-    box-shadow: rgba(0, 0, 0, 0.24) 1px 3px 8px !important;
+    //background-color: $color-background;
+    box-shadow: rgba(0, 0, 0, 0.24) 2px 5px 9px !important;
 
     &:after {
       background-image: linear-gradient(to bottom, rgba(255,255,255,0), $color-neutral 50%);

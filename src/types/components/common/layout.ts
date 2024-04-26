@@ -39,4 +39,8 @@ export interface PanelCardProps extends ColorProps, IconProps, ClassNameProps {
    * Whether this card should display an icon to collapse content and just show the title.
    */
   collapsable?: boolean;
+  /**
+   * Whether this card should display no border.
+   */
+  borderless?: boolean;
 }

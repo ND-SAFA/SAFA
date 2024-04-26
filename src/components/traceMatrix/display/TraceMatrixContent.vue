@@ -1,5 +1,5 @@
 <template>
-  <panel-card>
+  <panel-card borderless>
     <template #title>
       <div class="overflow-hidden" data-cy="text-selected-name">
         <typography variant="caption" value="Parent" />

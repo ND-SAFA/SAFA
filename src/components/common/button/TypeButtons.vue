@@ -19,7 +19,7 @@
         data-cy="button-filter-type"
         @click="emit('click', type, artifactTypes)"
       />
-      <separator v-show="visible" vertical color="primary" />
+      <separator v-show="visible" vertical color="text" />
       <icon-button
         dense
         tooltip="Filter Types"

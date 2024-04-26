@@ -51,12 +51,9 @@
         />
         <slot name="subtitle" />
       </q-item-label>
-      <div v-if="smallWindow" class="q-ml-auto" @click.stop="">
-        <slot name="actions" />
-      </div>
     </q-item-section>
     <q-item-section
-      v-if="!!slots.actions && !smallWindow"
+      v-if="!!slots.actions"
       :class="props.actionCols ? `col-${props.actionCols}` : 'width-fit'"
     >
       <div @click.stop="">

@@ -2,7 +2,6 @@
   <flex-box v-if="artifact">
     <text-button
       text
-      small
       label="Tree"
       icon="view-tree"
       data-cy="button-artifact-tree"
@@ -10,25 +9,14 @@
     />
     <text-button
       text
-      small
       label="Expand"
       icon="code"
       data-cy="button-artifact-body"
       @click="appStore.openDetailsPanel('displayArtifactBody')"
     />
     <text-button
-      v-if="ENABLED_FEATURES.NASA_ARTIFACT_COMMENT"
-      text
-      small
-      label="Comment"
-      icon="comment"
-      data-cy="button-artifact-comment"
-      @click="handleComment"
-    />
-    <text-button
       v-if="displayActions"
       text
-      small
       label="Edit"
       icon="edit"
       data-cy="button-artifact-edit"
@@ -37,7 +25,6 @@
     <text-button
       v-if="displayActions"
       text
-      small
       :loading="artifactApiStore.deleteLoading"
       label="Delete"
       icon="delete"
@@ -58,7 +45,6 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ENABLED_FEATURES } from "@/util";
 import {
   appStore,
   artifactApiStore,
@@ -74,8 +60,4 @@ const displayActions = computed(() =>
 );
 
 const artifact = computed(() => artifactStore.selectedArtifact);
-
-function handleComment() {
-  // TODO
-}
 </script>

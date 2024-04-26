@@ -46,7 +46,7 @@ export interface CommentSchema {
   /**
    * The date and time the comment was last edited.
    */
-  lastEditedAt: string;
+  updatedAt: string;
 }
 
 /**

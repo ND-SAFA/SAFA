@@ -57,9 +57,9 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
 
   async function handleSendChatMessage(message: string) {
     await chatDialogApi.handleRequest(async () => {
-      const fullMessage = {
+      const fullMessage: ChatMessageSchema = {
         id: "",
-        userMessage: true,
+        isUser: true,
         message,
         artifactIds: [],
       };

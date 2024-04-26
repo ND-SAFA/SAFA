@@ -18,7 +18,6 @@ from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
@@ -200,7 +199,7 @@ class ProjectSummarizer(BaseObject):
         self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
         self.llm_manager.llm_args.temperature = 0
 
-        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets(eval=dataset)
         trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
                                              prompt_builders=list(prompt_builders.values()),
                                              trainer_dataset_manager=trainer_dataset_manager))
@@ -222,8 +221,8 @@ class ProjectSummarizer(BaseObject):
                                                                 f"to be a {QuestionnairePrompt.__class__.__name__}"
         content_prompt = SupportedPrompts.PROJECT_SUMMARY_CONTEXT_ARTIFACTS.value if self.dataset \
             else SupportedPrompts.PROJECT_SUMMARY_CONTEXT_VERSIONS.value
-        prompt_prefix = BODY_ARTIFACT_TITLE if self.dataset else BODY_VERSION_TITLE
-        artifacts_prompt = MultiArtifactPrompt(prompt_prefix=prompt_prefix,
+        prompt_start = BODY_ARTIFACT_TITLE if self.dataset else BODY_VERSION_TITLE
+        artifacts_prompt = MultiArtifactPrompt(prompt_start=prompt_start,
                                                build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                xml_tags=ArtifactPrompt.DEFAULT_XML_TAGS
                                                if self.dataset else {"versions": ["id", "body"]},

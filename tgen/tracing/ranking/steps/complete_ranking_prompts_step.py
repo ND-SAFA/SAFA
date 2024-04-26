@@ -93,7 +93,7 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
 
         RankingUtil.add_project_summary_prompt(prompt_builder, state)
 
-        prompt_builder.add_prompt(MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(ARTIFACT_HEADER),
+        prompt_builder.add_prompt(MultiArtifactPrompt(prompt_start=PromptUtil.as_markdown_header(ARTIFACT_HEADER),
                                                       build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                       include_ids=True))
 

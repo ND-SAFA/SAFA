@@ -122,7 +122,7 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     )])
 
 API_DATAFLOW_QUESTIONNAIRE = QuestionnairePrompt(
-    question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_prefix="# Related Code Snippets"),
+    question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_start="# Related Code Snippets"),
                       Prompt("# TASK \n "
                              "Create a detailed summary describing what occurs during the execution of the endpoint."
                              "\n\t- The summary should detail the input, what happens inside of each step, and the output."
@@ -133,7 +133,7 @@ API_DATAFLOW_QUESTIONNAIRE = QuestionnairePrompt(
 )
 
 DB_ENTITY_SPEC_QUESTIONNAIRE = QuestionnairePrompt(
-    question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_prefix="# Usages of the entity"),
+    question_prompts=[ContextPrompt(id_to_context_artifacts={}, prompt_start="# Usages of the entity"),
                       Prompt("# TASK \n "
                              "You are given the code for an entity and summaries of each code module that uses the entity. "
                              "Extract the schema from the given entity's attributes using the following format: \n{format}.\n"

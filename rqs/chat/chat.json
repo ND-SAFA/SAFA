@@ -3,20 +3,20 @@
     {
       "jobs": [
         {
-          "object_type": "RANKING",
-          "ranking_pipeline": "LLM",
-          "sorter": "embedding",
+          "object_type": "CHAT",
+          "max_context": 10,
+          "chat_history": [{"role":  "user", "content":  "[QUESTION]"}],
           "job_args": {
-            "export_dir": "[OUTPUT_PATH]/ranking/[CURRENT_PROJECT]",
             "dataset_creator": {
               "object_type": "PROMPT",
               "trace_dataset_creator": {
                 "project_reader": {
-                  "object_type": "STRUCTURE",
+                  "object_type": "SAFA",
                   "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
                 }
               }
-            }
+            },
+            "export_dir": "[OUTPUT_PATH]/chat/[CURRENT_PROJECT]"
           }
         }
       ]

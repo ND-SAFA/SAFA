@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Set, Tuple, TypedDict
+from typing import Dict, List, Optional, Set, Tuple, TypedDict, Union
 
 import anthropic
 
@@ -48,7 +48,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
     """
 
     NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
-    prompt_args = PromptArgs(prompt_prefix="\n\nHuman: ", prompt_suffix="\n\nAssistant:", completion_prefix=" ",
+    prompt_args = PromptArgs(prompt_prefix=EMPTY_STRING, prompt_suffix=EMPTY_STRING, completion_prefix=" ",
                              completion_suffix="###")
 
     def __init__(self, llm_args: AnthropicArgs = None):
@@ -88,12 +88,14 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :return: Anthropic's response to completion request.
         """
         assert AnthropicParams.PROMPT in params, f"Expected {params} to include `prompt`"
-        prompts = params[AnthropicParams.PROMPT]
+        prompts = params.pop(AnthropicParams.PROMPT)
         logger.info(f"Starting Anthropic batch ({len(prompts)}): {params['model']}")
 
         if isinstance(prompts, str):
             prompts = [prompts]
 
+        prompts = [[self.convert_prompt_to_message(p) if not isinstance(p, dict) else p
+                    for p in (convo if isinstance(convo, List) else [convo])] for convo in prompts]
         anthropic_client = get_client()
 
         def thread_work(payload: Tuple[int, str]) -> Dict:
@@ -103,8 +105,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             :return: None
             """
             index, prompt = payload
-            prompt_params = {**params, AnthropicParams.PROMPT: prompt}
-            local_response = anthropic_client.completion(**prompt_params)
+            prompt_params = {**params, AnthropicParams.MESSAGES: prompt}
+            local_response = anthropic_client.messages.create(**prompt_params)
             return local_response
 
         global_state: MultiThreadState = ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
@@ -116,13 +118,15 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                                                          raise_exception=raise_exception,
                                                                          rpm=anthropic_constants.ANTHROPIC_MAX_RPM)
         close_client(anthropic_client)
+        if raise_exception and global_state.exception:
+            raise global_state.exception
 
         self._handle_exceptions(global_state)
         global_responses = global_state.results
         for i, res in enumerate(global_responses):
-            if res.get("exception", EMPTY_STRING):
+            if isinstance(res, Exception):
                 if raise_exception:
-                    raise Exception(res["exception"])
+                    raise res
                 global_state.failed_responses.add(i)
         if retries is not None:
             global_responses = self._combine_original_responses_and_retries(global_responses, original_responses, retries)
@@ -136,7 +140,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :param res: The response
         :return: All text across all batches from the response
         """
-        return EMPTY_STRING.join([res.get("completion", EMPTY_STRING) for res in res])
+        return EMPTY_STRING.join([AnthropicManager._extract_response(res) for res in res if "content" in res])
 
     def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse], **params) -> Optional[
         SupportedLLMResponses]:
@@ -147,7 +151,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :param params: Any additional parameters to customize translation.
         :return: A task-specific response.
         """
-        texts = [r.get("completion", r.get("exception")) for r in res]
+        texts = [self._extract_response(r) for r in res]
         if task == LLMCompletionType.GENERATION:
             return GenerationResponse(texts)
         if task == LLMCompletionType.CLASSIFICATION:
@@ -175,10 +179,22 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         """
         response = AttrDict()
         if response_text:
-            response["completion"] = response_text
+            response["content"] = [AttrDict({"text": response_text})]
         if exception:
-            response["exception"] = exception
+            response["error"] = exception
         return response
+
+    @staticmethod
+    def _extract_response(res: dict) -> Union[str, Exception]:
+        """
+        Gets the LLM response or the error msg if exception occurred.
+        :param res: The response.
+        :return: The LLM response or the error msg if exception occurred
+        """
+        if hasattr(res, "content"):
+            return res.content[0].text
+        else:
+            return Exception(res["error"])
 
     @staticmethod
     def _get_log_prob(completion: str) -> Dict[str, float]:
@@ -208,7 +224,7 @@ def get_client():
         return MockAnthropicClient()
     else:
         assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
-        return anthropic.Client(ANTHROPIC_KEY)
+        return anthropic.Client(api_key=ANTHROPIC_KEY)
 
 
 def close_client(anthropic_client: anthropic.Client) -> None:

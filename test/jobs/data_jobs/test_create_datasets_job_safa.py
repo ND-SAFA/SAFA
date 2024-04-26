@@ -6,8 +6,8 @@ from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.object_creator import ObjectCreator
+from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 
 
 class TestCreateDatasetJobSAFA(BaseJobTest):
@@ -34,5 +34,6 @@ class TestCreateDatasetJobSAFA(BaseJobTest):
         job_args = ObjectCreator.create(JobArgs)
         dataset_creator = ObjectCreator.create(TraceDatasetCreator)
         trainer_dataset_manager = TrainerDatasetManager(train_dataset_creator=dataset_creator)
-        return CreateDatasetsJob(trainer_dataset_manager=trainer_dataset_manager, export_path=TEST_OUTPUT_DIR, job_args=job_args,
+        job_args.export_dir = TEST_OUTPUT_DIR
+        return CreateDatasetsJob(trainer_dataset_manager=trainer_dataset_manager, job_args=job_args,
                                  format_type=SupportedDatasetExporter.SAFA)

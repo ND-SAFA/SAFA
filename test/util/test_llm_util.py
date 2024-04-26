@@ -1,4 +1,3 @@
-from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.models.llm.llm_responses import GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType

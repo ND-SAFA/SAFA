@@ -6,8 +6,10 @@ class MockAnthropicClient:
     Shell for the anthropic client.
     """
 
-    def completion(self, *args, **kwargs):
-        raise NotImplementedError("This object was access before mocking.")
+    class messages:
+
+        def create(self, *args, **kwargs):
+            raise NotImplementedError("This object was access before mocking.")
 
 
 def mock_anthropic(func=None, *args, **kwargs):

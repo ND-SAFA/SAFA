@@ -4,7 +4,6 @@ from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
@@ -24,7 +23,7 @@ def get_prediction_output(args: DeltaArgs, artifact_df: ArtifactDataFrame, state
     :return: The model predictions for each file diff
     """
     dataset = PromptDataset(artifact_df=artifact_df)
-    dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
+    dataset_manager = TrainerDatasetManager.create_from_datasets(eval=dataset)
     prompt_builder = PromptBuilder(prompts=prompts)
     prompt_builder.format_prompts_with_var(summary=state.project_summary.to_string(), **kwargs)
     trainer = LLMTrainer(LLMTrainerState(llm_manager=args.llm_manager,

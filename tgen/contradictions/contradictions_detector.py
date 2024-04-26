@@ -1,133 +1,106 @@
-from typing import Dict, List, Tuple, Set, Optional
+from typing import Dict, List, Optional
 
-from tgen.common.constants.model_constants import get_best_default_llm_manager_short_context
-from tgen.common.objects.artifact import Artifact
+from tgen.common.constants.deliminator_constants import COMMA
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
-from tgen.contradictions.contradiction_decision_nodes import SupportedContradictionDecisionNodes
-from tgen.contradictions.contradictions_tree_builder import ContradictionsTreeBuilder
-from tgen.contradictions.requirement import Requirement
-from tgen.contradictions.requirements_converter import RequirementsConverter
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.llm_response_util import LLMResponseUtil
+from tgen.common.util.prompt_util import PromptUtil
+from tgen.contradictions.common_choices import CommonChoices
+from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.core.trainers.llm_trainer import LLMTrainer
-from tgen.core.trainers.llm_trainer_state import LLMTrainerState
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
+from tgen.data.dataframes.layer_dataframe import LayerDataFrame
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys, LayerKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.decision_tree.nodes.llm_node import LLMNode
-from tgen.decision_tree.path import Path
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.context_prompt import ContextPrompt
+from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
+from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.tracing.context_finder import ContextFinder
 
 
 class ContradictionsDetector:
-    TREE = ContradictionsTreeBuilder().build_tree()
 
-    def __init__(self, trace_dataset: TraceDataset, export_path: str = None, llm_manager: AbstractLLMManager = None):
+    def __init__(self, args: ContradictionsArgs):
         """
         Handles detecting contradictions in requirements.
-        :param trace_dataset: Contains the requirements.
-        :param export_path: Where to export responses to.
-        :param llm_manager: The LLM manager to use to make decisions.
+        :param args: Arguments to the detector
         """
-        self.trace_dataset = trace_dataset
-        self.export_path = export_path
-        self.llm_manager = get_best_default_llm_manager_short_context() if not llm_manager else llm_manager
+        self.args = args
 
-    def detect_all(self) -> Dict[str, List[int]]:
+    def detect(self, req_id: str) -> Optional[List[str]]:
         """
-        Traverses a decision tree for each requirement pair to determine if a contradiction exists.
-        :return: A dictionary mapping type of contradiction to the id of all links identified as having that type of contradiction.
+        Determines whether a given requirement has any contradictions
+        :param req_id: The id of the requirement to detect contradictions for.
+        :return
         """
-        id2requirement = self.create_requirements([a for _, a in self.trace_dataset.artifact_df.itertuples()], self.export_path)
-        contradictions = {contradiction.value.description: [] for contradiction in SupportedContradictionDecisionNodes
-                          if contradiction != SupportedContradictionDecisionNodes.NONE}
+        assert req_id in self.args.dataset.artifact_df, "Unknown requirement"
 
-        links = self.trace_dataset.trace_df.get_links()
+        artifact_df = self.args.dataset.artifact_df
+        id2context, all_relationships = ContextFinder.find_related_artifacts(req_id, self.args.dataset,
+                                                                             max_context=self.args.max_context,
+                                                                             base_export_dir=self.args.export_dir)
+        trace_df = self.args.dataset.trace_dataset.trace_df if self.args.dataset.trace_dataset else TraceDataFrame()
+        conflicting_ids = self._perform_detections(req_id, id2context)
+        if not self.args.dataset.trace_dataset:
+            requirement_type = artifact_df.get_artifact(req_id)[ArtifactKeys.LAYER_ID]
+            layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [requirement_type],
+                                       LayerKeys.TARGET_TYPE: artifact_df.get_artifact_types()})
+            self.args.dataset.trace_dataset = TraceDataset(artifact_df, trace_df, layer_df)
+        self.args.dataset.trace_dataset.trace_df = self._add_traces_to_df(all_relationships, trace_df)
+        return [a_id for a_id in conflicting_ids if a_id in artifact_df] if conflicting_ids else None
 
-        link2path: Dict[int, Path] = {}
-        links_with_decisions: Set[int] = set()
-        choices = []
-        while len(links_with_decisions) != len(links):
-            choices = iter(choices)
-            prompt_builders = []
-            for link in links:
-                link_id = link[TraceKeys.LINK_ID]
-                if link_id in links_with_decisions:
-                    continue
-
-                current_path = link2path.get(link_id)
-                last_choice = next(choices, None)
-                if last_choice:
-                    current_path.add_decision(last_choice)
-                input_ = self._create_input_for_tree(link, id2requirement)
-                if not input_:
-                    links_with_decisions.add(link_id)
-                    continue
-
-                prompt_builder, path = self.TREE.next_step(input_, current_path)
-                link2path[link_id] = path
-
-                decision = path.get_final_decision()
-                if decision:
-                    links_with_decisions.add(link_id)
-                    if decision in contradictions:
-                        contradictions[decision].append(link_id)
-                else:
-                    prompt_builders.append(prompt_builder)
-            choices = self._get_llm_choices(prompt_builders)
-        return contradictions
-
-    @staticmethod
-    def detect_single_pair(artifact1: Artifact, artifact2: Artifact) -> Path:
+    def _perform_detections(self, req_id: str, id2context: Dict[str, List[EnumDict]]) -> Optional[List[str]]:
         """
-        Runs the detection for a single pair of artifacts..
-        :param artifact1: The first artifact.
-        :param artifact2: The second artifact.
-        :return: The path taken when traversing the tree.
+        Performs the detection by prompting the LLM with the given context.
+        :param req_id: The id of the requirement to perform detection on.
+        :param id2context: Dictionary mapping requirement id to its related artifacts.
+        :return: The output from the LLM.
         """
-        id2requirement = ContradictionsDetector.create_requirements([artifact1, artifact2])
-        if any([req.is_empty() for req in id2requirement.values()]):
-            raise Exception("Failed to convert artifact to requirement - bad response.")
-        link = Trace(source=artifact1[ArtifactKeys.ID], target=artifact2[ArtifactKeys.ID])
-        input_ = ContradictionsDetector._create_input_for_tree(link, id2requirement)
-        path = ContradictionsDetector.TREE.traverse(input_)
-        return path
+        requirement = self.args.dataset.artifact_df.get_artifact(req_id)
+        context_prompt = ContextPrompt(id2context, prompt_start=PromptUtil.as_markdown_header("Related Information"),
+                                       build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN, include_ids=True)
+        requirement_prompt = ArtifactPrompt(prompt_start=PromptUtil.as_markdown_header("Requirement"))
+        instructions_prompt = Prompt("Consider whether the following requirement is inconsistent or contradictory with any of the "
+                                     "related pieces of information. ")
+        task_prompt = Prompt("Output the ids of any contradictory or inconsistent information in a comma-deliminated list."
+                             "If all the information entails or is neutral to the requirement, simply respond with no.",
+                             title=f"Task",
+                             response_manager=PromptResponseManager(response_tag="contradictions",
+                                                                    value_formatter=self.format_response))
+        prompt_builder = PromptBuilder(prompts=[instructions_prompt, requirement_prompt, context_prompt, task_prompt])
+        save_and_load_path = FileUtil.safely_join_paths(self.args.export_dir, f"{req_id}_contradictions_response.yaml")
+        output = LLMTrainer.predict_from_prompts(self.args.llm_manager, prompt_builder,
+                                                 save_and_load_path=save_and_load_path,
+                                                 artifact=requirement)
+        response = LLMResponseUtil.extract_predictions_from_response(output.predictions, task_prompt.id,
+                                                                     task_prompt.response_manager.response_tag, return_first=False)[0]
+        return None if response[0] == CommonChoices.NO else response
 
     @staticmethod
-    def create_requirements(artifacts: List[Artifact], export_path: str = None) -> Dict[int, Requirement]:
+    def format_response(tag: str, value: str) -> Optional[List[str]]:
         """
-        Creates requirements from the artifacts.
-        :param artifacts: The artifacts to convert to requirements.
-        :param export_path: Path to save the LLM output to.
-        :return: Map of requirement id to the requirement.
+        Formats the LLM's response for the contradictions.
+        :param tag: The name of the tag.
+        :param value: The value of the response.
+        :return: List of conflicting ids if there is a conflict, else None
         """
-        requirements = RequirementsConverter(export_path=export_path).convert_artifacts(artifacts)
-        id2requirement = {req.id: req for req in requirements}
-        return id2requirement
+        conflicting_ids = value.split(COMMA)
+        if len(conflicting_ids) == 1 and conflicting_ids[0].lower() == CommonChoices.NO:
+            return CommonChoices.NO
+        return conflicting_ids
 
     @staticmethod
-    def _create_input_for_tree(link: EnumDict, id2requirement: Dict[int, Requirement]) -> Optional[Tuple[Requirement, Requirement]]:
+    def _add_traces_to_df(selected_entries: List[Trace], trace_df: TraceDataFrame) -> TraceDataFrame:
         """
-        Creates the input for the decision tree.
-        :param link: The current link to be examined.
-        :param id2requirement: Maps requirement ids to their content.
-        :return: The input for the decision tree.
+        Adds the selected traces to the dataframe.
+        :param selected_entries: List of selected traces.
+        :param trace_df: Dataframe to add to.
+        :return: The dataframe containing selected traces.
         """
-        r_id1, r_id2 = link[TraceKeys.child_label()], link[TraceKeys.parent_label()]
-        req1, req2 = id2requirement[r_id1], id2requirement[r_id2]
-        if req1.is_empty() or req2.is_empty():
-            return
-        input_ = (req1, req2)
-        return input_
-
-    def _get_llm_choices(self, prompt_builders: List[PromptBuilder]) -> List[str]:
-        """
-        Gets the LLM's next round of choices for each node.
-        :param prompt_builders: List of prompt builders for each node.
-        :return: The next round of choices for each node.
-        """
-        if len(prompt_builders) == 0:
-            return []
-        trainer = LLMTrainer(LLMTrainerState(prompt_builders=prompt_builders, llm_manager=self.llm_manager))
-        res = trainer.perform_prediction()
-        choices = [LLMNode.get_choice_from_response(r) for r in res.predictions]
-        return choices
+        for entry in selected_entries:
+            entry[TraceKeys.LINK_ID] = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET])
+        return TraceDataFrame.update_or_add_values(trace_df, selected_entries)

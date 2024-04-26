@@ -1,6 +1,7 @@
 from tgen.common.util.enum_util import EnumDict
-from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.keys.prompt_keys import PromptKeys
+from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
@@ -9,7 +10,6 @@ from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.select_question_prompt import SelectQuestionPrompt
-from tgen.models.llm.anthropic_manager import AnthropicManager
 from tgen.testres.base_tests.base_test import BaseTest
 
 
@@ -76,16 +76,6 @@ class TestPromptBuilder(BaseTest):
         self.assertFalse(prompt_builder.config.requires_trace_per_prompt)
         self.assertTrue(prompt_builder.config.requires_artifact_per_prompt)
         self.assertTrue(prompt_builder.config.requires_all_artifacts)
-
-    def test_add_remove_format_for_model(self):
-        has_start = AnthropicManager.prompt_args.prompt_prefix + "a prompt"
-        formatted = PromptBuilder.format_prompt_for_model(has_start, AnthropicManager.prompt_args)
-        self.assertEqual(1, formatted.count(AnthropicManager.prompt_args.prompt_prefix))
-        self.assertTrue(formatted.endswith(AnthropicManager.prompt_args.prompt_suffix))
-
-        not_formatted = PromptBuilder.remove_format_for_model_from_prompt(formatted, AnthropicManager.prompt_args)
-        self.assertNotIn(not_formatted, AnthropicManager.prompt_args.prompt_prefix)
-        self.assertNotIn(not_formatted, AnthropicManager.prompt_args.prompt_suffix)
 
     def get_prompt_builder(self, data_type=MultiArtifactPrompt.DataType.TRACES):
         prompts = [ArtifactPrompt(),

@@ -1,8 +1,8 @@
 from collections import namedtuple
-from typing import List, Set
 
 import openai
 from openai.openai_object import OpenAIObject
+from typing import List, Set
 
 from tgen.common.constants import open_ai_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
@@ -80,7 +80,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
             :param p: The prompt to complete.
             :return: The response as a string.
             """
-            params[OpenAIParams.MESSAGES] = [{"role": "user", "content": p}]
+            params[OpenAIParams.MESSAGES] = [self.convert_prompt_to_message(p)]
             res = openai.ChatCompletion.create(**params)
             return res.choices[0]
 

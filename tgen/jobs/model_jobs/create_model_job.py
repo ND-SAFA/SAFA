@@ -1,5 +1,4 @@
 from tgen.jobs.abstract_job import AbstractJob
-from tgen.jobs.components.job_result import JobResult
 
 
 class CreateModelJob(AbstractJob):

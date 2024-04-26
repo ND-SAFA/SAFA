@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.constants.other_constants import DEFAULT_CONTEXT_THRESHOLD
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.override import overrides
@@ -31,5 +31,5 @@ class ContextPrompt(MultiArtifactPrompt):
         a_id = artifact[ArtifactKeys.ID]
         artifacts = self.id_to_context_artifacts.get(a_id, [])
         if artifacts:
-            return super()._build(artifacts=artifacts, **kwargs)
+            return super()._build(artifacts=artifacts, **kwargs) + NEW_LINE
         return EMPTY_STRING

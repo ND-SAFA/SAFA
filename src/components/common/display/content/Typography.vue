@@ -39,7 +39,7 @@
         <q-separator vertical class="q-mx-xs" />
         <q-tooltip :delay="300"> {{ expandLabel }} </q-tooltip>
       </q-btn>
-      <q-markdown v-if="expanded" no-heading-anchor-links>
+      <q-markdown v-if="expanded" no-heading-anchor-links class="full-width">
         {{ "```" + codeExt + "\n" + value + "\n```" }}
       </q-markdown>
       <div v-else :class="className + ' text-textCaption'">Code hidden</div>

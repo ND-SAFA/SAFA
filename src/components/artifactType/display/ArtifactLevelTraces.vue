@@ -1,6 +1,11 @@
 <template>
   <div>
-    <panel-card v-if="parentCount > 0" :title="parentLabel" collapsable>
+    <panel-card
+      v-if="parentCount > 0"
+      :title="parentLabel"
+      collapsable
+      borderless
+    >
       <list :scroll-height="300" data-cy="list-selected-parents">
         <list-item
           v-for="parent in parentTypes"
@@ -28,7 +33,12 @@
       </list>
     </panel-card>
 
-    <panel-card v-if="childCount > 0" :title="childLabel" collapsable>
+    <panel-card
+      v-if="childCount > 0"
+      :title="childLabel"
+      collapsable
+      borderless
+    >
       <list :scroll-height="300" data-cy="list-selected-children">
         <list-item
           v-for="child in childTypes"

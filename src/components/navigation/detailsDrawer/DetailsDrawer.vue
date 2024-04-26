@@ -7,7 +7,7 @@
     :width="width"
     :class="className"
   >
-    <div class="q-pa-sm q-mb-md bg-background">
+    <div class="q-pa-sm q-mb-md bg-neutral">
       <delta-panel />
       <document-panel />
       <project-overview-panel />
@@ -67,7 +67,7 @@ const openState = computed(() => appStore.popups.detailsPanel);
 const drawerOpen = computed(() => typeof openState.value === "string");
 
 const className = computed(
-  () => `bg-background nav-panel nav-panel-${openState.value}`
+  () => `bg-neutral nav-panel nav-panel-${openState.value}`
 );
 
 const width = computed(() => {

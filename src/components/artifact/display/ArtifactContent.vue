@@ -1,5 +1,5 @@
 <template>
-  <panel-card>
+  <panel-card borderless>
     <artifact-name-display
       v-if="artifact"
       :artifact="artifact"

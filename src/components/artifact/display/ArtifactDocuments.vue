@@ -1,5 +1,5 @@
 <template>
-  <panel-card v-if="doDisplay" title="Views" collapsable>
+  <panel-card v-if="doDisplay" title="Views" collapsable borderless>
     <list>
       <list-item
         v-for="doc in documents"

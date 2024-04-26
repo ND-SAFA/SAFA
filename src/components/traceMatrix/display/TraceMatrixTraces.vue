@@ -1,5 +1,5 @@
 <template>
-  <panel-card :title="traceLabel" collapsable>
+  <panel-card :title="traceLabel" collapsable borderless>
     <template #title-actions>
       <text-button
         text

@@ -1,5 +1,5 @@
 <template>
-  <panel-card>
+  <panel-card borderless>
     <artifact-name-display
       v-if="artifact"
       :artifact="artifact"
@@ -15,6 +15,7 @@
       :collapse-length="0"
       :variant="variant"
       el="p"
+      class="full-width"
       :value="body"
     />
   </panel-card>

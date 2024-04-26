@@ -4,7 +4,7 @@ import { buildRequest } from "@/api";
 
 const EXAMPLE_SAFA_MESSAGE: ChatMessageSchema = {
   id: "1",
-  userMessage: false,
+  isUser: false,
   message: "Hello! How can I help you?",
   artifactIds: [],
 };
@@ -23,13 +23,13 @@ const EXAMPLE_NASA_CHAT: ProjectChatSchema = {
   messages: [
     {
       id: "1",
-      userMessage: true,
+      isUser: true,
       message: "How is the GLM coverage ensured?",
       artifactIds: [],
     },
     {
       id: "2",
-      userMessage: false,
+      isUser: false,
       message:
         "LIRD137 established the first coverage specification for the GLM.\n\n" +
         "A change request (CCR01543) was issued to update the level two requirement, MRD222.\n\n" +

@@ -2,8 +2,13 @@
  * Represents the type of user comment on an artifact.
  */
 export type CommentType =
-  | "warning" // Resolution is necessary
-  | "conversation"; // Resolution is optional
+  | "flag" // Resolution is necessary
+  | "conversation" // Resolution is optional
+  | "contradiction"
+  | "suggestion"
+  | "unknown_concept"
+  | "matched_concept"
+  | "multi_matched_concept";
 
 /**
  * Represents the status of a user comment on an artifact.
@@ -45,6 +50,48 @@ export interface CommentSchema {
 }
 
 /**
+ * Represents a health check on an artifact based on a mentioned concept.
+ */
+interface ConceptHealthCheckSchema extends CommentSchema {
+  type: "matched_concept" | "unknown_concept";
+  /**
+   * The name of the concept.
+   */
+  name: string;
+}
+
+/**
+ * Represents a health check on an artifact based on a contradiction.
+ */
+interface ContradictionHealthCheckSchema extends CommentSchema {
+  type: "contradiction";
+  /**
+   * The artifacts affected by the contradiction.
+   */
+  affectedArtifacts: string[];
+}
+
+/**
+ * Represents a health check on an artifact based on multiple concepts.
+ */
+interface MultipleConceptHealthCheckSchema extends CommentSchema {
+  type: "multi_matched_concept";
+  /**
+   * The names of the matched concepts.
+   */
+  concepts: string[];
+}
+
+/**
+ * Represents any type of health check on an artifact.
+ */
+export type AnyCommentSchema =
+  | CommentSchema
+  | ConceptHealthCheckSchema
+  | ContradictionHealthCheckSchema
+  | MultipleConceptHealthCheckSchema;
+
+/**
  * Represents a collection of comments and flags on an artifact.
  */
 export interface ArtifactCommentsSchema {
@@ -54,10 +101,17 @@ export interface ArtifactCommentsSchema {
   artifactId: string;
   /**
    * The comments on the artifact.
+   * type = conversation
    */
   comments: CommentSchema[];
   /**
    * The flags on the artifact.
+   * type = flag
    */
   flags: CommentSchema[];
+  /**
+   * The flags on the artifact.
+   * type = contradiction, suggestion, unknown_concept, matched_concept, multi_matched_concept
+   */
+  healthChecks: CommentSchema[];
 }

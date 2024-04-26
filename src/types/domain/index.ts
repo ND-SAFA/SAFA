@@ -19,5 +19,4 @@ export * from "./organizations";
 export * from "./billing";
 export * from "./admin";
 export * from "./comments";
-export * from "./health";
 export * from "./chat";

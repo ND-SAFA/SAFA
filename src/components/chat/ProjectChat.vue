@@ -168,10 +168,10 @@ const messages = computed(() => chatStore.currentMessages);
 const formattedMessages = computed(() =>
   messages.value.map((message) => ({
     ...message,
-    iconClass: message.userMessage ? undefined : "bg-gradient",
-    iconColor: message.userMessage ? "primary" : undefined,
-    iconVariant: (message.userMessage ? "account" : "generate") as IconVariant,
-    userName: message.userMessage ? sessionStore.userEmail : "SAFA",
+    iconClass: message.isUser ? undefined : "bg-gradient",
+    iconColor: message.isUser ? "primary" : undefined,
+    iconVariant: (message.isUser ? "account" : "generate") as IconVariant,
+    userName: message.isUser ? sessionStore.userEmail : "SAFA",
     referenceLabel:
       message.artifactIds.length === 1
         ? `1 Reference`

@@ -1,4 +1,4 @@
-import { ArtifactCommentsSchema, CommentSchema } from "@/types";
+import { ArtifactCommentsSchema, ArtifactSchema, CommentSchema } from "@/types";
 import { buildRequest } from "@/api";
 
 /**
@@ -88,4 +88,20 @@ export async function resolveArtifactComment(
     "resolveComment",
     { versionId, artifactId, commentId }
   ).post();
+}
+
+/**
+ * Generate health checks for an artifact.
+ * @param versionId - The unique identifier of the version.
+ * @param artifact - The artifact to generate health checks for.
+ * @returns The health checks for the artifact.
+ */
+export function generateArtifactHealth(
+  versionId: string,
+  artifact: ArtifactSchema
+): Promise<ArtifactCommentsSchema> {
+  return buildRequest<ArtifactCommentsSchema, "versionId", ArtifactSchema>(
+    "generateHealthChecks",
+    { versionId }
+  ).post(artifact);
 }

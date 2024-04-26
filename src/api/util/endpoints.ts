@@ -213,18 +213,14 @@ export enum Endpoint {
   getAllTransactions = "billing/transactions/:orgId",
   getMonthlyTransactions = "billing/transactions/:orgId/month",
 
-  // Artifact Health
+  // Comments, Flags, Health Checks
 
-  getHealthChecks = "projects/versions/:versionId/artifacts/:artifactId/health",
+  getComments = "projects/versions/:versionId/comments/artifact/:artifactId",
+  createComment = "projects/versions/:versionId/comments",
+  editComment = "projects/versions/:versionId/comments/:commentId",
+  deleteComment = "projects/versions/:versionId/comments/:commentId",
+  resolveComment = "projects/versions/:versionId/comments/:commentId/resolve",
   generateHealthChecks = "projects/versions/:versionId/artifacts/health",
-
-  // Comments
-
-  getComments = "projects/versions/:versionId/artifacts/:artifactId/comment",
-  createComment = "projects/versions/:versionId/artifacts/:artifactId/comment",
-  editComment = "projects/versions/:versionId/artifacts/comment/:commentId",
-  deleteComment = "projects/versions/:versionId/artifacts/comment/:commentId",
-  resolveComment = "projects/versions/:versionId/artifacts/comment/:commentId/resolve",
 
   // Chat
 

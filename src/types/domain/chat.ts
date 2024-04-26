@@ -9,7 +9,7 @@ export interface ChatMessageSchema {
   /**
    * Whether this is a user created message.
    */
-  userMessage: boolean;
+  isUser: boolean;
   /**
    * The message content.
    */

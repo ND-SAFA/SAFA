@@ -1,7 +1,6 @@
 import pandas as pd
 
-from test.concepts.constants import CONCEPT_ARTIFACT_ID, CONCEPT_ARTIFACT_PATH, CONCEPT_DF_PATH, CONCEPT_ENTITIES, \
-    CONCEPT_TARGET_LAYER_ID, CONCEPT_TYPE
+from test.concepts.constants import CONCEPT_ARTIFACT_ID, CONCEPT_ARTIFACT_PATH, CONCEPT_DF_PATH, CONCEPT_TARGET_LAYER_ID, CONCEPT_TYPE
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.file_util import FileUtil
 from tgen.concepts.concept_args import ConceptArgs
@@ -26,14 +25,3 @@ def create_concept_args() -> ConceptArgs:
     )
     args = ConceptArgs(concept_df=concept_df, artifact=target_artifact)
     return args
-
-
-def create_concept_test_entities() -> ArtifactDataFrame:
-    """
-    Creates list of test entities.
-    :return: Entities.
-    """
-    entities = []
-    for e_name, e_desc in CONCEPT_ENTITIES.items():
-        entities.append(Artifact(id=e_name, content=e_desc, layer_id="Entity", summary=""))
-    return ArtifactDataFrame(entities)

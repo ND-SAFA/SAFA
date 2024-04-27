@@ -8,7 +8,7 @@ from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
-class CreateResponse(AbstractPipelineStep):
+class CreateResponseStep(AbstractPipelineStep):
     def _run(self, args: ConceptArgs, state: ConceptState) -> None:
         """
         Defines

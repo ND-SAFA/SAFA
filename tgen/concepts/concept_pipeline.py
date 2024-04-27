@@ -2,10 +2,10 @@ from typing import Type
 
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
-from tgen.concepts.steps.create_response import CreateResponse
-from tgen.concepts.steps.direct_concept_matches import DirectConceptMatches
-from tgen.concepts.steps.entity_matching import EntityMatching
-from tgen.concepts.steps.extract_artifact_entities import EntityExtraction
+from tgen.concepts.steps.create_response_step import CreateResponseStep
+from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatches
+from tgen.concepts.steps.entity_extraction_step import EntityExtractionStep
+from tgen.concepts.steps.entity_matching_step import EntityMatching
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.pipeline.state import State
 
@@ -13,9 +13,9 @@ from tgen.pipeline.state import State
 class ConceptPipeline(AbstractPipeline[ConceptArgs, ConceptState]):
     steps = [
         DirectConceptMatches,
-        EntityExtraction,
+        EntityExtractionStep,
         EntityMatching,
-        CreateResponse
+        CreateResponseStep
     ]
 
     def __init__(self, args: ConceptArgs, **kwargs):

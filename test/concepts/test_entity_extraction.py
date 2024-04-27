@@ -1,7 +1,8 @@
-from test.concepts.utils import create_concept_args, create_concept_test_entities
+from test.concepts.constants import ConceptData
+from test.concepts.utils import create_concept_args
 from tgen.common.objects.artifact import Artifact
 from tgen.concepts.concept_state import ConceptState
-from tgen.concepts.steps.extract_artifact_entities import EntityExtraction
+from tgen.concepts.steps.entity_extraction_step import EntityExtractionStep
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.base_tests.base_test import BaseTest
@@ -15,12 +16,12 @@ class TestEntityExtraction(BaseTest):
         """
         Verifies that entities are extracted correctly and saved to state.
         """
-        test_entity_df = create_concept_test_entities()
+        test_entity_df = ConceptData.get_entity_df()
 
         args = create_concept_args()
         self.mock_entity_extraction(ai_manager, test_entity_df)
 
-        step = EntityExtraction()
+        step = EntityExtractionStep()
 
         state = ConceptState()
         step.run(args, state)
@@ -50,7 +51,4 @@ class TestEntityExtraction(BaseTest):
         """
         entity_name = artifact[ArtifactKeys.ID]
         entity_description = artifact[ArtifactKeys.CONTENT]
-        return (f"<{EntityExtraction.ENTITY_TAG}>"
-                f"<{EntityExtraction.ENTITY_NAME_TAG}>{entity_name}</{EntityExtraction.ENTITY_NAME_TAG}>"
-                f"<{EntityExtraction.ENTITY_DESCRIPTION_TAG}>{entity_description}</{EntityExtraction.ENTITY_DESCRIPTION_TAG}>"
-                f"</{EntityExtraction.ENTITY_TAG}>")
+        return EntityExtractionStep.get_response_format(entity_name, entity_description)

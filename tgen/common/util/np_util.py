@@ -84,7 +84,11 @@ class NpUtil:
 
         lower_limit = harmonic_mean - lower_sigma * scores.std()
         upper_limit = harmonic_mean + upper_sigma * scores.std()
-
+        
+        index = min([i for i, score in enumerate(scores) if score < upper_limit])
+        closest = scores[index]
+        if (upper_limit - closest) <= 0.02:
+            upper_limit = closest
         return lower_limit + epsilon, upper_limit - epsilon
 
     @staticmethod

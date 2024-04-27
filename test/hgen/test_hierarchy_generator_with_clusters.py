@@ -62,7 +62,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         DUP_SOURCE_ARTIFACT = "dup_link"
         content = state.get_cluster2generation()[list(state.get_cluster2generation().keys())[-1]][0]
         expected_parent = [a_id for a_id, c in state.new_artifact_dataset.artifact_df.to_map().items() if c == content][0]
-        dup_artifact_id = "dup1"
+        dup_artifact_id = "[USD] 4"
         dup_content = NEW_LINE.join([content, "new"])
 
         state.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)

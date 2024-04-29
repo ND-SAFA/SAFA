@@ -18,10 +18,10 @@ from tgen.common.util.random_util import RandomUtil
 from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
 from tgen.common.util.status import Status
 from tgen.core.wb.wb_manager import WBManager
-from tgen.embeddings.model_cache import ModelCache
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager
+from tgen.relationship_manager.model_cache import ModelCache
 
 
 class AbstractJob(threading.Thread, BaseObject):

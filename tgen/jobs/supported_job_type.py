@@ -14,6 +14,7 @@ from tgen.jobs.model_jobs.create_model_job import CreateModelJob
 from tgen.jobs.model_jobs.delete_model_job import DeleteModelJob
 from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
 from tgen.jobs.tracing_jobs.code_trace_job import TraceCodeJob
+from tgen.jobs.tracing_jobs.ranking_chunk_job import RankingChunkJob
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.jobs.tracing_jobs.tracing_job import TracingJob
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
@@ -34,6 +35,7 @@ class SupportedJobType(SupportedEnum):
     LLM = LLMJob
     TRACING = TracingJob
     RANKING = RankingJob
+    RANKING_CHUNKS = RankingChunkJob
     TRACE_CODE = TraceCodeJob
     VSM = VSMJob
     DOWNLOAD_REPO = DownloadRepositoryJob

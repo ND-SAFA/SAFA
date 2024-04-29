@@ -1,20 +1,23 @@
 import os
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from tgen.common.constants import environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDINGS_SCORE_WEIGHT, DEFAULT_EMBEDDING_MODEL, \
     DEFAULT_EXPLANATION_SCORE_WEIGHT, DEFAULT_LINK_THRESHOLD, DEFAULT_MAX_CONTEXT_ARTIFACTS, DEFAULT_PARENT_MIN_THRESHOLD, \
-    DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT
+    DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT, \
+    DEFAULT_CROSS_ENCODER_MODEL, DEFAULT_SCALED_THRESHOLD
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.pipeline_args import PipelineArgs
+from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
+from tgen.tracing.ranking.filters.supported_filters import SupportedFilter
 from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
+from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
 
 
 @dataclass
@@ -46,7 +49,11 @@ class RankingArgs(PipelineArgs):
     """ 
     - sorter: The sorting algorithm to use before ranking with claude
     """
-    sorter: str = DEFAULT_SORTING_ALGORITHM
+    sorter: Union[str, SupportedSorter] = DEFAULT_SORTING_ALGORITHM
+    """ 
+    - filter: If provided, sets scores of filtered out children to 0 using provided filter.
+    """
+    filter: SupportedFilter = None
     """
     - generate_explanations: Whether to generate explanations for links.
     """
@@ -64,6 +71,10 @@ class RankingArgs(PipelineArgs):
     """
     embedding_model_name: str = DEFAULT_EMBEDDING_MODEL
     """
+    - ranking_model_name: The model whose predictions are used to re-rank children.
+    """
+    ranking_model_name: str = DEFAULT_CROSS_ENCODER_MODEL
+    """
     - parent_thresholds: The threshold used to establish parents from (primary, secondary and min)
     """
     parent_thresholds: Tuple[float, float, float] = (DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_PARENT_MIN_THRESHOLD,
@@ -71,7 +82,7 @@ class RankingArgs(PipelineArgs):
     """
     - max_context_artifacts: The maximum number of artifacts to consider in a context window. 
     """
-    max_context_artifacts = DEFAULT_MAX_CONTEXT_ARTIFACTS
+    max_context_artifacts: int = DEFAULT_MAX_CONTEXT_ARTIFACTS
     """
     - link_threshold: The threshold at which to accept links when selecting top predictions.
     """
@@ -80,6 +91,10 @@ class RankingArgs(PipelineArgs):
     - selection_method: The method to use to select top predictions
     """
     selection_method: Optional[SupportedSelectionMethod] = SupportedSelectionMethod.SELECT_BY_THRESHOLD
+    """
+    - use_chunks: If True, uses the chunks of the artifacts.
+    """
+    use_chunks: bool = False
     """
     - weight_of_explanation_scores: If greater than 0, will weight the scores from the explanation in the final score
     """
@@ -90,9 +105,17 @@ class RankingArgs(PipelineArgs):
      """
     weight_of_embedding_scores: float = DEFAULT_EMBEDDINGS_SCORE_WEIGHT
     """
-    - embeddings_manager: If provided, will be used in the sorting step if using an embedding sorter
+    - relationship_manager: If provided, will be used in the sorting step if using an transformer sorter
     """
-    embeddings_manager: EmbeddingsManager = None
+    relationship_manager: AbstractRelationshipManager = None
+    """
+    - re_rank_children: If True, will re rank the children using a cross encoder
+    """
+    re_rank_children: bool = False
+    """
+    use_rag: If True, uses optimal parameters for RAG
+    """
+    use_rag_defaults: bool = False
 
     def save(self, obj: Any, file_name: str) -> str:
         """
@@ -165,3 +188,8 @@ class RankingArgs(PipelineArgs):
             self.run_name = self.get_run_name(self.child_type(), self.children_ids, self.parent_type(), self.parent_ids)
         super().__post_init__()
         self.embedding_model_name = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else self.embedding_model_name
+        if self.use_rag_defaults:
+            self.re_rank_children = True
+            self.selection_method = SupportedSelectionMethod.SELECT_BY_THRESHOLD_SCALED
+            self.link_threshold = DEFAULT_SCALED_THRESHOLD
+            logger.warn(f"Selected a threshold of {DEFAULT_SCALED_THRESHOLD} for RAG.")

@@ -1,6 +1,8 @@
 from collections import Counter
+
 from typing import List, Set, Union
 
+from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -20,6 +22,9 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         artifact_df = state.dataset.artifact_df
         should_filter = args.include_subset_by_type or args.include_subset_by_dir
         indices2remove = StepFilterDataset.identify_indices_with_duplicate_content(artifact_df)
+        missing_content = {i for i, a in artifact_df.itertuples() if not DataFrameUtil.get_optional_value(a[ArtifactKeys.CONTENT],
+                                                                                                          allow_empty=True)}
+        indices2remove.update(missing_content)
         if should_filter:
             indices2remove.update({a_id for a_id in artifact_df.index if not (self.in_dirs(a_id, args.include_subset_by_dir)
                                                                               or self.is_file_type(a_id,
@@ -27,6 +32,7 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         indices2keep = set(artifact_df.index).difference(indices2remove)
         filtered_artifacts = artifact_df.filter_by_index(index_to_filter=indices2keep)
         assert len(filtered_artifacts) > 0, "No artifacts remain after filtering. Please check the filter conditions."
+        filtered_artifacts.drop_large_files()
         state.dataset.update_artifact_df(filtered_artifacts)
 
     @staticmethod

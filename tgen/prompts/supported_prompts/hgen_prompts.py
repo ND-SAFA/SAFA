@@ -165,9 +165,9 @@ REFINE_OVERVIEW_PROMPT = Prompt("You are an engineer working on a software syste
                                 "a set of {target_type}s from a software project.")
 DUP_SUMMARY_TASKS = QuestionnairePrompt([
     Prompt("Construct 1-2 well written paragraphs that summarize the shared goal of the {target_type}. "
-           "Provide specific details from the {target_type} that highlight how the {target_type} provide the user the ability "
+           "Provide specific details that highlight how the {target_type} provide the user the ability "
            "to perform the shared goal. "
-           "Capture as many details from the {target_type} as possible, aligning with the specific user actions. \n"
+           "Capture details from the {target_type} that align with the specific user actions. \n"
            "You must your response in paragraph form to another engineer "
            "who does NOT have access to the {target_type}, so do NOT reference specific requirement numbers. "
            "Importantly, do not make an information up or make assumptions. "

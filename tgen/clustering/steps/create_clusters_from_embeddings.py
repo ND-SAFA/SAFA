@@ -1,6 +1,5 @@
-from typing import List
-
 from tqdm import tqdm
+from typing import List
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_condenser import ClusterCondenser
@@ -11,8 +10,8 @@ from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgor
 from tgen.common.constants.logging_constants import TQDM_NCOLS
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class CreateClustersFromEmbeddings(AbstractPipelineStep):

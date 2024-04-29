@@ -1,7 +1,6 @@
 from typing import Dict
 
 from tgen.common.constants.ranking_constants import CLUSTERING_LINK_THRESHOLD
-from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
@@ -24,7 +23,7 @@ class ClusteringRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         :param skip_summarization: Whether to skip summarization of artifacts.
         """
         super().__init__(args, ClusteringRankingPipeline.steps, skip_summarization=skip_summarization, no_project_summary=True)
-        self.state.embedding_manager = args.embeddings_manager
+        self.state.relationship_manager = args.relationship_manager
         self.args.link_threshold = CLUSTERING_LINK_THRESHOLD
 
     def state_class(self) -> RankingState:

@@ -1,4 +1,4 @@
-from tgen.data.chunkers.supported_chunker import SupportedChunker
+from tgen.data.chunkers.token_limit_chunkers.supported_chunker import SupportedChunker
 from tgen.testres.base_tests.base_test import BaseTest
 
 

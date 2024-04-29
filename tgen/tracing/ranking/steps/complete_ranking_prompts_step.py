@@ -67,7 +67,7 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
         :return: The ranking prompt.
         """
         max_children = args.max_children_per_query
-        entries = state.sorted_parent2children[parent_id][:max_children]
+        entries = state.get_current_parent2children()[parent_id][:max_children]
         parent_body = artifact_map[parent_id]
         artifacts = [EnumDict({ArtifactKeys.ID: i, ArtifactKeys.CONTENT: artifact_map[entry[TraceKeys.child_label()]]})
                      for i, entry in enumerate(entries)]

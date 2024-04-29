@@ -117,7 +117,7 @@ class TestFileUtil(BaseTest):
         expanded_path_user = FileUtil.expand_paths(without_user_path)
         self.assertEqual(expanded_path_user, expected_path)
 
-        replacements = {"[replacement1]": "hi", "[replacement2]": "hola"}
+        replacements = {"[replacement1]": "./hi", "[replacement2]": "./hola"}
         path_list = ["[replacement1]/one.txt", "[replacement2]/two.txt"]
         paths_dict = {i: path for i, path in enumerate(path_list)}
         for iterable_paths in [path_list, paths_dict]:

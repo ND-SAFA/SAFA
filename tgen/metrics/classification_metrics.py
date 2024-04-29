@@ -1,7 +1,7 @@
 from typing import Dict
 
 import datasets
-from sklearn.metrics import precision_score, recall_score
+from sklearn.metrics import fbeta_score, precision_score, recall_score
 
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
@@ -42,30 +42,10 @@ class ClassificationMetrics(AbstractTraceMetric):
         predictions = list(map(lambda p: 1 if p >= 0.5 else 0, predictions))
         precision = precision_score(references, predictions)
         recall = recall_score(references, predictions)
-        f1 = self.f1_score(precision, recall)
-        f2 = self.f2_score(precision, recall)
+        f1 = fbeta_score(references, predictions, beta=1)
+        f2 = fbeta_score(references, predictions, beta=2)
         metrics = {"precision": precision, "recall": recall, "f1": f1, "f2": f2}
         return metrics
-
-    @staticmethod
-    def f1_score(precision, recall):
-        """
-        Returns the f1 score from precision and recall.
-        :param precision: The precision score.
-        :param recall: The recall score
-        :return: The harmonic mean between precision and recall.
-        """
-        return 2 * (precision * recall) / (precision + recall) if precision + recall > 0 else 0
-
-    @staticmethod
-    def f2_score(precision, recall):
-        """
-        Returns the F2 score from precision and recall.
-        :param precision: The precision score.
-        :param recall: The recall score
-        :return: The harmonic mean between precision and recall with greater weight to recall.
-        """
-        return 5 * precision * recall / (4 * precision + recall) if precision + recall > 0 else 0
 
     def _info(self) -> datasets.MetricInfo:
         """

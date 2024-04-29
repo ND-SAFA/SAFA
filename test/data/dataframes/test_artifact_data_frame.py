@@ -9,7 +9,7 @@ from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.base_tests.base_test import BaseTest
 
 
-class TestArtifacteDataFrame(BaseTest):
+class TestArtifactDataFrame(BaseTest):
 
     def test_add_artifact(self):
         df = self.get_artifact_data_frame()
@@ -60,6 +60,7 @@ class TestArtifacteDataFrame(BaseTest):
         a_dataframe.add_artifact(chunked_id, chunked_content, chunks=["Chunk1", "Chunk2"])
         a_dataframe.add_artifact(ignored_id, ignored_content)
         artifact_ids = {a_id for a_id in a_dataframe.index if a_id != "ignored"}
+    
         chunk_map = a_dataframe.chunk(SentenceChunker(), artifact_ids=artifact_ids,
                                       unchunked_only=False)
         expected_chunked_artifacts = {unchunked_id: unchunked_content, chunked_id: chunked_content}

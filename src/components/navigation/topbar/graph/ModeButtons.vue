@@ -19,7 +19,7 @@
       icon="view-tree"
       @click="handleTreeView"
     >
-      <q-tooltip> A graph of related artifacts </q-tooltip>
+      <q-tooltip> {{ treeTooltip }} </q-tooltip>
     </text-button>
     <text-button
       v-bind="buttonProps(options.table)"
@@ -50,7 +50,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { GraphMode } from "@/types";
 import {
   appStore,
@@ -72,6 +72,13 @@ const options: Record<GraphMode, GraphMode> = {
 const { smallWindow } = useScreen();
 
 const value = ref<GraphMode[]>([]);
+
+const treeTooltip = computed(() => {
+  return artifactStore.largeNodeCount
+    ? "The tree view is disabled for very large graphs. " +
+        'To view a tree, visit "Table" view and select the tree icon next to an artifact, or create a new custom "View" above.'
+    : "A graph of related artifacts";
+});
 
 /**
  * Returns props for a mode button.

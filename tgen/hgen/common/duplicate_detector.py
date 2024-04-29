@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import Dict, List, Set, Tuple
 
 import numpy as np
+from typing import Dict, List, Set, Tuple
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
@@ -10,15 +10,14 @@ from tgen.clustering.clustering_pipeline import ClusteringPipeline
 from tgen.common.constants.deliminator_constants import DASH
 from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_CLUSTER_MIN_SIM_THRESHOLD, DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
 from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.np_util import NpUtil
 from tgen.common.util.pipeline_util import nested_pipeline
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.common.hgen_types import ArtifactPair, CountMap, MatrixIndex
 from tgen.hgen.hgen_state import HGenState
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class DuplicateType(Enum):
@@ -60,8 +59,7 @@ class DuplicateDetector:
         if len(artifact_ids) <= 1:
             return set(), {}
         self.embeddings_manager.update_or_add_contents(artifact_df.to_map())
-        artifact_embeddings = self.embeddings_manager.get_embeddings(artifact_ids, include_ids=True)
-        similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
+        similarity_matrix = self.embeddings_manager.compare_artifacts(artifact_ids, artifact_ids, include_ids=True)
         duplicate_similarity_threshold = self.calculate_duplicate_similarity_threshold(similarity_matrix)
         similar_indices = NpUtil.get_indices_above_threshold(similarity_matrix, duplicate_similarity_threshold)
         dup_counter, dup_pairs = DuplicateDetector.count_duplicates(artifact_ids, similar_indices, similarity_matrix)

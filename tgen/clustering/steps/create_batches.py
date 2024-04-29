@@ -1,16 +1,15 @@
 import math
-from typing import Dict, List
 
 import numpy as np
+from typing import Dict, List
 
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.supported_seed_clustering_methods import SupportedSeedClusteringMethods
 from tgen.common.constants.hgen_constants import MIN_SEED_SIMILARITY_QUANTILE, UPPER_SEED_SIMILARITY_QUANTILE
-from tgen.common.util.embedding_util import EmbeddingUtil, EmbeddingType
 from tgen.common.util.np_util import NpUtil
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
@@ -45,9 +44,9 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         :param centroids: The seeds to cluster around.
         :return: Map of centroids to their clustered artifacts.
         """
-        artifact_embeddings = embedding_manager.get_embeddings(artifact_ids)
-        centroid_embeddings = CreateBatches.create_embeddings(embedding_manager, centroids)
-        similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, centroid_embeddings)
+        CreateBatches.add_sentences_to_embedding_manager(embedding_manager, centroids)
+        similarity_matrix = embedding_manager.compare_artifacts(artifact_ids, centroids)
+        embedding_manager.remove_artifacts(centroids)
         if args.seed_clustering_method == SupportedSeedClusteringMethods.CENTROID_CHOOSES_ARTIFACTS:
             cluster_map = CreateBatches.assign_centroids_top_artifacts(centroids, artifact_ids, similarity_matrix,
                                                                        max_size=args.cluster_max_size)
@@ -117,7 +116,7 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         return cluster_map
 
     @staticmethod
-    def create_embeddings(embedding_manager: EmbeddingsManager, sentences: List[str]) -> List[EmbeddingType]:
+    def add_sentences_to_embedding_manager(embedding_manager: EmbeddingsManager, sentences: List[str]) -> None:
         """
         Creates embeddings for centroids.
         :param embedding_manager: Calculates the embeddings for the sentences.
@@ -126,6 +125,4 @@ class CreateBatches(AbstractPipelineStep[ClusteringArgs, ClusteringState]):
         """
         seed_content_map = {s: s for s in sentences}
         embedding_manager.update_or_add_contents(seed_content_map)
-        seed_embeddings = embedding_manager.create_artifact_embeddings(sentences)
-        embedding_manager.remove_artifacts(sentences)
-        return seed_embeddings
+        return

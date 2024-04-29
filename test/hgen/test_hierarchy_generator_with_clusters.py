@@ -16,7 +16,6 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.hgen.common.content_generator import ContentGenerator
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
@@ -31,6 +30,7 @@ from tgen.hgen.steps.step_name_artifacts import NameArtifactsStep
 from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
@@ -62,7 +62,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         DUP_SOURCE_ARTIFACT = "dup_link"
         content = state.get_cluster2generation()[list(state.get_cluster2generation().keys())[-1]][0]
         expected_parent = [a_id for a_id, c in state.new_artifact_dataset.artifact_df.to_map().items() if c == content][0]
-        dup_artifact_id = "dup1"
+        dup_artifact_id = "[USD] 4"
         dup_content = NEW_LINE.join([content, "new"])
 
         state.new_artifact_dataset.artifact_df.add_artifact(dup_artifact_id, dup_content, self.HGEN_ARGS.target_type)

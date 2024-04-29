@@ -1,11 +1,12 @@
 import os
 from dataclasses import dataclass, field
+
 from typing import Dict, List, Optional, Union
 
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.state import State
+from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 
@@ -16,7 +17,13 @@ class RankingState(State):
 
     # sorting
     sorted_parent2children: Optional[Dict[str, List[EnumDict]]] = None
-    embedding_manager: EmbeddingsManager = None
+    relationship_manager: AbstractRelationshipManager = None
+
+    # filtering
+    filtered_parent2children: Optional[Dict[str, List[EnumDict]]] = None
+
+    # composite (for chunks)
+    composite_parent2children: Optional[Dict[str, List[EnumDict]]] = None
 
     # Ranking
     ranking_responses: List[List[Dict]] = field(default=None, repr=False)
@@ -28,6 +35,16 @@ class RankingState(State):
     # IO
     export_path: str = None
 
+    def get_current_parent2children(self) -> Dict[str, List[EnumDict]]:
+        """
+        Gets the latest parent version of the parent2children.
+        :return: Dictionary mapping parent id to a list of the traces related to that parent.
+        """
+        last2first = [self.composite_parent2children, self.filtered_parent2children, self.sorted_parent2children]
+        for parent2children in last2first:
+            if parent2children:
+                return parent2children
+
     def get_current_entries(self) -> Optional[List[Dict]]:
         """
         Gets the current children entries
@@ -37,8 +54,8 @@ class RankingState(State):
             return self.selected_entries
         elif self.candidate_entries:
             return self.candidate_entries
-        elif self.sorted_parent2children:
-            self.candidate_entries = [entry for entries in self.sorted_parent2children.values() for entry in entries]
+        elif self.get_current_parent2children():
+            self.candidate_entries = [entry for entries in self.get_current_parent2children().values() for entry in entries]
             return self.candidate_entries
         else:
             raise Exception(

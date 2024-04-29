@@ -4,6 +4,7 @@ from types import DynamicClassAttribute
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY, NL_SUMMARY
+from tgen.prompts.supported_prompts.chunk_prompts import CHUNK_PROMPT
 from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_QUESTIONNAIRE
 from tgen.prompts.supported_prompts.delta_prompts import DIFF_SUMMARY_QUESTIONNAIRE, DIFF_SUMMARY_STARTER_PROMPT, \
     CHANGE_SUMMARY_STARTER_PROMPT, CHANGE_SUMMARY_QUESTIONNAIRE, IMPACTS_PROMPT, ADDED_PROMPT, DELETED_PROMPT
@@ -66,6 +67,9 @@ class SupportedPrompts(SupportedEnum):
 
     # ---------- REQ CONTRADICTION ANALYSIS ----------------
     REQUIREMENT_EXTRACT_CONSTITUENTS = EXTRACT_CONSTITUENTS_PROMPT
+
+    # ---------- ARTIFACT CHUNKING ----------------
+    CHUNK_INSTRUCTIONS = CHUNK_PROMPT
 
     @DynamicClassAttribute
     def value(self) -> Prompt:

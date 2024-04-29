@@ -1,9 +1,10 @@
+import datasets
 from typing import Dict, List
 
-import datasets
-
 from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.metrics_util import MetricsUtil
+from tgen.common.util.supported_enum import SupportedEnum
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """
@@ -21,6 +22,13 @@ Returns:
 
 _CITATION = """
 """
+
+
+class ErrorLabel(SupportedEnum):
+    TP = "tp"
+    TN = "tn"
+    FP = "fp"
+    FN = "fn"
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
@@ -48,24 +56,20 @@ class ConfusionMatrixAtThresholdMetric(AbstractTraceMetric):
         :param y_pred: List of predicted labels
         :return: Dictionary containing number of true positives, true negatives, false positives, and false negatives.
         """
-        errors = {
-            "tp": 0,
-            "tn": 0,
-            "fp": 0,
-            "fn": 0
-        }
-        for label, pred in zip(y_true, predictions):
+        errors = EnumDict({label: 0 for label in ErrorLabel})
+
+        for label, pred in zip(y_true, y_pred):
             if label == pred:
                 if label == 1:
-                    errors["tp"] += 1
+                    errors[ErrorLabel.TP] += 1
                 else:
-                    errors["tn"] += 1
+                    errors[ErrorLabel.TN] += 1
             else:
                 if pred == 1:
-                    errors["fp"] += 1
+                    errors[ErrorLabel.FP] += 1
                 else:
-                    errors["fn"] += 1
-        return errors
+                    errors[ErrorLabel.FN] += 1
+        return dict(errors)
 
     def _info(self) -> datasets.MetricInfo:
         """

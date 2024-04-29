@@ -1,14 +1,14 @@
 from collections import OrderedDict
-from typing import List, Dict, Tuple, Set
 
 import numpy as np
+from typing import List, Dict, Tuple, Set
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.np_util import NpUtil
 from tgen.common.util.override import overrides
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
 
@@ -92,7 +92,7 @@ class ClusterChildrenSorter(iSorter):
         """
         parent_cluster_score = cluster.similarity_to_neighbors(parent_id)
         child_cluster_score = cluster.similarity_to_neighbors(child_id)
-        child_parent_score = cluster.embedding_manager.compare_embeddings(parent_id, child_id)
+        child_parent_score = cluster.embedding_manager.compare_artifact(parent_id, child_id)
         score = .25 * parent_cluster_score + .25 * child_cluster_score + .5 * child_parent_score
         return score
 

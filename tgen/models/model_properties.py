@@ -1,6 +1,6 @@
 from enum import Enum, IntEnum
 
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, CrossEncoder
 from transformers import AutoModel, AutoModelForCausalLM, AutoModelForMaskedLM, AutoModelForSequenceClassification, BertModel
 
 model = BertModel
@@ -25,6 +25,8 @@ class ModelTask(Enum):
     AUTO = AutoModel
     CAUSAL_LM = AutoModelForCausalLM
     SBERT = AutoModelForSentenceTransformer
+    SENTENCE_TRANSFORMER = SentenceTransformer
+    CROSS_ENCODER = CrossEncoder
 
 
 class ModelArchitectureType(IntEnum):

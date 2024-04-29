@@ -37,7 +37,8 @@ class AddLinkedArtifactsToClustersStep(AbstractPipelineStep[HGenArgs, HGenState]
             children_map = {a_id: content for a_id, content in state.original_dataset.artifact_df.to_map(
                 use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS).items()
                             if a_id in children_ids or a_id in state.source_dataset.artifact_df}
-            state.embedding_manager.update_or_add_contents(children_map, create_embedding=True)
+            state.embedding_manager.update_or_add_contents(children_map)
+            state.embedding_manager.create_embeddings(list(children_map.keys()))
             clustering_args = ClusteringArgs(dataset=state.original_dataset)
             clustering_state = ClusteringState(
                 final_cluster_map={cluster_id: Cluster.from_artifacts([a[ArtifactKeys.ID] for a in cluster_artifacts],

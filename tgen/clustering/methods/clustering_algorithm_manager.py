@@ -1,4 +1,5 @@
 import math
+
 from typing import Any, Dict, List
 
 from tgen.clustering.base.cluster import Cluster
@@ -10,7 +11,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.param_specs import ParamSpecs
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class ClusteringAlgorithmManager:

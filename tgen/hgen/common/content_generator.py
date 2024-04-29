@@ -1,5 +1,6 @@
 import math
 import uuid
+
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
@@ -7,6 +8,7 @@ from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.math_util import MathUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -135,11 +137,12 @@ class ContentGenerator:
         file_lengths = [len(content.splitlines()) for content in source_dataset.artifact_df[ArtifactKeys.CONTENT]]
         avg_file_size = sum(file_lengths) / len(file_lengths)
         cluster2cohesion = {c_id: cohesion if cohesion else 1 for c_id, cohesion in cluster2cohesion.items()}
-        max_cohesion = max(cluster2cohesion.values())
+        max_cohesion = 1
         cluster2retention_percentage = {cluster_id: ContentGenerator.convert_cohesion_to_reduction_percentage(cohesion, max_cohesion)
                                         for cluster_id, cohesion in cluster2cohesion.items()}
         retention_percentage_delta = max(1 - max(cluster2retention_percentage.values()), 0)
-        cluster2retention_percentage = {cluster_id: rp + retention_percentage_delta
+        cluster2retention_percentage = {cluster_id: MathUtil.convert_to_new_range(rp, (0, max(cluster2retention_percentage.values())),
+                                                                                  (0, 1))
                                         for cluster_id, rp in cluster2retention_percentage.items()}
         n_targets = [ContentGenerator._calculate_n_targets_for_cluster(artifacts=cluster2artifacts[i],
                                                                        avg_file_size=avg_file_size,
@@ -155,7 +158,7 @@ class ContentGenerator:
         :param max_cohesion: Highest cohesion possible.
         :return: The reduction percentage for calculating # of higher level artifacts to generate.
         """
-        return 1 - math.log(cohesion + 1) / math.log(max_cohesion + 1)
+        return 1 - cohesion
 
     @staticmethod
     def _calculate_n_targets_for_cluster(artifacts: List[EnumDict], avg_file_size: float,

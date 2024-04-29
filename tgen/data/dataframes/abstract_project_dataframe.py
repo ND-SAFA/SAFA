@@ -1,11 +1,11 @@
 from abc import abstractmethod
 from copy import deepcopy
 from enum import Enum
-from typing import Any, Callable, Dict, List, Type, Union
 
 import pandas as pd
 from pandas._typing import Axes, Dtype
 from pandas.core.internals.construction import dict_to_mgr
+from typing import Any, Callable, Dict, List, Type, Union
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -89,7 +89,9 @@ class AbstractProjectDataFrame(pd.DataFrame):
         row_as_dict = EnumDict(row_as_dict)
         index = row_as_dict.get(self.index_name(), len(self.index))
         if index not in self:
-            self.assert_columns([col for col in row_as_dict.keys()])
+            required_columns = [col for col in self.required_column_names() if col in row_as_dict.keys()]
+            columns = required_columns + [col for col in row_as_dict if col not in self.required_column_names()]
+            self.assert_columns(columns)
             if self.columns.empty:
                 mgr = dict_to_mgr({key: [val] for key, val in row_as_dict.items()}, None, None)
                 object.__setattr__(self, "_mgr", mgr)
@@ -262,7 +264,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         if not isinstance(column2update, str):
             column2update = column2update.value
-        self.loc[self.index == id2update, column2update] = new_value
+        self.at[id2update, column2update] = new_value
 
     def update_values(self, column2update: Union[str, Enum], ids2update: List[str], new_values: List[Any]) -> None:
         """
@@ -272,6 +274,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
          :param new_values: The list of new values to update it to
          :return: None
          """
+        assert len(ids2update) == len(new_values), "Number of ids and values must match"
         for id_, val in zip(ids2update, new_values):
             self.update_value(column2update, id_, val)
 

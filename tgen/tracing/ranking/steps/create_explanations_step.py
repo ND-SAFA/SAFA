@@ -119,7 +119,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the ranking pipeline.
         :return: The prompt builder used to rank candidate children artifacts.
         """
-        scores = [entry[TraceKeys.SCORE] for entry in state.get_current_entries()]
+        scores = RankingUtil.get_scores(state.get_current_entries())
         converted_scores = [CreateExplanationsStep._convert_normalized_score_to_ranking_range(score) for score in scores]
         prompt_builder = PromptBuilder([SupportedPrompts.EXPLANATIONS_GOAL_INSTRUCTIONS.value], orig_score=converted_scores)
 

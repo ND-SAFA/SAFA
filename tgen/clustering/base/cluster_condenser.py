@@ -1,7 +1,7 @@
 from collections import Counter
-from typing import List, Optional, Set
 
 import numpy as np
+from typing import List, Optional, Set
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
@@ -11,7 +11,7 @@ from tgen.common.constants.clustering_constants import DEFAULT_ALLOW_OVERLAPPING
     MIN_CLUSTER_SIM_TO_MERGE, MIN_ARTIFACT_SIM_TO_MERGE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class ClusterCondenser:
@@ -64,10 +64,11 @@ class ClusterCondenser:
         :return: None
         """
         filtered_clusters = ClusterCondenser._filter_by_size(clusters, self.min_cluster_size, self.max_cluster_size)
-        min_pairwise_avg = ClusterCondenser._calculate_min_pairwise_avg_threshold(filtered_clusters)
-        clusters = self.filter_and_prioritize_clusters(filtered_clusters, min_pairwise_avg)
-        for c in ListUtil.selective_tqdm(clusters, desc="Condensing clusters..."):
-            self._add_cluster(c, min_pairwise_avg)
+        if filtered_clusters:
+            min_pairwise_avg = ClusterCondenser._calculate_min_pairwise_avg_threshold(filtered_clusters)
+            clusters = self.filter_and_prioritize_clusters(filtered_clusters, min_pairwise_avg)
+            for c in ListUtil.selective_tqdm(clusters, desc="Condensing clusters..."):
+                self._add_cluster(c, min_pairwise_avg)
 
     def should_add(self, cluster: Cluster, min_pairwise_avg: float = None) -> bool:
         """
@@ -270,8 +271,7 @@ class ClusterCondenser:
         :return: The filtered clusters within the size bounds.
         """
         filter_clusters = [c for c in clusters if min_size <= len(c) <= max_size]
-        clusters = filter_clusters if filter_clusters else clusters
-        return clusters
+        return filter_clusters
 
     @staticmethod
     def _calculate_min_pairwise_avg_threshold(clusters: List[Cluster]) -> Optional[float]:

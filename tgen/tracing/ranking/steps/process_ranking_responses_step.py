@@ -1,9 +1,9 @@
 from typing import List, Dict
 
 from tgen.common.constants.ranking_constants import DEFAULT_SCORE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.math_util import MathUtil
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
@@ -36,7 +36,7 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
         """
         parent_ids = args.parent_ids
         ranking_responses = state.ranking_responses
-        sorted_parent2children = state.sorted_parent2children
+        sorted_parent2children = state.get_current_parent2children()
         all_entries = []
         for parent_name, prompt_response in zip(parent_ids, ranking_responses):
             related_children = [entry[TraceKeys.child_label()] for entry in sorted_parent2children[parent_name]]
@@ -44,7 +44,7 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
                                                                                              parent_name,
                                                                                              related_children)
             ProcessRankingResponsesStep._add_missing_artifact_reasonings(parsed_id_to_reasoning, sorted_parent2children[parent_name],
-                                                                  args.weight_of_embedding_scores)
+                                                                         args.weight_of_embedding_scores)
             child_entries = ProcessRankingResponsesStep._create_trace_prediction_entries(list(parsed_id_to_reasoning.values()),
                                                                                          parent_name)
             all_entries.extend(child_entries)
@@ -77,7 +77,8 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
                 logger.exception(e)
                 logger.info(f"Unable to parse: {artifact_res}")
 
-        n_unidentified = ProcessRankingResponsesStep._identify_unknown_artifact_reasoning(unidentified_reasonings, parsed_id_to_reasoning)
+        n_unidentified = ProcessRankingResponsesStep._identify_unknown_artifact_reasoning(unidentified_reasonings,
+                                                                                          parsed_id_to_reasoning)
         ProcessRankingResponsesStep._log_processing_warning(n_unidentified, parent_name, "unidentified")
         n_missing = len(related_children) - len(parsed_id_to_reasoning)
         ProcessRankingResponsesStep._log_processing_warning(n_missing, parent_name, "missing")
@@ -85,7 +86,7 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
 
     @staticmethod
     def _identify_unknown_artifact_reasoning(unidentified_reasonings: List[ArtifactReasoning],
-                                      parsed_id_to_reasoning: Dict[str, ArtifactReasoning]) -> int:
+                                             parsed_id_to_reasoning: Dict[str, ArtifactReasoning]) -> int:
         """
         Tries to add any unidentified artifact reasoning to the parsed artifact reasoning
         :param unidentified_reasonings: The list of unidentified artifact reasoning
@@ -102,8 +103,8 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
 
     @staticmethod
     def _add_missing_artifact_reasonings(parsed_id_to_reasoning: Dict[str, ArtifactReasoning],
-                                  sorted_children: List[EnumDict],
-                                  weight_of_embedding_scores: float) -> None:
+                                         sorted_children: List[EnumDict],
+                                         weight_of_embedding_scores: float) -> None:
         """
         Fills in missing a reasonings using the sorted children
         :param parsed_id_to_reasoning: A dictionary mapping artifact id to its parsed a reasoning
@@ -120,8 +121,8 @@ class ProcessRankingResponsesStep(AbstractPipelineStep[RankingArgs, RankingState
                 artifact_reasoning.score = entry[TraceKeys.SCORE]
             else:
                 artifact_reasoning.score = MathUtil.calculate_weighted_score(scoreA=entry[TraceKeys.SCORE],
-                                                                      scoreB=artifact_reasoning.score,
-                                                                      weight_of_scoreA=weight_of_embedding_scores)
+                                                                             scoreB=artifact_reasoning.score,
+                                                                             weight_of_scoreA=weight_of_embedding_scores)
 
     @staticmethod
     def _create_trace_prediction_entries(parsed_entries: List[ArtifactReasoning], parent_name: str) -> List[Trace]:

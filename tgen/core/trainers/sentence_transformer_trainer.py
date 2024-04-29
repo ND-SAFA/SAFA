@@ -1,15 +1,13 @@
-from typing import List, Tuple
-
 from datasets import Dataset
 from sentence_transformers import InputExample, SentenceTransformer
 from torch import Tensor, nn
 from torch.utils.data import DataLoader
 from transformers.trainer_utils import EvalPrediction, PredictionOutput, TrainOutput
+from typing import List, Tuple
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL, NEG_LINK
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.reflection_util import ReflectionUtil
@@ -23,9 +21,9 @@ from tgen.core.trainers.st.st_training_manager import STTrainingParams
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class SentenceTransformerTrainer(HuggingFaceTrainer):
@@ -183,7 +181,8 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :return: Prediction output containing scores as predictions and labels as label ids.
         """
         unique_content = list(set(ListUtil.flatten([e.texts for e in input_examples])))
-        embeddings_manager = EmbeddingsManager.create_from_content(unique_content, model=model, show_progress_bar=False)
+        embeddings_manager = EmbeddingsManager.create_from_content(unique_content, model=model, show_progress_bar=False,
+                                                                   create_embeddings_on_init=True)
         scores = []
         labels = []
         for example in input_examples:
@@ -201,7 +200,5 @@ class SentenceTransformerTrainer(HuggingFaceTrainer):
         :return: The similarity score between texts.
         """
         s_text, t_text = input_example.texts
-        s_embedding = embeddings_manager.get_embedding(s_text)
-        t_embedding = embeddings_manager.get_embedding(t_text)
-        score = EmbeddingUtil.calculate_similarity(s_embedding, t_embedding)
+        score = embeddings_manager.compare_artifact(s_text, t_text)
         return score

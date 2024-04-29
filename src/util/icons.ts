@@ -219,6 +219,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-account-supervisor-circle";
     case "comment":
       return "mdi-comment-text-outline";
+    case "comment-resolve":
+      return "mdi-comment-check-outline";
     case "flag":
       return "mdi-flag";
     case "health":

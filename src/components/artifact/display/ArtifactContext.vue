@@ -5,16 +5,20 @@
         <text-button
           v-if="displayActions"
           text
+          small
           label="Parent"
-          icon="add"
+          icon="trace"
+          :icon-rotate="-90"
           data-cy="button-artifact-link-parent"
           @click="handleLinkParent"
         />
         <text-button
           v-if="displayActions"
           text
+          small
           label="Child"
-          icon="add"
+          icon="trace"
+          :icon-rotate="90"
           data-cy="button-artifact-link-child"
           @click="handleLinkChild"
         />

@@ -102,6 +102,7 @@ export type IconVariant =
   | "payment"
   | "admin"
   | "comment"
+  | "comment-resolve"
   | "flag"
   | "health";
 

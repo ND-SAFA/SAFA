@@ -1,15 +1,12 @@
 from typing import Dict, List
 
-from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
-from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
-from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
 
 
 class AbstractProjectReaderTest(BaseTest):
@@ -38,9 +35,7 @@ class AbstractProjectReaderTest(BaseTest):
         :return: None
         """
         project_reader: AbstractProjectReader = test_project.get_project_reader()
-        llm_manager = OpenAIManager(OpenAIArgs())
-        project_reader.set_summarizer(ArtifactsSummarizer(llm_manager_for_artifact_summaries=llm_manager,
-                                                          summarize_code_only=False))
+        project_reader.set_summarizer(ArtifactsSummarizer(summarize_code_only=False))
         artifact_df, trace_df, layer_mapping_df = project_reader.read_project()
         summary_artifacts = test_project.get_artifact_entries()
         for row in summary_artifacts:

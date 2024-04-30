@@ -137,6 +137,10 @@ class LLMTrainer(AbstractTrainer):
             prompts = [pb.build(llm_manager.prompt_args, **prompt_kwargs)[PromptKeys.PROMPT] for pb in prompt_builders]
 
         prompt_builder_ids = [pb.id for pb in prompt_builders]
+        if len(prompt_builder_ids) != len(prompts):
+            assert len(prompt_builder_ids) == 1, "Mismatch between # of prompts and builders"
+            prompt_builder_ids = [prompt_builder_ids[0] for _ in prompts]
+
         prompt_df = PromptDataFrame({PromptKeys.PROMPT: prompts,
                                      PromptKeys.COMPLETION: [EMPTY_STRING for _ in prompts],
                                      PromptKeys.PROMPT_BUILDER_ID: prompt_builder_ids})

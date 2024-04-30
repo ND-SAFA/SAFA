@@ -3,18 +3,18 @@ from typing import Type
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.steps.create_response_step import CreateResponseStep
-from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatches
+from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from tgen.concepts.steps.entity_extraction_step import EntityExtractionStep
-from tgen.concepts.steps.entity_matching_step import EntityMatching
+from tgen.concepts.steps.entity_matching_step import EntityMatchingStep
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.pipeline.state import State
 
 
 class ConceptPipeline(AbstractPipeline[ConceptArgs, ConceptState]):
     steps = [
-        DirectConceptMatches,
+        DirectConceptMatchingStep,
         EntityExtractionStep,
-        EntityMatching,
+        EntityMatchingStep,
         CreateResponseStep
     ]
 

@@ -1,6 +1,5 @@
 from enum import Enum
-
-from typing import Any, Dict, Iterable, List, Set, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Dict, Iterable, List, Set, Tuple, Type, TypeVar, Union
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil

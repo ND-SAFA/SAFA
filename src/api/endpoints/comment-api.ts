@@ -1,5 +1,66 @@
+import { comment } from "postcss";
 import { ArtifactCommentsSchema, ArtifactSchema, CommentSchema } from "@/types";
+import { ENABLED_FEATURES } from "@/util";
 import { buildRequest } from "@/api";
+
+const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
+  artifactId: "",
+  comments: [
+    {
+      id: "1",
+      content:
+        "Hello people, this is a super long comment that should wrap to multiple lines.",
+      userId: "tim@safa.ai",
+      createdAt: new Date(Date.now()).toISOString(),
+      updatedAt: new Date(Date.now()).toISOString(),
+      status: "active",
+      type: "conversation",
+    },
+  ],
+  flags: [
+    {
+      id: "2",
+      content: "Oh boy there's a flag",
+      userId: "tim@safa.ai",
+      createdAt: new Date(Date.now()).toISOString(),
+      updatedAt: new Date(Date.now()).toISOString(),
+      status: "active",
+      type: "flag",
+    },
+  ],
+  healthChecks: [
+    {
+      id: "1",
+      content: "[Matched concept]",
+      userId: "tim@safa.ai",
+      status: "active",
+      type: "matched_concept",
+      createdAt: new Date(Date.now()).toISOString(),
+      updatedAt: new Date(Date.now()).toISOString(),
+      name: "[Concept]",
+    },
+    {
+      id: "2",
+      content: "[Conflicting Requirement]",
+      userId: "tim@safa.ai",
+      status: "active",
+      type: "contradiction",
+      createdAt: new Date(Date.now()).toISOString(),
+      updatedAt: new Date(Date.now()).toISOString(),
+      affectedArtifacts: ["1", "2"],
+    },
+    {
+      id: "3",
+      content: "[Multiple Concept]",
+      userId: "tim@safa.ai",
+      status: "active",
+      type: "multi_matched_concept",
+      createdAt: new Date(Date.now()).toISOString(),
+      updatedAt: new Date(Date.now()).toISOString(),
+      concepts: ["[Concept 1]", "[Concept 2]"],
+    },
+  ],
+};
 
 /**
  * Get the comments for an artifact.
@@ -11,6 +72,10 @@ export async function getArtifactComments(
   versionId: string,
   artifactId: string
 ): Promise<ArtifactCommentsSchema> {
+  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
+    return { ...EXAMPLE_COMMENTS, artifactId };
+  }
+
   return buildRequest<ArtifactCommentsSchema, "versionId" | "artifactId">(
     "getComments",
     { versionId, artifactId }
@@ -27,12 +92,25 @@ export async function getArtifactComments(
 export async function createArtifactComment(
   versionId: string,
   artifactId: string,
-  comment: CommentSchema
+  comment: Pick<CommentSchema, "content" | "type">
 ): Promise<CommentSchema> {
-  return buildRequest<CommentSchema, "versionId" | "artifactId", CommentSchema>(
-    "createComment",
-    { versionId, artifactId }
-  ).post(comment);
+  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
+    return {
+      id: Math.random().toString(),
+      content: comment.content,
+      type: comment.type,
+      userId: "tim@safa.ai",
+      createdAt: new Date(Date.now()).toISOString(),
+      updatedAt: new Date(Date.now()).toISOString(),
+      status: "active",
+    };
+  }
+
+  return buildRequest<
+    CommentSchema,
+    "versionId" | "artifactId",
+    Pick<CommentSchema, "content" | "type">
+  >("createComment", { versionId, artifactId }).post(comment);
 }
 
 /**
@@ -47,6 +125,10 @@ export async function editArtifactComment(
   artifactId: string,
   comment: CommentSchema
 ): Promise<CommentSchema> {
+  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
+    return comment;
+  }
+
   return buildRequest<
     CommentSchema,
     "versionId" | "artifactId" | "commentId",
@@ -67,6 +149,10 @@ export async function deleteArtifactComment(
   artifactId: string,
   commentId: string
 ): Promise<void> {
+  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
+    return;
+  }
+
   return buildRequest<void, "versionId" | "artifactId" | "commentId">(
     "deleteComment",
     { versionId, artifactId, commentId }
@@ -84,6 +170,10 @@ export async function resolveArtifactComment(
   artifactId: string,
   commentId: string
 ): Promise<void> {
+  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
+    return;
+  }
+
   return buildRequest<void, "versionId" | "artifactId" | "commentId">(
     "resolveComment",
     { versionId, artifactId, commentId }
@@ -96,10 +186,14 @@ export async function resolveArtifactComment(
  * @param artifact - The artifact to generate health checks for.
  * @returns The health checks for the artifact.
  */
-export function generateArtifactHealth(
+export async function generateArtifactHealth(
   versionId: string,
   artifact: ArtifactSchema
 ): Promise<ArtifactCommentsSchema> {
+  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
+    return EXAMPLE_COMMENTS;
+  }
+
   return buildRequest<ArtifactCommentsSchema, "versionId", ArtifactSchema>(
     "generateHealthChecks",
     { versionId }

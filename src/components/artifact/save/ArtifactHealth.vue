@@ -40,9 +40,16 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { AnyCommentSchema, IconVariant, ThemeColor } from "@/types";
+import { computed } from "vue";
+import { onMounted, watch } from "vue/dist/vue";
+import { IconVariant, ThemeColor } from "@/types";
 import { ENABLED_FEATURES } from "@/util";
+import {
+  artifactSaveStore,
+  artifactStore,
+  commentApiStore,
+  commentStore,
+} from "@/hooks";
 import {
   PanelCard,
   Icon,
@@ -52,40 +59,15 @@ import {
   TextButton,
 } from "@/components/common";
 
-const EXAMPLE_HEALTH_COMMENTS: AnyCommentSchema[] = [
-  {
-    id: "1",
-    content: "[Matched concept]",
-    userId: "tim@safa.ai",
-    status: "active",
-    type: "matched_concept",
-    createdAt: new Date(Date.now()).toISOString(),
-    updatedAt: new Date(Date.now()).toISOString(),
-    name: "[Concept]",
-  },
-  {
-    id: "2",
-    content: "[Conflicting Requirement]",
-    userId: "tim@safa.ai",
-    status: "active",
-    type: "contradiction",
-    createdAt: new Date(Date.now()).toISOString(),
-    updatedAt: new Date(Date.now()).toISOString(),
-    affectedArtifacts: ["1", "2"],
-  },
-  {
-    id: "3",
-    content: "[Multiple Concept]",
-    userId: "tim@safa.ai",
-    status: "active",
-    type: "multi_matched_concept",
-    createdAt: new Date(Date.now()).toISOString(),
-    updatedAt: new Date(Date.now()).toISOString(),
-    concepts: ["[Concept 1]", "[Concept 2]"],
-  },
-];
+const artifactHealth = computed(() =>
+  commentStore.getHealthChecks(artifact.value?.id || "")
+);
 
-const artifactHealth = ref<AnyCommentSchema[]>([]);
+const artifact = computed(() =>
+  artifactSaveStore.editedArtifact.body
+    ? artifactSaveStore.editedArtifact
+    : artifactStore.selectedArtifact
+);
 
 const artifactHealthDisplay = computed(() =>
   artifactHealth.value
@@ -119,8 +101,16 @@ const artifactHealthDisplay = computed(() =>
     }))
 );
 
+/**
+ * Generates health checks for the current artifact.
+ */
 function handleCheckHealth(): void {
-  // TODO
-  artifactHealth.value = EXAMPLE_HEALTH_COMMENTS;
+  if (!artifact.value) return;
+
+  commentApiStore.handleLoadHealthChecks(artifact.value);
 }
+
+onMounted(handleCheckHealth);
+
+watch(() => artifact.value, handleCheckHealth);
 </script>

@@ -140,9 +140,10 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { ArtifactCommentsSchema, CommentSchema, CommentType } from "@/types";
+import { computed, onMounted, ref, watch } from "vue";
+import { CommentSchema, CommentType } from "@/types";
 import { ENABLED_FEATURES, timestampToDisplay } from "@/util";
+import { commentApiStore, commentStore, selectionStore } from "@/hooks";
 import {
   PanelCard,
   ListItem,
@@ -153,73 +154,54 @@ import {
   TextButton,
 } from "@/components/common";
 
-const EXAMPLE_COMMENTS = ref<ArtifactCommentsSchema>({
-  artifactId: "",
-  comments: [
-    {
-      id: "1",
-      content:
-        "Hello people, this is a super long comment that should wrap to multiple lines.",
-      userId: "tim@safa.ai",
-      createdAt: new Date(Date.now()).toISOString(),
-      updatedAt: new Date(Date.now()).toISOString(),
-      status: "active",
-      type: "conversation",
-    },
-  ],
-  flags: [
-    {
-      id: "2",
-      content: "Oh boy there's a flag",
-      userId: "tim@safa.ai",
-      createdAt: new Date(Date.now()).toISOString(),
-      updatedAt: new Date(Date.now()).toISOString(),
-      status: "active",
-      type: "flag",
-    },
-  ],
-  healthChecks: [],
-});
-
 const showResolved = ref(false);
 const newComment = ref("");
 const commentType = ref<CommentType>("conversation");
 const editedComment = ref<CommentSchema | null>(null);
 
+const artifactId = computed(() => selectionStore.selectedArtifactId);
+
 const allComments = computed(() =>
-  [...EXAMPLE_COMMENTS.value.flags, ...EXAMPLE_COMMENTS.value.comments].filter(
-    (comment) => showResolved.value || comment.status !== "resolved"
-  )
+  commentStore.getCommentsAndFlags(artifactId.value, showResolved.value)
 );
 
-function handleAddComment() {
-  // TODO
-  const comment: CommentSchema = {
-    id: Math.random().toString(),
-    content: newComment.value,
-    userId: "tim@safa.ai",
-    createdAt: new Date(Date.now()).toISOString(),
-    updatedAt: new Date(Date.now()).toISOString(),
-    status: "active",
-    type: commentType.value,
-  };
-
-  if (commentType.value === "conversation") {
-    EXAMPLE_COMMENTS.value.comments.push(comment);
-  } else {
-    EXAMPLE_COMMENTS.value.flags.push(comment);
-  }
-
+/**
+ * Resets the comment input fields.
+ */
+function handleReset() {
   newComment.value = "";
+  commentType.value = "conversation";
+  editedComment.value = null;
 }
 
+/**
+ * Adds a new comment to the artifact.
+ */
+function handleAddComment() {
+  commentApiStore.handleAddComment(
+    artifactId.value,
+    newComment.value,
+    commentType.value,
+    {
+      onSuccess: handleReset,
+    }
+  );
+}
+
+/**
+ * Resolves a comment, hiding it from the list.
+ * @param comment - The comment to resolve.
+ */
 function handleResolveComment(comment: CommentSchema) {
-  // TODO
-  comment.status = "resolved";
+  commentApiStore.handleResolveComment(artifactId.value, comment);
 }
 
+/**
+ * Enables a comments edit mode,
+ * or disables comment editing if already enabled on the given comment.
+ * @param comment - The comment to edit.
+ */
 function handleEditComment(comment: CommentSchema) {
-  // TODO
   if (!editedComment.value || editedComment.value.id !== comment.id) {
     editedComment.value = comment;
   } else {
@@ -227,20 +209,34 @@ function handleEditComment(comment: CommentSchema) {
   }
 }
 
+/**
+ * Saves the edited comment.
+ */
 function handleSaveEditedComment() {
-  // TODO
   if (!editedComment.value) return;
 
-  editedComment.value = null;
+  commentApiStore.handleEditComment(artifactId.value, editedComment.value, {
+    onSuccess: handleReset,
+  });
 }
 
+/**
+ * Deletes a comment.
+ * @param comment - The comment to delete.
+ */
 function handleDeleteComment(comment: CommentSchema) {
-  // TODO
-  EXAMPLE_COMMENTS.value.comments = EXAMPLE_COMMENTS.value.comments.filter(
-    (c) => c.id !== comment.id
-  );
-  EXAMPLE_COMMENTS.value.flags = EXAMPLE_COMMENTS.value.flags.filter(
-    (c) => c.id !== comment.id
-  );
+  commentApiStore.handleDeleteComment(artifactId.value, comment.id);
 }
+
+onMounted(() => {
+  commentApiStore.handleLoadComments(artifactId.value);
+});
+
+watch(
+  () => artifactId.value,
+  () => {
+    handleReset();
+    commentApiStore.handleLoadComments(artifactId.value);
+  }
+);
 </script>

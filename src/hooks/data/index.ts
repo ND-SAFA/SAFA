@@ -12,3 +12,4 @@ export { default as attributesStore } from "./useAttributes";
 export { default as membersStore } from "./useMembers";
 export { default as searchStore } from "./useSearch";
 export { default as chatStore } from "./useChat";
+export { default as commentStore } from "./useComments";

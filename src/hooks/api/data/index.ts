@@ -8,3 +8,4 @@ export { default as documentApiStore } from "./useDocumentApi";
 export { default as searchApiStore } from "./useSearchApi";
 export { default as deltaApiStore } from "./useDeltaApi";
 export { default as chatApiStore } from "./useChatApi";
+export { default as commentApiStore } from "./useCommentApi";

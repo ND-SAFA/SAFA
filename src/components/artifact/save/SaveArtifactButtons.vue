@@ -11,16 +11,6 @@
     />
     <q-space />
     <text-button
-      v-if="ENABLED_FEATURES.NASA_ARTIFACT_HEALTH"
-      text
-      color="secondary"
-      label="Health"
-      icon="health"
-      data-cy="button-artifact-health"
-      class="q-mr-sm"
-      @click="handleHealth"
-    />
-    <text-button
       :loading="artifactApiStore.saveLoading"
       :disabled="!canSave"
       label="Save"
@@ -42,7 +32,6 @@ export default {
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ENABLED_FEATURES } from "@/util";
 import {
   appStore,
   artifactApiStore,
@@ -79,9 +68,5 @@ function handleSubmit(): void {
       onSuccess: () => appStore.openDetailsPanel("displayArtifact"),
     }
   );
-}
-
-function handleHealth(): void {
-  // TODO
 }
 </script>

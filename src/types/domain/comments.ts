@@ -113,5 +113,5 @@ export interface ArtifactCommentsSchema {
    * The flags on the artifact.
    * type = contradiction, suggestion, unknown_concept, matched_concept, multi_matched_concept
    */
-  healthChecks: CommentSchema[];
+  healthChecks: AnyCommentSchema[];
 }

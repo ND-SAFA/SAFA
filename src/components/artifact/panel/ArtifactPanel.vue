@@ -4,9 +4,10 @@
       <artifact-buttons />
     </template>
     <artifact-content />
-    <artifact-comments />
     <artifact-context v-if="ENABLED_FEATURES.NASA_ARTIFACT_RELATIONS" />
     <artifact-traces v-else />
+    <artifact-comments />
+    <artifact-health />
     <artifact-documents />
     <artifact-errors />
   </details-panel>
@@ -31,5 +32,9 @@ import {
   ArtifactErrors,
   ArtifactContext,
 } from "@/components/artifact/display";
-import { ArtifactButtons, ArtifactComments } from "@/components/artifact/save";
+import {
+  ArtifactButtons,
+  ArtifactComments,
+  ArtifactHealth,
+} from "@/components/artifact/save";
 </script>

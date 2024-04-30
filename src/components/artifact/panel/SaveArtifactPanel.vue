@@ -14,6 +14,7 @@
         <save-artifact-buttons />
       </template>
     </panel-card>
+    <artifact-health />
   </details-panel>
 </template>
 
@@ -33,6 +34,7 @@ import { DetailsPanel, PanelCard, TextButton } from "@/components/common";
 import {
   SaveArtifactInputs,
   SaveArtifactButtons,
+  ArtifactHealth,
 } from "@/components/artifact/save";
 
 watch(

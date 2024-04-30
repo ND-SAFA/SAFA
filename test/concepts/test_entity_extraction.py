@@ -5,6 +5,7 @@ from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.steps.entity_extraction_step import EntityExtractionStep
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.prompts.supported_prompts.concept_prompts import create_entity_extraction_response
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
@@ -51,4 +52,4 @@ class TestEntityExtraction(BaseTest):
         """
         entity_name = artifact[ArtifactKeys.ID]
         entity_description = artifact[ArtifactKeys.CONTENT]
-        return EntityExtractionStep.get_response_format(entity_name, entity_description)
+        return create_entity_extraction_response(entity_name, entity_description)

@@ -14,9 +14,10 @@ from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.supported_prompts.concept_prompts import ENTITY_MATCHING_INSTRUCTIONS, ENTITY_MATCHING_RESPONSE_FORMAT
 
 
-class EntityMatching(AbstractPipelineStep):
+class EntityMatchingStep(AbstractPipelineStep):
     MATCH_TAG = "match"
     SOURCE_TAG = "source"
     TARGET_TAG = "target"
@@ -54,11 +55,11 @@ class EntityMatching(AbstractPipelineStep):
         for entity_artifact in entities:
             concept_prompt = MultiArtifactPrompt("# PROJECT ARTIFACTS", build_method=MultiArtifactPrompt.BuildMethod.XML)
             artifact_prompt = ArtifactPrompt(prompt_start="").build(artifact=entity_artifact)
-            response_format = f"Record each referenced entity like so {EntityMatching.create_example_xml('ARTIFACT_ID')}"
+            response_format = ENTITY_MATCHING_RESPONSE_FORMAT.format(EntityMatchingStep.create_example_xml("ARTIFACT_ID"))
             # `referenced` will make the model speculate about potential matches, using cite
             instructions_prompt = Prompt(
-                f"List the artifacts that are cited in the text below. If none exists, just say 'NA'.\n\n'{artifact_prompt}'\n\n",
-                response_manager=PromptResponseManager(response_tag=EntityMatching.MATCH_TAG,
+                f"{ENTITY_MATCHING_INSTRUCTIONS}\n\n'{artifact_prompt}'\n\n",
+                response_manager=PromptResponseManager(response_tag=EntityMatchingStep.MATCH_TAG,
                                                        response_instructions_format=response_format)
             )
             prompt_builder = PromptBuilder(prompts=[concept_prompt, instructions_prompt])
@@ -95,7 +96,7 @@ class EntityMatching(AbstractPipelineStep):
         predicted_links = []
         for entity_artifact, entity_response in zip(entities, entity_predictions):
             seen_ids = set()
-            entity_matches = entity_response[EntityMatching.MATCH_TAG]
+            entity_matches = entity_response[EntityMatchingStep.MATCH_TAG]
             for matched_concept in entity_matches:
                 matched_entity = entity_artifact[ArtifactKeys.ID]
                 if matched_concept in seen_ids:
@@ -112,7 +113,7 @@ class EntityMatching(AbstractPipelineStep):
         :return: String representation.
         """
         return (
-            f"<{EntityMatching.MATCH_TAG}>{target_text}</{EntityMatching.MATCH_TAG}>"
+            f"<{EntityMatchingStep.MATCH_TAG}>{target_text}</{EntityMatchingStep.MATCH_TAG}>"
         )
 
     @staticmethod

@@ -2,6 +2,7 @@ from typing import List
 
 from nltk import WordNetLemmatizer
 
+from tgen.common.constants.deliminator_constants import SPACE
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.types.concept_match import ConceptMatch
@@ -10,7 +11,7 @@ from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
-class DirectConceptMatches(AbstractPipelineStep):
+class DirectConceptMatchingStep(AbstractPipelineStep):
     """
     Attempts to find all concepts that are referenced in the artifact content.
 
@@ -83,6 +84,6 @@ class DirectConceptMatches(AbstractPipelineStep):
         :param concept: The word to sanitize.
         :return: String with each word lemmatize.
         """
-        concept_words = concept.lower().split(" ")
+        concept_words = concept.lower().split(SPACE)
         lemmatized_words = [self.lemmatizer.lemmatize(w) for w in concept_words]
-        return " ".join(lemmatized_words)
+        return SPACE.join(lemmatized_words)

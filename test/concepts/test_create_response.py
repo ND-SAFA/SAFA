@@ -5,8 +5,8 @@ from test.concepts.test_entity_matching import TestEntityMatching
 from test.concepts.utils import create_concept_args
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.steps.create_response_step import CreateResponseStep
-from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatches
-from tgen.concepts.steps.entity_matching_step import EntityMatching
+from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatchingStep
+from tgen.concepts.steps.entity_matching_step import EntityMatchingStep
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.base_tests.base_test import BaseTest
@@ -26,10 +26,10 @@ class TestCreateResponse(BaseTest):
         state = ConceptState()
 
         # Mock pipeline execution assumptions
-        DirectConceptMatches().run(args, state)
+        DirectConceptMatchingStep().run(args, state)
         state.entity_df = ConceptData.get_entity_df()
         TestEntityMatching.mock_entity_matching(ai_manager)
-        EntityMatching().run(args, state)
+        EntityMatchingStep().run(args, state)
         CreateResponseStep().run(args, state)
 
         res = state.response

@@ -11,10 +11,10 @@ from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 class CreateResponseStep(AbstractPipelineStep):
     def _run(self, args: ConceptArgs, state: ConceptState) -> None:
         """
-        Defines
-        :param args:
-        :param state:
-        :return:
+        Computes matched entities, ambiguously matched entities (multi-match), predicted entities, and undefined entities.
+        :param args: Not used.
+        :param state: Used to retrieve intermediate and store final result.
+        :return: None
         """
         loc2match: Dict[int, List[ConceptMatch]] = self.create_loc2match_map(state.direct_matches)
         direct_matches: List[ConceptMatch] = []

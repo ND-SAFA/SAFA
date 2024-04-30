@@ -1,4 +1,3 @@
-import { comment } from "postcss";
 import { ArtifactCommentsSchema, ArtifactSchema, CommentSchema } from "@/types";
 import { ENABLED_FEATURES } from "@/util";
 import { buildRequest } from "@/api";
@@ -191,6 +190,7 @@ export async function generateArtifactHealth(
   artifact: ArtifactSchema
 ): Promise<ArtifactCommentsSchema> {
   if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
+    console.log("Generating health checks for artifact:", artifact.id);
     return EXAMPLE_COMMENTS;
   }
 

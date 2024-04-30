@@ -99,9 +99,10 @@ export const useCommentApi = defineStore("useCommentApi", () => {
     artifact: ArtifactSchema
   ): Promise<void> {
     await commentApi.handleRequest(async () => {
-      commentStore.addArtifact(
+      commentStore.addHealthChecks(
         artifact.id,
-        await generateArtifactHealth(projectStore.versionId, artifact)
+        (await generateArtifactHealth(projectStore.versionId, artifact))
+          .healthChecks
       );
     });
   }

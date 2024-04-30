@@ -40,8 +40,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { onMounted, watch } from "vue/dist/vue";
+import { computed, onMounted, watch } from "vue";
 import { IconVariant, ThemeColor } from "@/types";
 import { ENABLED_FEATURES } from "@/util";
 import {
@@ -59,14 +58,14 @@ import {
   TextButton,
 } from "@/components/common";
 
-const artifactHealth = computed(() =>
-  commentStore.getHealthChecks(artifact.value?.id || "")
-);
-
 const artifact = computed(() =>
   artifactSaveStore.editedArtifact.body
     ? artifactSaveStore.editedArtifact
     : artifactStore.selectedArtifact
+);
+
+const artifactHealth = computed(() =>
+  commentStore.getHealthChecks(artifact.value?.id || "")
 );
 
 const artifactHealthDisplay = computed(() =>

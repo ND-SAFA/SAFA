@@ -1,6 +1,10 @@
 import { defineStore } from "pinia";
 
-import { ArtifactCommentsSchema, CommentSchema } from "@/types";
+import {
+  AnyCommentSchema,
+  ArtifactCommentsSchema,
+  CommentSchema,
+} from "@/types";
 import { pinia } from "@/plugins";
 
 /**
@@ -9,7 +13,14 @@ import { pinia } from "@/plugins";
  */
 export const useComments = defineStore("useComments", {
   state: () => ({
+    /**
+     * A map of artifact comments, flags, and health checks by artifact ID.
+     */
     commentsByArtifactId: {} as Record<string, ArtifactCommentsSchema>,
+    /**
+     * A list of health checks for newly created artifacts.
+     */
+    newArtifactHealth: [] as AnyCommentSchema[],
   }),
   getters: {},
   actions: {
@@ -38,7 +49,11 @@ export const useComments = defineStore("useComments", {
      * @returns The health checks on the artifact.
      */
     getHealthChecks(artifactId: string): CommentSchema[] {
-      return this.commentsByArtifactId[artifactId]?.healthChecks || [];
+      if (artifactId) {
+        return this.commentsByArtifactId[artifactId]?.healthChecks || [];
+      } else {
+        return this.newArtifactHealth;
+      }
     },
     /**
      * Adds comments, flags, and health checks for a given artifact.
@@ -47,6 +62,32 @@ export const useComments = defineStore("useComments", {
      */
     addArtifact(artifactId: string, comments: ArtifactCommentsSchema): void {
       this.commentsByArtifactId[artifactId] = comments;
+    },
+    /**
+     * Adds health checks for a given artifact.
+     * @param artifactId - The unique identifier of the artifact.
+     * @param healthChecks - The health checks to add.
+     */
+    addHealthChecks(
+      artifactId: string,
+      healthChecks: AnyCommentSchema[]
+    ): void {
+      this.newArtifactHealth = [];
+
+      if (artifactId) {
+        if (!this.commentsByArtifactId[artifactId]) {
+          this.commentsByArtifactId[artifactId] = {
+            artifactId,
+            comments: [],
+            flags: [],
+            healthChecks: [],
+          };
+        }
+
+        this.commentsByArtifactId[artifactId].healthChecks = healthChecks;
+      } else {
+        this.newArtifactHealth = healthChecks;
+      }
     },
     /**
      * Adds a comment to an artifact.

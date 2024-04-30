@@ -18,8 +18,8 @@ from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
-from tgen.tracing.ranking.selectors.selection_by_threshold_normalized_children import SelectByThresholdNormalizedChildren
 from tgen.tracing.ranking.selectors.selection_by_threshold_scaled_across_all import SelectByThresholdScaledAcrossAll
+from tgen.tracing.ranking.selectors.selection_by_threshold_scaled_by_artifact import SelectByThresholdScaledByArtifacts
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
 
@@ -40,7 +40,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
             trace_predictions = self._run_tracing_job_on_all_artifacts(args, state)
             trace_predictions = self._weight_scores_with_related_children_predictions(trace_predictions,
                                                                                       state.id_to_related_children)
-            selected_predictions = SelectByThresholdNormalizedChildren.select(trace_predictions, args.link_selection_threshold)
+            selected_predictions = SelectByThresholdScaledByArtifacts.select(trace_predictions, args.link_selection_threshold)
         state.selected_predictions = selected_predictions
         state.trace_predictions = trace_predictions
 
@@ -75,7 +75,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
         generation2id = {content: a_id for a_id, content in new_artifact_map.items()}
         subset_ids = list({a_id for a_ids in state.get_cluster2artifacts(ids_only=True).values() for a_id in a_ids})
         subset_ids += list(state.new_artifact_dataset.artifact_df.index)
-        state.embedding_manager.create_artifact_embeddings(artifact_ids=subset_ids)
+        state.embedding_manager.create_embeddings(artifact_ids=subset_ids)
         for cluster_id, generations in state.get_cluster2generation().items():
             parent_ids = [generation2id[generation] for generation in generations if
                           generation in generation2id]  # ignores if dup deleted already
@@ -172,7 +172,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                    types_to_trace=(args.source_type, args.target_type),
                                    export_dir=export_dir,
                                    generate_explanations=False,
-                                   embeddings_manager=state.embedding_manager,
+                                   relationship_manager=state.embedding_manager,
                                    **pipeline_args)
         ranking_state = RankingState()
         sort_children_step = SortChildrenStep()

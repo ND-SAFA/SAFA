@@ -1,7 +1,7 @@
 import inspect
-from typing import List, Type
 
 from datasets import Metric, list_metrics
+from typing import List, Type, Set
 
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
@@ -33,6 +33,14 @@ class SupportedTraceMetric(SupportedEnum):
     AVERAGE_TRUE_LINKS = AverageTrueLinksMetric
     SPECIFICITY = SpecificityMetric
     F = FMetric
+
+    @staticmethod
+    def get_score_based_metrics() -> Set[str]:
+        """
+        :return: Returns the metrics that rely on scores.
+        """
+        metrics = {SupportedTraceMetric.LAG, SupportedTraceMetric.MAP, SupportedTraceMetric.PRECISION_AT_K}
+        return {metric.name for metric in metrics}
 
     @staticmethod
     def get_query_metrics() -> List[str]:

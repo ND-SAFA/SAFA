@@ -1,11 +1,11 @@
 import gc
-from typing import Dict, List, Optional, Type
 
 import torch
 from torch.nn.parameter import Parameter
 from transformers import AutoConfig, PreTrainedModel, PretrainedConfig
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
+from typing import Dict, List, Optional, Type
 
 from tgen.common.constants.deliminator_constants import PERIOD
 from tgen.common.constants.hugging_face_constants import MAX_SEQ_LENGTH_DEFAULT
@@ -80,7 +80,8 @@ class ModelManager(BaseObject):
         """
         if self._config is None:
             self._config = AutoConfig.from_pretrained(self.model_path)
-            self._config.num_labels = 2
+            if not self._config.num_labels:
+                self._config.num_labels = 2
         return self._config
 
     def clear_model(self) -> None:

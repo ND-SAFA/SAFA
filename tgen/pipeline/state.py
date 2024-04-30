@@ -2,6 +2,7 @@ import os
 from collections.abc import Set
 from copy import deepcopy
 from dataclasses import dataclass, field
+
 from typing import Any, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, UNDERSCORE
@@ -227,7 +228,11 @@ class State(BaseObject):
         expected_param_type = param_specs.param_types.get(name, Any)
         if isinstance(val, AbstractDatasetCreator) and not ReflectionUtil.is_type(val, expected_param_type, name,
                                                                                   print_on_error=False):
-            val = val.create()
+            try:
+                val = val.create()
+            except Exception as e:
+                logger.error(f"Unable to create dataset: {name}")
+                raise e
         if not ReflectionUtil.is_type(val, expected_param_type, name):
             raise TypeError(f"Expected {name} to be {expected_param_type} but was type {type(val)}")
         return val

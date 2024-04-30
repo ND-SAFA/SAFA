@@ -2,24 +2,24 @@ import os
 import uuid
 from copy import deepcopy
 from os.path import dirname
-from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
 
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
-from tgen.common.util.embedding_util import EmbeddingUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.np_util import NpUtil
 from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class Cluster:
     """
     Manages a cluster in a dataset.
     """
+    CENTROID_KEY = "centroid"
 
     def __init__(self, embeddings_manager: EmbeddingsManager, c_id: str = None):
         """
@@ -104,7 +104,7 @@ class Cluster:
         :param cluster: The cluster to calculate the distance to.
         :return: The similarity to the other cluster.
         """
-        return EmbeddingUtil.calculate_similarities([self.centroid], [cluster.centroid])[0][0]
+        return self.embedding_manager.compare_artifacts([self.get_centroid_key()], [cluster.get_centroid_key()])[0][0]
 
     def similarity_to_neighbors(self, a_id: str) -> float:
         """
@@ -112,11 +112,10 @@ class Cluster:
         :param a_id: Artifact id to compare to cluster.
         :return: Average similarity.
         """
-        unique_artifacts_embeddings = [self.embedding_manager.get_embedding(a) for a in self.artifact_id_set if a != a_id]
-        if len(unique_artifacts_embeddings) == 0:
+        unique_artifacts_ids = [a for a in self.artifact_id_set if a != a_id]
+        if len(unique_artifacts_ids) == 0:
             return 1
-        artifact_embedding = [self.embedding_manager.get_embedding(a_id)]
-        similarities = EmbeddingUtil.calculate_similarities(artifact_embedding, unique_artifacts_embeddings)[0]
+        similarities = self.embedding_manager.compare_artifacts([a_id], unique_artifacts_ids)[0]
         avg_sim = sum(similarities) / len(similarities)
         return avg_sim
 
@@ -256,6 +255,13 @@ class Cluster:
             return 0
         return primary_metric * self.votes
 
+    def get_centroid_key(self) -> str:
+        """
+        Creates a key representing the centroid of this cluster.
+        :return: The centroid key.
+        """
+        return f"{self.CENTROID_KEY}{self.id}"
+
     def _commit_action(self, action: Callable, artifact_ids: Union[List[str], str], update_stats: bool) -> None:
         """
         Performs an action on all given artifacts.
@@ -296,7 +302,7 @@ class Cluster:
         Calculates all statistics for the cluster.
         :return: None, stats are set in place
         """
-        self.centroid = self.embedding_manager.calculate_centroid(self.artifact_ids)
+        self.centroid = self.embedding_manager.calculate_centroid(self.artifact_ids, key_to_add_to_map=self.get_centroid_key())
         self.avg_similarity = self.__calculate_average_similarity()
         if len(self.artifact_id_set) > 1:
             self.similarity_matrix = self.__calculate_similarity_matrix()
@@ -334,8 +340,7 @@ class Cluster:
         Calculates the average similarity from the artifacts to the centroid.
         :return: Average similarity to centroid.
         """
-        artifact_embeddings = [self.embedding_manager.get_embedding(a_id) for a_id in self.artifact_ids]
-        similarities = EmbeddingUtil.calculate_similarities([self.centroid], artifact_embeddings)[0]
+        similarities = self.embedding_manager.compare_artifacts([self.get_centroid_key()], self.artifact_ids)[0]
         return np.sum(similarities) / len(similarities)
 
     def __calculate_similarity_matrix(self) -> np.array:
@@ -343,8 +348,7 @@ class Cluster:
         Calculates the similarity scores between all artifacts in the cluster.
         :return: The similarity matrix.
         """
-        artifact_embeddings = [self.embedding_manager.get_embedding(a_id) for a_id in self.artifact_ids]
-        similarity_matrix = EmbeddingUtil.calculate_similarities(artifact_embeddings, artifact_embeddings)
+        similarity_matrix = self.embedding_manager.compare_artifacts(self.artifact_ids)
         return similarity_matrix
 
     def __calculate_min_max_median_similarity(self) -> Tuple[float, float, float]:

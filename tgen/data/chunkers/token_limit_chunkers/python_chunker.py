@@ -1,14 +1,13 @@
 import ast
+import math
 import re
 from copy import deepcopy
 from typing import List, Type, Union
 
-import math
-
-from tgen.common.util.override import overrides
 from tgen.common.constants.deliminator_constants import TAB
-from tgen.data.chunkers.abstract_code_chunker import AbstractCodeChunker
-from tgen.data.chunkers.chunked_node import ChunkedNode
+from tgen.common.util.override import overrides
+from tgen.data.chunkers.token_limit_chunkers.abstract_code_chunker import AbstractCodeChunker
+from tgen.data.chunkers.token_limit_chunkers.chunked_node import ChunkedNode
 
 ASTNode = Union[ast.AST, ast.stmt]
 

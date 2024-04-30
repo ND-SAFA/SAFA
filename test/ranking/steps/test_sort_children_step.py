@@ -33,7 +33,7 @@ class TestSortChildrenStep(BaseTest):
         parent_id = "s1"
         args, state = RankingPipelineTest.create_ranking_structures(parent_ids=[parent_id],
                                                                     children_ids=before,
-                                                                    sorter="embedding",
+                                                                    sorter="transformer",
                                                                     embedding_model_name=DEFAULT_SEARCH_EMBEDDING_MODEL)
         step = SortChildrenStep()
         step.run(args, state)

@@ -10,6 +10,14 @@ class TestDictUtil(TestCase):
     Responsible for testing that dictionary utility is correct.
     """
 
+    def test_initialize_value_if_not_in_dict(self):
+        dict_ = {1: [2, 3]}
+        self.assertFalse(DictUtil.initialize_value_if_not_in_dict(dict_, 1, []))
+        self.assertListEqual(dict_[1], [2, 3])
+        self.assertTrue(DictUtil.initialize_value_if_not_in_dict(dict_, 2, []))
+        self.assertIn(2, dict_)
+        self.assertIsInstance(dict_[2], list)
+
     def test_assert_same_keys(self):
         """
         Tests that same keys.
@@ -103,6 +111,13 @@ class TestDictUtil(TestCase):
                     for i, (k, v) in enumerate(zip(string.ascii_lowercase[:10], expected_values))}
         flipped = DictUtil.flip(orig)
         self.assertDictEqual(flipped, expected)
+
+    def test_set_or_increment_item(self):
+        dict_ = {"a": 1}
+        DictUtil.set_or_increment_count(dict_, "a", 3)
+        self.assertEqual(dict_["a"], 4)
+        DictUtil.set_or_increment_count(dict_, "b", 3)
+        self.assertEqual(dict_["b"], 3)
 
     def test_set_or_append_item(self):
         dict_ = {"a": [1, 2]}

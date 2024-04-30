@@ -1,9 +1,9 @@
 from typing import Any, Iterable, List, Optional, Tuple, Union
-
 import numpy as np
 import pandas as pd
 from scipy.stats import percentileofscore
 from tqdm import tqdm
+from typing import Iterable, List, Tuple, Union, Any
 
 
 class ListUtil:
@@ -177,6 +177,14 @@ class ListUtil:
             return all([item1 == item2 for item1 in list_ for item2 in list_])
 
     @staticmethod
+    def get_max_value_with_index(list_: List) -> Tuple[int, Any]:
+        """
+        Gets the index of the max value in the list.
+        :param list_: The list to get max of.
+        :return: The index of the max value in the list.
+        """
+        return max(enumerate(list_), key=lambda item: item[1])
+      
     def append_if_exists(base_items: List[Any], new_possible_item: Optional[Any], as_new_list: bool = False) -> List[Any]:
         """
         Appends new item to list if it exists.

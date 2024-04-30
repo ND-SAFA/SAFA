@@ -10,8 +10,8 @@ from tgen.common.constants.hgen_constants import ALLOWED_ORPHAN_CLUSTER_SIZE_DEL
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.list_util import ListUtil
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class AddOrphansToClusters(AbstractPipelineStep[ClusteringArgs, ClusteringState]):

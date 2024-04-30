@@ -2,9 +2,8 @@ import ast
 import os
 
 from test.data.chunker.base_code_chunker_test import BaseCodeChunkerTest
-
-from tgen.data.chunkers.chunked_node import ChunkedNode
-from tgen.data.chunkers.python_chunker import PythonChunker
+from tgen.data.chunkers.token_limit_chunkers.chunked_node import ChunkedNode
+from tgen.data.chunkers.token_limit_chunkers.python_chunker import PythonChunker
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR
 

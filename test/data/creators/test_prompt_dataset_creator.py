@@ -4,15 +4,12 @@ from typing import Dict, List
 from unittest import mock
 from unittest.mock import MagicMock
 
-from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
-from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
@@ -21,11 +18,9 @@ from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
-from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_openai import mock_openai
 from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -57,14 +52,13 @@ class TestPromptDatasetCreator(BaseTest):
         prompts_df = prompt_dataset.get_prompt_dataframe(prompt_builder, prompt_args=OpenAIManager.prompt_args, )
         PromptTestProject.verify_prompts_artifacts_project(self, prompts_df)
 
-    @mock_openai
+    @mock_anthropic
     def test_project_reader_artifact_with_summarizer(self, ai_manager: TestAIManager):
         ai_manager.mock_summarization()
         artifact_project_reader = PromptTestProject.get_artifact_project_reader()
-        llm_manager = self.create_llm_manager()
         dataset_creator = self.get_prompt_dataset_creator(project_reader=artifact_project_reader,
-                                                          summarizer=ArtifactsSummarizer(llm_manager_for_artifact_summaries=llm_manager,
-                                                                             summarize_code_only=False))
+                                                          summarizer=ArtifactsSummarizer(
+                                                              summarize_code_only=False))
 
         self.verify_summarization(dataset_creator=dataset_creator, expected_entries=ArtifactTestProject.get_artifact_entries())
 
@@ -84,16 +78,14 @@ class TestPromptDatasetCreator(BaseTest):
         prompt_builder = PromptBuilder(prompts=[prompt, prompt2])
         PromptTestProject.verify_dataset_creator(self, dataset_creator, prompt_builder=prompt_builder, trace_df=trace_df)
 
-    @mock_openai
+    @mock_anthropic
     def test_trace_dataset_creator_with_summarizer(self, ai_manager: TestAIManager):
         ai_manager.mock_summarization()
 
         trace_dataset_creator = PromptTestProject.get_trace_dataset_creator()
-        llm_manager = self.create_llm_manager()
         dataset_creator: PromptDatasetCreator = self.get_prompt_dataset_creator(trace_dataset_creator=trace_dataset_creator,
                                                                                 summarizer=ArtifactsSummarizer(
-                                                                                        llm_manager_for_artifact_summaries=llm_manager,
-                                                                                        summarize_code_only=False))
+                                                                                    summarize_code_only=False))
         artifact_entries = self.get_expected_bodies()
         self.verify_summarization(dataset_creator=dataset_creator, expected_entries=artifact_entries)
 
@@ -151,7 +143,3 @@ class TestPromptDatasetCreator(BaseTest):
     @staticmethod
     def get_prompt_dataset_creator(ensure_code_is_summarized=False, **params):
         return PromptDatasetCreator(**params, ensure_code_is_summarized=ensure_code_is_summarized)
-
-    @staticmethod
-    def create_llm_manager() -> AbstractLLMManager:
-        return OpenAIManager(OpenAIArgs(model=OPEN_AI_MODEL_DEFAULT))

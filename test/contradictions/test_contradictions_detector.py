@@ -12,14 +12,14 @@ from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys, LayerKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestContradictionsDetector(BaseTest):
     LAYER_ID = "requirement"
 
-    @mock_openai
+    @mock_anthropic
     def test_detect_all(self, test_ai_manager: TestAIManager):
         responses = [get_response_for_req(r) for r in REQUIREMENTS]
         responses.extend([self.fake_question_answers for i in range(8)])
@@ -48,7 +48,7 @@ class TestContradictionsDetector(BaseTest):
             else:
                 self.assertFalse(any([trace_id in contradictions for contradictions in results.values()]))
 
-    @mock_openai
+    @mock_anthropic
     def test_single(self, test_ai_manager: TestAIManager):
         responses = [get_response_for_req(r) for r in [R1, R2]]
         responses.extend([self.fake_question_answers for i in range(2)])

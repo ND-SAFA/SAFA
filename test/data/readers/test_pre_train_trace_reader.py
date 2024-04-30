@@ -2,14 +2,11 @@ import os
 from typing import List
 
 from tgen.common.util.file_util import FileUtil
-from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from tgen.data.readers.pre_train_trace_reader import PreTrainTraceReader
-from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
-from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.project_paths import PRE_TRAIN_TRACE_PATH
@@ -29,16 +26,15 @@ class TestPreTrainingTraceReader(BaseTest):
         lines = FileUtil.read_file(reader.data_file).split(os.linesep)
         self.verify_project_data_frames(artifact_df, trace_df, layer_mapping_df, lines)
 
-    @mock_openai
+    @mock_anthropic
     def test_summarization(self, ai_manager: TestAIManager):
         """
         Tests that pre-train data can be summarized
         """
         ai_manager.mock_summarization()
         reader: PreTrainTraceReader = self.get_project_reader()
-        llm_manager = OpenAIManager(OpenAIArgs())
         reader.set_summarizer(
-            ArtifactsSummarizer(llm_manager_for_artifact_summaries=llm_manager, summarize_code_only=False))
+            ArtifactsSummarizer(summarize_code_only=False))
         artifact_df, trace_df, layer_mapping_df = reader.read_project()
         orig_lines = list(FileUtil.read_file(reader.data_file).split(os.linesep))
         summarized = [SUMMARY_FORMAT.format(line) for line in orig_lines]

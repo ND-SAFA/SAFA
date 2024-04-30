@@ -1,7 +1,8 @@
+from typing import Any, Dict, List, Union
+
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from typing import Any, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
@@ -32,6 +33,7 @@ class EmbeddingsManager(AbstractRelationshipManager):
         :param model_name: Name of model to use for creating embeddings
         :param model: The model to use to embed artifacts.
         :param show_progress_bar: Whether to show progress bar when calculating batches.
+        :param create_embeddings_on_init: If True, creates embeddings for all items in the content map.
         """
         self._embedding_map = {}
         self.__ordered_ids = []

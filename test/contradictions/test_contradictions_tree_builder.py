@@ -7,13 +7,13 @@ from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestContradictionsTreeBuilder(BaseTest):
 
-    @mock_openai
+    @mock_anthropic
     def test_traversal(self, test_manager: TestAIManager):
         builder = ContradictionsTreeBuilder()
         responses = [PromptUtil.create_xml("answer", r) for i in range(5) for r in [CommonChoices.NO, CommonChoices.YES]]

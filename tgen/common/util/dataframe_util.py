@@ -1,8 +1,8 @@
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
+from typing import Any, Callable, Dict, List, Optional, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 
@@ -101,15 +101,17 @@ class DataFrameUtil:
         return df_dict
 
     @staticmethod
-    def get_optional_value_from_df(row: Union[pd.Series, Dict], col_name: Union[str, Enum], allow_empty: bool = True) -> Optional[Any]:
+    def get_optional_value_from_df(row: Union[pd.Series, Dict], col_name: Union[str, Enum],
+                                   allow_empty: bool = True, default_value: Any = None) -> Optional[Any]:
         """
         Returns the column value if exists, otherwise None is returned.
         :param row: The row in the dataframe.
         :param col_name: The name of the column.
         :param allow_empty: Whether to allow empty string. If false, None is returned on empty string.
+        :param default_value: The value to use as a default if the value does not exist.
         :return: The column value if exists, otherwise None is returned.
         """
-        potential_value = row.get(col_name, None)
+        potential_value = row.get(col_name, default_value)
         return DataFrameUtil.get_optional_value(potential_value, allow_empty)
 
     @staticmethod
@@ -162,4 +164,3 @@ class DataFrameUtil:
 
         nan_empty_indices = nan_empty_indices[nan_empty_indices].index
         return list(nan_empty_indices)
-

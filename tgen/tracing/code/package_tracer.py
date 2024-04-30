@@ -3,9 +3,9 @@ from typing import Dict, Iterable, List, Tuple
 
 from tgen.common.constants.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
 from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
@@ -81,7 +81,7 @@ class PackageTracer:
         """
         artifact_ids_set = set(trace_dataset.artifact_df.index)
         for package in packages:
-            trace_dataset.artifact_df.add_artifact(id=package,
+            trace_dataset.artifact_df.add_artifact(a_id=package,
                                                    layer_id=package_artifact_type,
                                                    content=EMPTY_STRING,
                                                    summary=EMPTY_STRING)

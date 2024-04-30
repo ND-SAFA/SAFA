@@ -1,18 +1,17 @@
+import pandas as pd
 from typing import Dict, List
 
-import numpy as np
-import pandas as pd
-
-from tgen.common.objects.artifact import Artifact
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.util.json_util import JsonUtil
+from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
+from tgen.common.objects.trace_layer import TraceLayer
+from tgen.common.util.json_util import JsonUtil
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.common.objects.trace_layer import TraceLayer
 
 
 class ApiExporter(AbstractDatasetExporter):
@@ -34,8 +33,8 @@ class ApiExporter(AbstractDatasetExporter):
         :return: The ApiDefinition
         """
         dataset = self.get_dataset()
-        links = dataset.trace_df.to_dict(orient="records")
-        self.true_links: List[Dict] = [t for t in links if not np.isnan(t["score"]) and t["score"] > 0]
+        trace_df: TraceDataFrame = dataset.trace_df
+        self.true_links: List[Dict] = trace_df.get_links(true_only=True)
         artifacts: List[Artifact] = dataset.artifact_df.to_dict("records", index=True)
 
         layers = []

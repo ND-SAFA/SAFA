@@ -6,6 +6,15 @@ from tgen.testres.base_tests.base_test import BaseTest
 
 class TestStrUtil(BaseTest):
 
+    def test_split_by_punctuation(self):
+        input_string = "no punctuation"
+        self.assertEqual(StrUtil.split_by_punctuation(input_string)[0], input_string)
+        input_string = "there? is punctuation; in string!"
+        split_string = StrUtil.split_by_punctuation(input_string)
+        self.assertEqual(split_string[0], "there")
+        self.assertEqual(split_string[1], "is punctuation")
+        self.assertEqual(split_string[2], "in string")
+
     def test_format_selective(self):
         str2format = "I need to format these: {one} {two} but not this: {three}"
         formatted = StrUtil.format_selective(str2format, "random", one="A", two="B")

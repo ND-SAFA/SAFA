@@ -1,8 +1,6 @@
 from enum import Enum
 from typing import List
 
-from tgen.common.util.enum_util import EnumUtil
-
 
 class StructuredKeys:
     """
@@ -55,6 +53,7 @@ class StructuredKeys:
         CONTENT = "content"
         LAYER_ID = "layer_id"
         SUMMARY = "summary"
+        CHUNKS = "chunks"
 
     class LayerMapping(Enum):
         SOURCE_TYPE = "source_type"

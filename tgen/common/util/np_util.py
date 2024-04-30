@@ -5,6 +5,7 @@ import pandas as pd
 from numpy import mean
 
 from tgen.common.util.list_util import ListUtil
+from tgen.common.util.math_util import MathUtil
 
 
 class NpUtil:
@@ -54,23 +55,40 @@ class NpUtil:
         return result
 
     @staticmethod
-    def detect_outlier_scores(scores: List[float], epsilon: float = 0.01, sigma: float = None) -> Tuple[float, float]:
+    def detect_outlier_scores(scores: List[float], epsilon: float = 0.01, sigma: float = None,
+                              ensure_at_least_one_detection: bool = False) -> Tuple[float, float]:
         """
         Detects the list of outlier scores within sigma.
         :param scores: List of scores to detect outliers from.
         :param sigma: Number of Std Deviations to include in valid boundary.
         :param epsilon: The small number to use instead of negative or zero values.
         :param sigma: How many stds from the mean are allowed.
+        :param ensure_at_least_one_detection: If True, makes sure that at least one score will be detected as low or high.
         :return: The lower and upper threshold scores for filtering out outliers.
         """
         if sigma is None:
             sigma = 2.5 if len(scores) > 20 else 1.5
-        scores = pd.Series(scores)
+        scores = pd.Series(sorted(scores, reverse=True))
         scores[scores < 0] = epsilon
         harmonic_mean = mean(scores)
-        lower_limit = harmonic_mean - sigma * scores.std()
-        upper_limit = harmonic_mean + sigma * scores.std()
 
+        upper_sigma, lower_sigma = sigma, sigma
+        if ensure_at_least_one_detection:
+            max_sigmas = (max(scores) - harmonic_mean) / scores.std()
+            max_sigma_allowed = MathUtil.round_to_nearest_half(max_sigmas, floor=True)
+            upper_sigma = min(sigma, max_sigma_allowed)
+
+            min_sigmas = (harmonic_mean - min(scores)) / scores.std()
+            min_sigmas_allowed = MathUtil.round_to_nearest_half(min_sigmas, floor=True)
+            lower_sigma = min(sigma, min_sigmas_allowed)
+
+        lower_limit = harmonic_mean - lower_sigma * scores.std()
+        upper_limit = harmonic_mean + upper_sigma * scores.std()
+        
+        index = min([i for i, score in enumerate(scores) if score < upper_limit])
+        closest = scores[index]
+        if (upper_limit - closest) <= 0.02:
+            upper_limit = closest
         return lower_limit + epsilon, upper_limit - epsilon
 
     @staticmethod

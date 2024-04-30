@@ -6,8 +6,8 @@ from tgen.common.objects.trace import Trace
 from tgen.common.util.clustering_util import ClusteringUtil
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.pipeline.state import State
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 @dataclass

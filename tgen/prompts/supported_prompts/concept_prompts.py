@@ -1,4 +1,5 @@
 from tgen.common.constants.concept_pipeline_constants import ENTITY_DESCRIPTION_TAG, ENTITY_NAME_TAG, ENTITY_TAG
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 
@@ -15,8 +16,11 @@ def get_response_format():
     return create_entity_extraction_response("ACRONYM", "DESCRIPTION", prefix="Record each acronym like so: \n")
 
 
-def create_entity_extraction_response(name: str, description: str, prefix: str = "") -> str:
+def create_entity_extraction_response(name: str, description: str, prefix: str = EMPTY_STRING) -> str:
     """
+    :param name: The entity name.
+    :param description: The description of the entity.
+    :param prefix: Goes before the response tags.
     :return: Expected response format for each entity found.
     """
     return (

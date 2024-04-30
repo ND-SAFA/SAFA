@@ -2,6 +2,7 @@ from typing import Dict, List
 
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.core.trainers.llm_trainer import LLMTrainer
@@ -110,11 +111,10 @@ class EntityMatchingStep(AbstractPipelineStep):
     def create_example_xml(target_text: str) -> str:
         """
         Creates example of how to enclose each match.
+        :param target_text: The text inside of the xml.
         :return: String representation.
         """
-        return (
-            f"<{EntityMatchingStep.MATCH_TAG}>{target_text}</{EntityMatchingStep.MATCH_TAG}>"
-        )
+        return PromptUtil.create_xml(EntityMatchingStep.MATCH_TAG, target_text)
 
     @staticmethod
     def strip_artifact_bodies(artifacts: List[Artifact]):

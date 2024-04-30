@@ -1,6 +1,5 @@
 from test.concepts.constants import ConceptData
-from test.concepts.utils import create_concept_args
-from tgen.concepts.concept_state import ConceptState
+from test.concepts.utils import create_concept_args, create_concept_state
 from tgen.concepts.steps.entity_matching_step import EntityMatchingStep
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
@@ -18,7 +17,7 @@ class TestEntityMatching(BaseTest):
         :return:
         """
         args = create_concept_args()
-        state = ConceptState()
+        state = create_concept_state(args)
         state.entity_df = ConceptData.get_entity_df()
 
         self.mock_entity_matching(ai_manager)

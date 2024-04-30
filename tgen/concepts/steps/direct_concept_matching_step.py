@@ -45,7 +45,7 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
         :param state: Contains running list of matches.
         :return: None
         """
-        concept_artifact_ids = args.concept_df.index.to_list()
+        concept_artifact_ids = state.concept_df.index.to_list()
         target_artifact_content = args.artifact[ArtifactKeys.CONTENT]
 
         concept_alternate_names = extract_alternate_names(concept_artifact_ids)  # [(c0_name, c0_name_alt_name1, ...) ,...]

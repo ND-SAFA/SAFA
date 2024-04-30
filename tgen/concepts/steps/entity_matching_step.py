@@ -31,7 +31,7 @@ class EntityMatchingStep(AbstractPipelineStep):
         :return: None
         """
         entities: List[Artifact] = self.strip_artifact_bodies(state.entity_df.to_artifacts())
-        concepts: List[Artifact] = self.strip_artifact_bodies(args.concept_df.to_artifacts())
+        concepts: List[Artifact] = self.strip_artifact_bodies(state.concept_df.to_artifacts())
 
         prompt_builders, prompts = self.create_prompts(entities, concepts, args.llm_manager)
         entity_predictions = self.generate_predictions(prompts, prompt_builders, args.llm_manager)

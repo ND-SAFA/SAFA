@@ -1,6 +1,5 @@
 from test.concepts.constants import ConceptData
-from test.concepts.utils import create_concept_args
-from tgen.concepts.concept_state import ConceptState
+from test.concepts.utils import create_concept_args, create_concept_state
 from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from tgen.concepts.util.extract_alt_names import extract_alternate_names
 from tgen.testres.base_tests.base_test import BaseTest
@@ -15,7 +14,7 @@ class TestDirectConceptMatching(BaseTest):
         args = create_concept_args()
         step = DirectConceptMatchingStep()
 
-        state = ConceptState()
+        state = create_concept_state(args)
         step.run(args, state)
 
         direct_matches = ConceptData.DirectMatches

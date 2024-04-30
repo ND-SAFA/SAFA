@@ -1,4 +1,4 @@
-from dataclasses import field
+from dataclasses import field, dataclass
 from typing import List
 
 from tgen.common.objects.trace import Trace
@@ -8,7 +8,12 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.pipeline.state import State
 
 
+@dataclass
 class ConceptState(State):
+    """
+    Contains all concept artifacts.
+    """
+    concept_df: ArtifactDataFrame = None
     """
     List of concepts found directly in target artifact.
     """

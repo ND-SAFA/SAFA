@@ -2,8 +2,7 @@ from unittest import TestCase
 
 from test.concepts.constants import ConceptData
 from test.concepts.test_entity_matching import TestEntityMatching
-from test.concepts.utils import create_concept_args
-from tgen.concepts.concept_state import ConceptState
+from test.concepts.utils import create_concept_args, create_concept_state
 from tgen.concepts.steps.create_response_step import CreateResponseStep
 from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from tgen.concepts.steps.entity_matching_step import EntityMatchingStep
@@ -23,7 +22,7 @@ class TestCreateResponse(BaseTest):
         :return: None
         """
         args = create_concept_args()
-        state = ConceptState()
+        state = create_concept_state(args)
 
         # Mock pipeline execution assumptions
         DirectConceptMatchingStep().run(args, state)

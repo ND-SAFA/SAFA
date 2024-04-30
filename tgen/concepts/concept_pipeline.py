@@ -25,6 +25,7 @@ class ConceptPipeline(AbstractPipeline[ConceptArgs, ConceptState]):
         :param kwargs: Additional keyword arguments to pipeline
         """
         super().__init__(args, steps=self.steps, skip_summarization=True, **kwargs)
+        self.state.concept_df = args.dataset.artifact_df.get_artifacts_by_type(args.concept_layer_id)
 
     def state_class(self) -> Type[State]:
         """

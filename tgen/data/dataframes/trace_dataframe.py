@@ -201,9 +201,20 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param artifact_id: Id of artifact to find parents for.
         :return: Parent ids of artifact.
         """
-        query_df = self[(self[TraceKeys.child_label()] == artifact_id) & (~self[TraceKeys.SCORE.value].isna())]
+        query_df = self.filter_for_parents_or_children(artifact_id)
         parent_ids = list(query_df[TraceKeys.TARGET.value])
         return parent_ids
+
+    def filter_for_parents_or_children(self, artifact_id: str, artifact_key: str = TraceKeys.child_label()) -> "TraceDataFrame":
+        """
+        Filters dataframe to find all children or parents of the artifact.
+        :param artifact_id: The id to look for.
+        :param artifact_key: The key that the artifact will be under (child label means all parents are returned and vice versa).
+        :return: Dataframe with traces of only the children or parents of the artifact.
+        """
+        query_df = self[(self[artifact_key] == artifact_id) &
+                        ((~self[TraceKeys.SCORE.value].isna()) | self[TraceKeys.LABEL.value] == 1)]
+        return query_df
 
     def get_artifact_ids(self, artifact_role: TraceKeys = None, linked_only: bool = False) -> Set[str]:
         """
@@ -219,3 +230,20 @@ class TraceDataFrame(AbstractProjectDataFrame):
                     continue
                 artifact_ids.add(trace[key])
         return artifact_ids
+
+    def get_relationships(self, artifact_id: str, artifact_key: str = None) -> List[EnumDict]:
+        """
+        Finds traces related to the artifact.
+        If an artifact key is provided, will only look for traces with trace[artifact_key] == artifact_id.
+        :param artifact_id: The id to look for.
+        :param artifact_key: The key that the artifact will be under (child label means all parents are returned and vice versa).
+        :return: List of all traces related to the artifact.
+        """
+        relationships = []
+        if artifact_key == TraceKeys.child_label() or not artifact_key:
+            parents = self.filter_for_parents_or_children(artifact_id, artifact_key).get_links()
+            relationships.extend(parents)
+        if artifact_key == TraceKeys.parent_label() or not artifact_key:
+            children = self.filter_for_parents_or_children(artifact_id, artifact_key).get_links()
+            relationships.extend(children)
+        return relationships

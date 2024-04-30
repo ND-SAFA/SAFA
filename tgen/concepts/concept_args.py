@@ -3,7 +3,6 @@ from dataclasses import dataclass, field
 from tgen.common.constants.model_constants import get_best_default_llm_manager_short_context
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.dataclass_util import required_field
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.pipeline_args import PipelineArgs
 
@@ -13,7 +12,7 @@ class ConceptArgs(PipelineArgs):
     """
     DataFrame containing only concepts to match.
     """
-    concept_df: ArtifactDataFrame = required_field(field_name="concept_df")
+    concept_layer_id: str = required_field(field_name="concept_layer_id")
     """
     Artifact to match concepts against.
     """
@@ -26,14 +25,3 @@ class ConceptArgs(PipelineArgs):
     Layer ID to given extracted entities.
     """
     entity_layer_id = "Entity"
-
-    def __post_init__(self) -> None:
-        """
-        Verifies that required arguments are passed in.
-        :return: None
-        """
-
-        if self.concept_df is None:
-            raise Exception("Expected concepts to be defined.")
-        if self.artifact is None:
-            raise Exception("Expected artifact to be defined.")

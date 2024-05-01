@@ -1,4 +1,9 @@
-import { ArtifactCommentsSchema, ArtifactSchema, CommentSchema } from "@/types";
+import {
+  ArtifactCommentsSchema,
+  ArtifactSchema,
+  CommentSchema,
+  HealthCheckCollectionSchema,
+} from "@/types";
 import { ENABLED_FEATURES } from "@/util";
 import { buildRequest } from "@/api";
 
@@ -36,7 +41,7 @@ const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
       type: "matched_concept",
       createdAt: new Date(Date.now()).toISOString(),
       updatedAt: new Date(Date.now()).toISOString(),
-      name: "[Concept]",
+      conceptName: "[Concept]",
     },
     {
       id: "2",
@@ -46,7 +51,7 @@ const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
       type: "contradiction",
       createdAt: new Date(Date.now()).toISOString(),
       updatedAt: new Date(Date.now()).toISOString(),
-      affectedArtifacts: ["1", "2"],
+      artifactIds: ["1", "2"],
     },
     {
       id: "3",
@@ -188,13 +193,13 @@ export async function resolveArtifactComment(
 export async function generateArtifactHealth(
   versionId: string,
   artifact: ArtifactSchema
-): Promise<ArtifactCommentsSchema> {
+): Promise<HealthCheckCollectionSchema> {
   if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
     console.log("Generating health checks for artifact:", artifact.id);
     return EXAMPLE_COMMENTS;
   }
 
-  return buildRequest<ArtifactCommentsSchema, "versionId", ArtifactSchema>(
+  return buildRequest<HealthCheckCollectionSchema, "versionId", ArtifactSchema>(
     "generateHealthChecks",
     { versionId }
   ).post(artifact);

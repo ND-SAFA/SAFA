@@ -62,7 +62,7 @@ const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
       type: "undefined_concept",
       createdAt: new Date(Date.now()).toISOString(),
       updatedAt: new Date(Date.now()).toISOString(),
-      undefinedConcept: {} as ArtifactSchema,
+      undefinedConcept: "Product Refresh Rate",
     },
     {
       id: "13",

@@ -21,31 +21,56 @@
       value="There are no active health checks."
     />
     <q-banner v-for="check in artifactHealthDisplay" :key="check.content" dense>
-      <flex-box justify="between">
-        <flex-box align="center">
-          <separator vertical :color="check.color" r="2" style="width: 2px" />
-          <icon size="sm" :variant="check.icon" :color="check.color" />
-          <typography :value="check.content" l="2" />
-        </flex-box>
-        <icon-button small tooltip="See details" icon="more">
-          <q-popup-proxy>
-            <artifact-list-display
-              v-if="'artifactIds' in check"
-              :artifacts="getArtifacts(check.artifactIds)"
-              @click="({ id }) => selectionStore.selectArtifact(id)"
-            />
-            <flex-box v-if="'concepts' in check">
-              <q-chip
-                v-for="concept in check.concepts"
-                :key="concept"
-                style="max-width: 300px; height: fit-content"
-              >
-                <typography :value="concept" wrap />
-              </q-chip>
-            </flex-box>
-          </q-popup-proxy>
-        </icon-button>
+      <flex-box align="center">
+        <separator vertical :color="check.color" r="2" style="width: 2px" />
+        <icon size="sm" :variant="check.icon" :color="check.color" />
+        <typography :value="check.content" l="2" />
       </flex-box>
+      <div class="q-ml-sm q-mt-sm">
+        <flex-box v-if="'artifactIds' in check">
+          <q-chip
+            v-for="relatedArtifact in getArtifacts(check.artifactIds)"
+            :key="relatedArtifact.id"
+            color="background"
+            style="max-width: 300px; height: fit-content"
+            clickable
+          >
+            <typography :value="relatedArtifact.name" wrap />
+            <q-popup-proxy>
+              <artifact-body-display
+                clickable
+                display-title
+                :artifact="relatedArtifact"
+                @click="selectionStore.selectArtifact(relatedArtifact.id)"
+              />
+            </q-popup-proxy>
+          </q-chip>
+        </flex-box>
+        <flex-box v-if="'concepts' in check">
+          <q-chip
+            v-for="concept in check.concepts"
+            :key="concept"
+            color="background"
+            style="max-width: 300px; height: fit-content"
+          >
+            <typography :value="concept" wrap />
+          </q-chip>
+        </flex-box>
+        <q-chip
+          v-if="'conceptName' in check"
+          color="background"
+          style="max-width: 300px; height: fit-content"
+        >
+          <typography :value="check.conceptName" wrap />
+        </q-chip>
+        <q-chip
+          v-if="'undefinedConcept' in check"
+          color="background"
+          style="max-width: 300px; height: fit-content"
+        >
+          <typography :value="check.undefinedConcept" wrap />
+        </q-chip>
+      </div>
     </q-banner>
   </panel-card>
 </template>
@@ -78,8 +103,7 @@ import {
   FlexBox,
   TextButton,
 } from "@/components/common";
-import IconButton from "@/components/common/button/IconButton.vue";
-import ArtifactListDisplay from "@/components/artifact/display/ArtifactListDisplay.vue";
+import { ArtifactBodyDisplay } from "@/components/artifact/display";
 
 const artifact = computed(() =>
   artifactSaveStore.editedArtifact.body

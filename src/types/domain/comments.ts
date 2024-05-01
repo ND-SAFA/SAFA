@@ -57,7 +57,7 @@ export interface CommentSchema {
  */
 interface UndefinedConceptHealthCheck extends CommentSchema {
   type: "undefined_concept";
-  undefinedConcept: ArtifactSchema;
+  undefinedConcept: string;
 }
 
 /**

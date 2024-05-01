@@ -23,7 +23,12 @@
       :action-cols="3"
     >
       <flex-box full-width class="show-on-hover-parent">
-        <icon variant="account" size="sm" class="q-mr-md" />
+        <icon
+          :variant="comment.type === 'flag' ? 'flag' : 'account'"
+          size="sm"
+          class="q-mr-md"
+          :color="comment.type === 'flag' ? 'secondary' : undefined"
+        />
         <div class="full-width">
           <div style="height: 30px">
             <typography :value="comment.userId" />
@@ -34,17 +39,11 @@
               l="2"
               ellipsis
             />
-            <div class="float-right show-on-hover-child">
+            <div
+              v-if="comment.status !== 'resolved'"
+              class="float-right show-on-hover-child"
+            >
               <icon-button
-                v-if="comment.status === 'resolved'"
-                small
-                icon="comment"
-                color="text"
-                tooltip="Mark unresolved"
-                @click="handleResolveComment(comment)"
-              />
-              <icon-button
-                v-if="comment.status !== 'resolved'"
                 small
                 icon="comment-resolve"
                 color="text"
@@ -52,19 +51,28 @@
                 @click="handleResolveComment(comment)"
               />
               <icon-button
-                v-if="comment.status !== 'resolved'"
                 small
                 icon="edit"
                 tooltip="Edit comment"
                 @click="handleEditComment(comment)"
               />
               <icon-button
-                v-if="comment.status !== 'resolved'"
                 small
                 icon="delete"
                 tooltip="Delete comment"
                 @click="handleDeleteComment(comment)"
               />
+            </div>
+            <div v-else class="float-right">
+              <icon-button
+                small
+                icon="comment"
+                color="text"
+                class="show-on-hover-child"
+                tooltip="Mark unresolved"
+                @click="handleResolveComment(comment)"
+              />
+              <typography secondary small value="Resolved" l="1" />
             </div>
           </div>
           <typography

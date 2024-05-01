@@ -22,6 +22,34 @@
           data-cy="button-artifact-link-child"
           @click="handleLinkChild"
         />
+        <q-btn-dropdown
+          flat
+          auto-close
+          dense
+          size="sm"
+          dropdown-icon=""
+          :icon="groupType === 'type' ? getIcon('artifact') : getIcon('trace')"
+        >
+          <flex-box column>
+            <text-button
+              label="Type"
+              icon="artifact"
+              small
+              text
+              block
+              align="start"
+              @click="groupType = 'type'"
+            />
+            <text-button
+              label="Hierarchy"
+              icon="trace"
+              small
+              block
+              text
+              @click="groupType = 'hierarchy'"
+            />
+          </flex-box>
+        </q-btn-dropdown>
       </template>
 
       <expansion-item
@@ -34,6 +62,7 @@
           :data-cy="'list-selected-' + artifactType"
           :artifacts="relatedArtifacts[artifactType]"
           :action-cols="1"
+          class="bg-background rounded"
           :item-data-cy="'list-selected-item-' + artifactType"
           @click="handleArtifactClick($event.name)"
         >
@@ -71,8 +100,9 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { ArtifactSchema } from "@/types";
+import { getIcon } from "@/util";
 import {
   artifactStore,
   permissionStore,
@@ -86,9 +116,12 @@ import {
   IconButton,
   PanelCard,
   TextButton,
+  FlexBox,
 } from "@/components/common";
 import ExpansionItem from "@/components/common/display/list/ExpansionItem.vue";
 import ArtifactListDisplay from "./ArtifactListDisplay.vue";
+
+const groupType = ref<"type" | "hierarchy">("type");
 
 const displayActions = computed(() =>
   permissionStore.isAllowed("project.edit_data")
@@ -96,11 +129,13 @@ const displayActions = computed(() =>
 
 const artifact = computed(() => artifactStore.selectedArtifact);
 
-const relatedArtifacts = computed(() =>
-  artifact.value
+const artifactId = computed(() => artifact.value?.id || "");
+
+const relatedArtifacts = computed<Record<string, ArtifactSchema[]>>(() =>
+  groupType.value === "type"
     ? (
         subtreeStore
-          .getParentsAndChildren(artifact.value.id)
+          .getParentsAndChildren(artifactId.value)
           .map((id) => artifactStore.getArtifactById(id))
           .filter((artifact) => !!artifact) as ArtifactSchema[]
       ).reduce<Record<string, ArtifactSchema[]>>(
@@ -110,7 +145,16 @@ const relatedArtifacts = computed(() =>
         }),
         {}
       )
-    : {}
+    : {
+        Parents: subtreeStore
+          .getParents(artifactId.value)
+          .map((id) => artifactStore.getArtifactById(id))
+          .filter((artifact) => !!artifact) as ArtifactSchema[],
+        Children: subtreeStore
+          .getChildren(artifactId.value)
+          .map((id) => artifactStore.getArtifactById(id))
+          .filter((artifact) => !!artifact) as ArtifactSchema[],
+      }
 );
 
 /**

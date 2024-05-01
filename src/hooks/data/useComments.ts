@@ -48,9 +48,12 @@ export const useComments = defineStore("useComments", {
      * @param artifactId - The unique identifier of the artifact.
      * @returns The health checks on the artifact.
      */
-    getHealthChecks(artifactId: string): CommentSchema[] {
+    getHealthChecks(artifactId: string): AnyCommentSchema[] {
       if (artifactId) {
-        return this.commentsByArtifactId[artifactId]?.healthChecks || [];
+        return [
+          ...(this.commentsByArtifactId[artifactId]?.healthChecks || []),
+          ...(this.commentsByArtifactId[artifactId]?.flags || []),
+        ];
       } else {
         return this.newArtifactHealth;
       }

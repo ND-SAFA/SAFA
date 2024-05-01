@@ -36,6 +36,15 @@
             />
             <div class="float-right show-on-hover-child">
               <icon-button
+                v-if="comment.status === 'resolved'"
+                small
+                icon="comment"
+                color="text"
+                tooltip="Mark unresolved"
+                @click="handleResolveComment(comment)"
+              />
+              <icon-button
+                v-if="comment.status !== 'resolved'"
                 small
                 icon="comment-resolve"
                 color="text"
@@ -43,12 +52,14 @@
                 @click="handleResolveComment(comment)"
               />
               <icon-button
+                v-if="comment.status !== 'resolved'"
                 small
                 icon="edit"
                 tooltip="Edit comment"
                 @click="handleEditComment(comment)"
               />
               <icon-button
+                v-if="comment.status !== 'resolved'"
                 small
                 icon="delete"
                 tooltip="Delete comment"
@@ -105,6 +116,7 @@
               label="Comment"
               icon="comment"
               small
+              text
               block
               @click="commentType = 'conversation'"
             />
@@ -113,6 +125,7 @@
               icon="flag"
               small
               block
+              text
               align="start"
               @click="commentType = 'flag'"
             />

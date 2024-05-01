@@ -21,10 +21,30 @@
       value="There are no active health checks."
     />
     <q-banner v-for="check in artifactHealthDisplay" :key="check.content" dense>
-      <flex-box align="center">
-        <separator vertical :color="check.color" r="2" style="width: 2px" />
-        <icon size="sm" :variant="check.icon" :color="check.color" />
-        <typography :value="check.content" l="2" />
+      <flex-box justify="between">
+        <flex-box align="center">
+          <separator vertical :color="check.color" r="2" style="width: 2px" />
+          <icon size="sm" :variant="check.icon" :color="check.color" />
+          <typography :value="check.content" l="2" />
+        </flex-box>
+        <icon-button small tooltip="See details" icon="more">
+          <q-popup-proxy>
+            <artifact-list-display
+              v-if="'artifactIds' in check"
+              :artifacts="getArtifacts(check.artifactIds)"
+              @click="({ id }) => selectionStore.selectArtifact(id)"
+            />
+            <flex-box v-if="'concepts' in check">
+              <q-chip
+                v-for="concept in check.concepts"
+                :key="concept"
+                style="max-width: 300px; height: fit-content"
+              >
+                <typography :value="concept" wrap />
+              </q-chip>
+            </flex-box>
+          </q-popup-proxy>
+        </icon-button>
       </flex-box>
     </q-banner>
   </panel-card>
@@ -41,13 +61,14 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
-import { IconVariant, ThemeColor } from "@/types";
+import { ArtifactSchema, IconVariant, ThemeColor } from "@/types";
 import { ENABLED_FEATURES } from "@/util";
 import {
   artifactSaveStore,
   artifactStore,
   commentApiStore,
   commentStore,
+  selectionStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -57,6 +78,8 @@ import {
   FlexBox,
   TextButton,
 } from "@/components/common";
+import IconButton from "@/components/common/button/IconButton.vue";
+import ArtifactListDisplay from "@/components/artifact/display/ArtifactListDisplay.vue";
 
 const artifact = computed(() =>
   artifactSaveStore.editedArtifact.body
@@ -99,6 +122,20 @@ const artifactHealthDisplay = computed(() =>
       })(),
     }))
 );
+
+/**
+ * Retrieves the artifacts by their IDs.
+ * @param artifactIds - The IDs of the artifacts to retrieve.
+ * @returns The artifacts.
+ */
+function getArtifacts(artifactIds: string[]): ArtifactSchema[] {
+  return artifactIds
+    .map(
+      (id) =>
+        artifactStore.getArtifactById(id) || artifactStore.getArtifactByName(id) // TODO: remove after testing
+    )
+    .filter((artifact) => !!artifact) as ArtifactSchema[];
+}
 
 /**
  * Generates health checks for the current artifact.

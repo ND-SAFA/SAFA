@@ -6,7 +6,11 @@
       collapsable
       borderless
     >
-      <list :scroll-height="300" data-cy="list-selected-parents">
+      <list
+        :scroll-height="300"
+        data-cy="list-selected-parents"
+        class="bg-background rounded"
+      >
         <list-item
           v-for="parent in parentTypes"
           :key="parent.typeId"
@@ -39,7 +43,11 @@
       collapsable
       borderless
     >
-      <list :scroll-height="300" data-cy="list-selected-children">
+      <list
+        :scroll-height="300"
+        data-cy="list-selected-children"
+        class="bg-background rounded"
+      >
         <list-item
           v-for="child in childTypes"
           :key="child.typeId"

@@ -18,6 +18,7 @@
       :artifacts="artifacts"
       data-cy="list-selected-artifacts"
       item-data-cy="list-selected-artifact-item"
+      class="bg-background rounded"
       @click="viewsStore.addDocumentOfNeighborhood($event)"
     />
   </panel-card>
@@ -35,7 +36,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { artifactStore, viewsStore, timStore } from "@/hooks";
-import { PanelCard, TextButton } from "@/components/common";
+import { List, PanelCard, TextButton } from "@/components/common";
 import { ArtifactListDisplay } from "@/components/artifact/display";
 
 const artifactLevel = computed(() => timStore.selectedArtifactLevel);

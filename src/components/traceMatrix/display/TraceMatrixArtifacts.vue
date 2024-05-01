@@ -15,6 +15,7 @@
         :artifacts="targetArtifacts"
         data-cy="list-selected-parent-artifacts"
         item-data-cy="list-selected-parent-artifact-item"
+        class="bg-background rounded"
         @click="viewsStore.addDocumentOfNeighborhood($event)"
       />
       <typography
@@ -40,6 +41,7 @@
         :artifacts="sourceArtifacts"
         data-cy="list-selected-child-artifacts"
         item-data-cy="list-selected-child-artifact-item"
+        class="bg-background rounded"
         @click="viewsStore.addDocumentOfNeighborhood($event)"
       />
       <typography
@@ -64,7 +66,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { artifactStore, timStore, viewsStore } from "@/hooks";
-import { PanelCard, Typography, TextButton } from "@/components/common";
+import { PanelCard, Typography, TextButton, List } from "@/components/common";
 import { ArtifactListDisplay } from "@/components/artifact/display";
 
 const traceMatrix = computed(() => timStore.selectedTraceMatrix);

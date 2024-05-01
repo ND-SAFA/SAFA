@@ -79,12 +79,12 @@ public class Comment {
      * Timestamp of when comment was created.
      */
     @Column
-    private LocalDateTime created;
+    private LocalDateTime createdAt;
     /**
      * Timestamp of when this comment was last updated.
      */
     @Column
-    private LocalDateTime updated;
+    private LocalDateTime updatedAt;
 
     /**
      * Whether given user is author of comment.
@@ -97,13 +97,13 @@ public class Comment {
     }
 
     @PrePersist
-    public void setCreated() {
-        this.created = LocalDateTime.now();
-        this.updated = LocalDateTime.now();
+    public void setCreatedAt() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    public void setUpdated() {
-        this.updated = LocalDateTime.now();
+    public void setUpdatedAt() {
+        this.updatedAt = LocalDateTime.now();
     }
 }

@@ -71,7 +71,7 @@ public class TestMembershipPermissions extends AbstractPermissionViolationTest {
         membership.setRole("ADMIN");
 
         test(
-            () -> SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+            () -> SafaRequest.withRoute(AppRoutes.Memberships.Invites.BY_ENTITY_ID)
                 .withEntityId(project.getId())
                 .postWithJsonObject(membership, status().is4xxClientError()),
             Set.of(ProjectPermission.EDIT_MEMBERS)
@@ -85,7 +85,7 @@ public class TestMembershipPermissions extends AbstractPermissionViolationTest {
         membership.setRole("ADMIN");
 
         test(
-            () -> SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+            () -> SafaRequest.withRoute(AppRoutes.Memberships.Invites.BY_ENTITY_ID)
                 .withEntityId(team.getId())
                 .postWithJsonObject(membership, status().is4xxClientError()),
             Set.of(TeamPermission.EDIT_MEMBERS)
@@ -99,7 +99,7 @@ public class TestMembershipPermissions extends AbstractPermissionViolationTest {
         membership.setRole("ADMIN");
 
         test(
-            () -> SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+            () -> SafaRequest.withRoute(AppRoutes.Memberships.Invites.BY_ENTITY_ID)
                 .withEntityId(organization.getId())
                 .postWithJsonObject(membership, status().is4xxClientError()),
             Set.of(OrganizationPermission.EDIT_MEMBERS)

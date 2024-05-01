@@ -124,7 +124,7 @@ public abstract class BaseController {
         return ex;
     }
 
-    @ExceptionHandler(InvalidTokenException.class)
+    @ExceptionHandler(UserError.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public UserError handleUserError(UserError ex) {
         return ex;

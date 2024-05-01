@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.UserUtils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,10 +46,10 @@ class TestProjectMemberCrud extends ApplicationBaseTest {
         MembershipAppEntity membershipDefinition = new MembershipAppEntity(otherEmail, otherRole);
 
         newMembership =
-            SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
-                .withEntityId(project.getProjectId())
-                .postAndParseResponse(membershipDefinition, new TypeReference<>() {
-                });
+            UserUtils.asActiveSuperuser(getCurrentUser(),
+                () -> SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+                    .withEntityId(project.getProjectId())
+                    .postAndParseResponse(membershipDefinition, new TypeReference<>() {}));
 
         assertMembership(newMembership, otherRole);
     }
@@ -118,17 +119,17 @@ class TestProjectMemberCrud extends ApplicationBaseTest {
     }
 
     private void createTwoMemberships() throws Exception {
-        MembershipAppEntity membershipDefinition = new MembershipAppEntity(otherEmail, otherRole);
-        SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+        MembershipAppEntity membershipDefinition1 = new MembershipAppEntity(otherEmail, otherRole);
+        UserUtils.asActiveSuperuser(getCurrentUser(), () -> SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
             .withEntityId(project.getProjectId())
-            .postAndParseResponse(membershipDefinition, new TypeReference<>() {
-            });
+            .postAndParseResponse(membershipDefinition1, new TypeReference<>() {
+            }));
 
-        membershipDefinition = new MembershipAppEntity(otherEmail, secondRole);
-        SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+        MembershipAppEntity membershipDefinition2 = new MembershipAppEntity(otherEmail, secondRole);
+        UserUtils.asActiveSuperuser(getCurrentUser(), () -> SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
             .withEntityId(project.getProjectId())
-            .postAndParseResponse(membershipDefinition, new TypeReference<>() {
-            });
+            .postAndParseResponse(membershipDefinition2, new TypeReference<>() {
+            }));
 
         List<MembershipAppEntity> memberships =
             SafaRequest.withRoute(AppRoutes.Memberships.BY_ENTITY_ID)

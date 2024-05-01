@@ -11,6 +11,7 @@ import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.services.MembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.IRole;
+import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
@@ -29,12 +30,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class MembershipController extends BaseController {
     private final MembershipService membershipService;
     private final SafaUserService safaUserService;
+    private final PermissionService permissionService;
 
     public MembershipController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
-                                MembershipService membershipService, SafaUserService safaUserService) {
+                                MembershipService membershipService, SafaUserService safaUserService,
+                                PermissionService permissionService) {
         super(resourceBuilder, serviceProvider);
         this.membershipService = membershipService;
         this.safaUserService = safaUserService;
+        this.permissionService = permissionService;
     }
 
     /**
@@ -66,7 +70,7 @@ public class MembershipController extends BaseController {
         SafaUser newMember = safaUserService.getUserByEmail(newMembership.getEmail());
 
         List<IRole> userRoles = membershipService.getUserRoles(newMember, entityId);
-        if (userRoles.isEmpty()) {
+        if (userRoles.isEmpty() && !permissionService.isActiveSuperuser(getCurrentUser())) {
             throw new UserError("User is not yet a member of this entity and must be invited first.");
         }
 

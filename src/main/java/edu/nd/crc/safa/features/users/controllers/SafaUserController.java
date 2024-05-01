@@ -10,6 +10,9 @@ import edu.nd.crc.safa.config.SecurityConstants;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.email.services.EmailService;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
+import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.permissions.entities.SimplePermission;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
@@ -61,6 +64,7 @@ public class SafaUserController extends BaseController {
     private final PermissionService permissionService;
     private final EmailVerificationService emailVerificationService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final OrganizationService organizationService;
 
     @Value("${security.allow_new_accounts}")
     private boolean allowNewAccounts;
@@ -71,7 +75,8 @@ public class SafaUserController extends BaseController {
                               EmailService emailService,
                               PermissionService permissionService,
                               EmailVerificationService emailVerificationService,
-                              PasswordResetTokenRepository passwordResetTokenRepository) {
+                              PasswordResetTokenRepository passwordResetTokenRepository,
+                              OrganizationService organizationService) {
         super(resourceBuilder, serviceProvider);
         this.tokenService = serviceProvider.getTokenService();
         this.passwordEncoder = serviceProvider.getPasswordEncoder();
@@ -81,6 +86,7 @@ public class SafaUserController extends BaseController {
         this.permissionService = permissionService;
         this.emailVerificationService = emailVerificationService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.organizationService = organizationService;
     }
 
     /**
@@ -287,6 +293,10 @@ public class SafaUserController extends BaseController {
 
         SafaUser updatedUser = safaUserService.getUserByEmail(body.getEmail());
         safaUserService.addSuperUser(updatedUser);
+
+        Organization personalOrg = organizationService.getPersonalOrganization(updatedUser);
+        personalOrg.setPaymentTier(PaymentTier.UNLIMITED);
+        organizationService.updateOrganization(personalOrg);
     }
 
     /**

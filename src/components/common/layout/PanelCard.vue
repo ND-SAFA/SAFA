@@ -24,7 +24,7 @@
           v-if="props.collapsable || !!slots['title-actions']"
           align="center"
         >
-          <slot name="title-actions" />
+          <slot v-if="!props.collapsable || expanded" name="title-actions" />
           <icon-button
             v-if="props.collapsable"
             small

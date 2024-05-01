@@ -13,7 +13,7 @@
         icon="health"
         data-cy="button-artifact-health"
         class="q-mr-sm"
-        @click="handleCheckHealth"
+        @click="handleCheckHealth()"
       />
     </template>
     <typography
@@ -103,13 +103,18 @@ const artifactHealthDisplay = computed(() =>
 /**
  * Generates health checks for the current artifact.
  */
-function handleCheckHealth(): void {
+function handleCheckHealth(preload?: boolean): void {
   if (!artifact.value) return;
+
+  if (preload && !ENABLED_FEATURES.NASA_ARTIFACT_HEALTH_PRELOAD) return;
 
   commentApiStore.handleLoadHealthChecks(artifact.value);
 }
 
-onMounted(handleCheckHealth);
+onMounted(() => handleCheckHealth(true));
 
-watch(() => artifact.value, handleCheckHealth);
+watch(
+  () => artifact.value,
+  () => handleCheckHealth(true)
+);
 </script>

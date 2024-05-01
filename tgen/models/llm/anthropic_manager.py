@@ -10,7 +10,7 @@ from tgen.common.threading.threading_state import MultiThreadState
 from tgen.common.util.attr_dict import AttrDict
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.core.args.anthropic_args import AnthropicArgs, AnthropicParams
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, ConversationType
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.prompt_args import PromptArgs
@@ -90,12 +90,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         assert AnthropicParams.PROMPT in params, f"Expected {params} to include `prompt`"
         prompts = params.pop(AnthropicParams.PROMPT)
         logger.info(f"Starting Anthropic batch ({len(prompts)}): {params['model']}")
+        prompts = self._format_prompts(prompts)
 
-        if isinstance(prompts, str):
-            prompts = [prompts]
-
-        prompts = [[self.convert_prompt_to_message(p) if not isinstance(p, dict) else p
-                    for p in (convo if isinstance(convo, List) else [convo])] for convo in prompts]
         anthropic_client = get_client()
 
         def thread_work(payload: Tuple[int, str]) -> Dict:
@@ -213,6 +209,23 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         else:
             log_probs = {k: 0.5 for k in log_probs.keys()}
         return log_probs
+
+    def _format_prompts(self, prompts: Union[List, str, Dict]) -> List[ConversationType]:
+        """
+        Formats the prompt for the anthropic api.
+        :param prompts: Either a single prompt, a list of prompts, or a list of messages.
+        :return: A list of conversations for the anthropic api.
+        """
+        if not isinstance(prompts, list) or isinstance(prompts[0], dict):
+            prompts = [prompts]
+        prompts_formatted = []
+        for convo in prompts:
+            if not isinstance(convo, list):
+                if isinstance(convo, str):
+                    convo = self.convert_prompt_to_message(convo)
+                convo = [convo]
+            prompts_formatted.append(convo)
+        return prompts_formatted
 
 
 def get_client():

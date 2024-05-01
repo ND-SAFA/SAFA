@@ -7,6 +7,6 @@ from tgen.concepts.types.concept_pipeline_response import ConceptPipelineRespons
 
 @dataclass
 class HealthCheckResults:
-    related_traces: Optional[List[EnumDict]] = None
+    context_traces: Optional[List[EnumDict]] = None
     conflicting_ids: Optional[List[str]] = None
     concept_matches: Optional[ConceptPipelineResponse] = None

@@ -1,6 +1,5 @@
 from typing import Dict, List, Optional
 
-from tgen.common.constants.deliminator_constants import COMMA
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
@@ -11,14 +10,15 @@ from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys, LayerKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys, LayerKeys, TraceRelationshipType
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.supported_prompts.contradiction_prompts import CONTRADICTIONS_INSTRUCTIONS
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.tracing.context_finder import ContextFinder
 
 
@@ -47,11 +47,13 @@ class ContradictionsDetector:
         conflicting_ids = self._perform_detections(req_id, id2context)
         if not self.args.dataset.trace_dataset:
             requirement_type = artifact_df.get_artifact(req_id)[ArtifactKeys.LAYER_ID]
-            layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [requirement_type],
-                                       LayerKeys.TARGET_TYPE: artifact_df.get_artifact_types()})
+            artifact_types = artifact_df.get_artifact_types()
+            layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [requirement_type for _ in artifact_types],
+                                       LayerKeys.TARGET_TYPE: artifact_types})
             self.args.dataset.trace_dataset = TraceDataset(artifact_df, trace_df, layer_df)
         self.args.dataset.trace_dataset.trace_df = self._add_traces_to_df(all_relationships, trace_df)
-        return [a_id for a_id in conflicting_ids if a_id in artifact_df] if conflicting_ids else None
+        conflicting_ids = [a_id for a_id in conflicting_ids if a_id in artifact_df]
+        return conflicting_ids if conflicting_ids else None
 
     def _perform_detections(self, req_id: str, id2context: Dict[str, List[EnumDict]]) -> Optional[List[str]]:
         """
@@ -64,34 +66,17 @@ class ContradictionsDetector:
         context_prompt = ContextPrompt(id2context, prompt_start=PromptUtil.as_markdown_header("Related Information"),
                                        build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN, include_ids=True)
         requirement_prompt = ArtifactPrompt(prompt_start=PromptUtil.as_markdown_header("Requirement"))
-        instructions_prompt = Prompt("Consider whether the following requirement is inconsistent or contradictory with any of the "
-                                     "related pieces of information. ")
-        task_prompt = Prompt("Output the ids of any contradictory or inconsistent information in a comma-deliminated list."
-                             "If all the information entails or is neutral to the requirement, simply respond with no.",
-                             title=f"Task",
-                             response_manager=PromptResponseManager(response_tag="contradictions",
-                                                                    value_formatter=self.format_response))
+        instructions_prompt = Prompt(CONTRADICTIONS_INSTRUCTIONS)
+        task_prompt = SupportedPrompts.CONTRADICTIONS_TASK.value
         prompt_builder = PromptBuilder(prompts=[instructions_prompt, requirement_prompt, context_prompt, task_prompt])
         save_and_load_path = FileUtil.safely_join_paths(self.args.export_dir, f"{req_id}_contradictions_response.yaml")
         output = LLMTrainer.predict_from_prompts(self.args.llm_manager, prompt_builder,
                                                  save_and_load_path=save_and_load_path,
                                                  artifact=requirement)
         response = LLMResponseUtil.extract_predictions_from_response(output.predictions, task_prompt.id,
-                                                                     task_prompt.response_manager.response_tag, return_first=False)[0]
+                                                                     task_prompt.response_manager.response_tag,
+                                                                     return_first=False)[0][0]
         return None if response[0] == CommonChoices.NO else response
-
-    @staticmethod
-    def format_response(tag: str, value: str) -> Optional[List[str]]:
-        """
-        Formats the LLM's response for the contradictions.
-        :param tag: The name of the tag.
-        :param value: The value of the response.
-        :return: List of conflicting ids if there is a conflict, else None
-        """
-        conflicting_ids = value.split(COMMA)
-        if len(conflicting_ids) == 1 and conflicting_ids[0].lower() == CommonChoices.NO:
-            return CommonChoices.NO
-        return conflicting_ids
 
     @staticmethod
     def _add_traces_to_df(selected_entries: List[Trace], trace_df: TraceDataFrame) -> TraceDataFrame:
@@ -103,4 +88,6 @@ class ContradictionsDetector:
         """
         for entry in selected_entries:
             entry[TraceKeys.LINK_ID] = TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET])
+            if entry[TraceKeys.LINK_ID] not in trace_df:
+                entry[TraceKeys.RELATIONSHIP_TYPE] = TraceRelationshipType.CONTEXT
         return TraceDataFrame.update_or_add_values(trace_df, selected_entries)

@@ -55,7 +55,7 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
             loc = self._find_match(target_artifact_content, main_name, alternate_names)
             if loc == -1:
                 continue
-            concept_match = ConceptMatch(artifact_id=concept_artifact_ids[concept_index], loc=loc)
+            concept_match = ConceptMatch(id=concept_artifact_ids[concept_index], loc=loc)
             matches.append(concept_match)
 
         state.direct_matches = matches
@@ -68,7 +68,8 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
         :param alternate_names: List of acronyms to find in artifact content
         :return: Index of where concept is found. -1 if none found.
         """
-        main_index = artifact_content.lower().find(self.lemmatize(main_name))
+        lemmatized = self.lemmatize(main_name)
+        main_index = artifact_content.lower().find(lemmatized)
         if main_index > -1:
             return main_index
         for m_str in alternate_names:

@@ -1,11 +1,11 @@
-from typing_extensions import TypedDict
+from tgen.common.util.typed_enum_dict import TypedEnumDict
 
 
-class ConceptMatch(TypedDict):
+class ConceptMatch(TypedEnumDict):
     """
     Artifact ID of concept matched.
     """
-    artifact_id: str
+    id: str
     """
     Index in target artifact where match was found
     """

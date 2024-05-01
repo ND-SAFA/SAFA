@@ -86,7 +86,7 @@ class ConceptData:
         C5 = "Data Collection System (DCS)"
 
     DirectMatches = [Concepts.C1, Concepts.C2, Concepts.C3, Concepts.C4]
-    Predicted = [{"source": Entities.E1, "target": Concepts.C2}, {"source": Entities.E2, "target": Concepts.C5}]
+    Predicted = [{"source": Entities.E2, "target": Concepts.C5}]
 
     @staticmethod
     def get_entity_names() -> List[str]:

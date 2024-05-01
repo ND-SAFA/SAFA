@@ -38,6 +38,6 @@ class PromptDataFrame(AbstractProjectDataFrame):
         :param prompt_builder_id: The id of the prompt builder the prompt was constructed from
         :return: The prompt and completion pair
         """
-        return self.add_or_update_row({PromptKeys.PROMPT: prompt,
-                                       PromptKeys.COMPLETION: completion,
-                                       PromptKeys.PROMPT_BUILDER_ID: prompt_builder_id})
+        return self.add_row({PromptKeys.PROMPT: prompt,
+                             PromptKeys.COMPLETION: completion,
+                             PromptKeys.PROMPT_BUILDER_ID: prompt_builder_id})

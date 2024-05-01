@@ -142,7 +142,7 @@ class HGenDatasetBuilder:
             seed = artifact2seed.get(source_id, None)
             if seed is None:
                 continue
-            generated_artifacts = generated_trace_df.get_parents(source_id)
+            generated_artifacts = generated_trace_df.get_parent_ids(source_id)
             for gen_artifact in generated_artifacts:
                 DictUtil.set_or_append_item(seed2generated, seed, gen_artifact, iterable_type=set)
 

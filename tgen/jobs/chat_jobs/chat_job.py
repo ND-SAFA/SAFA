@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context
@@ -7,7 +7,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, CONTENT_KEY
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, CONTENT_KEY, ConversationType
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
@@ -18,10 +18,14 @@ from tgen.tracing.context_finder import ContextFinder
 
 class ChatJob(AbstractJob):
 
-    def __init__(self, job_args: JobArgs, chat_history: List[Dict[str, str]], llm_manager: AbstractLLMManager = None,
+    def __init__(self, job_args: JobArgs, chat_history: ConversationType, llm_manager: AbstractLLMManager = None,
                  max_context: int = None):
         """
         Initializes the job with the previous chats.
+        :param job_args: Contains dataset and other common arguments to jobs in general.
+        :param chat_history: List containing previous conversation, with the last item containing most recent user query.
+        :param llm_manager: Responsible for making LLM responses.
+        :param max_context: The max number of artifacts to include in the context for the model.
         """
         super().__init__(job_args, require_data=True)
         self.chat_history = chat_history
@@ -38,7 +42,7 @@ class ChatJob(AbstractJob):
             artifact_df: ArtifactDataFrame = self.job_args.dataset.artifact_df
             chat_content = self.chat_history[0][CONTENT_KEY]
             artifact_id = "query_artifact"
-            query_artifact = artifact_df.add_artifact(id=artifact_id, content=chat_content, layer_id="chat")
+            query_artifact = artifact_df.add_artifact(a_id=artifact_id, content=chat_content, layer_id="query")
             id2context, related_traces = ContextFinder.find_related_artifacts(artifact_id, self.job_args.dataset,
                                                                               base_export_dir=self.job_args.export_dir,
                                                                               max_context=self.max_context)

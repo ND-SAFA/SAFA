@@ -14,7 +14,7 @@ class ContextFinder:
 
     @staticmethod
     def find_related_artifacts(artifact_id: str, dataset: PromptDataset, max_context: int = None,
-                               base_export_dir: str = None) -> Tuple[Dict[str, List[EnumDict]], List[Trace]]:
+                               base_export_dir: str = None, **ranking_params) -> Tuple[Dict[str, List[EnumDict]], List[Trace]]:
         """
         Identifies related artifacts to the given artifact.
         :param artifact_id: The id of the artifact to find related artifacts for.
@@ -38,7 +38,9 @@ class ContextFinder:
                                        children_ids=children_ids,
                                        export_dir=export_dir,
                                        types_to_trace=(layer, requirement[ArtifactKeys.LAYER_ID]),
-                                       generate_explanations=False)
+                                       generate_explanations=False,
+                                       use_rag_defaults=True,
+                                       **ranking_params)
             logger.info(f"Starting to find related {layer} to artifact {artifact_id}")
 
             pipeline = EmbeddingRankingPipeline(ranking_args)

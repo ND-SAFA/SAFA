@@ -15,7 +15,7 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.supported_prompts.requirements_contradiction_prompts import CONSTITUENT2TAG
+from tgen.prompts.supported_prompts.contradiction_prompts import CONSTITUENT2TAG
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 

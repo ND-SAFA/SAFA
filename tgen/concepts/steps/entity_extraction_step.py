@@ -11,7 +11,7 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.supported_prompts.concept_prompts import ENTITY_EXTRACTION_PROMPT
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 
 class EntityExtractionStep(AbstractPipelineStep):
@@ -29,7 +29,8 @@ class EntityExtractionStep(AbstractPipelineStep):
         :return: None
         """
         artifact_content = args.artifact[ArtifactKeys.CONTENT]
-        parsed_response = self.predict_artifact_prompt(artifact_content, ENTITY_EXTRACTION_PROMPT, args.llm_manager)
+        parsed_response = self.predict_artifact_prompt(artifact_content, SupportedPrompts.CONCEPT_ENTITY_EXTRACTION.value,
+                                                       args.llm_manager)
         state.entity_df = self.create_entity_df(parsed_response[ENTITY_TAG], args.entity_layer_id)
 
     @staticmethod

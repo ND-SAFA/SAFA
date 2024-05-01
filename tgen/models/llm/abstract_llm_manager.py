@@ -25,6 +25,9 @@ class PromptRoles:
 ROLE_KEY = "role"
 CONTENT_KEY = "content"
 
+MessageType = Dict[str, str]
+ConversationType = List[MessageType]
+
 
 class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
     """
@@ -82,7 +85,8 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         translated_response = self.translate_to_response(completion_type, llm_response, **params)
         return translated_response
 
-    def convert_prompt_to_message(self, prompt: str, role: str = PromptRoles.USER) -> Dict[str, str]:
+    @staticmethod
+    def convert_prompt_to_message(prompt: str, role: str = PromptRoles.USER) -> MessageType:
         """
         Converts a prompt to the expected format for messages between the user and assistant.
         :param prompt: The prompt/content of the message.

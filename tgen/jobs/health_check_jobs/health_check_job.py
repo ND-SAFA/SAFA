@@ -7,7 +7,7 @@ from tgen.concepts.types.concept_pipeline_response import ConceptPipelineRespons
 from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.contradictions.contradictions_detector import ContradictionsDetector
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
+from tgen.data.keys.structure_keys import TraceKeys, TraceRelationshipType
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
@@ -22,6 +22,8 @@ class HealthCheckJob(AbstractJob):
         """
         Initializes the job to run health checks on the requirement.
         :param job_args: Contains dataset and other common arguments to jobs in general.
+        :param req_id: The id of the requirement under inspection.
+        :param concept_layer_id: The id of the layer containing concept artifacts.
         """
         super().__init__(job_args, require_data=True)
         self.req_id = req_id if req_id.upper() != self.RANDOM_SELECTION else random.choice(self.job_args.dataset.artifact_df.index)
@@ -37,7 +39,8 @@ class HealthCheckJob(AbstractJob):
         concept_matches = self._run_concept_matching(dataset.artifact_df)
         related_traces = dataset.trace_dataset.trace_df.get_relationships(artifact_id=self.req_id,
                                                                           artifact_key=TraceKeys.child_label())
-        results = HealthCheckResults(related_traces=related_traces, concept_matches=concept_matches,
+        context_traces = [trace for trace in related_traces if trace[TraceKeys.RELATIONSHIP_TYPE] == TraceRelationshipType.CONTEXT]
+        results = HealthCheckResults(context_traces=context_traces, concept_matches=concept_matches,
                                      conflicting_ids=conflicting_ids)
         return results
 

@@ -49,7 +49,8 @@ class RankingJob(AbstractJob):
         :param layer_ids: The layers to rank between.
         :param log_results: If True and true links are given, logs the results to the console.
         :param ranking_pipeline: The pipeline used to rank children to each parent.
-        :param relationship_manager: If provided, will be used in the sorting step if using an embedding sorter
+        :param relationship_manager: If provided, will be used in the sorting step if using an embedding sorter.
+        :param relationship_manager_type: If no relationship manager is provided, this is the type of manager that will be created.
         """
         super().__init__(job_args, require_data=True)
         self.select_top_predictions = select_top_predictions

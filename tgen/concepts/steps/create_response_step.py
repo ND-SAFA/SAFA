@@ -26,7 +26,7 @@ class CreateResponseStep(AbstractPipelineStep):
                 multi_matches[loc] = matches
 
         # Undefined entities
-        direct_matched_entities = set([m["artifact_id"] for m in state.direct_matches])
+        direct_matched_entities = set([m[ArtifactKeys.ID] for m in state.direct_matches])
         predicted_matched_entities = set([t[TraceKeys.SOURCE] for t in state.predicted_matches])
         matched_entities = direct_matched_entities.union(predicted_matched_entities)
         undefined_entities = [e for e in state.entity_df.to_artifacts() if e[ArtifactKeys.ID] not in matched_entities]

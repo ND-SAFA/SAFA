@@ -3,6 +3,7 @@
     v-if="layoutStore.isTreeMode"
     :default-visible="!smallWindow"
     :hidden-types="hiddenTypes"
+    class="q-mb-sm q-mr-xs"
     @click="handleClick"
   />
 </template>

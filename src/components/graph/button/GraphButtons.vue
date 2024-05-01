@@ -4,8 +4,8 @@
     position="top-right"
     class="artifact-fab"
   >
-    <flex-box column x="2" y="2" align="end">
-      <visible-type-buttons class="q-mb-sm q-mr-xs" />
+    <flex-box column x="2" y="2" align="end" style="width: 40px">
+      <visible-type-buttons />
       <icon-button
         v-for="definition in viewButtons"
         :key="definition.label"

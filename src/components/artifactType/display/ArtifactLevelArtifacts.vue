@@ -8,6 +8,7 @@
     <template #title-actions>
       <text-button
         text
+        small
         label="View Artifacts"
         icon="view-tree"
         @click="viewsStore.addDocumentOfTypes([name])"

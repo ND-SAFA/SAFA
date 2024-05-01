@@ -4,6 +4,7 @@
       <template #title-actions>
         <text-button
           text
+          small
           label="View Parents"
           icon="view-tree"
           @click="viewsStore.addDocumentOfTypes([targetType])"
@@ -28,6 +29,7 @@
       <template #title-actions>
         <text-button
           text
+          small
           label="View Children"
           icon="view-tree"
           @click="viewsStore.addDocumentOfTypes([sourceType])"

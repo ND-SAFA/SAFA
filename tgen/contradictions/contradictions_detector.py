@@ -26,53 +26,53 @@ class ContradictionsDetector:
 
     def __init__(self, args: ContradictionsArgs):
         """
-        Handles detecting contradictions in requirements.
+        Handles detecting contradictions in artifacts.
         :param args: Arguments to the detector
         """
         self.args = args
 
-    def detect(self, req_id: str) -> Optional[List[str]]:
+    def detect(self, query_id: str) -> Optional[List[str]]:
         """
-        Determines whether a given requirement has any contradictions
-        :param req_id: The id of the requirement to detect contradictions for.
-        :return
+        Determines whether a given artifact has any contradictions
+        :param query_id: The id of the artifact to detect contradictions for.
+        :return A list of ids that conflict with the artifact (empty list if none conflict)
         """
-        assert req_id in self.args.dataset.artifact_df, "Unknown requirement"
+        assert query_id in self.args.dataset.artifact_df, "Unknown artifact"
 
         artifact_df = self.args.dataset.artifact_df
-        id2context, all_relationships = ContextFinder.find_related_artifacts(req_id, self.args.dataset,
+        id2context, all_relationships = ContextFinder.find_related_artifacts(query_id, self.args.dataset,
                                                                              max_context=self.args.max_context,
                                                                              base_export_dir=self.args.export_dir)
         trace_df = self.args.dataset.trace_dataset.trace_df if self.args.dataset.trace_dataset else TraceDataFrame()
-        conflicting_ids = self._perform_detections(req_id, id2context)
+        conflicting_ids = self._perform_detections(query_id, id2context)
         if not self.args.dataset.trace_dataset:
-            requirement_type = artifact_df.get_artifact(req_id)[ArtifactKeys.LAYER_ID]
-            artifact_types = artifact_df.get_artifact_types()
-            layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [requirement_type for _ in artifact_types],
-                                       LayerKeys.TARGET_TYPE: artifact_types})
+            artifact_type = artifact_df.get_artifact(query_id)[ArtifactKeys.LAYER_ID]
+            all_artifact_types = artifact_df.get_artifact_types()
+            layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [artifact_type for _ in all_artifact_types],
+                                       LayerKeys.TARGET_TYPE: all_artifact_types})
             self.args.dataset.trace_dataset = TraceDataset(artifact_df, trace_df, layer_df)
         self.args.dataset.trace_dataset.trace_df = self._add_traces_to_df(all_relationships, trace_df)
         conflicting_ids = [a_id for a_id in conflicting_ids if a_id in artifact_df]
         return conflicting_ids if conflicting_ids else None
 
-    def _perform_detections(self, req_id: str, id2context: Dict[str, List[EnumDict]]) -> Optional[List[str]]:
+    def _perform_detections(self, query_id: str, id2context: Dict[str, List[EnumDict]]) -> Optional[List[str]]:
         """
         Performs the detection by prompting the LLM with the given context.
-        :param req_id: The id of the requirement to perform detection on.
-        :param id2context: Dictionary mapping requirement id to its related artifacts.
+        :param query_id: The id of the artifact to perform detection on.
+        :param id2context: Dictionary mapping query id to its related artifacts.
         :return: The output from the LLM.
         """
-        requirement = self.args.dataset.artifact_df.get_artifact(req_id)
+        query_artifact = self.args.dataset.artifact_df.get_artifact(query_id)
         context_prompt = ContextPrompt(id2context, prompt_start=PromptUtil.as_markdown_header("Related Information"),
                                        build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN, include_ids=True)
-        requirement_prompt = ArtifactPrompt(prompt_start=PromptUtil.as_markdown_header("Requirement"))
+        query_prompt = ArtifactPrompt(prompt_start=PromptUtil.as_markdown_header("Artifact"))
         instructions_prompt = Prompt(CONTRADICTIONS_INSTRUCTIONS)
         task_prompt = SupportedPrompts.CONTRADICTIONS_TASK.value
-        prompt_builder = PromptBuilder(prompts=[instructions_prompt, requirement_prompt, context_prompt, task_prompt])
-        save_and_load_path = FileUtil.safely_join_paths(self.args.export_dir, f"{req_id}_contradictions_response.yaml")
+        prompt_builder = PromptBuilder(prompts=[instructions_prompt, query_prompt, context_prompt, task_prompt])
+        save_and_load_path = FileUtil.safely_join_paths(self.args.export_dir, f"{query_id}_contradictions_response.yaml")
         output = LLMTrainer.predict_from_prompts(self.args.llm_manager, prompt_builder,
                                                  save_and_load_path=save_and_load_path,
-                                                 artifact=requirement)
+                                                 artifact=query_artifact)
         response = LLMResponseUtil.extract_predictions_from_response(output.predictions, task_prompt.id,
                                                                      task_prompt.response_manager.response_tag,
                                                                      return_first=False)[0][0]

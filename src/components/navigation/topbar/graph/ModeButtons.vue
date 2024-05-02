@@ -38,6 +38,7 @@
       @click="handleDeltaView"
     />
     <text-button
+      v-if="ENABLED_FEATURES.NASA_PROJECT_CHAT"
       v-bind="buttonProps('chat')"
       :hide-label="smallWindow"
       :disabled="!hasArtifacts"
@@ -63,6 +64,7 @@ export default {
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue";
 import { GraphMode } from "@/types";
+import { ENABLED_FEATURES } from "@/util";
 import {
   appStore,
   artifactStore,

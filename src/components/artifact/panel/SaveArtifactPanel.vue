@@ -14,7 +14,7 @@
         <save-artifact-buttons />
       </template>
     </panel-card>
-    <artifact-health />
+    <artifact-health v-if="ENABLED_FEATURES.NASA_ARTIFACT_HEALTH_NEW" />
   </details-panel>
 </template>
 
@@ -29,6 +29,7 @@ export default {
 
 <script setup lang="ts">
 import { watch } from "vue";
+import { ENABLED_FEATURES } from "@/util";
 import { appStore, artifactSaveStore, artifactStore } from "@/hooks";
 import { DetailsPanel, PanelCard, TextButton } from "@/components/common";
 import {

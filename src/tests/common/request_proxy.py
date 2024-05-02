@@ -18,6 +18,19 @@ class RequestProxy:
     CLIENT = None
 
     @staticmethod
+    def health(dataset: ApiDefinition, query_id: str, concept_layer_id: str) -> List[Trace]:
+        """
+        Performs health checks on the query artifact.
+        :param dataset: The dataset containing artifacts and layers to trace.
+        :param query_id: The id of the query artifact under inspection.
+        :param concept_layer_id: The id of the layer containing concept artifacts.
+        :return: The list of trace predictions.
+        """
+        data = {"dataset": dataset, "query_id": query_id, "concept_layer_id": concept_layer_id}
+        response = RequestProxy._request(AppEndpoints.HEALTH, data)
+        return response
+
+    @staticmethod
     def trace(dataset: ApiDefinition, sync=False) -> List[Trace]:
         """
         Traces the layers defined in given api definition.

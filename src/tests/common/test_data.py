@@ -34,6 +34,8 @@ class TestArtifacts(Enum):
 
 subset2artifacts = {TestSubset.SOURCE: 4, TestSubset.FULL: 6}
 
+IGNORED_ARTIFACT_COLS = {"chunks"}
+
 
 class TestData:
     """
@@ -122,7 +124,10 @@ class TestData:
             expected_artifact = artifact_query[0]
             for k, v in expected_artifact.items():
                 if v is None:
-                    tc.assertIsNone(a[k])
+                    if k not in a:
+                        tc.assertIn(k, IGNORED_ARTIFACT_COLS)
+                        continue
+                    tc.assertIsNone(a.get(k))
                 if isinstance(v, str):
                     tc.assertEqual(v.strip(), a[k].strip())
                 else:

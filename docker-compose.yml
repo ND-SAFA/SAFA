@@ -20,6 +20,8 @@ services:
     - DEBUG=false
     - ENV_MODE=local
     - N_WORKERS=2
+    - DEFAULT_CROSS_ENCODER_MODEL=cross-encoder/ms-marco-TinyBERT-L-2
+    - DEFAULT_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
 
   redis:
     container_name: redis

@@ -5,8 +5,14 @@ from uuid import UUID
 from django.http import HttpRequest
 from rest_framework import serializers
 
+from tgen.common.constants.dataset_constants import NO_CHECK
 from tgen.common.util.status import Status
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from tgen.data.readers.api_project_reader import ApiProjectReader
+from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.components.args.job_args import JobArgs
 
 
 class ViewUtil:
@@ -59,3 +65,17 @@ class ViewUtil:
         except ValueError:
             return False
         return str(uuid_obj) == model_id
+
+    @staticmethod
+    def create_job_args_from_api_definition(dataset_definition: ApiDefinition, **additional_args) -> JobArgs:
+        """
+        Creates job args from an api definition of a datset.
+        :param dataset_definition: The api definition used for datasets.
+        :param additional_args: Any additional args for the job.
+        """
+        eval_project_reader = ApiProjectReader(api_definition=dataset_definition)
+        eval_dataset_creator = TraceDatasetCreator(project_reader=eval_project_reader, allowed_orphans=NO_CHECK)
+        prompt_dataset_creator = PromptDatasetCreator(trace_dataset_creator=eval_dataset_creator,
+                                                      project_summary=dataset_definition.summary)
+        job_args = JobArgs(dataset_creator=prompt_dataset_creator, **additional_args)
+        return job_args

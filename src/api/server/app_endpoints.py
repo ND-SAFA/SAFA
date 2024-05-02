@@ -15,6 +15,7 @@ class AppEndpoints(Enum):
     CANCEL = "cancel"
     RESULTS = "results"
     WAIT = "wait"
+    SYSTEM = "system"
     HEALTH = "health"
     TASKS_ACTIVE = "tasks/active"
     TASKS_PENDING = "tasks/pending"

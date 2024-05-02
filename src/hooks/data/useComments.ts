@@ -39,7 +39,7 @@ export const useComments = defineStore("useComments", {
     getCommentsAndFlags(
       artifactId: string,
       includeResolved?: boolean
-    ): CommentSchema[] {
+    ): BasicCommentSchema[] {
       const comments = this.commentsByArtifactId[artifactId]?.comments || [];
       const flags = this.commentsByArtifactId[artifactId]?.flags || [];
 

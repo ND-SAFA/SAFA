@@ -75,29 +75,31 @@
               <typography secondary small value="Resolved" l="1" />
             </div>
           </div>
-          <typography
-            v-if="!editedComment || editedComment.id !== comment.id"
-            :value="comment.content"
-            el="p"
-          />
-          <q-input
-            v-else
+          <typography :value="comment.content" el="p" />
+          <q-popup-edit
+            v-if="editedComment && editedComment.id === comment.id"
+            v-slot="scope"
             v-model="editedComment.content"
-            outlined
-            autogrow
-            type="textarea"
-            dense
-            class="full-width"
+            @hide="handleCloseEditedComment"
+            @save="handleSaveEditedComment"
           >
-            <template #append>
-              <icon-button
-                small
-                icon="save"
-                tooltip="Save comment"
-                @click="handleSaveEditedComment"
-              />
-            </template>
-          </q-input>
+            <q-input
+              v-model="scope.value"
+              autogrow
+              type="textarea"
+              dense
+              class="full-width"
+            >
+              <template #append>
+                <icon-button
+                  small
+                  icon="save"
+                  tooltip="Save comment"
+                  @click="scope.set"
+                />
+              </template>
+            </q-input>
+          </q-popup-edit>
         </div>
       </flex-box>
     </list-item>
@@ -162,7 +164,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { CommentSchema, CommentType } from "@/types";
+import { BasicCommentSchema, CommentSchema } from "@/types";
 import { ENABLED_FEATURES, timestampToDisplay } from "@/util";
 import { commentApiStore, commentStore, selectionStore } from "@/hooks";
 import {
@@ -177,8 +179,8 @@ import {
 
 const showResolved = ref(false);
 const newComment = ref("");
-const commentType = ref<CommentType>("conversation");
-const editedComment = ref<CommentSchema | null>(null);
+const commentType = ref<"conversation" | "flag">("conversation");
+const editedComment = ref<BasicCommentSchema | null>(null);
 
 const artifactId = computed(() => selectionStore.selectedArtifactId);
 
@@ -213,7 +215,7 @@ function handleAddComment() {
  * Resolves a comment, hiding it from the list.
  * @param comment - The comment to resolve.
  */
-function handleResolveComment(comment: CommentSchema) {
+function handleResolveComment(comment: BasicCommentSchema) {
   commentApiStore.handleResolveComment(artifactId.value, comment);
 }
 
@@ -222,7 +224,7 @@ function handleResolveComment(comment: CommentSchema) {
  * or disables comment editing if already enabled on the given comment.
  * @param comment - The comment to edit.
  */
-function handleEditComment(comment: CommentSchema) {
+function handleEditComment(comment: BasicCommentSchema) {
   if (!editedComment.value || editedComment.value.id !== comment.id) {
     editedComment.value = comment;
   } else {
@@ -231,10 +233,19 @@ function handleEditComment(comment: CommentSchema) {
 }
 
 /**
+ * Closes the edited comment.
+ */
+function handleCloseEditedComment() {
+  editedComment.value = null;
+}
+
+/**
  * Saves the edited comment.
  */
-function handleSaveEditedComment() {
+function handleSaveEditedComment(content: string) {
   if (!editedComment.value) return;
+
+  editedComment.value.content = content;
 
   commentApiStore.handleEditComment(artifactId.value, editedComment.value, {
     onSuccess: handleReset,

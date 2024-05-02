@@ -1,11 +1,11 @@
 from abc import abstractmethod
 from copy import deepcopy
 from enum import Enum
+from typing import Any, Callable, Dict, List, Type, Union
 
 import pandas as pd
 from pandas._typing import Axes, Dtype
 from pandas.core.internals.construction import dict_to_mgr
-from typing import Any, Callable, Dict, List, Type, Union
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -19,6 +19,7 @@ class AbstractProjectDataFrame(pd.DataFrame):
     """
     __COLS = None
     OPTIONAL_COLUMNS: List[str] = []
+    DEFAULT_FOR_OPTIONAL_COLS: EnumDict = EnumDict()
 
     def __init__(self, data=None, index: Axes = None, columns: Axes = None, dtype: Dtype = None, copy: bool = None):
         """
@@ -80,7 +81,12 @@ class AbstractProjectDataFrame(pd.DataFrame):
         if self.index_name() is not None and not self.columns.empty and self.index.name != self.index_name():
             self.set_index(self.index_name(), inplace=True)
 
-    def add_or_update_row(self, row_as_dict: Dict[Union[Enum, str], Any]) -> EnumDict:
+        if not self.empty:
+            for col in self.OPTIONAL_COLUMNS:
+                if col not in self.columns and col in self.DEFAULT_FOR_OPTIONAL_COLS:
+                    self[col] = [self.DEFAULT_FOR_OPTIONAL_COLS.get(col) for _ in self.index]
+
+    def add_row(self, row_as_dict: Dict[Union[Enum, str], Any]) -> EnumDict:
         """
         Adds row to dataframe
         :param row_as_dict: Dictionary mapping column name to its value
@@ -195,7 +201,8 @@ class AbstractProjectDataFrame(pd.DataFrame):
         :param filter_lambda: The lambda used to filter out rows
         :return: A copy of the dataframe with filter applied to rows
         """
-        return self.__class__(DataFrameUtil.filter_df_by_row(self, filter_lambda))
+        query_df = DataFrameUtil.filter_df_by_row(self, filter_lambda)
+        return self.__class__(query_df)
 
     def filter_by_index(self, index_to_filter: List) -> "AbstractProjectDataFrame":
         """
@@ -277,6 +284,22 @@ class AbstractProjectDataFrame(pd.DataFrame):
         assert len(ids2update) == len(new_values), "Number of ids and values must match"
         for id_, val in zip(ids2update, new_values):
             self.update_value(column2update, id_, val)
+
+    @staticmethod
+    def update_or_add_values(original_df: "AbstractProjectDataFrame", rows2update: List[EnumDict],
+                             ids_to_update: List[Any] = None) -> "AbstractProjectDataFrame":
+        """
+        Updates the values if the row already exists, else adds it to the dataframe.
+        :param original_df: The original dataframe to update.
+        :param rows2update: List of rows to update.
+        :param ids_to_update: List of ids, corresponding to the rows, to update.
+        :return: A dataframe containing updated values.
+        """
+        assert original_df.index_name() or ids_to_update, "Must provide a list of corresponding ids if no index name"
+        ids = [row[original_df.index_name()] for row in rows2update] if not ids_to_update else ids_to_update
+        rows2keep = [row for i, row in original_df.itertuples() if i not in ids]
+        updated_rows_df = original_df.__class__(rows2keep + rows2update)
+        return updated_rows_df
 
     def update_index(self, new_ids: List[Any]) -> "AbstractProjectDataFrame":
         """

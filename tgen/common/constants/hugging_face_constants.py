@@ -20,6 +20,7 @@ EVAL_ON_EPOCH_DEFAULT = True
 SAVE_RANDOM_MODEL_DEFAULT = True
 MIN_LENGTH_DEFAULT = 1
 SMALL_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+SMALL_CROSS_ENCODER = "cross-encoder/ms-marco-TinyBERT-L-2"
 TEXT_PARAM = "text"
 INPUT_IDS_PARAM = "input_ids"
 TRAIN_PARAM = "train"

@@ -6,6 +6,8 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY, NL_SUMMARY
 from tgen.prompts.supported_prompts.chunk_prompts import CHUNK_PROMPT
 from tgen.prompts.supported_prompts.classification_prompts import CLASSIFICATION_QUESTIONNAIRE
+from tgen.prompts.supported_prompts.concept_prompts import ENTITY_EXTRACTION_PROMPT
+from tgen.prompts.supported_prompts.contradiction_prompts import EXTRACT_CONSTITUENTS_PROMPT, CONTRADICTIONS_TASK_PROMPT
 from tgen.prompts.supported_prompts.delta_prompts import DIFF_SUMMARY_QUESTIONNAIRE, DIFF_SUMMARY_STARTER_PROMPT, \
     CHANGE_SUMMARY_STARTER_PROMPT, CHANGE_SUMMARY_QUESTIONNAIRE, IMPACTS_PROMPT, ADDED_PROMPT, DELETED_PROMPT
 from tgen.prompts.supported_prompts.explanation_prompts import EXPLANATION_GOAL, EXPLANATION_TASK_QUESTIONNAIRE
@@ -15,7 +17,6 @@ from tgen.prompts.supported_prompts.hgen_prompts import FORMAT_QUESTIONNAIRE, GE
 from tgen.prompts.supported_prompts.project_summary_prompts import OVERVIEW_SECTION_PROMPT, \
     FEATURE_SECTION_PROMPT, ENTITIES_SECTION_PROMPT, SUBSYSTEM_SECTION_PROMPT, DATA_FLOW_SECTION_PROMPT, \
     PROJECT_SUMMARY_CONTEXT_PROMPT_ARTIFACTS, PROJECT_SUMMARY_CONTEXT_PROMPT_VERSIONS
-from tgen.prompts.supported_prompts.requirements_contradiction_prompts import EXTRACT_CONSTITUENTS_PROMPT
 from tgen.prompts.supported_prompts.tracing_prompts import RANKING_GOAL, QUESTION1, QUESTION2
 
 
@@ -67,9 +68,13 @@ class SupportedPrompts(SupportedEnum):
 
     # ---------- REQ CONTRADICTION ANALYSIS ----------------
     REQUIREMENT_EXTRACT_CONSTITUENTS = EXTRACT_CONSTITUENTS_PROMPT
+    CONTRADICTIONS_TASK = CONTRADICTIONS_TASK_PROMPT
 
     # ---------- ARTIFACT CHUNKING ----------------
     CHUNK_INSTRUCTIONS = CHUNK_PROMPT
+
+    # ---------- CONCEPTS ----------
+    CONCEPT_ENTITY_EXTRACTION = ENTITY_EXTRACTION_PROMPT
 
     @DynamicClassAttribute
     def value(self) -> Prompt:

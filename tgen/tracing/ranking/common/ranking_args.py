@@ -192,4 +192,4 @@ class RankingArgs(PipelineArgs):
             self.re_rank_children = True
             self.selection_method = SupportedSelectionMethod.SELECT_BY_THRESHOLD_SCALED
             self.link_threshold = DEFAULT_SCALED_THRESHOLD
-            logger.warn(f"Selected a threshold of {DEFAULT_SCALED_THRESHOLD} for RAG.")
+            logger.warning(f"Selected a threshold of {DEFAULT_SCALED_THRESHOLD} for RAG.")

@@ -11,12 +11,11 @@ from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.supported_prompts.requirements_contradiction_prompts import CONSTITUENT2TAG
+from tgen.prompts.supported_prompts.contradiction_prompts import CONSTITUENT2TAG
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 
@@ -43,8 +42,7 @@ class RequirementsConverter:
                                                        include_id=False, build_method=ArtifactPrompt.BuildMethod.BASE),
                                         task_prompt])
         trainer_state = LLMTrainerState(prompt_builders=prompt_builder,
-                                        trainer_dataset_manager=TrainerDatasetManager.create_from_datasets(
-                                            {DatasetRole.EVAL: dataset}),
+                                        trainer_dataset_manager=TrainerDatasetManager.create_from_datasets(eval=dataset),
                                         llm_manager=self.llm_manager)
         trainer = LLMTrainer(trainer_state)
         res = trainer.perform_prediction(save_and_load_path=FileUtil.safely_join_paths(self.export_path,

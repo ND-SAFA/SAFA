@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-
 from typing import Any, Dict, List, Set, Union
 
 from tgen.clustering.base.cluster_type import ClusterIdType
@@ -17,7 +16,7 @@ class HGenState(State):
     Step 1 - Dataset Construction
     """
     source_dataset: PromptDataset = None  # The dataset containing the original artifacts.
-    original_dataset: Union[PromptDataset, TraceDataset] = None
+    original_dataset: Union[TraceDataset, PromptDataset] = None
 
     """
     Step 2 - Input generation

@@ -6,7 +6,7 @@ from tgen.common.util.enum_util import EnumDict
 
 class _TypedEnumDictMeta(_TypedDictMeta):
 
-    def __new__(cls, name, bases, ns, keys):
+    def __new__(cls, name, bases, ns, keys=None):
         """
         Create new typed dict class object based on the EnumDict.
 
@@ -21,12 +21,13 @@ class _TypedEnumDictMeta(_TypedDictMeta):
         """
         annotations = ns['__annotations__']
         updated_annotations = {}
-        for key, val in annotations.items():
-            try:
-                enum_key = keys[key.upper()]
-                updated_annotations[enum_key] = val
-            except KeyError:
-                continue
+        if keys:
+            for key, val in annotations.items():
+                try:
+                    enum_key = keys[key.upper()]
+                    updated_annotations[enum_key] = val
+                except KeyError:
+                    continue
         annotations.update(updated_annotations)
         tp_dict = _TypedDictMeta.__new__(cls, name, (), ns, False)
         etp_dict = type.__new__(_TypedEnumDictMeta, name, (EnumDict,), ns)

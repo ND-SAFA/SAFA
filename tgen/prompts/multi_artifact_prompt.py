@@ -30,7 +30,7 @@ class MultiArtifactPrompt(Prompt):
         TRACES = auto()
         ARTIFACT = auto()
 
-    def __init__(self, prompt_prefix: str = EMPTY_STRING,
+    def __init__(self, prompt_start: str = EMPTY_STRING,
                  build_method: BuildMethod = BuildMethod.NUMBERED,
                  data_type: DataType = DataType.ARTIFACT,
                  starting_num: int = 1,
@@ -38,7 +38,7 @@ class MultiArtifactPrompt(Prompt):
                  **artifact_params):
         """
         Constructor for making a prompt containing many artifacts.
-        :param prompt_prefix: The prefix to attach to prompt.
+        :param prompt_start: The prefix to attach to prompt.
         :param build_method: The method to build the prompt (determines prompt format).
         :param data_type: Whether the data is coming from artifacts or traces
         :param starting_num: The number to start the artifacts at if using numbered build method
@@ -53,7 +53,7 @@ class MultiArtifactPrompt(Prompt):
         self.artifact_params = artifact_params
         self.data_type = data_type
         self.starting_num = starting_num
-        super().__init__(value=prompt_prefix)
+        super().__init__(value=prompt_start)
 
     @overrides(Prompt)
     def _build(self, artifacts: List[EnumDict], **kwargs) -> str:

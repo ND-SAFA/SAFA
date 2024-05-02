@@ -1,11 +1,13 @@
 from tgen.common.util.supported_enum import SupportedEnum
+from tgen.jobs.chat_jobs.chat_job import ChatJob
 from tgen.jobs.clustering_job.clustering_job import ClusteringJob
-from tgen.jobs.contradictions_jobs.contradiction_job import ContradictionJob
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
 from tgen.jobs.data_jobs.create_source_splits_job import CreateSourceSplitsJob
 from tgen.jobs.data_jobs.download_repository_job import DownloadRepositoryJob
 from tgen.jobs.data_jobs.export_artifacts_job import ExportArtifactsJob
 from tgen.jobs.delta_jobs.delta_summarizer_job import DeltaSummarizerJob
+from tgen.jobs.health_check_jobs.contradiction_job import ContradictionJob
+from tgen.jobs.health_check_jobs.health_check_job import HealthCheckJob
 from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.jobs.model_jobs.create_model_job import CreateModelJob
@@ -40,3 +42,5 @@ class SupportedJobType(SupportedEnum):
     CREATE_SOURCE_SPLITS = CreateSourceSplitsJob
     CLUSTERING = ClusteringJob
     CONTRADICTIONS = ContradictionJob
+    HEALTH_CHECK = HealthCheckJob
+    CHAT = ChatJob

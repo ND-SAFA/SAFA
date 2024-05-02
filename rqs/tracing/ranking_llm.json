@@ -6,13 +6,15 @@
           "object_type": "RANKING",
           "ranking_pipeline": "LLM",
           "sorter": "embedding",
-          "export_dir": "[OUTPUT_PATH]/ranking/[CURRENT_PROJECT]",
-           "dataset_creator": {
-            "object_type": "PROMPT",
-            "trace_dataset_creator": {
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+          "job_args": {
+            "export_dir": "[OUTPUT_PATH]/ranking/[CURRENT_PROJECT]",
+            "dataset_creator": {
+              "object_type": "PROMPT",
+              "trace_dataset_creator": {
+                "project_reader": {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+                }
               }
             }
           }

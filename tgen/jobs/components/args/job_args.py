@@ -1,8 +1,14 @@
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any, Dict, Type
 
-from tgen.common.constants.job_constants import SAVE_DATASET_SPLITS_DEFAULT, SAVE_OUTPUT_DEFAULT
+from tgen.common.constants.job_constants import SAVE_OUTPUT_DEFAULT
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.util.file_util import FileUtil
+from tgen.common.util.param_specs import ParamSpecs
+from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from tgen.data.tdatasets.idataset import iDataset
+from tgen.pipeline.pipeline_args import PipelineArgs
 
 
 @dataclass
@@ -12,13 +18,13 @@ class JobArgs(BaseObject):
     """
     output_dir: str = None
     """
+    Where model and logs will be saved to.
+    """
+    export_dir: str = None
+    """
     If True, saves the output to the output_dir
     """
     save_job_output: bool = SAVE_OUTPUT_DEFAULT
-    """
-    If True, saves the dataset splits to the output_dir
-    """
-    save_dataset_splits: bool = SAVE_DATASET_SPLITS_DEFAULT
     """
     Sets the random seed for a job
     """
@@ -27,6 +33,28 @@ class JobArgs(BaseObject):
     Suffix to run name in weights and biases.
     """
     run_suffix: str = None
+    """
+    Creator to make a dataset for the job.
+    """
+    dataset_creator: AbstractDatasetCreator = None
+    """
+    Dataset for the job.
+    """
+    dataset: iDataset = None
+
+    def __post_init__(self) -> None:
+        """
+        Performs any steps after initialize.
+        :return: None
+        """
+        FileUtil.create_dir_safely(self.export_dir)
+
+    def require_data(self) -> None:
+        """
+        Ensures data has been provided in either the form of a dataset or a dataset creator.
+        :return: None
+        """
+        self.dataset = DataclassUtil.post_initialize_datasets(self.dataset, self.dataset_creator)
 
     def as_kwargs(self) -> Dict[str, Any]:
         """
@@ -34,3 +62,15 @@ class JobArgs(BaseObject):
         :return: the job args as kwargs
         """
         return {attr_name: getattr(self, attr_name) for attr_name in dir(self) if not attr_name.startswith("__")}
+
+    def get_args_for_pipeline(self, pipeline_args_class: Type[PipelineArgs]) -> Dict[str, Any]:
+        """
+        Gets job args that are needed for the pipeline.
+        :param pipeline_args_class: The pipeline args class.
+        :return: A dictionary mapping param name to value for all job args that are in the pipeline args.
+        """
+        job_args_dict = DataclassUtil.convert_to_dict(self)
+        constructor_param_names = ParamSpecs.create_from_method(pipeline_args_class.__init__).param_names
+        args4pipeline = {name: val for name, val in job_args_dict.items()
+                         if name in constructor_param_names and name != "dataset_creator"}
+        return args4pipeline

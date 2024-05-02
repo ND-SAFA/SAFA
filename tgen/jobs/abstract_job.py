@@ -26,18 +26,22 @@ from tgen.relationship_manager.model_cache import ModelCache
 
 class AbstractJob(threading.Thread, BaseObject):
 
-    def __init__(self, job_args: JobArgs = None, model_manager: ModelManager = None):
+    def __init__(self, job_args: JobArgs = None, model_manager: ModelManager = None, require_data: bool = False):
         """
         The base job class
         :param job_args: The arguments to the job.
+        :param require_data: If True, asserts a dataset creator or a dataset are provided.
         :param model_manager: the model manager
         """
         super().__init__()
+        self.require_data = require_data
         self.job_args = job_args if job_args else JobArgs()
         self.model_manager = model_manager
         self.id = uuid.uuid4()
         self.result = JobResult(job_id=self.id)
         self.save_job_output = self.job_args.save_job_output
+        if self.require_data:
+            self.job_args.require_data()
 
     def run(self) -> JobResult:
         """

@@ -1,5 +1,6 @@
 from collections import namedtuple
 from typing import List, Set
+from unittest.mock import MagicMock
 
 import openai
 from openai.openai_object import OpenAIObject
@@ -16,12 +17,6 @@ from tgen.models.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.prompt_args import PromptArgs
-
-if not IS_TEST:
-    assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
-                                        f"and {f'{OPEN_AI_KEY=}'.split('=')[0]} in .env"
-    openai.organization = OPEN_AI_ORG
-    openai.api_key = OPEN_AI_KEY
 
 Res = namedtuple('Res', ['choices'])
 
@@ -80,8 +75,8 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
             :param p: The prompt to complete.
             :return: The response as a string.
             """
-            params[OpenAIParams.MESSAGES] = [{"role": "user", "content": p}]
-            res = openai.ChatCompletion.create(**params)
+            params[OpenAIParams.MESSAGES] = [self.convert_prompt_to_message(p)]
+            res = self._make_request(**params)
             return res.choices[0]
 
         global_state: MultiThreadState = ThreadUtil.multi_thread_process("Making completion requests",
@@ -152,3 +147,20 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         if exception:
             response["exception"] = exception
         return response
+
+    @staticmethod
+    def _make_request(**params) -> AttrDict:
+        """
+        Makes a request to open ai.
+        :param params: Parameters for the request.
+        :return: The response from open ai.
+        """
+        if not IS_TEST:
+            assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
+                                                f"and {f'{OPEN_AI_KEY=}'.split('=')[0]} in .env"
+            openai.organization = OPEN_AI_ORG
+            openai.api_key = OPEN_AI_KEY
+        else:
+            assert isinstance(openai.ChatCompletion.create, MagicMock), "Should not make real request if in test mode!!"
+        res = openai.ChatCompletion.create(**params)
+        return res

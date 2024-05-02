@@ -263,7 +263,7 @@ class ContentGenerator:
         :param multi_artifact_params: Any additional params to the prompt.
         :return: The prompt that will be used to supply the LLM with the source artifacts.
         """
-        artifact_prompt_kwargs = dict(prompt_prefix=PromptUtil.as_markdown_header(f"{source_type.upper()}S:"),
+        artifact_prompt_kwargs = dict(prompt_start=PromptUtil.as_markdown_header(f"{source_type.upper()}S:"),
                                       build_method=build_method,
                                       include_ids=build_method == MultiArtifactPrompt.BuildMethod.XML,
                                       data_type=MultiArtifactPrompt.DataType.ARTIFACT,

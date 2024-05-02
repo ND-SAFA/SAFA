@@ -8,3 +8,4 @@ export * from "./traceApi";
 export * from "./traceMatrixApi";
 export * from "./warningApi";
 export * from "./chatApi";
+export * from "./commentApi";

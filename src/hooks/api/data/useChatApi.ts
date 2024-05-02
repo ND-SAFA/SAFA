@@ -30,26 +30,23 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
 
   async function handleGetProjectChat(chatId: string) {
     await chatApi.handleRequest(async () => {
-      chatStore.updateChat(
-        await getProjectChatMessages(projectStore.versionId, chatId)
-      );
+      chatStore.updateChat(await getProjectChatMessages(chatId));
     }, {});
   }
 
-  async function handleCreateProjectChat(message: ChatMessageSchema) {
+  async function handleCreateProjectChat() {
     await chatApi.handleRequest(async () => {
-      chatStore.addChat(
-        await createProjectChat(projectStore.versionId, message)
-      );
+      chatStore.addChat(await createProjectChat(projectStore.versionId));
     }, {});
   }
 
   async function handleDeleteProjectChat() {
     await chatApi.handleRequest(async () => {
       const chatId = chatStore.currentChat?.id;
+
       if (!chatId) return;
 
-      await deleteProjectChat(projectStore.versionId, chatId);
+      await deleteProjectChat(chatId);
 
       chatStore.deleteChat(chatId);
     }, {});
@@ -65,24 +62,25 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
       };
 
       if (!chatStore.currentChat) {
-        await handleCreateProjectChat(fullMessage);
-      } else {
-        chatStore.updateChat({
-          ...chatStore.currentChat,
-          messages: [...chatStore.currentChat.messages, fullMessage],
-        });
-
-        const responseMessage = await createProjectChatMessage(
-          projectStore.versionId,
-          chatStore.currentChat.id,
-          fullMessage
-        );
-
-        chatStore.updateChat({
-          ...chatStore.currentChat,
-          messages: [...chatStore.currentChat.messages, responseMessage],
-        });
+        await handleCreateProjectChat();
       }
+
+      if (!chatStore.currentChat) return;
+
+      chatStore.updateChat({
+        ...chatStore.currentChat,
+        messages: [...chatStore.currentChat.messages, fullMessage],
+      });
+
+      const responseMessage = await createProjectChatMessage(
+        chatStore.currentChat.id,
+        fullMessage
+      );
+
+      chatStore.updateChat({
+        ...chatStore.currentChat,
+        messages: [...chatStore.currentChat.messages, responseMessage],
+      });
     }, {});
   }
 

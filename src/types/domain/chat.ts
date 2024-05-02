@@ -35,6 +35,10 @@ export interface ProjectChatSchema {
    */
   title: string;
   /**
+   * Version ID of the project for this chat.
+   */
+  versionId: string;
+  /**
    * Restricts available actions on chat.
    */
   permission: ChatPermissionType;
@@ -43,3 +47,8 @@ export interface ProjectChatSchema {
    */
   messages: ChatMessageSchema[];
 }
+
+export type CreateProjectChatSchema = Pick<
+  ProjectChatSchema,
+  "versionId" | "title"
+>;

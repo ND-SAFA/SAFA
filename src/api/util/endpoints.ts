@@ -215,20 +215,20 @@ export enum Endpoint {
 
   // Comments, Flags, Health Checks
 
-  getComments = "projects/versions/:versionId/comments/artifact/:artifactId",
-  createComment = "projects/versions/:versionId/comments",
-  editComment = "projects/versions/:versionId/comments/:commentId",
-  deleteComment = "projects/versions/:versionId/comments/:commentId",
-  resolveComment = "projects/versions/:versionId/comments/:commentId/resolve",
+  getComments = "comments/artifact/:artifactId",
+  createComment = "comments/artifact/:artifactId",
+  editComment = "comments/:commentId",
+  deleteComment = "comments/:commentId",
+  resolveComment = "comments/:commentId/resolve",
   generateHealthChecks = "health/versions/:versionId/artifacts",
 
   // Chat
 
-  createChat = "projects/versions/:versionId/chat",
-  deleteChat = "projects/versions/:versionId/chat/:chatId",
-  getChats = "projects/versions/:versionId/chat",
-  getChatMessages = "projects/versions/:versionId/chat/:chatId",
-  createChatMessage = "projects/versions/:versionId/chat/:chatId/message",
+  createChat = "chat",
+  deleteChat = "chat/:chatId",
+  getChats = "chat/versions/:versionId",
+  getChatMessages = "chat/:chatId/messages",
+  createChatMessage = "chat/:chatId/messages",
 }
 
 /**

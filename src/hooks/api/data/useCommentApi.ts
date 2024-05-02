@@ -1,11 +1,6 @@
 import { defineStore } from "pinia";
 
-import {
-  ArtifactSchema,
-  CommentSchema,
-  CommentType,
-  IOHandlerCallback,
-} from "@/types";
+import { ArtifactSchema, BasicCommentSchema, IOHandlerCallback } from "@/types";
 import { commentStore, projectStore, useApi } from "@/hooks";
 import {
   createArtifactComment,
@@ -27,7 +22,7 @@ export const useCommentApi = defineStore("useCommentApi", () => {
     await commentApi.handleRequest(async () => {
       commentStore.addArtifact(
         artifactId,
-        await getArtifactComments(projectStore.versionId, artifactId)
+        await getArtifactComments(artifactId)
       );
     });
   }
@@ -35,15 +30,16 @@ export const useCommentApi = defineStore("useCommentApi", () => {
   async function handleAddComment(
     artifactId: string,
     content: string,
-    type: CommentType,
+    type: "flag" | "conversation",
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     await commentApi.handleRequest(async () => {
       commentStore.addComment(
         artifactId,
-        await createArtifactComment(projectStore.versionId, artifactId, {
+        await createArtifactComment(artifactId, {
           content,
           type,
+          versionId: projectStore.versionId,
         })
       );
     }, callbacks);
@@ -51,14 +47,10 @@ export const useCommentApi = defineStore("useCommentApi", () => {
 
   async function handleResolveComment(
     artifactId: string,
-    comment: CommentSchema
+    comment: BasicCommentSchema
   ): Promise<void> {
     await commentApi.handleRequest(async () => {
-      await resolveArtifactComment(
-        projectStore.versionId,
-        artifactId,
-        comment.id
-      );
+      await resolveArtifactComment(artifactId, comment.id);
 
       comment.status = "resolved";
 
@@ -68,13 +60,13 @@ export const useCommentApi = defineStore("useCommentApi", () => {
 
   async function handleEditComment(
     artifactId: string,
-    comment: CommentSchema,
+    comment: BasicCommentSchema,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     await commentApi.handleRequest(async () => {
       commentStore.editComment(
         artifactId,
-        await editArtifactComment(projectStore.versionId, artifactId, comment)
+        await editArtifactComment(artifactId, comment)
       );
     }, callbacks);
   }
@@ -85,11 +77,7 @@ export const useCommentApi = defineStore("useCommentApi", () => {
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     await commentApi.handleRequest(async () => {
-      await deleteArtifactComment(
-        projectStore.versionId,
-        artifactId,
-        commentId
-      );
+      await deleteArtifactComment(artifactId, commentId);
 
       commentStore.deleteComment(artifactId, commentId);
     }, callbacks);

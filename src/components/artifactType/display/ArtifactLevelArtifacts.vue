@@ -36,7 +36,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { artifactStore, viewsStore, timStore } from "@/hooks";
-import { List, PanelCard, TextButton } from "@/components/common";
+import { PanelCard, TextButton } from "@/components/common";
 import { ArtifactListDisplay } from "@/components/artifact/display";
 
 const artifactLevel = computed(() => timStore.selectedArtifactLevel);

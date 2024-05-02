@@ -66,7 +66,7 @@ export default {
 <script setup lang="ts">
 import { computed } from "vue";
 import { artifactStore, timStore, viewsStore } from "@/hooks";
-import { PanelCard, Typography, TextButton, List } from "@/components/common";
+import { PanelCard, Typography, TextButton } from "@/components/common";
 import { ArtifactListDisplay } from "@/components/artifact/display";
 
 const traceMatrix = computed(() => timStore.selectedTraceMatrix);

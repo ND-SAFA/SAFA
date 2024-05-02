@@ -3,8 +3,14 @@ import { defineStore } from "pinia";
 import {
   AnyCommentSchema,
   ArtifactCommentsSchema,
+  ArtifactSchema,
+  BasicCommentSchema,
   CommentSchema,
+  DisplayableHealthCheckSchema,
+  IconVariant,
+  ThemeColor,
 } from "@/types";
+import { artifactStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -48,14 +54,73 @@ export const useComments = defineStore("useComments", {
      * @param artifactId - The unique identifier of the artifact.
      * @returns The health checks on the artifact.
      */
-    getHealthChecks(artifactId: string): AnyCommentSchema[] {
+    getHealthChecks(artifactId: string): DisplayableHealthCheckSchema[] {
+      const getArtifacts = (artifactIds: string[]) =>
+        artifactIds
+          .map(
+            (id) =>
+              artifactStore.getArtifactById(id) ||
+              artifactStore.getArtifactByName(id) // TODO: remove after testing
+          )
+          .filter((artifact) => !!artifact) as ArtifactSchema[];
+
+      const checkToDisplay = (
+        checks: AnyCommentSchema[]
+      ): DisplayableHealthCheckSchema[] =>
+        checks
+          .filter((comment) => comment.status !== "resolved")
+          .map((health) => ({
+            ...health,
+            icon: ((): IconVariant => {
+              switch (health.type) {
+                case "cited_concept":
+                  return "health";
+                case "contradiction":
+                  return "edit";
+                case "undefined_concept":
+                case "predicted_concept":
+                case "multi_matched_concept":
+                  return "warning";
+                default:
+                  return "flag";
+              }
+            })(),
+            color: ((): ThemeColor => {
+              switch (health.type) {
+                case "cited_concept":
+                  return "primary";
+                case "contradiction":
+                  return "negative";
+                default:
+                  return "secondary";
+              }
+            })(),
+            artifacts: ((): ArtifactSchema[] => {
+              switch (health.type) {
+                case "cited_concept":
+                case "predicted_concept":
+                  return getArtifacts([health.conceptArtifactId]);
+                case "contradiction":
+                  return getArtifacts(health.artifactIds);
+                case "multi_matched_concept":
+                  return getArtifacts(health.conceptArtifactIds);
+                default:
+                  return [];
+              }
+            })(),
+            concepts:
+              health.type === "undefined_concept"
+                ? [health.undefinedConcept]
+                : [],
+          }));
+
       if (artifactId) {
-        return [
+        return checkToDisplay([
           ...(this.commentsByArtifactId[artifactId]?.healthChecks || []),
           ...(this.commentsByArtifactId[artifactId]?.flags || []),
-        ];
+        ]);
       } else {
-        return this.newArtifactHealth;
+        return checkToDisplay(this.newArtifactHealth);
       }
     },
     /**
@@ -97,7 +162,7 @@ export const useComments = defineStore("useComments", {
      * @param artifactId - The unique identifier of the artifact.
      * @param comment - The comment to add.
      */
-    addComment(artifactId: string, comment: CommentSchema): void {
+    addComment(artifactId: string, comment: BasicCommentSchema): void {
       if (!this.commentsByArtifactId[artifactId]) {
         this.commentsByArtifactId[artifactId] = {
           artifactId,
@@ -118,7 +183,7 @@ export const useComments = defineStore("useComments", {
      * @param artifactId - The unique identifier of the artifact.
      * @param comment - The comment that has been edited.
      */
-    editComment(artifactId: string, comment: CommentSchema): void {
+    editComment(artifactId: string, comment: BasicCommentSchema): void {
       const comments =
         comment.type === "conversation"
           ? this.commentsByArtifactId[artifactId].comments

@@ -1,4 +1,8 @@
-import { ChatMessageSchema, ProjectChatSchema } from "@/types";
+import {
+  ChatMessageSchema,
+  CreateProjectChatSchema,
+  ProjectChatSchema,
+} from "@/types";
 import { ENABLED_FEATURES } from "@/util";
 import { buildRequest } from "@/api";
 
@@ -11,6 +15,7 @@ const EXAMPLE_SAFA_MESSAGE: ChatMessageSchema = {
 
 const EXAMPLE_PROJECT_CHAT: ProjectChatSchema = {
   id: "1",
+  versionId: "1",
   title: "Mockup Chat",
   permission: "owner",
   messages: [EXAMPLE_SAFA_MESSAGE],
@@ -19,6 +24,7 @@ const EXAMPLE_PROJECT_CHAT: ProjectChatSchema = {
 const EXAMPLE_NASA_CHAT: ProjectChatSchema = {
   id: "2",
   title: "GLM Coverage",
+  versionId: "1",
   permission: "owner",
   messages: [
     {
@@ -50,40 +56,36 @@ const EXAMPLE_NASA_CHAT: ProjectChatSchema = {
 /**
  * Create a chat dialogue for a project.
  * @param versionId - The unique identifier of the version.
- * @param message - The chat message to create.
+ * @param title - The title of the chat dialogue.
  * @returns The chat dialogue created.
  */
 export async function createProjectChat(
   versionId: string,
-  message: ChatMessageSchema
+  title = ""
 ): Promise<ProjectChatSchema> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
     return {
       ...EXAMPLE_PROJECT_CHAT,
+      title: title || "New Chat",
       id: Math.random().toString(),
-      messages: [message],
+      versionId,
     };
   }
-  return buildRequest<ProjectChatSchema, "versionId", ChatMessageSchema>(
-    "createChat",
-    { versionId }
-  ).post(message);
+
+  return buildRequest<ProjectChatSchema, string, CreateProjectChatSchema>(
+    "createChat"
+  ).post({ versionId, title });
 }
 
 /**
  * Delete a chat dialogue for a project.
- * @param versionId - The unique identifier of the version.
  * @param chatId - The unique identifier of the chat dialogue.
  */
-export async function deleteProjectChat(
-  versionId: string,
-  chatId: string
-): Promise<void> {
+export async function deleteProjectChat(chatId: string): Promise<void> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
     return;
   }
-  return buildRequest<void, "versionId" | "chatId">("deleteChat", {
-    versionId,
+  return buildRequest<void, "chatId">("deleteChat", {
     chatId,
   }).delete();
 }
@@ -99,6 +101,7 @@ export async function getProjectChats(
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
     return [EXAMPLE_NASA_CHAT, EXAMPLE_PROJECT_CHAT];
   }
+
   return buildRequest<ProjectChatSchema[], "versionId", ChatMessageSchema>(
     "getChats",
     { versionId }
@@ -107,41 +110,37 @@ export async function getProjectChats(
 
 /**
  * Create a new message in a chat dialogue.
- * @param versionId - The unique identifier of the version.
  * @param chatId - The unique identifier of the chat dialogue.
  * @param message - The chat message to create.
  * @returns The chat dialogues with the new message.
  */
 export async function createProjectChatMessage(
-  versionId: string,
   chatId: string,
   message: ChatMessageSchema
 ): Promise<ChatMessageSchema> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
     return EXAMPLE_SAFA_MESSAGE;
   }
-  return buildRequest<
-    ChatMessageSchema,
-    "versionId" | "chatId",
-    ChatMessageSchema
-  >("getChats", { versionId, chatId }).post(message);
+
+  return buildRequest<ChatMessageSchema, "chatId", ChatMessageSchema>(
+    "getChats",
+    { chatId }
+  ).post(message);
 }
 
 /**
  * Get all messages in a chat dialogue.
- * @param versionId - The unique identifier of the version.
  * @param chatId - The unique identifier of the chat dialogue.
  * @returns The chat dialogue.
  */
 export async function getProjectChatMessages(
-  versionId: string,
   chatId: string
 ): Promise<ProjectChatSchema> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
     return EXAMPLE_PROJECT_CHAT;
   }
-  return buildRequest<ProjectChatSchema, "versionId" | "chatId">("getChats", {
-    versionId,
+
+  return buildRequest<ProjectChatSchema, "chatId">("getChats", {
     chatId,
   }).get();
 }

@@ -14,7 +14,7 @@ import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.comments.entities.dtos.comments.ArtifactCommentDTO;
 import edu.nd.crc.safa.features.comments.entities.dtos.comments.MultiArtifactCommentDTO;
-import edu.nd.crc.safa.features.comments.entities.dtos.comments.UnknownConceptCommentDTO;
+import edu.nd.crc.safa.features.comments.entities.dtos.comments.UndefinedConceptCommentDTO;
 import edu.nd.crc.safa.features.comments.entities.persistent.Comment;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentArtifact;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentConcept;
@@ -36,6 +36,11 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class HealthService {
+    private static final String UNKNOWN_CONTENT = "`%s` is used in artifact but undefined in project concepts.";
+    private static final String MULTI_CONTENT = "Found multiple, conflicting concepts matching in artifact: %s";
+    private static final String PREDICTED_CONTENT = "%s was predicted to be referenced in artifact.";
+    private static final String CITED_CONTENT = "`%s` was cited in artifact.";
+
     private CommentRepository commentRepository;
     private CommentArtifactRepository commentArtifactRepository;
     private CommentConceptRepository commentConceptRepository;
@@ -43,14 +48,28 @@ public class HealthService {
     private ArtifactService artifactService;
     private GenApi genApi;
 
-    public HealthResponse generateHealthChecks(ProjectVersion projectVersion, UUID id) {
-        Artifact artifact = artifactService.findById(id);
+    /**
+     * Performs health checks on artifact and saves them to the database.
+     *
+     * @param projectVersion Project version being commented on.
+     * @param artifactId     ID of artifact being evaluated.
+     * @return Response containing health checks.
+     */
+    public HealthResponse performArtifactHealthChecks(ProjectVersion projectVersion, UUID artifactId) {
+        Artifact artifact = artifactService.findById(artifactId);
         List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(projectVersion.getProject());
-        HealthGenResponse genResponse = genHealthChecks(projectVersion, id);
+        HealthGenResponse genResponse = generateHealthChecks(projectVersion, artifactId);
         return saveHealthChecks(projectVersion, projectArtifacts, artifact, genResponse);
     }
 
-    private HealthGenResponse genHealthChecks(ProjectVersion projectVersion, UUID artifactId) {
+    /**
+     * Calls GEN API to generate health checks.
+     *
+     * @param projectVersion Project version used to retrieve artifact content.
+     * @param artifactId     ID of artifact being evaluated.
+     * @return GEN response.
+     */
+    private HealthGenResponse generateHealthChecks(ProjectVersion projectVersion, UUID artifactId) {
         List<ArtifactAppEntity> artifacts = artifactService.getAppEntities(projectVersion);
         List<ArtifactAppEntity> projectArtifacts =
             artifacts.stream().filter(a -> !a.getId().equals(artifactId)).toList();
@@ -67,6 +86,15 @@ public class HealthService {
         );
     }
 
+    /**
+     * Saves health checks as comments under artifact.
+     *
+     * @param projectVersion   Project version to save comments under.
+     * @param projectArtifacts Artifacts in the project.
+     * @param artifact         Artifact being evaluated.
+     * @param genResponse      GEN API response containing health checks.
+     * @return Response object containing comments.
+     */
     @NotNull
     private HealthResponse saveHealthChecks(ProjectVersion projectVersion,
                                             List<Artifact> projectArtifacts,
@@ -95,34 +123,45 @@ public class HealthService {
         return response;
     }
 
-    public List<UnknownConceptCommentDTO> saveUndefinedEntities(ProjectVersion projectVersion,
-                                                                Artifact artifact,
-                                                                List<String> undefinedEntities) {
+    /**
+     * Saves undefined entities as concept comments.
+     *
+     * @param projectVersion    The project version this comment is created in.
+     * @param artifact          The artifact being commented on.
+     * @param undefinedEntities List of undefined entities in target artifact.
+     * @return List of DTOS.
+     */
+    public List<UndefinedConceptCommentDTO> saveUndefinedEntities(ProjectVersion projectVersion,
+                                                                  Artifact artifact,
+                                                                  List<String> undefinedEntities) {
         List<Comment> comments = new ArrayList<>();
-        Map<Comment, CommentConcept> comment2concept = new HashMap<>();
-        for (String undefinedEntityName : undefinedEntities) {
-            Comment comment = asMatchedConcept(projectVersion, artifact, CommentType.UNKNOWN_CONCEPT);
+        Map<Integer, CommentConcept> comment2concept = new HashMap<>();
+        for (int i = 0; i < undefinedEntities.size(); i++) {
+            String undefinedEntityName = undefinedEntities.get(i);
+            String content = String.format(UNKNOWN_CONTENT, undefinedEntityName);
+            Comment comment = asMatchedConcept(projectVersion, artifact, CommentType.UNDEFINED_CONCEPT, content);
 
             CommentConcept commentConcept = new CommentConcept();
             commentConcept.setComment(comment);
             commentConcept.setConceptName(undefinedEntityName);
 
             comments.add(comment);
-            comment2concept.put(comment, commentConcept);
+            comment2concept.put(i, commentConcept);
         }
 
         this.commentRepository.saveAll(comments);
 
-        for (Map.Entry<Comment, CommentConcept> entry : comment2concept.entrySet()) {
-            entry.getValue().setComment(entry.getKey());
+        for (Map.Entry<Integer, CommentConcept> entry : comment2concept.entrySet()) {
+            Comment comment = comments.get(entry.getKey());
+            entry.getValue().setComment(comment);
         }
 
         this.commentConceptRepository.saveAll(comment2concept.values());
 
-        List<UnknownConceptCommentDTO> DTOs = new ArrayList<>();
-        for (Comment comment : comments) {
-            CommentConcept commentConcept = comment2concept.get(comment);
-            DTOs.add(UnknownConceptCommentDTO.fromComment(commentConcept));
+        List<UndefinedConceptCommentDTO> DTOs = new ArrayList<>();
+        for (int i = 0; i < comments.size(); i++) {
+            CommentConcept commentConcept = comment2concept.get(i);
+            DTOs.add(UndefinedConceptCommentDTO.fromComment(commentConcept));
         }
         return DTOs;
     }
@@ -130,23 +169,24 @@ public class HealthService {
     /**
      * Saves predicted links as comment suggestions.
      *
-     * @param projectVersion     The project version to create comment in.
-     * @param artifact           The artifact being commented on.
-     * @param predictedArtifacts List of predicted artifacts.
-     * @param artifactNameLookup Map of name to artifact.
+     * @param projectVersion         The project version to create comment in.
+     * @param artifact               The artifact being commented on.
+     * @param predictedArtifactNames List of predicted artifacts.
+     * @param artifactNameLookup     Map of name to artifact.
      * @return List of comments DTOs.
      */
     public List<ArtifactCommentDTO> savePredictedMatches(ProjectVersion projectVersion,
                                                          Artifact artifact,
-                                                         List<GenerationArtifact> predictedArtifacts,
+                                                         List<String> predictedArtifactNames,
                                                          Map<String, Artifact> artifactNameLookup) {
 
         return saveCommentArtifacts(
             projectVersion,
             artifact,
-            predictedArtifacts,
-            g -> Optional.of(artifactNameLookup.get(g.getId())),
-            CommentType.MATCHED_CONCEPT
+            predictedArtifactNames,
+            n -> Optional.of(artifactNameLookup.get(n)),
+            i -> String.format(PREDICTED_CONTENT, predictedArtifactNames.get(i)),
+            CommentType.PREDICTED_CONCEPT
         )
             .stream()
             .map(ArtifactCommentDTO::fromComment)
@@ -171,7 +211,8 @@ public class HealthService {
             artifact,
             directMatches,
             c -> Optional.of(artifactNameLookup.get(c.getId())),
-            CommentType.MATCHED_CONCEPT
+            i -> String.format(CITED_CONTENT, directMatches.get(i).getId()),
+            CommentType.CITED_CONCEPT
         ).stream().map(ArtifactCommentDTO::fromComment).toList();
     }
 
@@ -193,6 +234,7 @@ public class HealthService {
             artifact,
             multiMatches,
             c -> Optional.of(artifactNameLookup.get(c.getId())),
+            loc -> createMultiMatchContent(multiMatches.get(loc)),
             CommentType.MULTI_MATCHED_CONCEPT);
 
         Map<Comment, List<CommentArtifact>> commentConceptLookup =
@@ -223,10 +265,13 @@ public class HealthService {
                                                            Artifact artifact,
                                                            List<K> commentConcepts,
                                                            Function<K, Optional<Artifact>> conceptExtractor,
+                                                           Function<Integer, String> contentCreator,
                                                            CommentType commentType) {
-        Map<String, List<K>> hashMap = new HashMap<>();
-        hashMap.put("ID", commentConcepts);
-        return saveCommentArtifacts(projectVersion, artifact, hashMap, conceptExtractor, commentType);
+        Map<Integer, List<K>> hashMap = new HashMap<>();
+        for (int i = 0; i < commentConcepts.size(); i++) {
+            hashMap.put(i, commentConcepts.subList(i, i + 1));
+        }
+        return saveCommentArtifacts(projectVersion, artifact, hashMap, conceptExtractor, contentCreator, commentType);
     }
 
     /**
@@ -243,13 +288,15 @@ public class HealthService {
                                                               Artifact artifact,
                                                               Map<T, List<K>> group2concepts,
                                                               Function<K, Optional<Artifact>> artifactLookup,
+                                                              Function<T, String> contentCreator,
                                                               CommentType commentType) {
         Map<T, Comment> id2comment = new HashMap<>();
         Map<T, List<CommentArtifact>> id2artifacts = new HashMap<>();
 
         for (Map.Entry<T, List<K>> entry : group2concepts.entrySet()) {
             List<CommentArtifact> entryArtifacts = new ArrayList<>();
-            Comment comment = asMatchedConcept(projectVersion, artifact, commentType);
+            String commentContent = contentCreator.apply(entry.getKey());
+            Comment comment = asMatchedConcept(projectVersion, artifact, commentType, commentContent);
             for (K dto : entry.getValue()) {
                 Optional<Artifact> artifactOptional = artifactLookup.apply(dto);
                 if (artifactOptional.isEmpty()) {
@@ -297,13 +344,28 @@ public class HealthService {
      * @param artifact       The artifact being commented on.
      * @return Base comment of type MatchedConcept.
      */
-    private Comment asMatchedConcept(ProjectVersion projectVersion, Artifact artifact, CommentType commentType) {
+    private Comment asMatchedConcept(ProjectVersion projectVersion,
+                                     Artifact artifact,
+                                     CommentType commentType,
+                                     String content) {
         Comment comment = new Comment();
         comment.setStatus(CommentStatus.ACTIVE);
         comment.setType(commentType);
+        comment.setContent(content);
         comment.setAuthor(null);// generated so no author
         comment.setVersion(projectVersion);
         comment.setArtifact(artifact);
         return comment;
+    }
+
+    /**
+     * Creates content of multi-concept match comment.
+     *
+     * @param conceptMatches List of matches.
+     * @return Comment content.
+     */
+    private String createMultiMatchContent(List<ConceptMatchDTO> conceptMatches) {
+        String concepts = String.join(",", conceptMatches.stream().map(c -> c.getId()).toList());
+        return String.format(MULTI_CONTENT, concepts);
     }
 }

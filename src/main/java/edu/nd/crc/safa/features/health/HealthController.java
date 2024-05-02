@@ -35,6 +35,6 @@ public class HealthController extends BaseController {
             .asUser(currentUser)
             .withPermission(ProjectPermission.EDIT)
             .get();
-        return getServiceProvider().getHealthService().generateHealthChecks(projectVersion, artifactId);
+        return getServiceProvider().getHealthService().performArtifactHealthChecks(projectVersion, artifactId);
     }
 }

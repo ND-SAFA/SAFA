@@ -206,6 +206,16 @@ public class DbEntityBuilder extends AbstractBuilder {
         return this;
     }
 
+    public DbEntityBuilder setVersion(ProjectVersion projectVersion) {
+        Project project = projectVersion.getProject();
+        String projectName = project.getName();
+        if (!this.projects.containsKey(projectName)) {
+            setProject(projectName, project);
+        }
+        addEntry(this.versions, projectVersion.getProject().getName(), projectVersion);
+        return this;
+    }
+
     public boolean hasDocument(String projectName,
                                String documentName) {
         assertProjectExists(this.documents, projectName);

@@ -6,7 +6,7 @@ import java.util.List;
 import edu.nd.crc.safa.features.comments.entities.dtos.comments.ArtifactCommentDTO;
 import edu.nd.crc.safa.features.comments.entities.dtos.comments.CommentDTO;
 import edu.nd.crc.safa.features.comments.entities.dtos.comments.MultiArtifactCommentDTO;
-import edu.nd.crc.safa.features.comments.entities.dtos.comments.UnknownConceptCommentDTO;
+import edu.nd.crc.safa.features.comments.entities.dtos.comments.UndefinedConceptCommentDTO;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentType;
 
 import lombok.AllArgsConstructor;
@@ -39,7 +39,7 @@ public class ArtifactCommentResponseDTO {
      */
     public static ArtifactCommentResponseDTO fromTypes(List<CommentDTO> commentDTOS,
                                                        List<ArtifactCommentDTO> artifactCommentDTOS,
-                                                       List<UnknownConceptCommentDTO> unknownCommentDTOS,
+                                                       List<UndefinedConceptCommentDTO> unknownCommentDTOS,
                                                        List<MultiArtifactCommentDTO> multiArtifactCommentDTOS) {
         List<CommentDTO> comments = new ArrayList<>();
         List<CommentDTO> flags = new ArrayList<>();

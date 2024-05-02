@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class UnknownConceptCommentDTO extends CommentDTO {
+public class UndefinedConceptCommentDTO extends CommentDTO {
     /**
      * The concept found in artifact but undefined in project.
      */
@@ -19,8 +19,8 @@ public class UnknownConceptCommentDTO extends CommentDTO {
      * @param commentConcept The comment concept to copy fields from.
      * @return DTO.
      */
-    public static UnknownConceptCommentDTO fromComment(CommentConcept commentConcept) {
-        UnknownConceptCommentDTO dto = new UnknownConceptCommentDTO();
+    public static UndefinedConceptCommentDTO fromComment(CommentConcept commentConcept) {
+        UndefinedConceptCommentDTO dto = new UndefinedConceptCommentDTO();
         CommentDTO.fromComment(commentConcept.getComment()).copyTo(dto);
         dto.setUndefinedConcept(commentConcept.getConceptName());
         return dto;

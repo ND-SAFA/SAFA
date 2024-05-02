@@ -1,8 +1,6 @@
 package edu.nd.crc.safa.features.health;
 
-import java.util.List;
-
-import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,9 +11,13 @@ public class HealthGenRequest {
     /**
      * List of artifacts in project.
      */
-    private List<GenerationArtifact> projectArtifacts;
+    private GenerationDataset dataset;
+    /**
+     * ID of artifact representing the target artifac.t
+     */
+    private String queryId;
     /**
      * Target artifact to generate health checks for.
      */
-    private GenerationArtifact targetArtifacts;
+    private String conceptLayerId;
 }

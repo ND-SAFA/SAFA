@@ -16,11 +16,15 @@ public enum CommentType {
     /**
      * Generated notification that a concept in artifact is not found in project vocabulary.
      */
-    UNKNOWN_CONCEPT,
+    UNDEFINED_CONCEPT,
     /**
-     * Generated notification that a concept in project vocabulary was matched.
+     * Concept was found directly cited in artifact.
      */
-    MATCHED_CONCEPT,
+    CITED_CONCEPT,
+    /**
+     * Concept was predicted to be used in artifact.
+     */
+    PREDICTED_CONCEPT,
     /**
      * Generated notification that a concept in artifact was matched with multiple.
      */

@@ -6,6 +6,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.comments.entities.persistent.Comment;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentStatus;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentType;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import lombok.Data;
 
@@ -56,10 +57,14 @@ public class CommentDTO {
         dto.setContent(comment.getContent());
         dto.setType(comment.getType());
         dto.setStatus(comment.getStatus());
-        dto.setUserId(comment.getAuthor().getUserId());
         dto.setVersionId(comment.getVersion().getVersionId());
         dto.setTimeCreated(comment.getCreatedAt());
         dto.setTimeUpdated(comment.getUpdatedAt());
+
+        SafaUser author = comment.getAuthor();
+        if (author != null) {
+            dto.setUserId(author.getUserId());
+        }
         return dto;
     }
 

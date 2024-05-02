@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.generation.summary.SummaryRequest;
 import edu.nd.crc.safa.features.generation.summary.SummaryResponse;
 import edu.nd.crc.safa.features.generation.tgen.TGenRequest;
 import edu.nd.crc.safa.features.generation.tgen.TGenResponse;
+import edu.nd.crc.safa.features.health.HealthConstants;
 import edu.nd.crc.safa.features.health.HealthGenRequest;
 import edu.nd.crc.safa.features.health.HealthGenResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
@@ -47,8 +48,9 @@ public class GenApi implements ITraceGenerationController {
      */
     public HealthGenResponse generateHealthChecks(List<GenerationArtifact> projectArtifacts,
                                                   GenerationArtifact targetArtifact) {
-        HealthGenRequest request = new HealthGenRequest(projectArtifacts, targetArtifact);
-        String chatEndpoint = TGenConfig.getEndpoint("health");
+        GenerationDataset dataset = new GenerationDataset(projectArtifacts);
+        HealthGenRequest request = new HealthGenRequest(dataset, targetArtifact.getId(), HealthConstants.CONCEPT_TYPE);
+        String chatEndpoint = TGenConfig.getEndpoint(HealthConstants.ENDPOINT);
         return genApiController.sendGenRequest(chatEndpoint, request, HealthGenResponse.class);
     }
 

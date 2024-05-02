@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS comment
     type        VARCHAR(255) NOT NULL,
     created_at  DATETIME     NOT NULL,
     updated_at  DATETIME     NOT NULL,
-    author_id   VARCHAR(255) NOT NULL,
+    author_id   VARCHAR(255),
     artifact_id VARCHAR(255) NOT NULL,
     version_id  VARCHAR(255) NOT NULL,
     constraint comment_author_id_fk foreign key (author_id) references safa_user (user_id) on delete cascade,

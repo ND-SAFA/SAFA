@@ -204,6 +204,11 @@ public class SafaRequest extends RouteBuilder<SafaRequest> {
         );
     }
 
+    public <T> T postWithoutBody(Class<T> responseClass) throws Exception {
+        JSONObject responseObject = makeAsyncRequestWithoutBody(post(this.buildEndpoint()), status().is2xxSuccessful());
+        return parse(responseObject, responseClass);
+    }
+
     public JSONObject postWithoutBody(ResultMatcher resultMatcher) throws Exception {
         return makeAsyncRequestWithoutBody(post(this.buildEndpoint()), resultMatcher);
     }

@@ -3,8 +3,6 @@ package edu.nd.crc.safa.features.health;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
-
 import lombok.Data;
 
 @Data
@@ -20,7 +18,7 @@ public class HealthGenResponse {
     /**
      * List of traces predicted between concept and artifact.
      */
-    private List<GenerationArtifact> predictedMatches;
+    private List<String> predictedMatches;
     /**
      * List of entities found in artifact but missing in concept artifacts.
      */

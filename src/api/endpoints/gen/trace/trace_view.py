@@ -1,7 +1,7 @@
 import os.path
 from typing import List, Type, TypedDict, Union
 
-from api.endpoints.gen.trace.trace_serializer import TraceSerializer, TraceRequest
+from api.endpoints.gen.trace.trace_serializer import TraceRequest, TraceSerializer
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
 from tgen.common.constants.dataset_constants import NO_CHECK
@@ -11,6 +11,7 @@ from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
+from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.jobs.tracing_jobs.tracing_job import TracingJob
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
@@ -36,7 +37,8 @@ def perform_tracing_job(dataset: ApiDefinition, job: Union[Type[RankingJob], Typ
     eval_project_reader = ApiProjectReader(api_definition=dataset)
     eval_dataset_creator = TraceDatasetCreator(project_reader=eval_project_reader, allowed_orphans=NO_CHECK)
     prompt_dataset_creator = PromptDatasetCreator(trace_dataset_creator=eval_dataset_creator, project_summary=dataset.summary)
-    tracing_job = job(dataset_creator=prompt_dataset_creator, **kwargs)
+    job_args = JobArgs(dataset_creator=prompt_dataset_creator)
+    tracing_job = job(job_args, **kwargs)
     prediction_result = ViewUtil.run_job(tracing_job)
 
     return {"predictions": prediction_result.prediction_entries}

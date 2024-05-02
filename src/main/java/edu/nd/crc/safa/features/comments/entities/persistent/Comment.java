@@ -19,13 +19,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "comment")
 public class Comment {
@@ -59,7 +61,7 @@ public class Comment {
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "author_id")
     private SafaUser author;
     /**
      * Artifact being commented on.
@@ -78,12 +80,12 @@ public class Comment {
     /**
      * Timestamp of when comment was created.
      */
-    @Column
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
     /**
      * Timestamp of when this comment was last updated.
      */
-    @Column
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     /**
@@ -93,17 +95,45 @@ public class Comment {
      * @return True if given user is author of comment.
      */
     public boolean isAuthor(SafaUser user) {
+        if (user == null) {
+            return this.author == null;
+        }
         return this.author.getUserId().equals(user.getUserId());
     }
 
+    /**
+     * Sets creation and last updated time at creation.
+     */
     @PrePersist
     public void setCreatedAt() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
+    /**
+     * Sets last updated time at update.
+     */
     @PreUpdate
     public void setUpdatedAt() {
         this.updatedAt = LocalDateTime.now();
+    }
+
+    /**
+     * @return Hash of ID.
+     */
+    public int hashCode() {
+        return this.id.hashCode();
+    }
+
+    /**
+     * @param obj Object being compared.
+     * @return True if IDs match.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Comment comment) {
+            return this.id.equals(comment.id);
+        }
+        return false;
     }
 }

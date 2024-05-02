@@ -6,7 +6,9 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.comments.entities.persistent.Comment;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class MultiArtifactCommentDTO extends CommentDTO {
     /**
@@ -15,7 +17,7 @@ public class MultiArtifactCommentDTO extends CommentDTO {
     private List<UUID> artifactIds;
 
     /**
-     * Creates DTO from comment and assocaited artifacts.
+     * Creates DTO from comment and associated artifacts.
      *
      * @param comment     The base comment.
      * @param artifactIds Linked artifact ids.
@@ -23,7 +25,7 @@ public class MultiArtifactCommentDTO extends CommentDTO {
      */
     public static MultiArtifactCommentDTO fromComment(Comment comment, List<UUID> artifactIds) {
         MultiArtifactCommentDTO dto = new MultiArtifactCommentDTO();
-        ConceptCommentDTO.fromComment(comment).copyTo(dto);
+        ArtifactCommentDTO.fromComment(comment).copyTo(dto);
         dto.setArtifactIds(artifactIds);
         return dto;
     }

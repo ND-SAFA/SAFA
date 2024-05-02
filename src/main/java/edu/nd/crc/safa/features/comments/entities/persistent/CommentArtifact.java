@@ -11,13 +11,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "comment_artifact")
 public class CommentArtifact {
@@ -42,5 +44,24 @@ public class CommentArtifact {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false)
-    private Artifact artifact;
+    private Artifact artifactReferenced;
+
+    /**
+     * @return Hash of ID.
+     */
+    public int hashCode() {
+        return this.id.hashCode();
+    }
+
+    /**
+     * @param obj Object being compared.
+     * @return True if IDs match.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CommentArtifact commentArtifact) {
+            return this.id.equals(commentArtifact.id);
+        }
+        return false;
+    }
 }

@@ -3,10 +3,10 @@ package edu.nd.crc.safa.features.comments.entities.dtos;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.nd.crc.safa.features.comments.entities.dtos.comments.ArtifactCommentDTO;
 import edu.nd.crc.safa.features.comments.entities.dtos.comments.CommentDTO;
-import edu.nd.crc.safa.features.comments.entities.dtos.comments.ConceptCommentDTO;
 import edu.nd.crc.safa.features.comments.entities.dtos.comments.MultiArtifactCommentDTO;
-import edu.nd.crc.safa.features.comments.entities.dtos.comments.MultiConceptCommentDTO;
+import edu.nd.crc.safa.features.comments.entities.dtos.comments.UnknownConceptCommentDTO;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentType;
 
 import lombok.AllArgsConstructor;
@@ -32,15 +32,15 @@ public class ArtifactCommentResponseDTO {
      * Creates response DTO from the different types of comments, placing each into its corresponding DTO property.
      *
      * @param commentDTOS              DTOs containing only comment information.
-     * @param conceptCommentDTOS       DTOs containing linked concepts.
+     * @param artifactCommentDTOS      DTOs containing linked concepts.
      * @param multiArtifactCommentDTOS DTOs containing linked artifacts.
-     * @param multiConceptCommentDTOS  DTOs containing multiple linked concepts.
+     * @param unknownCommentDTOS       Unknown concepts in artifact.
      * @return Response DTO.
      */
     public static ArtifactCommentResponseDTO fromTypes(List<CommentDTO> commentDTOS,
-                                                       List<ConceptCommentDTO> conceptCommentDTOS,
-                                                       List<MultiArtifactCommentDTO> multiArtifactCommentDTOS,
-                                                       List<MultiConceptCommentDTO> multiConceptCommentDTOS) {
+                                                       List<ArtifactCommentDTO> artifactCommentDTOS,
+                                                       List<UnknownConceptCommentDTO> unknownCommentDTOS,
+                                                       List<MultiArtifactCommentDTO> multiArtifactCommentDTOS) {
         List<CommentDTO> comments = new ArrayList<>();
         List<CommentDTO> flags = new ArrayList<>();
         List<CommentDTO> healthChecks = new ArrayList<>();
@@ -57,9 +57,9 @@ public class ArtifactCommentResponseDTO {
             }
         }
 
-        healthChecks.addAll(conceptCommentDTOS);
+        healthChecks.addAll(unknownCommentDTOS);
+        healthChecks.addAll(artifactCommentDTOS);
         healthChecks.addAll(multiArtifactCommentDTOS);
-        healthChecks.addAll(multiConceptCommentDTOS);
 
         return new ArtifactCommentResponseDTO(comments, flags, healthChecks);
     }

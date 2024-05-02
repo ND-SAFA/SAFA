@@ -46,26 +46,23 @@ public class ChatService {
     /**
      * Updates chat with new title, if one exists.
      *
-     * @param chatDTO        The chat to update.
-     * @param user           The user making request to update chat.
-     * @param projectVersion The project version being queried in chat.
+     * @param chat     The chat being updated.
+     * @param newTitle New title to set chat to.
+     * @param user     The user making request to update chat.
      * @return The updated chat.
      */
-    public ChatDTO updateChat(ChatDTO chatDTO, SafaUser user, ProjectVersion projectVersion) {
-        Chat chat = getChatById(chatDTO.getId());
+    public ChatDTO updateChat(Chat chat, String newTitle, SafaUser user) {
         if (!chat.isOwner(user)) {
             throw new SafaError("Chat is not owned by user making request.");
         }
 
         ChatSharePermission permission = verifyChatPermission(chat, user, ChatSharePermission.EDIT);
 
-        String userTitle = chatDTO.getTitle();
-        if (userTitle == null || userTitle.isBlank()) {
+        if (newTitle == null || newTitle.isBlank()) {
             throw new SafaError("Unable to save chat with empty title.");
         }
 
-        chat.setTitle(userTitle);
-        chat.setProjectVersion(projectVersion);
+        chat.setTitle(newTitle);
 
         chat = chatRepository.save(chat);
         return ChatDTO.fromChat(chat, permission);

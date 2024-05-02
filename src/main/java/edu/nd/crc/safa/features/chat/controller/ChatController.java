@@ -7,6 +7,8 @@ import java.util.UUID;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
+import edu.nd.crc.safa.features.chat.entities.dtos.EditChatRequestDTO;
+import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
@@ -40,7 +42,7 @@ public class ChatController extends BaseController {
     @PostMapping(AppRoutes.Chat.CHAT_CREATE)
     public ChatDTO createChat(@RequestBody @Valid ChatDTO chatDTO) {
         SafaUser currentUser = getServiceProvider().getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = fetchAssociatedProjectVersion(chatDTO, currentUser);
+        ProjectVersion projectVersion = fetchAndAuthenticateProjectVersion(chatDTO.getVersionId(), currentUser);
         String userTitle = chatDTO.getTitle();
         String title = userTitle == null || userTitle.isBlank() ? DEFAULT_TITLE : userTitle;
         return this.getServiceProvider().getChatService().createNewChat(currentUser, projectVersion, title);
@@ -50,14 +52,16 @@ public class ChatController extends BaseController {
     /**
      * Updates chat (e.g. title)
      *
-     * @param chatDTO The chat to update.
+     * @param editRequest The chat to update.
+     * @param chatId      ID of chat to edit.
      * @return Updated chat.
      */
     @PutMapping(AppRoutes.Chat.CHAT_UPDATE)
-    public ChatDTO updateChat(@RequestBody @Valid ChatDTO chatDTO) {
+    public ChatDTO updateChatTitle(@RequestBody @Valid EditChatRequestDTO editRequest, @PathVariable UUID chatId) {
         SafaUser currentUser = getServiceProvider().getSafaUserService().getCurrentUser();
-        ProjectVersion projectVersion = fetchAssociatedProjectVersion(chatDTO, currentUser);
-        return this.getServiceProvider().getChatService().updateChat(chatDTO, currentUser, projectVersion);
+        Chat chat = getServiceProvider().getChatService().getChatById(chatId);
+        authenticateProjectVersion(currentUser, chat.getProjectVersion());
+        return this.getServiceProvider().getChatService().updateChat(chat, editRequest.getTitle(), currentUser);
     }
 
     /**
@@ -85,17 +89,22 @@ public class ChatController extends BaseController {
     /**
      * Retrieves project version in chat if user has sufficient permission to access that edit and generate on it.
      *
-     * @param chatDTO The chat accessing the project version.
-     * @param user    The user accessing project version.
+     * @param versionId Id of version to authenticate and fetch.
+     * @param user      The user accessing project version.
      * @return The project version associated with chat.
      */
-    private ProjectVersion fetchAssociatedProjectVersion(ChatDTO chatDTO, SafaUser user) {
-        UUID versionId = chatDTO.getVersionId();
+    private ProjectVersion fetchAndAuthenticateProjectVersion(UUID versionId, SafaUser user) {
         if (versionId == null) {
             throw new SafaError("Version Id not defined on chat.");
         }
-        return getResourceBuilder()
-            .fetchVersion(chatDTO.getVersionId())
+        ProjectVersion projectVersion = getResourceBuilder().fetchVersion(versionId).get();
+        authenticateProjectVersion(user, projectVersion);
+        return projectVersion;
+    }
+
+    private void authenticateProjectVersion(SafaUser user, ProjectVersion projectVersion) {
+        getResourceBuilder()
+            .withVersion(projectVersion)
             .asUser(user)
             .withPermissions(Set.of(ProjectPermission.EDIT_DATA, ProjectPermission.GENERATE))
             .get();

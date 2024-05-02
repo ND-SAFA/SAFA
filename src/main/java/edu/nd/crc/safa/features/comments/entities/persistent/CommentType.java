@@ -14,10 +14,6 @@ public enum CommentType {
      */
     CONTRADICTION,
     /**
-     * AI generated improvement of artifact.
-     */
-    SUGGESTION,
-    /**
      * Generated notification that a concept in artifact is not found in project vocabulary.
      */
     UNKNOWN_CONCEPT,

@@ -78,8 +78,8 @@ public class AppRoutes {
         private static final String ROOT = "/chat";
         public static final String CHAT_GET = ROOT;
         public static final String CHAT_CREATE = ROOT;
-        public static final String CHAT_UPDATE = ROOT;
         private static final String BY_ID = ROOT + "/{chatId}";
+        public static final String CHAT_UPDATE = BY_ID;
         public static final String CHAT_DELETE = BY_ID;
 
         public static class Message {
@@ -186,6 +186,11 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Prompts {
         public static final String COMPLETE = "/prompt";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Health {
+        public static final String GENERATE = "/health/versions/{versionId}/artifacts/{artifactId}";
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)

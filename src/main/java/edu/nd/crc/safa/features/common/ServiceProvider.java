@@ -36,6 +36,7 @@ import edu.nd.crc.safa.features.github.repositories.GithubAccessCredentialsRepos
 import edu.nd.crc.safa.features.github.repositories.GithubProjectRepository;
 import edu.nd.crc.safa.features.github.services.GithubConnectionService;
 import edu.nd.crc.safa.features.github.services.GithubGraphQlService;
+import edu.nd.crc.safa.features.health.HealthService;
 import edu.nd.crc.safa.features.jira.repositories.JiraAccessCredentialsRepository;
 import edu.nd.crc.safa.features.jira.repositories.JiraProjectRepository;
 import edu.nd.crc.safa.features.jira.services.JiraConnectionService;
@@ -211,6 +212,8 @@ public class ServiceProvider {
     // Comments
     private CommentService commentService;
     private CommentRetrievalService commentRetrievalService;
+    // Health
+    private HealthService healthService;
 
     @PostConstruct
     public void postInit() {

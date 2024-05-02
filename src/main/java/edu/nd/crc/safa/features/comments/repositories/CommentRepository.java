@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommentRepository extends CrudRepository<Comment, UUID> {
-    List<Comment> findByArtifactOrderByCreatedAsc(Artifact artifact);
+    List<Comment> findByArtifactOrderByCreatedAtAsc(Artifact artifact);
 }

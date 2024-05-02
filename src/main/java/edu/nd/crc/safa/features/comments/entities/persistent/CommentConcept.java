@@ -9,13 +9,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
-@Data
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @Entity
 @Table(name = "comment_concept")
 public class CommentConcept {
@@ -25,16 +31,34 @@ public class CommentConcept {
     @Column(nullable = false)
     private UUID id;
     /**
-     * The concept associated with comment.
-     */
-    @Column(name = "concept_name")
-    private String conceptName;
-
-    /**
      * Author of comment
      */
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "comment_id", nullable = false)
     private Comment comment;
+    /**
+     * The concept associated with comment.
+     */
+    @Column(name = "concept_name")
+    private String conceptName;
+
+    /**
+     * @return Hash of ID.
+     */
+    public int hashCode() {
+        return this.id.hashCode();
+    }
+
+    /**
+     * @param obj Object being compared.
+     * @return True if IDs match.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CommentConcept commentConcept) {
+            return this.id.equals(commentConcept.id);
+        }
+        return false;
+    }
 }

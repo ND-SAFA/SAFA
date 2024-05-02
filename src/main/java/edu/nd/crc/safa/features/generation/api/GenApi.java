@@ -18,6 +18,8 @@ import edu.nd.crc.safa.features.generation.summary.SummaryRequest;
 import edu.nd.crc.safa.features.generation.summary.SummaryResponse;
 import edu.nd.crc.safa.features.generation.tgen.TGenRequest;
 import edu.nd.crc.safa.features.generation.tgen.TGenResponse;
+import edu.nd.crc.safa.features.health.HealthGenRequest;
+import edu.nd.crc.safa.features.health.HealthGenResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -35,6 +37,20 @@ public class GenApi implements ITraceGenerationController {
     private final ArtifactSummaryApi artifactSummaryApi;
     private final GenerateLinksApi generateLinksApi;
     private final GenApiController genApiController;
+
+    /**
+     * Generates health check for target artifacts.
+     *
+     * @param projectArtifacts List of artifacts in project.
+     * @param targetArtifact   Target artifact to generate health checks for.
+     * @return Health checks generated for artifact.
+     */
+    public HealthGenResponse generateHealthChecks(List<GenerationArtifact> projectArtifacts,
+                                                  GenerationArtifact targetArtifact) {
+        HealthGenRequest request = new HealthGenRequest(projectArtifacts, targetArtifact);
+        String chatEndpoint = TGenConfig.getEndpoint("health");
+        return genApiController.sendGenRequest(chatEndpoint, request, HealthGenResponse.class);
+    }
 
     /**
      * Sends request to GEN to response to chat message.

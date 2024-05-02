@@ -73,13 +73,13 @@ export const useComments = defineStore("useComments", {
             ...health,
             icon: ((): IconVariant => {
               switch (health.type) {
-                case "cited_concept":
-                  return "health";
                 case "contradiction":
-                  return "edit";
-                case "undefined_concept":
+                  return "health";
+                case "cited_concept":
                 case "predicted_concept":
                 case "multi_matched_concept":
+                  return "changelog";
+                case "undefined_concept":
                   return "warning";
                 default:
                   return "flag";

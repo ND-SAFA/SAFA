@@ -14,8 +14,7 @@ const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
     {
       id: "1",
       versionId: "1",
-      content:
-        "Hello people, this is a super long comment that should wrap to multiple lines.",
+      content: "Has anyone had a chance to review this requirement yet?",
       userId: "tim@safa.ai",
       createdAt: new Date(Date.now()).toISOString(),
       updatedAt: new Date(Date.now()).toISOString(),
@@ -27,7 +26,7 @@ const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
     {
       id: "2",
       versionId: "1",
-      content: "Oh boy there's a flag",
+      content: "There is a potential issue with this requirement.",
       userId: "tim@safa.ai",
       createdAt: new Date(Date.now()).toISOString(),
       updatedAt: new Date(Date.now()).toISOString(),

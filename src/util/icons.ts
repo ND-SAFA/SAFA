@@ -225,6 +225,14 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-flag";
     case "health":
       return "mdi-heart-pulse";
+    case "health-unknown":
+      return "mdi-help";
+    case "health-concept":
+      return "mdi-file-document";
+    case "health-concept-multiple":
+      return "mdi-file-document-multiple";
+    case "health-conflict":
+      return "mdi-compare-remove";
     default:
       return "";
   }

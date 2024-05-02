@@ -104,7 +104,11 @@ export type IconVariant =
   | "comment"
   | "comment-resolve"
   | "flag"
-  | "health";
+  | "health"
+  | "health-unknown"
+  | "health-concept"
+  | "health-concept-multiple"
+  | "health-conflict";
 
 /**
  * Defines props for an icon.

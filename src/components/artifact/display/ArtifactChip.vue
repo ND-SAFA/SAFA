@@ -1,6 +1,6 @@
 <template>
   <q-chip
-    :color="timStore.getTypeColor(props.artifact.type, true)"
+    :color="color"
     :icon="timStore.getTypeIcon(props.artifact.type)"
     outline
     style="max-width: 300px; height: fit-content"
@@ -28,10 +28,15 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ArtifactProps } from "@/types";
+import { computed } from "vue";
+import { ArtifactProps, ColorProps } from "@/types";
 import { selectionStore, timStore } from "@/hooks";
 import { Typography } from "@/components/common";
 import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
 
-const props = defineProps<ArtifactProps>();
+const props = defineProps<ArtifactProps & ColorProps>();
+
+const color = computed(
+  () => props.color || timStore.getTypeColor(props.artifact.type, true)
+);
 </script>

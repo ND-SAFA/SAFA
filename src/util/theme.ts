@@ -26,7 +26,7 @@ export enum Colors {
   red = "#E24C15",
   redLight = "#E24C15",
 
-  orange = "#fb8500",
+  orange = "#f0ad4e", // "#fb8500",
 
   brown = "#b6ad90",
   brownDark = "#a68a64", // Secondary

@@ -32,16 +32,19 @@
             v-for="relatedArtifact in check.artifacts"
             :key="relatedArtifact.id"
             :artifact="relatedArtifact"
+            :color="check.color"
           />
         </flex-box>
         <flex-box v-if="check.concepts.length > 0">
           <q-chip
             v-for="concept in check.concepts"
             :key="concept"
-            color="background"
+            :color="check.color"
+            outline
+            :icon="getIcon('health-unknown')"
             style="max-width: 300px; height: fit-content"
           >
-            <typography :value="concept" wrap />
+            <typography :value="concept" wrap color="text" />
           </q-chip>
         </flex-box>
       </div>
@@ -60,7 +63,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
-import { ENABLED_FEATURES } from "@/util";
+import { ENABLED_FEATURES, getIcon } from "@/util";
 import {
   artifactSaveStore,
   artifactStore,

@@ -74,13 +74,14 @@ export const useComments = defineStore("useComments", {
             icon: ((): IconVariant => {
               switch (health.type) {
                 case "contradiction":
-                  return "health";
+                  return "health-conflict";
                 case "cited_concept":
                 case "predicted_concept":
+                  return "health-concept";
                 case "multi_matched_concept":
-                  return "changelog";
+                  return "health-concept-multiple";
                 case "undefined_concept":
-                  return "warning";
+                  return "health-unknown";
                 default:
                   return "flag";
               }
@@ -88,11 +89,11 @@ export const useComments = defineStore("useComments", {
             color: ((): ThemeColor => {
               switch (health.type) {
                 case "cited_concept":
-                  return "primary";
+                  return "positive";
                 case "contradiction":
                   return "negative";
                 default:
-                  return "secondary";
+                  return "warning";
               }
             })(),
             artifacts: ((): ArtifactSchema[] => {

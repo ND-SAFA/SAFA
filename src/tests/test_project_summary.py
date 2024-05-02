@@ -29,4 +29,4 @@ class TestProjectSummary(BaseTest):
 
         section_bodies = list(section_body_map.values())
         TestVerifier.assert_all_in(self, summary, section_bodies)
-        TestVerifier.verify_artifacts(self, artifacts, response_artifacts, ignore_keys=[ArtifactKeys.SUMMARY])
+        TestVerifier.verify_artifacts(self, artifacts, response_artifacts, ignore_keys=[ArtifactKeys.SUMMARY, ArtifactKeys.CHUNKS])

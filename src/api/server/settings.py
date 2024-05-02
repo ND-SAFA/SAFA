@@ -13,7 +13,6 @@ import json
 import os.path
 import sys
 
-from celery_s3.backends import S3Backend
 from kombu.serialization import register
 
 from tgen.common.constants import anthropic_constants
@@ -160,7 +159,6 @@ https://docs.celeryq.dev/en/stable/index.html
 TODO: broker_connection_retry_on_startup needs to be set
 """
 
-CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'  # 'api.celery.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
@@ -174,17 +172,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 25_000_000
 CELERY_ACCEPT_CONTENT = ['NpEncoder']
 CELERY_TASK_SERIALIZER = 'NpEncoder'
 CELERY_RESULT_SERIALIZER = 'NpEncoder'
-
-if 'BACKEND_ACCESS_ID' in os.environ:  # collect static will be running this without env file
-    base_path = f"/{ENV_NAME}"
-    CELERY_S3_BACKEND_SETTINGS = {
-        'aws_access_key_id': f'{os.environ["BACKEND_ACCESS_ID"]}',
-        'aws_secret_access_key': f'{os.environ["BACKEND_SECRET_KEY"]}',
-        'bucket': f'{os.environ["BACKEND_BUCKET_NAME"]}',
-        'reduced_redundancy': True,
-        'base_path': bytes(base_path, "utf-8")  # See `Rabbit Hole Fix`
-
-    }
 """"
 FootNotes:
 

@@ -1,8 +1,8 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  server:
-    container_name: server
+  gen:
+    container_name: gen
     build:
       context: .
       dockerfile: Dockerfile
@@ -12,32 +12,23 @@ services:
     volumes:
     - tgen-volume:/vol
     networks:
-    - app_network
-    depends_on:
-    - rabbitmq
+    - safa_network
     environment:
-    - BROKER_URL=amqp://guest:guest@rabbitmq/tgen_vhost
+    - BROKER_URL=redis://redis:6379/0
     - BROKER_USERNAME=guest
     - BROKER_PASSWORD=guest
-    - DEBUG=true
+    - DEBUG=false
     - ENV_MODE=local
+    - N_WORKERS=2
 
-  rabbitmq:
-    container_name: rabbitmq
-    image: "rabbitmq:3-management"
-    hostname: rabbitmq
-    environment:
-    - RABBITMQ_DEFAULT_VHOST=tgen_vhost
-    - RABBITMQ_DEFAULT_USER=guest
-    - RABBITMQ_DEFAULT_PASS=guest
-    ports:
-    - "5672:5672" # RabbitMQ
-    - "15672:15672" # Management interface
+  redis:
+    container_name: redis
+    image: redis:alpine
     networks:
-    - app_network
+    - safa_network
 
 networks:
-  app_network:
+  safa_network:
 
 volumes:
   tgen-volume:

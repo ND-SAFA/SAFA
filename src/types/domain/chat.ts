@@ -1,3 +1,5 @@
+import { ArtifactSchema, IconVariant } from "@/types";
+
 /**
  * Represents a chat message between SAFA and a user.
  */
@@ -18,6 +20,36 @@ export interface ChatMessageSchema {
    * Artifact IDs referenced in the message.
    */
   artifactIds: string[];
+}
+
+/**
+ * Represents a chat message between SAFA and a user, with additional display information.
+ */
+export interface DisplayChatMessageSchema extends ChatMessageSchema {
+  /**
+   * The icon class for the message.
+   */
+  iconClass: string | undefined;
+  /**
+   * The icon color for the message.
+   */
+  iconColor: string | undefined;
+  /**
+   * The icon variant for the message.
+   */
+  iconVariant: IconVariant;
+  /**
+   * The user name of the message sender.
+   */
+  userName: string;
+  /**
+   * The label for the references.
+   */
+  referenceLabel: string;
+  /**
+   * The artifacts referenced in the message.
+   */
+  artifacts: ArtifactSchema[];
 }
 
 export type ChatPermissionType = "owner" | "reader" | "editor";

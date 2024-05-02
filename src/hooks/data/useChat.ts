@@ -1,7 +1,14 @@
 import { defineStore } from "pinia";
 
-import { ChatMessageSchema, ProjectChatSchema } from "@/types";
+import {
+  ArtifactSchema,
+  ChatMessageSchema,
+  DisplayChatMessageSchema,
+  IconVariant,
+  ProjectChatSchema,
+} from "@/types";
 import { removeMatches } from "@/util";
+import { artifactStore, sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -18,6 +25,29 @@ export const useChat = defineStore("useChat", {
      */
     currentMessages(): ChatMessageSchema[] {
       return this.currentChat?.messages || [];
+    },
+    /**
+     * @returns The current chat messages with additional display data.
+     */
+    currentMessagesDisplay(): DisplayChatMessageSchema[] {
+      return (this.currentChat?.messages || []).map((message) => ({
+        ...message,
+        iconClass: message.isUser ? undefined : "bg-gradient",
+        iconColor: message.isUser ? "primary" : undefined,
+        iconVariant: (message.isUser ? "account" : "generate") as IconVariant,
+        userName: message.isUser ? sessionStore.userEmail : "SAFA",
+        referenceLabel:
+          message.artifactIds.length === 1
+            ? `1 Reference`
+            : `${message.artifactIds.length} References`,
+        artifacts: message.artifactIds
+          .map(
+            (artifactId) =>
+              artifactStore.getArtifactById(artifactId) ||
+              artifactStore.getArtifactByName(artifactId) // TODO: remove after mockup
+          )
+          .filter((artifact) => !!artifact) as ArtifactSchema[],
+      }));
     },
   },
   actions: {

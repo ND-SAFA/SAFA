@@ -77,20 +77,13 @@
                   :value="message.message"
                   default-expanded
                 />
-                <q-card flat bordered class="width-fit">
-                  <expansion-item
-                    v-if="message.artifactIds.length > 0"
-                    :label="message.referenceLabel"
-                    class="width-fit"
-                  >
-                    <artifact-list-display
-                      :artifacts="message.artifacts"
-                      @click="
-                        (artifact) => selectionStore.selectArtifact(artifact.id)
-                      "
-                    />
-                  </expansion-item>
-                </q-card>
+                <flex-box v-if="message.artifacts.length > 0">
+                  <artifact-chip
+                    v-for="relatedArtifact in message.artifacts"
+                    :key="relatedArtifact.id"
+                    :artifact="relatedArtifact"
+                  />
+                </flex-box>
               </div>
             </flex-box>
           </list-item>
@@ -141,50 +134,22 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { ArtifactSchema, IconVariant } from "@/types";
-import {
-  artifactStore,
-  chatApiStore,
-  chatStore,
-  layoutStore,
-  selectionStore,
-  sessionStore,
-} from "@/hooks";
+import { chatApiStore, chatStore, layoutStore } from "@/hooks";
 import {
   IconButton,
   ListItem,
   Typography,
   Icon,
   FlexBox,
-  ExpansionItem,
   TextButton,
 } from "@/components/common";
-import { ArtifactListDisplay } from "@/components/artifact";
+import { ArtifactChip } from "@/components/artifact";
 
 const currentMessage = ref("");
 
 const messages = computed(() => chatStore.currentMessages);
 
-const formattedMessages = computed(() =>
-  messages.value.map((message) => ({
-    ...message,
-    iconClass: message.isUser ? undefined : "bg-gradient",
-    iconColor: message.isUser ? "primary" : undefined,
-    iconVariant: (message.isUser ? "account" : "generate") as IconVariant,
-    userName: message.isUser ? sessionStore.userEmail : "SAFA",
-    referenceLabel:
-      message.artifactIds.length === 1
-        ? `1 Reference`
-        : `${message.artifactIds.length} References`,
-    artifacts: message.artifactIds
-      .map(
-        (artifactId) =>
-          artifactStore.getArtifactById(artifactId) ||
-          artifactStore.getArtifactByName(artifactId) // TODO: remove after mockup
-      )
-      .filter((artifact) => !!artifact) as ArtifactSchema[],
-  }))
-);
+const formattedMessages = computed(() => chatStore.currentMessagesDisplay);
 
 /**
  * Sends a chat message to the server.

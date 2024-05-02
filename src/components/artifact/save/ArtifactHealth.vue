@@ -28,23 +28,11 @@
       </flex-box>
       <div class="q-ml-sm q-mt-sm">
         <flex-box v-if="check.artifacts.length > 0">
-          <q-chip
+          <artifact-chip
             v-for="relatedArtifact in check.artifacts"
             :key="relatedArtifact.id"
-            color="background"
-            style="max-width: 300px; height: fit-content"
-            clickable
-          >
-            <typography :value="relatedArtifact.name" wrap />
-            <q-popup-proxy>
-              <artifact-body-display
-                clickable
-                display-title
-                :artifact="relatedArtifact"
-                @click="selectionStore.selectArtifact(relatedArtifact.id)"
-              />
-            </q-popup-proxy>
-          </q-chip>
+            :artifact="relatedArtifact"
+          />
         </flex-box>
         <flex-box v-if="check.concepts.length > 0">
           <q-chip
@@ -78,7 +66,6 @@ import {
   artifactStore,
   commentApiStore,
   commentStore,
-  selectionStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -88,7 +75,7 @@ import {
   FlexBox,
   TextButton,
 } from "@/components/common";
-import { ArtifactBodyDisplay } from "@/components/artifact/display";
+import { ArtifactChip } from "@/components/artifact/display";
 
 const artifact = computed(() =>
   artifactSaveStore.editedArtifact.body

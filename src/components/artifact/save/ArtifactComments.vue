@@ -22,86 +22,67 @@
       style="border-width: 0 0 0 2px !important"
       :action-cols="3"
     >
-      <flex-box full-width class="show-on-hover-parent">
-        <icon
-          :variant="comment.type === 'flag' ? 'flag' : 'account'"
-          size="sm"
-          class="q-mr-md"
-          :color="comment.type === 'flag' ? 'secondary' : undefined"
+      <popup-edit-input
+        :value="editedComment ? editedComment.content : ''"
+        multiline
+        :editing="editedComment && editedComment.id === comment.id"
+        @open="handleEditComment(comment)"
+        @close="handleCloseEditedComment"
+        @save="handleSaveEditedComment"
+      >
+        <template #icon>
+          <icon
+            :variant="comment.type === 'flag' ? 'flag' : 'account'"
+            size="sm"
+            class="q-mr-md"
+            :color="comment.type === 'flag' ? 'secondary' : undefined"
+          />
+        </template>
+        <typography :value="comment.userId" />
+        <typography
+          secondary
+          small
+          :value="timestampToDisplay(comment.updatedAt)"
+          l="2"
+          ellipsis
         />
-        <div class="full-width">
-          <div style="height: 30px">
-            <typography :value="comment.userId" />
-            <typography
-              secondary
-              small
-              :value="timestampToDisplay(comment.updatedAt)"
-              l="2"
-              ellipsis
-            />
-            <div
-              v-if="comment.status !== 'resolved'"
-              class="float-right show-on-hover-child"
-            >
-              <icon-button
-                small
-                icon="comment-resolve"
-                color="text"
-                tooltip="Resolve comment"
-                @click="handleResolveComment(comment)"
-              />
-              <icon-button
-                small
-                icon="edit"
-                tooltip="Edit comment"
-                @click="handleEditComment(comment)"
-              />
-              <icon-button
-                small
-                icon="delete"
-                tooltip="Delete comment"
-                @click="handleDeleteComment(comment)"
-              />
-            </div>
-            <div v-else class="float-right">
-              <icon-button
-                small
-                icon="comment"
-                color="text"
-                class="show-on-hover-child"
-                tooltip="Mark unresolved"
-                @click="handleResolveComment(comment)"
-              />
-              <typography secondary small value="Resolved" l="1" />
-            </div>
-          </div>
+        <template #actions>
+          <icon-button
+            v-if="comment.status !== 'resolved'"
+            small
+            icon="comment-resolve"
+            color="text"
+            tooltip="Resolve"
+            @click="handleResolveComment(comment)"
+          />
+          <icon-button
+            v-if="comment.status !== 'resolved'"
+            small
+            icon="delete"
+            tooltip="Delete"
+            @click="handleDeleteComment(comment)"
+          />
+          <icon-button
+            v-if="comment.status === 'resolved'"
+            small
+            icon="comment"
+            color="text"
+            class="show-on-hover-child"
+            tooltip="Unresolve"
+            @click="handleResolveComment(comment)"
+          />
+          <typography
+            v-if="comment.status === 'resolved'"
+            secondary
+            small
+            value="Resolved"
+            l="1"
+          />
+        </template>
+        <template #body>
           <typography :value="comment.content" el="p" />
-          <q-popup-edit
-            v-if="editedComment && editedComment.id === comment.id"
-            v-slot="scope"
-            v-model="editedComment.content"
-            @hide="handleCloseEditedComment"
-            @save="handleSaveEditedComment"
-          >
-            <q-input
-              v-model="scope.value"
-              autogrow
-              type="textarea"
-              dense
-              class="full-width"
-            >
-              <template #append>
-                <icon-button
-                  small
-                  icon="save"
-                  tooltip="Save comment"
-                  @click="scope.set"
-                />
-              </template>
-            </q-input>
-          </q-popup-edit>
-        </div>
-      </flex-box>
+        </template>
+      </popup-edit-input>
     </list-item>
     <q-input
       v-model="newComment"
@@ -176,6 +157,7 @@ import {
   IconButton,
   TextButton,
 } from "@/components/common";
+import PopupEditInput from "@/components/common/input/PopupEditInput.vue";
 
 const showResolved = ref(false);
 const newComment = ref("");

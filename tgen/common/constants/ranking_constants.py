@@ -10,7 +10,6 @@ ARTIFACT_HEADER = "Software Artifacts"
 VERSION_HEADER = "Section Versions"
 BODY_ARTIFACT_TITLE = f"# {ARTIFACT_HEADER}\nBelow are the artifact of the software system."
 BODY_VERSION_TITLE = f"# {VERSION_HEADER}\nBelow are the section versions for the software system."
-DEFAULT_SUMMARY_TOKENS = 4096
 DEFAULT_COMPLETION_TOKENS = 4096
 GENERATE_EXPLANATIONS_DEFAULT = True
 PROJECT_SUMMARY_HEADER = "Software Specification"

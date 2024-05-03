@@ -7,6 +7,7 @@ import {
   createProjectChat,
   createProjectChatMessage,
   deleteProjectChat,
+  editProjectChat,
   getProjectChatMessages,
   getProjectChats,
 } from "@/api";
@@ -40,9 +41,21 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
     }, {});
   }
 
+  async function handleEditProjectChat(title: string) {
+    await chatApi.handleRequest(async () => {
+      const chatId = chatStore.currentChat.id;
+
+      if (!chatId) return;
+
+      chatStore.currentChat.title = title;
+
+      await editProjectChat(chatStore.currentChat);
+    }, {});
+  }
+
   async function handleDeleteProjectChat() {
     await chatApi.handleRequest(async () => {
-      const chatId = chatStore.currentChat?.id;
+      const chatId = chatStore.currentChat.id;
 
       if (!chatId) return;
 
@@ -90,6 +103,7 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
     handleGetProjectChats,
     handleGetProjectChat,
     handleCreateProjectChat,
+    handleEditProjectChat,
     handleDeleteProjectChat,
     handleSendChatMessage,
   };

@@ -26,6 +26,10 @@ export interface ChatApiHook {
    */
   handleCreateProjectChat(): Promise<void>;
   /**
+   * Saves edits to the title of the current chat.
+   */
+  handleEditProjectChat(title: string): Promise<void>;
+  /**
    * Deletes a chat for the current project.
    * If the chat is the current chat, the current chat will be set to the next most recent.
    * @param chatId - The chat to delete.

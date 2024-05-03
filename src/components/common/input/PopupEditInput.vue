@@ -1,14 +1,16 @@
 <template>
-  <flex-box full-width class="show-on-hover-parent">
+  <flex-box :full-width="props.fullWidth" class="show-on-hover-parent">
     <slot name="icon" />
-    <div class="full-width">
-      <div style="min-height: 30px">
-        <slot />
-        <div v-if="!props.disabled" class="float-right show-on-hover-child">
+    <div :class="props.fullWidth ? 'full-width' : undefined">
+      <flex-box :full-width="props.fullWidth" align="center" justify="between">
+        <div>
+          <slot />
+        </div>
+        <div v-if="!props.disabled" class="q-ml-sm show-on-hover-child">
           <icon-button small icon="edit" tooltip="Edit" @click="emit('open')" />
           <slot name="actions" />
         </div>
-      </div>
+      </flex-box>
       <slot name="body" />
       <q-popup-edit
         v-if="props.editing"
@@ -50,6 +52,7 @@ const props = defineProps<{
   disabled?: boolean;
   editing?: boolean | null;
   multiline?: boolean;
+  fullWidth?: boolean;
 }>();
 
 const emit = defineEmits<{

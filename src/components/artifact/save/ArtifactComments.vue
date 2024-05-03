@@ -25,6 +25,7 @@
       <popup-edit-input
         :value="editedComment ? editedComment.content : ''"
         multiline
+        full-width
         :editing="editedComment && editedComment.id === comment.id"
         @open="handleEditComment(comment)"
         @close="handleCloseEditedComment"
@@ -156,8 +157,8 @@ import {
   Typography,
   IconButton,
   TextButton,
+  PopupEditInput,
 } from "@/components/common";
-import PopupEditInput from "@/components/common/input/PopupEditInput.vue";
 
 const showResolved = ref(false);
 const newComment = ref("");

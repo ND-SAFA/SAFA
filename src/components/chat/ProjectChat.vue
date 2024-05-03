@@ -51,6 +51,21 @@
     </q-drawer>
     <q-page-container>
       <q-page>
+        <popup-edit-input
+          :value="chatStore.currentChat.title"
+          :editing="editing"
+          @close="editing = false"
+          @open="editing = true"
+          @save="handleSaveEdit"
+        >
+          <typography
+            variant="subtitle"
+            :value="chatStore.currentChat.title"
+            el="h2"
+            class="q-py-sm q-pl-md"
+          />
+        </popup-edit-input>
+
         <div
           v-if="!chatApiStore.loading"
           style="max-width: 60vw; max-height: 70vh"
@@ -67,16 +82,12 @@
                   :color="message.iconColor"
                   :variant="message.iconVariant"
                   size="md"
-                  class="q-mr-md"
+                  class="q-mr-md q-mt-md"
                 />
               </div>
-              <div class="full-width">
+              <div class="q-pa-md bg-neutral rounded">
                 <typography variant="subtitle" :value="message.userName" />
-                <typography
-                  variant="expandable"
-                  :value="message.message"
-                  default-expanded
-                />
+                <typography variant="markdown" :value="message.message" />
                 <flex-box v-if="message.artifacts.length > 0">
                   <artifact-chip
                     v-for="relatedArtifact in message.artifacts"
@@ -144,8 +155,10 @@ import {
   TextButton,
 } from "@/components/common";
 import { ArtifactChip } from "@/components/artifact";
+import PopupEditInput from "@/components/common/input/PopupEditInput.vue";
 
 const currentMessage = ref("");
+const editing = ref(false);
 
 const messages = computed(() => chatStore.currentMessages);
 
@@ -160,7 +173,7 @@ function handleSendMessage() {
 }
 
 function handleCreateChat() {
-  chatStore.currentChat = undefined;
+  chatStore.addChat();
 }
 
 /**
@@ -170,6 +183,16 @@ function handleKeydown(e?: { key: string }) {
   if (e?.key === "Enter") {
     handleSendMessage();
   }
+}
+
+/**
+ * Saves an edit to the chat title.
+ * @param title - The new chat title.
+ */
+function handleSaveEdit(title: string) {
+  chatApiStore.handleEditProjectChat(title);
+
+  editing.value = false;
 }
 
 /**

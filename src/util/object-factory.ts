@@ -21,6 +21,7 @@ import {
   TraceLinkSchema,
   UploadPanelType,
   CreatorFilePanel,
+  ProjectChatSchema,
 } from "@/types";
 
 export function buildSnackbarMessage(): SnackbarMessage {
@@ -262,5 +263,17 @@ export function buildTeam(team: Partial<TeamSchema> = {}): TeamSchema {
     members: team.members || [],
     projects: team.projects || [],
     permissions: team?.permissions || [],
+  };
+}
+
+export function buildProjectChat(
+  chat: Partial<ProjectChatSchema> = {}
+): ProjectChatSchema {
+  return {
+    id: chat.id || "",
+    title: chat.title || "",
+    versionId: chat.versionId || "",
+    permission: chat.permission || "owner",
+    messages: chat.messages || [],
   };
 }

@@ -24,7 +24,7 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
 
   async function handleGetProjectChats() {
     await chatApi.handleRequest(async () => {
-      chatStore.initializeChats(await getProjectChats(projectStore.versionId));
+      chatStore.initializeChats(await getProjectChats());
     }, {});
   }
 

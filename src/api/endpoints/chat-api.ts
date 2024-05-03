@@ -95,17 +95,12 @@ export async function deleteProjectChat(chatId: string): Promise<void> {
  * @param versionId - The unique identifier of the version.
  * @returns All chat dialogues for the project.
  */
-export async function getProjectChats(
-  versionId: string
-): Promise<ProjectChatSchema[]> {
+export async function getProjectChats(): Promise<ProjectChatSchema[]> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
     return [EXAMPLE_NASA_CHAT, EXAMPLE_PROJECT_CHAT];
   }
 
-  return buildRequest<ProjectChatSchema[], "versionId", ChatMessageSchema>(
-    "getChats",
-    { versionId }
-  ).get();
+  return buildRequest<ProjectChatSchema[]>("getChats").get();
 }
 
 /**

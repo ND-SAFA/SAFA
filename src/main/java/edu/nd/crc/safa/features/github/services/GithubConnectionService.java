@@ -44,13 +44,15 @@ public interface GithubConnectionService {
                                                            String commitSha);
 
     /**
-     * @param credentials    User credentials
-     * @param repositoryName Repository name
-     * @param baseCommitSha  Commit checkpoint
-     * @param branchName     Branch name
+     * @param credentials     User credentials
+     * @param repositoryOwner Repository owner
+     * @param repositoryName  Repository name
+     * @param baseCommitSha   Commit checkpoint
+     * @param branchName      Branch name
      * @return Diff between the base commit and named branch.
      */
     GithubCommitDiffResponseDTO getDiffBetweenOldCommitAndHead(GithubAccessCredentials credentials,
+                                                               String repositoryOwner,
                                                                String repositoryName,
                                                                String baseCommitSha,
                                                                String branchName);

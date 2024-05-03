@@ -1,11 +1,11 @@
 import random
-from typing import List
 
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_pipeline import ConceptPipeline
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
 from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.contradictions.contradictions_detector import ContradictionsDetector
+from tgen.contradictions.contradictions_result import ContradictionsResult
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys, TraceRelationshipType
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
@@ -26,7 +26,8 @@ class HealthCheckJob(AbstractJob):
         :param concept_layer_id: The id of the layer containing concept artifacts.
         """
         super().__init__(job_args, require_data=True)
-        self.query_id = query_id if query_id.upper() != self.RANDOM_SELECTION else random.choice(self.job_args.dataset.artifact_df.index)
+        self.query_id = query_id if query_id.upper() != self.RANDOM_SELECTION else random.choice(
+            self.job_args.dataset.artifact_df.index)
         self.concept_layer_id = concept_layer_id
 
     def _run(self) -> HealthCheckResults:
@@ -35,13 +36,13 @@ class HealthCheckJob(AbstractJob):
         :return: Results from each health check.
         """
         dataset: PromptDataset = self.job_args.dataset
-        conflicting_ids = self._run_contradictions_detector()
+        contradictions_result = self._run_contradictions_detector()
         concept_matches = self._run_concept_matching(dataset.artifact_df)
         related_traces = dataset.trace_dataset.trace_df.get_relationships(artifact_id=self.query_id,
                                                                           artifact_key=TraceKeys.child_label())
         context_traces = [trace for trace in related_traces if trace[TraceKeys.RELATIONSHIP_TYPE] == TraceRelationshipType.CONTEXT]
         results = HealthCheckResults(context_traces=context_traces, concept_matches=concept_matches,
-                                     conflicting_ids=conflicting_ids)
+                                     contradictions=contradictions_result)
         return results
 
     def _run_concept_matching(self, artifact_df: ArtifactDataFrame) -> ConceptPipelineResponse:
@@ -57,13 +58,13 @@ class HealthCheckJob(AbstractJob):
         pipeline.run()
         return pipeline.state.response
 
-    def _run_contradictions_detector(self) -> List[str]:
+    def _run_contradictions_detector(self) -> ContradictionsResult:
         """
         Runs contradictions detector to identify any conflicting artifacts with the query artifact.
-        :return: Any ids of conflicting artifacts.
+        :return: Any ids of conflicting artifacts and an explanation as to why if some were found.
         """
         pipeline_params = self.job_args.get_args_for_pipeline(ContradictionsArgs)
         args = ContradictionsArgs(**pipeline_params)
         detector = ContradictionsDetector(args)
-        conflicting_ids = detector.detect(self.query_id)
-        return conflicting_ids
+        contradictions_result = detector.detect(self.query_id)
+        return contradictions_result

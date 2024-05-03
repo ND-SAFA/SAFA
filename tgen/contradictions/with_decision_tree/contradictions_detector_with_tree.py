@@ -4,10 +4,10 @@ from tgen.common.constants.model_constants import get_best_default_llm_manager_s
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.util.enum_util import EnumDict
-from tgen.contradictions.contradiction_decision_nodes import SupportedContradictionDecisionNodes
-from tgen.contradictions.contradictions_tree_builder import ContradictionsTreeBuilder
-from tgen.contradictions.requirement import Requirement
 from tgen.contradictions.requirements_converter import RequirementsConverter
+from tgen.contradictions.with_decision_tree.contradiction_decision_nodes import SupportedContradictionDecisionNodes
+from tgen.contradictions.with_decision_tree.contradictions_tree_builder import ContradictionsTreeBuilder
+from tgen.contradictions.with_decision_tree.requirement import Requirement
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys

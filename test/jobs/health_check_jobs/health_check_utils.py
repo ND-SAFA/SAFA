@@ -8,7 +8,6 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.jobs.health_check_jobs.health_check_results import HealthCheckResults
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
@@ -28,7 +27,7 @@ EXPECTED_RELATED_ARTIFACTS = EXPECTED_CONTEXT_IDS + EXISTING_CONCEPTS[:2]
 
 
 def assert_correct_related_artifacts(test_case: BaseTest, related_artifacts: List[EnumDict]):
-    related_ids = [a[ArtifactKeys.ID.value  ] for a in related_artifacts]
+    related_ids = [a[ArtifactKeys.ID.value] for a in related_artifacts]
     test_case.assertEqual(len(EXPECTED_CONTEXT_IDS), len(related_ids))
     for a_id in EXPECTED_CONTEXT_IDS:
         test_case.assertIn(a_id, related_ids)
@@ -45,7 +44,7 @@ def assert_correct_related_traces(test_case: BaseTest, related_traces: List[Enum
 
 
 def assert_health_check_success(test_case: BaseTest, result: Dict):
-    test_case.assertListEqual(result["conflicting_ids"], [EXPECTED_CONTRADICTION])
+    test_case.assertListEqual(result["contradictions"]["conflicting_ids"], [EXPECTED_CONTRADICTION])
     assert_correct_related_traces(test_case, result["context_traces"], EXPECTED_RELATED_ARTIFACTS, QUERY_ID)
     direct_matches = [a[ArtifactKeys.ID.value] for a in result["concept_matches"]['matches']]
     undefined_matches = [a[ArtifactKeys.ID.value] for a in result["concept_matches"]['undefined_entities']]

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, List, Set, Type, TypeVar, Union
+from typing import Any, Dict, Generic, List, Set, Type, TypeVar, Union, TypedDict
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
@@ -25,8 +25,14 @@ class PromptRoles:
 ROLE_KEY = "role"
 CONTENT_KEY = "content"
 
+
+class Message(TypedDict):
+    content: str
+    role: str
+
+
 MessageType = Dict[str, str]
-ConversationType = List[MessageType]
+ConversationType = List[Message]
 
 
 class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
@@ -93,7 +99,7 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         :param role: The role specifies if the message is from the user or assistant.
         :return: Dictionary containing message content and role.
         """
-        return {ROLE_KEY: role, CONTENT_KEY: prompt}
+        return Message(role=role, content=prompt)
 
     @abstractmethod
     def make_completion_request_impl(self, raise_exception: bool = True, original_responses: List = None,

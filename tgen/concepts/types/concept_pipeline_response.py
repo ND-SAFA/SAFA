@@ -1,5 +1,7 @@
 from typing import Dict, List, TypedDict
 
+from tgen.common.objects.artifact import Artifact
+from tgen.common.objects.trace import Trace
 from tgen.concepts.types.concept_match import ConceptMatch
 
 
@@ -15,8 +17,8 @@ class ConceptPipelineResponse(TypedDict):
     """
     List of predicted matches found in artifact.
     """
-    predicted_matches: List[str]
+    predicted_matches: List[Trace]
     """
     Undefined entities.
     """
-    undefined_entities: List[str]
+    undefined_entities: List[Artifact]

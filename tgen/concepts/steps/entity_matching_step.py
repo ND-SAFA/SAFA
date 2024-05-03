@@ -2,12 +2,13 @@ from typing import Dict, List
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.objects.artifact import Artifact
+from tgen.common.objects.trace import Trace
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.keys.structure_keys import ArtifactKeys
+from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.artifact_prompt import ArtifactPrompt
@@ -35,19 +36,17 @@ class EntityMatchingStep(AbstractPipelineStep):
         if not entities:
             state.predicted_matches = []
             return
-
-        previously_matched_concepts = set([m["id"] for m in state.direct_matches])
-        concepts: List[Artifact] = [a for a in self.strip_artifact_bodies(state.concept_df.to_artifacts())
-                                    if a[ArtifactKeys.ID] not in previously_matched_concepts]
+        concepts: List[Artifact] = self.strip_artifact_bodies(state.concept_df.to_artifacts())
 
         direct_match_ids = [match[ArtifactKeys.ID] for match in state.direct_matches]
 
         prompt_builders, prompts = self.create_prompts(entities, concepts, args.llm_manager, direct_match_ids)
         entity_predictions = self.generate_predictions(prompts, prompt_builders, args.llm_manager)
+        predicted_links = self.create_predicted_links(entities, entity_predictions, direct_match_ids)
 
         concept_artifact_ids = set([a[ArtifactKeys.ID] for a in concepts])
-        predicted_links = self.create_predicted_links(entities, entity_predictions, direct_match_ids)
-        predicted_links = [m for m in predicted_links if m in concept_artifact_ids]  # remove links with erroneous concept ids
+        predicted_links = [m for m in predicted_links if
+                           m[TraceKeys.TARGET] in concept_artifact_ids]  # remove links with erroneous concept ids
         state.predicted_matches = predicted_links
 
     @staticmethod
@@ -99,7 +98,7 @@ class EntityMatchingStep(AbstractPipelineStep):
 
     @staticmethod
     def create_predicted_links(entities: List[Artifact], entity_predictions: List[Dict],
-                               direct_match_ids: List[str]) -> List[str]:
+                               direct_match_ids: List[str]) -> List[Trace]:
         """
         Parses model predictions into links between entities and concepts.
         :param entities: The entities corresponding to each prediction.
@@ -107,20 +106,22 @@ class EntityMatchingStep(AbstractPipelineStep):
         :param direct_match_ids: Contains entities that have already been matched in the direct concept matching step.
         :return: List of trace links from entities to concepts.
         """
-        predicted_concepts = []
+        predicted_links = []
         entity_predictions = iter(entity_predictions)
         for entity_artifact in entities:
             if entity_artifact[ArtifactKeys.ID] in direct_match_ids:
                 continue
             entity_response = next(entity_predictions)
             seen_ids = set()
-            concept_matches = entity_response[EntityMatchingStep.MATCH_TAG]
-            for concept_match in concept_matches:
-                if concept_match in seen_ids:
+            entity_matches = entity_response[EntityMatchingStep.MATCH_TAG]
+            for matched_concept in entity_matches:
+                matched_entity = entity_artifact[ArtifactKeys.ID]
+                if matched_concept in seen_ids:
                     continue
-                predicted_concepts.append(concept_match)
-                seen_ids.add(concept_match)
-        return predicted_concepts
+                match_trace = Trace(source=matched_entity, target=matched_concept)
+                predicted_links.append(match_trace)
+                seen_ids.add(matched_concept)
+        return predicted_links
 
     @staticmethod
     def create_example_xml(target_text: str) -> str:

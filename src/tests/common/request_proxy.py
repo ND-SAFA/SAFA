@@ -12,19 +12,32 @@ from tgen.common.util.json_util import NpEncoder
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
+from tgen.models.llm.abstract_llm_manager import ConversationType
 
 
 class RequestProxy:
     CLIENT = None
 
     @staticmethod
+    def chat(dataset: ApiDefinition, chat_history: ConversationType) -> List[Trace]:
+        """
+        Creates chat with the model.
+        :param dataset: The dataset containing project artifacts for context.
+        :param chat_history: List of messages exchanged with the model.
+        :return: The model response and any artifacts used for context.
+        """
+        data = {"dataset": dataset, "chat_history": chat_history}
+        response = RequestProxy._request(AppEndpoints.CHAT, data)
+        return response
+
+    @staticmethod
     def health(dataset: ApiDefinition, query_id: str, concept_layer_id: str) -> List[Trace]:
         """
         Performs health checks on the query artifact.
-        :param dataset: The dataset containing artifacts and layers to trace.
+        :param dataset: The dataset containing project artifacts for context.
         :param query_id: The id of the query artifact under inspection.
         :param concept_layer_id: The id of the layer containing concept artifacts.
-        :return: The list of trace predictions.
+        :return: The health check results.
         """
         data = {"dataset": dataset, "query_id": query_id, "concept_layer_id": concept_layer_id}
         response = RequestProxy._request(AppEndpoints.HEALTH, data)

@@ -10,6 +10,7 @@ class AppEndpoints(Enum):
     API = "api"
     HGEN = "hgen"
     TGEN = "tgen"
+    CHAT = "chat"
     SUMMARIZE = "summarize"
     STATUS = "status"
     CANCEL = "cancel"

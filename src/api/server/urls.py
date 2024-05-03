@@ -23,6 +23,7 @@ from rest_framework import permissions
 
 from api.constants.config import get_current_version, get_home_page
 from api.endpoints.auth_view import generate_key
+from api.endpoints.gen.chat.chat_view import perform_chat
 from api.endpoints.gen.health_checks.health_check_view import perform_health_check
 from api.endpoints.gen.hgen.hgen_view import perform_hgen
 from api.endpoints.gen.summarize.summarize_view import perform_summarization_job, perform_summarization_sync
@@ -74,6 +75,7 @@ urlpatterns = [
     path(AppEndpoints.TGEN.as_path(), perform_trace_prediction),
     path(AppEndpoints.TGEN.as_path(suffix="sync"), perform_embedding_search),
     path(AppEndpoints.HGEN.as_path(), perform_hgen),
+    path(AppEndpoints.CHAT.as_path(), perform_chat),
     path(AppEndpoints.HEALTH.as_path(), perform_health_check),
     path(AppEndpoints.SUMMARIZE.as_path(), perform_summarization_job),
     path(AppEndpoints.SUMMARIZE.as_path(suffix="sync"), perform_summarization_sync),

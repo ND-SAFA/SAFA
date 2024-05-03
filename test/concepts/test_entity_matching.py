@@ -29,12 +29,11 @@ class TestEntityMatching(BaseTest):
         step = EntityMatchingStep()
         step.run(args, state)
 
-        predicted_links = state.predicted_matches
-        self.assertEqual(TestEntityMatching.N_MATCHES, len(predicted_links))
+        predicted_concepts = state.predicted_matches
+        self.assertEqual(TestEntityMatching.N_MATCHES, len(predicted_concepts))
         for i in range(TestEntityMatching.N_MATCHES):
-            link = predicted_links[i]
-            self.assertEqual(ConceptData.Predicted[i]["source"], link["source"])
-            self.assertEqual(ConceptData.Predicted[i]["target"], link["target"])
+            concept = predicted_concepts[i]
+            self.assertEqual(ConceptData.Predicted[i], concept)
 
     @staticmethod
     def mock_entity_matching(ai_manager: TestAIManager, matches: List = None) -> None:
@@ -43,6 +42,6 @@ class TestEntityMatching(BaseTest):
         :param ai_manager: AI manager to add responses to.
         :return:None.
         """
-        matches = [prediction["target"] for prediction in ConceptData.Predicted] + ["NA"] if not matches else matches
+        matches = [prediction for prediction in ConceptData.Predicted] + ["NA"] if not matches else matches
         responses = [EntityMatchingStep.create_example_xml(match) for match in matches]
         ai_manager.add_responses(responses)

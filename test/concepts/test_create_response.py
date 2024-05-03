@@ -47,7 +47,7 @@ class TestCreateResponse(BaseTest):
         tc.assertEqual(ConceptData.Expected.N_MULTI_MATCHES, len(res["multi_matches"]))  # 'Ground Speed' and 'Ground Station'
         tc.assertTrue(ConceptData.Expected.MULTI_MATCH_LOC in res["multi_matches"])
         tc.assertEqual(ConceptData.Expected.N_PREDICTED_MATCHES, len(res["predicted_matches"]))
-        tc.assertEqual(ConceptData.Predicted[0]["target"], res["predicted_matches"][0]["target"])
+        tc.assertEqual(ConceptData.Predicted[0], res["predicted_matches"][0])
         tc.assertEqual(ConceptData.Expected.N_UNDEFINED, len(res["undefined_entities"]))
         undefined_entity_artifact = res["undefined_entities"][0]
         tc.assertEqual(ConceptData.Entities.UNDEFINED, undefined_entity_artifact[ArtifactKeys.ID])

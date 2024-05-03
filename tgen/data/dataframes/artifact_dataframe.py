@@ -148,12 +148,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         Converts entries in data frame to converts.
         :return: The list of artifacts.
         """
-        artifacts = [Artifact(id=artifact_id,
-                              content=artifact_row[ArtifactKeys.CONTENT],
-                              layer_id=artifact_row[ArtifactKeys.LAYER_ID],
-                              summary=artifact_row[ArtifactKeys.SUMMARY],
-                              chunks=artifact_row[ArtifactKeys.CHUNKS])
-                     for artifact_id, artifact_row in self.itertuples()]
+        artifacts = [Artifact(**artifact_row) for artifact_id, artifact_row in self.itertuples()]
         return artifacts
 
     def get_body(self, artifact_id: str) -> str:

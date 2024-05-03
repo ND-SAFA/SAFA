@@ -7,7 +7,7 @@ from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, UNDERSCORE
 from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS, PS_QUESTIONS_HEADER, \
     USE_PROJECT_SUMMARY_SECTIONS
-from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, BODY_VERSION_TITLE
+from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_COMPLETION_TOKENS, BODY_VERSION_TITLE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
@@ -36,7 +36,7 @@ class ProjectSummarizer(BaseObject):
 
     def __init__(self, summarizer_args: SummarizerArgs, dataset: PromptDataset = None,
                  project_summary_versions: List[Summary] = None,
-                 reload_existing: bool = True, n_tokens: int = DEFAULT_SUMMARY_TOKENS,
+                 reload_existing: bool = True, n_tokens: int = DEFAULT_COMPLETION_TOKENS,
                  summarizer_id: str = str(uuid.uuid4())):
         """
         Generates a system specification document for containing all artifacts.

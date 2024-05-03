@@ -19,7 +19,7 @@ class TraceDataFrame(AbstractProjectDataFrame):
                         StructuredKeys.Trace.EXPLANATION.value,
                         StructuredKeys.Trace.RELATIONSHIP_TYPE.value]
     DEFAULT_FOR_OPTIONAL_COLS = EnumDict({StructuredKeys.Trace.RELATIONSHIP_TYPE: TraceRelationshipType.TRACEABILITY,
-                                          StructuredKeys.Trace.LABEL.value: 0,
+                                          StructuredKeys.Trace.LABEL.value: np.NAN,
                                           StructuredKeys.Trace.SCORE.value: np.NAN,
                                           StructuredKeys.Trace.EXPLANATION.value: None})
 
@@ -100,19 +100,31 @@ class TraceDataFrame(AbstractProjectDataFrame):
             self.link_as_dict(source_id=source, target_id=target, link_id=link_id, label=label, score=score, explanation=explanation,
                               relationship_type=relationship_type))
 
-    def get_links(self, true_only: bool = False, true_link_threshold: float = None) -> List[EnumDict]:
+    def get_links(self, true_only: bool = False, true_link_threshold: float = 0) -> List[EnumDict]:
         """
         Returns the links in the data frame.
         :param true_only: If True, only returns links with positive id.
         :param true_link_threshold: If selecting positive links only, considers scored links as true if above threshold.
+        (Set to None to only consider links with labels)
         :return: Traces in data frame.
         """
-        true_only = true_only or true_link_threshold is not None
-        links = []
-        for link_id, link in self.itertuples():
-            if not true_only or link[TraceKeys.LABEL] == 1 or (true_link_threshold and link[TraceKeys.SCORE] >= true_link_threshold):
-                links.append(link)
+        true_only = true_only or bool(true_link_threshold)
+        links = [link for link_id, link in self.itertuples() if not true_only or
+                 self.is_true_link(link, true_link_threshold=true_link_threshold)]
         return links
+
+    @staticmethod
+    def is_true_link(link: EnumDict, true_link_threshold: float = 0) -> bool:
+        """
+        Determines whether the link is a true (positive) link.
+        :param link: The link to determine if it is true.
+        :param true_link_threshold: If selecting positive links only, considers scored links as true if above threshold.
+        (Set to None to only consider links with labels)
+        """
+        use_scores = true_link_threshold is not None
+        if link[TraceKeys.LABEL] == 0:
+            return False
+        return link[TraceKeys.LABEL] == 1 or (use_scores and link[TraceKeys.SCORE] >= true_link_threshold)
 
     def get_link(self, link_id: int = None, source_id: Any = None, target_id: Any = None) -> EnumDict:
         """

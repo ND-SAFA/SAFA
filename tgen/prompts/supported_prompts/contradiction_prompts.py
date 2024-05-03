@@ -96,10 +96,10 @@ def format_response(tag: str, value: str) -> Optional[List[str]]:
     return conflicting_ids
 
 
-CONTRADICTIONS_INSTRUCTIONS = "Consider whether the following requirement is inconsistent or contradictory with any of the " \
+CONTRADICTIONS_INSTRUCTIONS = "Consider whether the following software artifact is inconsistent or contradictory with any of the " \
                               "related pieces of information. "
 CONTRADICTIONS_TASK_PROMPT = Prompt("Output the ids of any contradictory or inconsistent information in a comma-deliminated list."
-                                    "If all the information entails or is neutral to the requirement, simply respond with no.",
+                                    "If all the information entails or is neutral to the artifact, simply respond with no.",
                                     title=f"Task",
                                     response_manager=PromptResponseManager(response_tag="contradictions",
                                                                            value_formatter=format_response))

@@ -33,6 +33,9 @@ class EntityMatchingStep(AbstractPipelineStep):
         :return: None
         """
         entities: List[Artifact] = self.strip_artifact_bodies(state.entity_df.to_artifacts())
+        if not entities:
+            state.predicted_matches = []
+            return
         concepts: List[Artifact] = self.strip_artifact_bodies(state.concept_df.to_artifacts())
 
         direct_match_ids = [match[ArtifactKeys.ID] for match in state.direct_matches]

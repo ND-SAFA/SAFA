@@ -1,6 +1,7 @@
 from typing import List, Dict
 
-from test.tracing.data_test_context import get_dataset_for_context, QUERY, assert_correct_related_artifacts, EXPECTED_CONTEXT_IDS
+from test.jobs.health_check_jobs.health_check_utils import QUERY, EXPECTED_CONTEXT_IDS, assert_correct_related_artifacts, \
+    get_dataset_for_context
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.chat_jobs.chat_job import ChatJob

@@ -7,8 +7,8 @@ import {
   IconVariant,
   ProjectChatSchema,
 } from "@/types";
-import { removeMatches } from "@/util";
-import { artifactStore, sessionStore } from "@/hooks";
+import { buildProjectChat, removeMatches } from "@/util";
+import { artifactStore, projectStore, sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -17,20 +17,20 @@ import { pinia } from "@/plugins";
 export const useChat = defineStore("useChat", {
   state: () => ({
     chats: [] as ProjectChatSchema[],
-    currentChat: undefined as ProjectChatSchema | undefined,
+    currentChat: buildProjectChat(),
   }),
   getters: {
     /**
      * @returns The current chat messages.
      */
     currentMessages(): ChatMessageSchema[] {
-      return this.currentChat?.messages || [];
+      return this.currentChat.messages;
     },
     /**
      * @returns The current chat messages with additional display data.
      */
     currentMessagesDisplay(): DisplayChatMessageSchema[] {
-      return (this.currentChat?.messages || []).map((message) => ({
+      return this.currentChat.messages.map((message) => ({
         ...message,
         iconClass: message.isUser ? undefined : "bg-gradient",
         iconColor: message.isUser ? "primary" : undefined,
@@ -66,9 +66,14 @@ export const useChat = defineStore("useChat", {
      * Add a chat to the store, and sets it as the current.
      * @param chat
      */
-    addChat(chat: ProjectChatSchema): void {
-      this.chats.push(chat);
-      this.currentChat = chat;
+    addChat(chat: Partial<ProjectChatSchema> = {}): void {
+      const fullChat = buildProjectChat({
+        versionId: projectStore.versionId,
+        ...chat,
+      });
+
+      this.chats.push(fullChat);
+      this.currentChat = fullChat;
     },
     /**
      * Delete a chat from the store.
@@ -78,7 +83,7 @@ export const useChat = defineStore("useChat", {
     deleteChat(chatId: string): void {
       this.chats = this.chats.filter((chat) => chat.id !== chatId);
 
-      if (this.currentChat?.id === chatId) {
+      if (this.currentChat.id === chatId) {
         this.currentChat = this.chats[0] || this.chats[0];
       }
     },
@@ -89,7 +94,7 @@ export const useChat = defineStore("useChat", {
     updateChat(chat: ProjectChatSchema): void {
       this.chats = [...removeMatches(this.chats, "id", [chat.id]), chat];
 
-      if (chat.id === this.currentChat?.id) {
+      if (chat.id === this.currentChat.id) {
         this.currentChat = chat;
       }
     },

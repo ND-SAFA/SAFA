@@ -78,6 +78,27 @@ export async function createProjectChat(
 }
 
 /**
+ * Edits the title of a project chat.
+ * @param chat - The chat dialogue to edit.
+ * @returns The chat dialogue with the new title.
+ */
+export async function editProjectChat(
+  chat: ProjectChatSchema
+): Promise<ProjectChatSchema> {
+  if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
+    return chat;
+  }
+
+  return buildRequest<
+    ProjectChatSchema,
+    "chatId",
+    Pick<ProjectChatSchema, "title">
+  >("editChat", {
+    chatId: chat.id,
+  }).put({ title: chat.title });
+}
+
+/**
  * Delete a chat dialogue for a project.
  * @param chatId - The unique identifier of the chat dialogue.
  */

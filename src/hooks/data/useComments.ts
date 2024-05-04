@@ -5,7 +5,6 @@ import {
   ArtifactCommentsSchema,
   ArtifactSchema,
   BasicCommentSchema,
-  CommentSchema,
   DisplayableHealthCheckSchema,
   IconVariant,
   ThemeColor,

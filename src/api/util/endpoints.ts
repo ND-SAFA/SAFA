@@ -220,7 +220,7 @@ export enum Endpoint {
   editComment = "comments/:commentId",
   deleteComment = "comments/:commentId",
   resolveComment = "comments/:commentId/resolve",
-  generateHealthChecks = "health/versions/:versionId/artifacts",
+  generateHealthChecks = "health/versions/:versionId",
 
   // Chat
 

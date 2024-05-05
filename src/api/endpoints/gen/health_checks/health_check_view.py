@@ -1,4 +1,4 @@
-from api.endpoints.gen.health_checks.health_check_serializer import HealthCheckSerializer, HealthCheckRequest
+from api.endpoints.gen.health_checks.health_check_serializer import HealthCheckRequest, HealthCheckSerializer
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
 from tgen.jobs.health_check_jobs.health_check_job import HealthCheckJob

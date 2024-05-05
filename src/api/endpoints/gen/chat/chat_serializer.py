@@ -34,4 +34,22 @@ class ChatSerializer(AbstractSerializer):
         message_serializer = MessageSerializer(data=validated_data["chat_history"], many=True)
         message_serializer.is_valid(raise_exception=True)
         chat_history = message_serializer.save()
+        self._assert_valid_history(chat_history)
         return ChatRequest(dataset=dataset, chat_history=chat_history)
+
+    @staticmethod
+    def _assert_valid_history(chat_history: List[Message]):
+        """
+        Asserts chat history constraints.
+        :param chat_history: List of messages in chat.
+        :return:
+        """
+        if len(chat_history) == 0:
+            raise ValueError("No messages given to chat.")
+        if chat_history[-1]["role"] != "user":
+            raise ValueError("Last message must be user message.")
+
+        for i in range(0, len(chat_history) - 1):
+            if chat_history[i]["role"] == chat_history[i + 1]["role"]:
+                role = chat_history[i]["role"]
+                raise ValueError(f"Found two messages with {role} in a row.")

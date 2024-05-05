@@ -60,4 +60,5 @@ class ChatJob(AbstractJob):
         output = self.llm_manager.make_completion_request(completion_type=LLMCompletionType.GENERATION,
                                                           prompt=self.chat_history)
         response = output.batch_responses[0]
+        related_artifacts = related_artifacts if related_artifacts else []
         return response, related_artifacts

@@ -10,7 +10,7 @@ from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys, LayerKeys, TraceRelationshipType
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys, TraceRelationshipType
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt
@@ -53,7 +53,7 @@ class ContradictionsDetector:
             self.args.dataset.trace_dataset = TraceDataset(artifact_df, trace_df, layer_df)
         self.args.dataset.trace_dataset.trace_df = self._add_traces_to_df(all_relationships, trace_df)
         conflicting_ids = [a_id for a_id in conflicting_ids if a_id in artifact_df]
-        return conflicting_ids if conflicting_ids else None
+        return conflicting_ids if conflicting_ids else []
 
     def _perform_detections(self, query_id: str, id2context: Dict[str, List[EnumDict]]) -> Optional[List[str]]:
         """

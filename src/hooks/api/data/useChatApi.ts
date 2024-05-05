@@ -39,12 +39,12 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
     }, {});
   }
 
-  async function handleCreateProjectChat(): Promise<
-    ProjectChatSchema | undefined
-  > {
+  async function handleCreateProjectChat(
+    title?: string
+  ): Promise<ProjectChatSchema | undefined> {
     let chatCreated; // Define the variable to store the chat creation result
     await chatApi.handleRequest(async () => {
-      chatCreated = await createProjectChat(projectStore.versionId);
+      chatCreated = await createProjectChat(projectStore.versionId, title);
       chatStore.addChat(chatCreated); // Use the chatCreated variable
     }, {});
     return chatCreated; // Return the chatCreated variable
@@ -97,7 +97,7 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
        */
       if (!chat.id) {
         chatStore.deleteChat(""); // todo: better way to delete empty current chat?
-        const chatCreated = await handleCreateProjectChat(); // sets chat with id in store.
+        const chatCreated = await handleCreateProjectChat(chat.title); // sets chat with id in store.
         if (chatCreated) {
           chat = chatCreated;
         } else {

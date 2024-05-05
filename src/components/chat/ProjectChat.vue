@@ -177,6 +177,10 @@ function handleCreateChat() {
   chatStore.addChat();
 }
 
+/**
+ * Switches chat and loads its messages afterwards.
+ * @param chat The chat to switch to.
+ */
 function handleSwitchChat(chat: ProjectChatSchema) {
   chatStore.switchChat(chat);
   chatApiStore.handleLoadProjectChatMessages(chat.id);

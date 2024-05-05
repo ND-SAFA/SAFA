@@ -1,4 +1,5 @@
 import { ComputedRef } from "vue";
+import { ProjectChatSchema } from "@/types";
 
 /**
  * Represents actions that can be performed on the chat API.
@@ -17,14 +18,14 @@ export interface ChatApiHook {
    */
   handleGetProjectChats(): Promise<void>;
   /**
-   * Loads a chat for the project.
-   * @param chatId - The chat to load.
+   * Retrieves messages for given chat and updates store.
+   * @param chatId - ID of chat to load messages for.
    */
-  handleGetProjectChat(chatId: string): Promise<void>;
+  handleLoadProjectChatMessages(chatId: string): Promise<void>;
   /**
    * Creates a new chat for the current project, and sets it as the current chat.
    */
-  handleCreateProjectChat(): Promise<void>;
+  handleCreateProjectChat(): Promise<ProjectChatSchema | undefined>;
   /**
    * Saves edits to the title of the current chat.
    */
@@ -37,7 +38,11 @@ export interface ChatApiHook {
   handleDeleteProjectChat(chatId: string): Promise<void>;
   /**
    * Sends a chat message to the current chat.
+   * @param chat - The chat to send the message in.
    * @param message - The message to send.
    */
-  handleSendChatMessage(message: string): Promise<void>;
+  handleSendChatMessage(
+    chat: ProjectChatSchema,
+    message: string
+  ): Promise<void>;
 }

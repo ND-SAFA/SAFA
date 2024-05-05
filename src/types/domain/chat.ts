@@ -1,6 +1,20 @@
 import { ArtifactSchema, IconVariant } from "@/types";
 
 /**
+ * Represents response for a successful send of a user message.
+ */
+export interface ChatMessageSendResponse {
+  /**
+   * Saved user message containing persistent properties (e.g ID and timestamp)
+   */
+  userMessage: ChatMessageSchema;
+  /**
+   * Saved assistant response.
+   */
+  responseMessage: ChatMessageSchema;
+}
+
+/**
  * Represents a chat message between SAFA and a user.
  */
 export interface ChatMessageSchema {

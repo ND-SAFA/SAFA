@@ -37,7 +37,7 @@
         clickable
         :focused="chatStore.currentChat?.id === chat.id"
         :action-cols="1"
-        @click="chatStore.switchChat(chat)"
+        @click="handleSwitchChat(chat)"
       >
         <template #actions>
           <icon-button
@@ -118,13 +118,13 @@
             placeholder="Ask a question"
             class="full-width bg-neutral"
             clearable
-            @keydown="handleKeydown"
+            @keydown="handleKeydown($event, chatStore.currentChat)"
           >
             <template #append>
               <icon-button
                 icon="forward"
                 tooltip="Send message"
-                @click="handleSendMessage"
+                @click="handleSendMessage(chatStore.currentChat)"
               />
             </template>
           </q-input>
@@ -145,6 +145,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
+import { ProjectChatSchema } from "@/types";
 import { chatApiStore, chatStore, layoutStore } from "@/hooks";
 import {
   IconButton,
@@ -167,8 +168,8 @@ const formattedMessages = computed(() => chatStore.currentMessagesDisplay);
 /**
  * Sends a chat message to the server.
  */
-function handleSendMessage() {
-  chatApiStore.handleSendChatMessage(currentMessage.value);
+function handleSendMessage(chat: ProjectChatSchema) {
+  chatApiStore.handleSendChatMessage(chat, currentMessage.value);
   currentMessage.value = "";
 }
 
@@ -176,12 +177,20 @@ function handleCreateChat() {
   chatStore.addChat();
 }
 
+function handleSwitchChat(chat: ProjectChatSchema) {
+  chatStore.switchChat(chat);
+  chatApiStore.handleLoadProjectChatMessages(chat.id);
+}
+
 /**
- * Emits an event when enter is clicked.
+ * Emits an event when enter is clicked and sends the message associated with the specific chat.
+ * @param e - The keyboard event.
+ * @param chat - The chat object to which the message will be sent.
  */
-function handleKeydown(e?: { key: string }) {
-  if (e?.key === "Enter") {
-    handleSendMessage();
+function handleKeydown(e: KeyboardEvent, chat: ProjectChatSchema) {
+  if (e.key === "Enter") {
+    handleSendMessage(chat);
+    e.preventDefault(); // To prevent form submission or other default actions
   }
 }
 

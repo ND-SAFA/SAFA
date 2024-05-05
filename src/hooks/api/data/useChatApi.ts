@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
-import { ChatApiHook, ChatMessageSchema } from "@/types";
+import { ChatApiHook, ChatMessageSchema, ProjectChatSchema } from "@/types";
 import { chatStore, projectStore, useApi } from "@/hooks";
 import {
   createProjectChat,
@@ -26,19 +26,28 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
   async function handleGetProjectChats() {
     await chatApi.handleRequest(async () => {
       chatStore.initializeChats(await getProjectChats());
+      await handleLoadProjectChatMessages(chatStore.currentChat.id);
     }, {});
   }
 
-  async function handleGetProjectChat(chatId: string) {
+  async function handleLoadProjectChatMessages(chatId: string) {
+    if (!chatId) {
+      return; // on mounted might have default chat with no id
+    }
     await chatApi.handleRequest(async () => {
       chatStore.updateChat(await getProjectChatMessages(chatId));
     }, {});
   }
 
-  async function handleCreateProjectChat() {
+  async function handleCreateProjectChat(): Promise<
+    ProjectChatSchema | undefined
+  > {
+    let chatCreated; // Define the variable to store the chat creation result
     await chatApi.handleRequest(async () => {
-      chatStore.addChat(await createProjectChat(projectStore.versionId));
+      chatCreated = await createProjectChat(projectStore.versionId);
+      chatStore.addChat(chatCreated); // Use the chatCreated variable
     }, {});
+    return chatCreated; // Return the chatCreated variable
   }
 
   async function handleEditProjectChat(title: string) {
@@ -56,43 +65,63 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
   async function handleDeleteProjectChat() {
     await chatApi.handleRequest(async () => {
       const chatId = chatStore.currentChat.id;
-
-      if (!chatId) return;
-
-      await deleteProjectChat(chatId);
-
+      if (chatId) {
+        await deleteProjectChat(chatId);
+      }
       chatStore.deleteChat(chatId);
     }, {});
   }
 
-  async function handleSendChatMessage(message: string) {
+  async function handleSendChatMessage(
+    chat: ProjectChatSchema,
+    message: string
+  ) {
     await chatDialogApi.handleRequest(async () => {
-      const fullMessage: ChatMessageSchema = {
+      const newMessage: ChatMessageSchema = {
         id: "",
         isUser: true,
         message,
         artifactIds: [],
       };
 
-      if (!chatStore.currentChat) {
-        await handleCreateProjectChat();
+      if (!chat) return;
+
+      /**
+       * BUG
+       * Slight problem here, currentChat could be switched at anytime
+       * which is why this now accepts the chat to send the message in.
+       * However, handleCreateProjectChat will create the currentChat
+       * and set the new response there. So, there is a chance that the user
+       * sends their first message, jumps to another chat and sends another message,
+       * and so when the first chat is done creating currentChat could have switched.
+       */
+      if (!chat.id) {
+        chatStore.deleteChat(""); // todo: better way to delete empty current chat?
+        const chatCreated = await handleCreateProjectChat(); // sets chat with id in store.
+        if (chatCreated) {
+          chat = chatCreated;
+        } else {
+          return; //error occurred while saving chat.
+        }
       }
 
-      if (!chatStore.currentChat) return;
-
       chatStore.updateChat({
-        ...chatStore.currentChat,
-        messages: [...chatStore.currentChat.messages, fullMessage],
+        ...chat,
+        messages: [...chat.messages, newMessage],
       });
 
-      const responseMessage = await createProjectChatMessage(
-        chatStore.currentChat.id,
-        fullMessage
+      const messagesCreated = await createProjectChatMessage(
+        chat.id,
+        newMessage
       );
 
       chatStore.updateChat({
-        ...chatStore.currentChat,
-        messages: [...chatStore.currentChat.messages, responseMessage],
+        ...chat,
+        messages: [
+          ...chat.messages.slice(0, -1), // everything but last user message
+          messagesCreated.userMessage,
+          messagesCreated.responseMessage,
+        ],
       });
     }, {});
   }
@@ -101,7 +130,7 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
     loading,
     loadingResponse,
     handleGetProjectChats,
-    handleGetProjectChat,
+    handleLoadProjectChatMessages,
     handleCreateProjectChat,
     handleEditProjectChat,
     handleDeleteProjectChat,

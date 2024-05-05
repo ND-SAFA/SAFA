@@ -1,5 +1,6 @@
 import {
   ChatMessageSchema,
+  ChatMessageSendResponse,
   CreateProjectChatSchema,
   ProjectChatSchema,
 } from "@/types";
@@ -11,6 +12,11 @@ const EXAMPLE_SAFA_MESSAGE: ChatMessageSchema = {
   isUser: false,
   message: "Hello! How can I help you?",
   artifactIds: [],
+};
+
+const EXAMPLE_SAFA_MESSAGE_RESPONSE = {
+  userMessage: EXAMPLE_SAFA_MESSAGE,
+  responseMessage: EXAMPLE_SAFA_MESSAGE,
 };
 
 const EXAMPLE_PROJECT_CHAT: ProjectChatSchema = {
@@ -133,13 +139,13 @@ export async function getProjectChats(): Promise<ProjectChatSchema[]> {
 export async function createProjectChatMessage(
   chatId: string,
   message: ChatMessageSchema
-): Promise<ChatMessageSchema> {
+): Promise<ChatMessageSendResponse> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
-    return EXAMPLE_SAFA_MESSAGE;
+    return EXAMPLE_SAFA_MESSAGE_RESPONSE;
   }
 
-  return buildRequest<ChatMessageSchema, "chatId", ChatMessageSchema>(
-    "getChats",
+  return buildRequest<ChatMessageSendResponse, "chatId", ChatMessageSchema>(
+    "createChatMessage",
     { chatId }
   ).post(message);
 }
@@ -156,7 +162,7 @@ export async function getProjectChatMessages(
     return EXAMPLE_PROJECT_CHAT;
   }
 
-  return buildRequest<ProjectChatSchema, "chatId">("getChats", {
+  return buildRequest<ProjectChatSchema, "chatId">("getChatMessages", {
     chatId,
   }).get();
 }

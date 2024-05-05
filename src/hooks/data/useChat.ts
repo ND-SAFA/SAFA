@@ -7,7 +7,7 @@ import {
   IconVariant,
   ProjectChatSchema,
 } from "@/types";
-import { buildProjectChat, removeMatches } from "@/util";
+import { buildProjectChat } from "@/util";
 import { artifactStore, projectStore, sessionStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
@@ -53,7 +53,7 @@ export const useChat = defineStore("useChat", {
   actions: {
     initializeChats(chats: ProjectChatSchema[]): void {
       this.chats = chats;
-      this.currentChat = chats[0];
+      this.currentChat = chats[0] || buildProjectChat();
     },
     /**
      * Switch the current chat.
@@ -64,16 +64,19 @@ export const useChat = defineStore("useChat", {
     },
     /**
      * Add a chat to the store, and sets it as the current.
+     * No-operation is performed if current chat does not have ID set.
      * @param chat
      */
     addChat(chat: Partial<ProjectChatSchema> = {}): void {
-      const fullChat = buildProjectChat({
+      if (chat.id === undefined && this.chats.map((c) => c.id).includes("")) {
+        return; // blocks spamming the `create` button
+      }
+      const newChat = buildProjectChat({
         versionId: projectStore.versionId,
         ...chat,
       });
-
-      this.chats.push(fullChat);
-      this.currentChat = fullChat;
+      this.chats.push(newChat);
+      this.currentChat = newChat;
     },
     /**
      * Delete a chat from the store.
@@ -84,16 +87,20 @@ export const useChat = defineStore("useChat", {
       this.chats = this.chats.filter((chat) => chat.id !== chatId);
 
       if (this.currentChat.id === chatId) {
-        this.currentChat = this.chats[0] || this.chats[0];
+        // setes first chat or new empty chat if none left
+        this.currentChat = this.chats[0] || buildProjectChat();
       }
     },
     /**
-     * Update the current chat with new data.
+     * Update the current chat with new data, retaining order of chats.
      * @param chat - The chat data to update.
      */
     updateChat(chat: ProjectChatSchema): void {
-      this.chats = [...removeMatches(this.chats, "id", [chat.id]), chat];
-
+      const index = this.chats.findIndex((c) => c.id === chat.id);
+      if (index === -1) {
+        return;
+      }
+      this.chats[index] = chat;
       if (chat.id === this.currentChat.id) {
         this.currentChat = chat;
       }

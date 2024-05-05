@@ -271,7 +271,7 @@ export function buildProjectChat(
 ): ProjectChatSchema {
   return {
     id: chat.id || "",
-    title: chat.title || "",
+    title: chat.title || "New Chat",
     versionId: chat.versionId || "",
     permission: chat.permission || "owner",
     messages: chat.messages || [],

@@ -1,26 +1,26 @@
 package edu.nd.crc.safa.features.health;
 
 import java.util.List;
-import java.util.Map;
 
+import edu.nd.crc.safa.features.generation.common.GenerationLink;
+
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
 
 @Data
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class HealthGenResponse {
     /**
-     * List of direct matches with concept artifacts.
+     * List of concept matches.
      */
-    private List<ConceptMatchDTO> matches;
+    private ConceptGenResponse conceptMatches;
     /**
-     * Map of location matched to the multiple concepts matched at that location.
+     * List of Artifact IDs that experience a contradiction with target artifact.
      */
-    private Map<Integer, List<ConceptMatchDTO>> multiMatches;
+    private List<String> conflictingIds;
     /**
-     * List of traces predicted between concept and artifact.
+     * Links of project artifacts to target artifact.
      */
-    private List<String> predictedMatches;
-    /**
-     * List of entities found in artifact but missing in concept artifacts.
-     */
-    private List<String> undefinedEntities;
+    private List<GenerationLink> contextTraces;
 }

@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.comments.entities.persistent;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum CommentType {
     /**
      * Comment left by another user.
@@ -28,5 +30,10 @@ public enum CommentType {
     /**
      * Generated notification that a concept in artifact was matched with multiple.
      */
-    MULTI_MATCHED_CONCEPT
+    MULTI_MATCHED_CONCEPT;
+
+    @JsonValue
+    public String toLower() {
+        return this.name().toLowerCase();
+    }
 }

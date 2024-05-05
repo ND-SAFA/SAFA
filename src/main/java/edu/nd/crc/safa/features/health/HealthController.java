@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
@@ -12,6 +13,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,18 +25,18 @@ public class HealthController extends BaseController {
     /**
      * Generates health checks for an artifact.
      *
-     * @param versionId  ID of version artifact.
-     * @param artifactId ID of artifact generating checks for.
+     * @param versionId ID of version artifact.
+     * @param artifact  Artifact generating health checks for.
      * @return Response containing all health checks found.
      */
     @PostMapping(AppRoutes.Health.GENERATE)
-    public HealthResponse generateHealthChecks(@PathVariable UUID versionId, @PathVariable UUID artifactId) {
+    public HealthResponse generateHealthChecks(@PathVariable UUID versionId, @RequestBody ArtifactAppEntity artifact) {
         SafaUser currentUser = getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(versionId)
             .asUser(currentUser)
             .withPermission(ProjectPermission.EDIT)
             .get();
-        return getServiceProvider().getHealthService().performArtifactHealthChecks(projectVersion, artifactId);
+        return getServiceProvider().getHealthService().performArtifactHealthChecks(projectVersion, artifact);
     }
 }

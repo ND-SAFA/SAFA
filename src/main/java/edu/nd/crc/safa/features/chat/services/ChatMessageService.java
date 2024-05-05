@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.chat.services;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
+import org.javatuples.Pair;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -44,22 +46,32 @@ public class ChatMessageService {
      * @return The response from the AI.
      */
     public SendChatMessageResponse sendChatMessage(Chat chat, String message, SafaUser author) {
-        List<ChatMessage> chatMessages = chatMessageRepository.findByChatOrderByCreatedAsc(chat);
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatOrderByCreatedAtAsc(chat);
 
         ChatMessage userMessage = new ChatMessage();
-
+        userMessage.setCreatedAt(LocalDateTime.now());
         userMessage.setContent(message);
         userMessage.setUser(true);
         userMessage.setChat(chat);
         userMessage.setAuthor(author);
 
-        chatMessageRepository.save(userMessage);
+        Pair<ChatMessage, List<ChatMessageArtifact>> response = generateChatResponse(
+            userMessage,
+            chatMessages,
+            chat.getProjectVersion());
+        ChatMessage responseMessage = response.getValue0();
+        List<ChatMessageArtifact> responseMessageArtifacts = response.getValue1();
 
-        ChatMessageDTO responseMessage = generateChatResponse(userMessage, chatMessages, chat.getProjectVersion());
+        chatMessageRepository.save(userMessage);
+        chatMessageRepository.save(responseMessage);
+        chatMessageArtifactRepository.saveAll(responseMessageArtifacts);
 
         return new SendChatMessageResponse(
             ChatMessageDTO.asUserMessage(userMessage),
-            responseMessage
+            ChatMessageDTO.asResponseMessage(
+                responseMessage,
+                responseMessageArtifacts.stream().map(r -> r.getArtifact().getArtifactId()).toList()
+            )
         );
     }
 
@@ -71,7 +83,7 @@ public class ChatMessageService {
      */
     public List<ChatMessageDTO> getChatMessages(Chat chat) {
         List<ChatMessageArtifact> chatMessageArtifacts = chatMessageArtifactRepository.findByMessageChat(chat);
-        List<ChatMessage> chatMessages = chatMessageRepository.findByChatOrderByCreatedAsc(chat);
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatOrderByCreatedAtAsc(chat);
         List<ChatMessageDTO> chatMessageDTOS = new ArrayList<>();
         Map<UUID, List<ChatMessageArtifact>> message2artifacts = ProjectDataStructures
             .createGroupLookup(chatMessageArtifacts, c -> c.getMessage().getId());
@@ -92,9 +104,9 @@ public class ChatMessageService {
      * @param projectVersion Project version used to retrieve artifacts going into response context.
      * @return DTO of response to user message.
      */
-    private ChatMessageDTO generateChatResponse(ChatMessage userMessage,
-                                                List<ChatMessage> chatMessages,
-                                                ProjectVersion projectVersion) {
+    private Pair<ChatMessage, List<ChatMessageArtifact>> generateChatResponse(ChatMessage userMessage,
+                                                                              List<ChatMessage> chatMessages,
+                                                                              ProjectVersion projectVersion) {
         ChatMessage responseMessage = new ChatMessage();
         responseMessage.setChat(userMessage.getChat());
         responseMessage.setAuthor(userMessage.getAuthor());
@@ -104,7 +116,7 @@ public class ChatMessageService {
         List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
             .retrieveVersionEntitiesByProjectVersion(projectVersion);
         artifactService.versionToAppEntity(artifactVersions);
-        Map<String, ArtifactVersion> artifactId2version = ProjectDataStructures.createEntityLookup(
+        Map<String, ArtifactVersion> artifactName2Version = ProjectDataStructures.createEntityLookup(
             artifactVersions, ArtifactVersion::getName);
 
         List<GenerationArtifact> genArtifacts = artifactVersions
@@ -113,27 +125,17 @@ public class ChatMessageService {
             .toList();
         GenChatResponse genChatResponse = genApi.generateChatResponse(
             userMessage.getContent(), chatMessages, genArtifacts);
-        responseMessage.setContent(genChatResponse.getMessage());
-
-        responseMessage = chatMessageRepository.save(responseMessage);
-
-        ChatMessage finalResponseMessage = responseMessage; // variables used in lambda must be final.
-        List<ChatMessageArtifact> chatMessageArtifacts = genChatResponse.getArtifactIds().stream()
-            .map(artifactName -> {
+        responseMessage.setContent(genChatResponse.getResponse());
+        responseMessage.setCreatedAt(LocalDateTime.now());
+        List<ChatMessageArtifact> responseMessageArtifacts = genChatResponse.getRelatedArtifacts().stream()
+            .map(genArtifact -> {
                 ChatMessageArtifact chatMessageArtifact = new ChatMessageArtifact();
-                chatMessageArtifact.setMessage(finalResponseMessage);
-                Artifact artifact = artifactId2version.get(artifactName).getArtifact();
+                chatMessageArtifact.setMessage(responseMessage);
+                Artifact artifact = artifactName2Version.get(genArtifact.getId()).getArtifact();
                 chatMessageArtifact.setArtifact(artifact);
                 return chatMessageArtifact;
             }).toList();
-        List<UUID> chatMessageArtifactIds = chatMessageArtifacts
-            .stream()
-            .map(c -> c.getArtifact().getArtifactId())
-            .toList();
-
-        chatMessageArtifactRepository.saveAll(chatMessageArtifacts);
-
-        return ChatMessageDTO.asResponseMessage(responseMessage, chatMessageArtifactIds);
+        return new Pair<>(responseMessage, responseMessageArtifacts);
     }
 
     /**

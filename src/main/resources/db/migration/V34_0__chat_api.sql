@@ -3,19 +3,20 @@ CREATE TABLE IF NOT EXISTS chat
     id         BINARY(16)   NOT NULL PRIMARY KEY,
     version_id VARCHAR(255) NOT NULL,
     owner_id   VARCHAR(255) NOT NULL,
-    title      VARCHAR(255),
+    title      VARCHAR(255) NOT NULL,
+    updated_at DATETIME(6)  NOT NULL,
     CONSTRAINT version_id_fk FOREIGN KEY (version_id) REFERENCES project_version (version_id) ON DELETE CASCADE,
     CONSTRAINT chat_user_id_fk FOREIGN KEY (owner_id) REFERENCES safa_user (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS chat_message
 (
-    id        BINARY(16) NOT NULL PRIMARY KEY,
-    chat_id   BINARY(16) NOT NULL,
-    is_user   BOOL,
-    author_id VARCHAR(255),
-    created   DATETIME,
-    content   MEDIUMTEXT,
+    id         BINARY(16)  NOT NULL PRIMARY KEY,
+    chat_id    BINARY(16)  NOT NULL,
+    is_user    BOOL        NOT NULL,
+    author_id  VARCHAR(255),
+    content    MEDIUMTEXT  NOT NULL,
+    created_at DATETIME(6) NOT NULL,
     CONSTRAINT chat_message_chat_id_fk FOREIGN KEY (chat_id) REFERENCES chat (id) ON DELETE CASCADE,
     CONSTRAINT chat_message_author_id_fk FOREIGN KEY (author_id) REFERENCES safa_user (user_id) ON DELETE CASCADE
 );

@@ -2,9 +2,11 @@ package edu.nd.crc.safa.features.generation.api;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.TGenConfig;
-import edu.nd.crc.safa.features.chat.entities.gen.GenChatRequest;
+import edu.nd.crc.safa.features.chat.entities.dtos.gen.GenChatMessage;
+import edu.nd.crc.safa.features.chat.entities.dtos.gen.GenChatRequest;
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatMessage;
 import edu.nd.crc.safa.features.chat.entities.persistent.GenChatResponse;
 import edu.nd.crc.safa.features.common.RequestService;
@@ -51,7 +53,7 @@ public class GenApi implements ITraceGenerationController {
         GenerationDataset dataset = new GenerationDataset(projectArtifacts);
         HealthGenRequest request = new HealthGenRequest(dataset, targetArtifact.getId(), HealthConstants.CONCEPT_TYPE);
         String chatEndpoint = TGenConfig.getEndpoint(HealthConstants.ENDPOINT);
-        return genApiController.sendGenRequest(chatEndpoint, request, HealthGenResponse.class);
+        return genApiController.performJob(chatEndpoint, request, HealthGenResponse.class, null);
     }
 
     /**
@@ -65,9 +67,15 @@ public class GenApi implements ITraceGenerationController {
     public GenChatResponse generateChatResponse(String userMessageContent,
                                                 List<ChatMessage> chatMessages,
                                                 List<GenerationArtifact> artifacts) {
-        GenChatRequest request = new GenChatRequest(userMessageContent, artifacts, chatMessages);
+        GenerationDataset dataset = new GenerationDataset(artifacts);
+        List<GenChatMessage> chatHistory = chatMessages
+            .stream()
+            .map(GenChatMessage::new)
+            .collect(Collectors.toList());
+        chatHistory.add(GenChatMessage.fromUserMessage(userMessageContent));
+        GenChatRequest request = new GenChatRequest(dataset, chatHistory);
         String chatEndpoint = TGenConfig.getEndpoint("chat");
-        return genApiController.sendGenRequest(chatEndpoint, request, GenChatResponse.class);
+        return genApiController.performJob(chatEndpoint, request, GenChatResponse.class, null);
     }
 
     /**

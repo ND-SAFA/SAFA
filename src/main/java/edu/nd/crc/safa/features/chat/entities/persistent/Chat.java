@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.chat.entities.persistent;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -14,18 +15,21 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "chat")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Chat {
 
     @Id
@@ -58,8 +62,13 @@ public class Chat {
     /**
      * Display name of chat.
      */
-    @Column
+    @Column(nullable = false)
     private String title;
+    /**
+     * Timestamp of when this chat was last updated.
+     */
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     /**
      * Returns whether user is owner of chat.

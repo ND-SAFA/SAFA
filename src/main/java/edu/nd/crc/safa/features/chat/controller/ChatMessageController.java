@@ -5,10 +5,12 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatMessageDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageRequest;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageResponse;
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
+import edu.nd.crc.safa.features.chat.entities.persistent.ChatSharePermission;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -39,9 +41,14 @@ public class ChatMessageController extends BaseController {
         SafaUser currentUser = getCurrentUser();
         ServiceProvider serviceProvider = this.getServiceProvider();
         Chat chat = serviceProvider.getChatService().getChatById(chatId);
-        return serviceProvider.getChatMessageService().sendChatMessage(chat,
+        if (!chat.isOwner(currentUser)) {
+            throw new SafaError("User cannot send messages in chats they do not own.");
+        }
+        SendChatMessageResponse response = serviceProvider.getChatMessageService().sendChatMessage(chat,
             sendChatMessageRequest.getMessage(),
             currentUser);
+        getServiceProvider().getChatService().touchChat(chat);
+        return response;
     }
 
     /**
@@ -51,12 +58,15 @@ public class ChatMessageController extends BaseController {
      * @return List of messages in chat.
      */
     @GetMapping(AppRoutes.Chat.Message.MESSAGE_GET)
-    public List<ChatMessageDTO> getChatMessages(@PathVariable UUID chatId) {
+    public ChatDTO getChatMessages(@PathVariable UUID chatId) {
         SafaUser currentUser = getCurrentUser();
         Chat chat = getServiceProvider().getChatService().getChatById(chatId);
-        if (!chat.isOwner(currentUser)) {
-            throw new SafaError("User cannot send messages in chats they do not own.");
-        }
-        return getServiceProvider().getChatMessageService().getChatMessages(chat);
+        List<ChatMessageDTO> chatMessages = getServiceProvider().getChatMessageService().getChatMessages(chat);
+        ChatSharePermission chatPermission = getServiceProvider().getChatService().verifyChatPermission(chat,
+            currentUser,
+            ChatSharePermission.READ);
+        ChatDTO chatDTO = ChatDTO.fromChat(chat, chatPermission);
+        chatDTO.setMessages(chatMessages);
+        return chatDTO;
     }
 }

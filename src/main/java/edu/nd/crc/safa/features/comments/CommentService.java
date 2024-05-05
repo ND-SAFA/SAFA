@@ -34,14 +34,15 @@ public class CommentService {
      */
     @NotNull
     public CommentDTO createConversationComment(CommentCreateRequestDTO commentCreateRequestDTO,
+                                                UUID artifactId,
                                                 SafaUser author,
                                                 ProjectVersion projectVersion) {
-        Artifact artifact = artifactService.findById(commentCreateRequestDTO.getArtifactId());
+        Artifact artifact = artifactService.findById(artifactId);
 
         Comment comment = new Comment();
         comment.setContent(commentCreateRequestDTO.getContent());
         comment.setStatus(CommentStatus.ACTIVE);
-        comment.setType(commentCreateRequestDTO.getCommentType());
+        comment.setType(commentCreateRequestDTO.getType());
         comment.setAuthor(author);
         comment.setVersion(projectVersion);
         comment.setArtifact(artifact);

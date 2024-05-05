@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.chat.services;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,7 @@ public class ChatService {
     @NotNull
     public ChatDTO createNewChat(SafaUser user, ProjectVersion projectVersion, String title) {
         Chat chat = new Chat();
+        chat.setUpdatedAt(LocalDateTime.now());
         chat.setOwner(user);
         chat.setProjectVersion(projectVersion);
         chat.setTitle(title);
@@ -77,14 +79,15 @@ public class ChatService {
     public List<ChatDTO> getUserChats(SafaUser user) {
         List<ChatDTO> ownedChats = chatRepository.findByOwner(user)
             .stream().map(c -> ChatDTO.fromChat(c, ChatSharePermission.OWNER)).toList();
-        List<ChatDTO> chatDTOS = new ArrayList<>(ownedChats);
+        List<ChatDTO> userChats = new ArrayList<>(ownedChats);
         List<ChatDTO> sharedChats = chatShareRepository
             .findByUser(user)
             .stream()
             .map(cs -> ChatDTO.fromChat(cs.getChat(), cs.getPermission()))
             .toList();
-        chatDTOS.addAll(sharedChats);
-        return chatDTOS;
+        userChats.addAll(sharedChats);
+        userChats.sort((chat1, chat2) -> chat2.getUpdatedAt().compareTo(chat1.getUpdatedAt()));
+        return userChats;
     }
 
     /**
@@ -139,5 +142,15 @@ public class ChatService {
             throw new SafaError("Could not find chat with ID.");
         }
         return chatOptional.get();
+    }
+
+    /**
+     * `Touches` file setting a new last updated time.
+     *
+     * @param chat The chat to update.
+     */
+    public void touchChat(Chat chat) {
+        chat.setUpdatedAt(LocalDateTime.now());
+        this.chatRepository.save(chat);
     }
 }

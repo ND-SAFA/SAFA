@@ -23,7 +23,7 @@ public class CommentDTO {
     /**
      * ID of user who created comment.
      */
-    private UUID userId;
+    private String userId;
     /**
      * ID of version this comment was created in.
      */
@@ -63,7 +63,7 @@ public class CommentDTO {
 
         SafaUser author = comment.getAuthor();
         if (author != null) {
-            dto.setUserId(author.getUserId());
+            dto.setUserId(author.getEmail());
         }
         return dto;
     }

@@ -1,4 +1,6 @@
-package edu.nd.crc.safa.features.health;
+package edu.nd.crc.safa.features.chat.entities.dtos.gen;
+
+import java.util.List;
 
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 
@@ -10,17 +12,13 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class HealthGenRequest {
+public class GenChatRequest {
     /**
-     * List of artifacts in project.
+     * The dataset used in context.
      */
     private GenerationDataset dataset;
     /**
-     * ID of artifact representing the target artifac.t
+     * The chat history.
      */
-    private String queryId;
-    /**
-     * Target artifact to generate health checks for.
-     */
-    private String conceptLayerId;
+    private List<GenChatMessage> chatHistory;
 }

@@ -47,9 +47,10 @@ class TestCommentCrud extends ApplicationBaseTest {
 
         // Step -  Create comment
         CommentCreateRequestDTO request = new CommentCreateRequestDTO(
-            commentContent, commentType, projectVersion.getId(), artifactCreated.getId());
+            commentContent, commentType, projectVersion.getId());
         CommentDTO commentCreated = SafaRequest
             .withRoute(AppRoutes.Comments.COMMENT_CREATE)
+            .withArtifactId(artifactCreated.getId())
             .postWithJsonObject(request, CommentDTO.class);
 
         verifyCommentContent(commentCreated, commentContent, currentUser, projectVersion);
@@ -103,7 +104,7 @@ class TestCommentCrud extends ApplicationBaseTest {
                                       ProjectVersion projectVersion) {
         assertThat(commentCreated.getId()).isNotNull();
         assertThat(commentCreated.getContent()).isEqualTo(content);
-        assertThat(commentCreated.getUserId()).isEqualTo(currentUser.getUserId());
+        assertThat(commentCreated.getUserId()).isEqualTo(currentUser.getEmail());
         assertThat(commentCreated.getVersionId()).isEqualTo(projectVersion.getId());
         assertThat(commentCreated.getStatus()).isEqualTo(CommentStatus.ACTIVE);
         assertThat(commentCreated.getType()).isEqualTo(CommentType.CONVERSATION);

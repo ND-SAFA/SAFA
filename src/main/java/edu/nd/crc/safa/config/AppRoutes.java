@@ -60,7 +60,7 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Comments {
-        public static final String COMMENT_CREATE = "/comments";
+        public static final String COMMENT_CREATE = "/comments/artifact/{artifactId}";
         public static final String COMMENT_GET = "/comments/artifact/{artifactId}";
         public static final String COMMENT_RESOLVE = "/comments/{commentId}/resolve";
         private static final String BY_ID = "/comments/{commentId}";
@@ -83,7 +83,7 @@ public class AppRoutes {
         public static final String CHAT_DELETE = BY_ID;
 
         public static class Message {
-            public static final String MESSAGE_SEND = BY_ID + "/send";
+            public static final String MESSAGE_SEND = BY_ID + "/messages";
             public static final String MESSAGE_GET = BY_ID + "/messages";
         }
     }
@@ -190,7 +190,7 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Health {
-        public static final String GENERATE = "/health/versions/{versionId}/artifacts/{artifactId}";
+        public static final String GENERATE = "/health/versions/{versionId}";
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatMessage;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class ChatMessageDTO {
     /**
      * The user message in chat.
      */
+    @JsonProperty("isUser")
     private boolean isUser;
     /**
      * The AI message in chat.
@@ -34,7 +36,7 @@ public class ChatMessageDTO {
     /**
      * Timestamp of when this was created.
      */
-    private LocalDateTime created;
+    private LocalDateTime createdAt;
 
     /**
      * Creates DTO from response message.
@@ -49,7 +51,7 @@ public class ChatMessageDTO {
             false,
             chatMessage.getContent(),
             artifactIds,
-            chatMessage.getCreated());
+            chatMessage.getCreatedAt());
     }
 
     /**
@@ -64,6 +66,6 @@ public class ChatMessageDTO {
             true,
             chatMessage.getContent(),
             new ArrayList<>(),
-            chatMessage.getCreated());
+            chatMessage.getCreatedAt());
     }
 }

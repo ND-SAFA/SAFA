@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.comments.entities.dtos.ArtifactCommentResponseDTO;
 import edu.nd.crc.safa.features.comments.entities.dtos.comments.ArtifactCommentDTO;
@@ -16,6 +17,9 @@ import edu.nd.crc.safa.features.comments.entities.dtos.comments.MultiArtifactCom
 import edu.nd.crc.safa.features.comments.entities.dtos.comments.UndefinedConceptCommentDTO;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentStatus;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentType;
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
+import edu.nd.crc.safa.features.generation.common.GenerationLink;
+import edu.nd.crc.safa.features.health.ConceptGenResponse;
 import edu.nd.crc.safa.features.health.ConceptMatchDTO;
 import edu.nd.crc.safa.features.health.HealthConstants;
 import edu.nd.crc.safa.features.health.HealthGenResponse;
@@ -30,6 +34,7 @@ class TestHealthGeneration extends GenerationalTest {
     private static final int C1_LOC = 4;
     private static final int MULTI_LOC = 20;
     private static final String TARGET_NAME = "Target";
+    private static final String UNDEFINED_CONCEPT_DEF = "Undefined concept.";
 
 
     /**
@@ -43,6 +48,8 @@ class TestHealthGeneration extends GenerationalTest {
     void testHealthChecks() throws Exception {
         ProjectVersion projectVersion = rootBuilder.actions(a -> a.createProjectWithVersion(getCurrentUser())).get();
         UUID artifactId = createProjectArtifacts(projectVersion);
+        ArtifactAppEntity targetArtifact = new ArtifactAppEntity();
+        targetArtifact.setId(artifactId);
 
 
         List<Artifact> projectArtifacts =
@@ -54,7 +61,7 @@ class TestHealthGeneration extends GenerationalTest {
 
         HealthResponse healthResponse = getServiceProvider()
             .getHealthService()
-            .performArtifactHealthChecks(projectVersion, artifactId);
+            .performArtifactHealthChecks(projectVersion, targetArtifact);
 
         List<CommentDTO> healthChecks = healthResponse.getHealthChecks();
         UUID versionId = projectVersion.getVersionId();
@@ -81,7 +88,8 @@ class TestHealthGeneration extends GenerationalTest {
     private void verifyUndefinedMatches(List<CommentDTO> healthChecks, UUID versionId) {
         UndefinedConceptCommentDTO comment = filterType(healthChecks, CommentType.UNDEFINED_CONCEPT, UndefinedConceptCommentDTO.class);
         verifyCommentContent(versionId, comment, "undefined");
-        assertThat(comment.getUndefinedConcept()).isEqualTo("U1");
+        assertThat(comment.getUndefinedConcept()).contains("U1");
+        assertThat(comment.getUndefinedConcept()).contains(UNDEFINED_CONCEPT_DEF);
     }
 
     private void verifyDirectMatches(List<CommentDTO> healthChecks,
@@ -128,11 +136,27 @@ class TestHealthGeneration extends GenerationalTest {
 
     public void mockHealthResponse() {
         HealthGenResponse genResponse = new HealthGenResponse();
-        genResponse.setMatches(List.of(new ConceptMatchDTO("C1", C1_LOC)));
-        genResponse.setMultiMatches(getTestMultiMatchMap());
-        genResponse.setPredictedMatches(List.of("C4"));
-        genResponse.setUndefinedEntities(List.of("U1"));
-        getServer().setResponse(genResponse);
+        ConceptGenResponse conceptGenResponse = new ConceptGenResponse();
+        conceptGenResponse.setMatches(List.of(new ConceptMatchDTO("C1", C1_LOC)));
+        conceptGenResponse.setMultiMatches(getTestMultiMatchMap());
+        conceptGenResponse.setPredictedMatches(List.of(asLink("C4")));
+        conceptGenResponse.setUndefinedEntities(List.of(asArtifact("U1")));
+        genResponse.setConceptMatches(conceptGenResponse);
+        getServer().setJobResponse(genResponse);
+    }
+
+    private GenerationLink asLink(String aId) {
+        GenerationLink link = new GenerationLink();
+        link.setTarget(aId);
+        link.setSource("test entity");
+        return link;
+    }
+
+    private GenerationArtifact asArtifact(String aId) {
+        GenerationArtifact artifact = new GenerationArtifact();
+        artifact.setId(aId);
+        artifact.setContent(UNDEFINED_CONCEPT_DEF);
+        return artifact;
     }
 
     private Map<Integer, List<ConceptMatchDTO>> getTestMultiMatchMap() {

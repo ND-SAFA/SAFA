@@ -12,5 +12,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ChatMessageRepository extends CrudRepository<ChatMessage, UUID> {
 
-    List<ChatMessage> findByChatOrderByCreatedAsc(Chat chat);
+    List<ChatMessage> findByChatOrderByCreatedAtAsc(Chat chat);
 }

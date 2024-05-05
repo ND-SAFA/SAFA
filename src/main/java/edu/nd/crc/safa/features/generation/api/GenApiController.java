@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.common.RequestService;
-import edu.nd.crc.safa.features.generation.common.ITGenResponse;
 import edu.nd.crc.safa.features.generation.common.TGenStatus;
 import edu.nd.crc.safa.features.generation.common.TGenTask;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GenApiController {
     private static final String GEN_COOKIE_KEY = "GEN_KEY";
-    private static final int WAIT_SECONDS = 5;
+    private static final int WAIT_SECONDS = 2;
     private static final int HOURS = 3600;
     private static final int MAX_DURATION = 4 * HOURS; // 4 hours
     private final RequestService requestService;
@@ -39,10 +38,10 @@ public class GenApiController {
      * @param logger        The logger to store logs under.
      * @return Parsed TGEN response if job is successful.
      */
-    public <T extends ITGenResponse> T performJob(String endpoint,
-                                                  Object payload,
-                                                  Class<T> responseClass,
-                                                  JobLogger logger) {
+    public <T> T performJob(String endpoint,
+                            Object payload,
+                            Class<T> responseClass,
+                            JobLogger logger) {
         TGenTask<T> task = sendGenRequest(endpoint, payload, TGenTask.class);
         task.setResponseClass(responseClass);
         setTaskId(logger, task.getTaskId());

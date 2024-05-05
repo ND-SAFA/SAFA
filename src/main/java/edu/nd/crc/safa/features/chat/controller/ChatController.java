@@ -7,6 +7,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
+import edu.nd.crc.safa.features.chat.entities.dtos.CreateChatRequestDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.EditChatRequestDTO;
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
 import edu.nd.crc.safa.features.common.BaseController;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class ChatController extends BaseController {
-    public static final String DEFAULT_TITLE = "Untitled Chat";
+
 
     public ChatController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
@@ -40,11 +41,10 @@ public class ChatController extends BaseController {
      * @return New Chat.
      */
     @PostMapping(AppRoutes.Chat.CHAT_CREATE)
-    public ChatDTO createChat(@RequestBody @Valid ChatDTO chatDTO) {
+    public ChatDTO createChat(@RequestBody @Valid CreateChatRequestDTO chatDTO) {
         SafaUser currentUser = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = fetchAndAuthenticateProjectVersion(chatDTO.getVersionId(), currentUser);
-        String userTitle = chatDTO.getTitle();
-        String title = userTitle == null || userTitle.isBlank() ? DEFAULT_TITLE : userTitle;
+        String title = chatDTO.getTitle();
         return this.getServiceProvider().getChatService().createNewChat(currentUser, projectVersion, title);
     }
 

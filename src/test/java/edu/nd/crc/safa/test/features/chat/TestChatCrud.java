@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.chat.controller.ChatController;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
+import edu.nd.crc.safa.features.chat.entities.dtos.CreateChatRequestDTO;
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatSharePermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -35,7 +35,7 @@ class TestChatCrud extends ApplicationBaseTest {
         assertThat(userChats.size()).isZero();
 
         ChatDTO chat = createChat(projectVersion); // create
-        verifyChat(chat, ChatController.DEFAULT_TITLE, ChatSharePermission.OWNER);
+        verifyChat(chat, CreateChatRequestDTO.DEFAULT_TITLE, ChatSharePermission.OWNER);
 
         userChats = getUserChats(projectVersion); // verify : create
         assertThat(userChats.size()).isEqualTo(1);

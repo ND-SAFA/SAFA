@@ -13,11 +13,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -26,7 +24,6 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @Table(name = "chat_message")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessage {
 
@@ -62,19 +59,30 @@ public class ChatMessage {
     )
     private SafaUser author;
     /**
-     * Date time of when this message was created.
-     */
-    @Column
-    private LocalDateTime created;
-    /**
      * The content of the message.
      */
-    @Column(columnDefinition = "mediumtext")
+    @Column(columnDefinition = "mediumtext", nullable = false)
     @Lob
-    private String content;
+    private String content = "";
+    /**
+     * Date time of when this message was created.
+     */
+    @Column(nullable = false, name = "created_at")
+    private LocalDateTime createdAt;
 
-    @PrePersist
-    public void setCreated() {
-        this.created = LocalDateTime.now();
+    /**
+     * Sets the creation time to time instance is created.
+     */
+    public ChatMessage() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    /**
+     * Sets content to empty string if null, otherwise content is set to given input.
+     *
+     * @param content Content to set on comment.
+     */
+    public void setContent(String content) {
+        this.content = content == null ? "" : content;
     }
 }

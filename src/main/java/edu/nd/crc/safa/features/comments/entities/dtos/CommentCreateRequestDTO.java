@@ -18,15 +18,10 @@ public class CommentCreateRequestDTO {
      * Type of comment to create.
      */
     @NotNull
-    private CommentType commentType;
+    private CommentType type;
     /**
      * ID of version that comment was created in.
      */
     @NotNull
     private UUID versionId;
-    /**
-     *
-     */
-    @NotNull
-    private UUID artifactId;
 }

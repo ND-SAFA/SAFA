@@ -43,7 +43,8 @@ public class CommentController extends BaseController {
      * @return DTO of created comment.
      */
     @PostMapping(AppRoutes.Comments.COMMENT_CREATE)
-    public CommentDTO createComment(@RequestBody @Valid CommentCreateRequestDTO commentCreateRequestDTO) {
+    public CommentDTO createComment(@PathVariable UUID artifactId,
+                                    @RequestBody @Valid CommentCreateRequestDTO commentCreateRequestDTO) {
         SafaUser currentUser = getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(commentCreateRequestDTO.getVersionId())
@@ -52,12 +53,13 @@ public class CommentController extends BaseController {
             .get();
 
 
-        if (!ACCEPTED_TYPES.contains(commentCreateRequestDTO.getCommentType())) {
+        if (!ACCEPTED_TYPES.contains(commentCreateRequestDTO.getType())) {
             throw new SafaError(String.format("Expected comment type to be one of: %s.", ACCEPTED_TYPES));
         }
 
         return this.getServiceProvider().getCommentService().createConversationComment(
             commentCreateRequestDTO,
+            artifactId,
             currentUser,
             projectVersion
         );

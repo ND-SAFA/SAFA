@@ -47,7 +47,8 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
 
     await chatApi.handleRequest(async () => {
       chatCreated = await createProjectChat(projectStore.versionId, title);
-      chatStore.addChat(chatCreated); // Use the chatCreated variable
+      chatStore.deleteChat(""); // Delete the unsaved chat to replace.
+      chatStore.addChat(chatCreated); // Add the newly created chat and switch to it.
     }, {});
 
     return chatCreated; // Return the chatCreated variable
@@ -96,19 +97,7 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
     await chatDialogApi.handleRequest(async () => {
       const newMessage = buildProjectChatMessage({ message });
 
-      if (!chat) return;
-
-      /**
-       * BUG
-       * Slight problem here, currentChat could be switched at anytime
-       * which is why this now accepts the chat to send the message in.
-       * However, handleCreateProjectChat will create the currentChat
-       * and set the new response there. So, there is a chance that the user
-       * sends their first message, jumps to another chat and sends another message,
-       * and so when the first chat is done creating currentChat could have switched.
-       */
       if (!chat.id) {
-        chatStore.deleteChat(""); // todo: better way to delete empty current chat?
         const chatCreated = await handleCreateProjectChat(chat.title); // sets chat with id in store.
         if (chatCreated) {
           chat = chatCreated;

@@ -43,34 +43,50 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
   async function handleCreateProjectChat(
     title?: string
   ): Promise<ProjectChatSchema | undefined> {
-    let chatCreated; // Define the variable to store the chat creation result
+    let chatCreated: ProjectChatSchema | undefined; // Define the variable to store the chat creation result
+
     await chatApi.handleRequest(async () => {
       chatCreated = await createProjectChat(projectStore.versionId, title);
       chatStore.addChat(chatCreated); // Use the chatCreated variable
     }, {});
+
     return chatCreated; // Return the chatCreated variable
   }
 
   async function handleEditProjectChat(title: string) {
-    await chatApi.handleRequest(async () => {
-      const chatId = chatStore.currentChat.id;
+    await chatApi.handleRequest(
+      async () => {
+        const chatId = chatStore.currentChat.id;
 
-      if (!chatId) return;
+        if (!chatId) return;
 
-      chatStore.currentChat.title = title;
+        chatStore.currentChat.title = title;
 
-      await editProjectChat(chatStore.currentChat);
-    }, {});
+        await editProjectChat(chatStore.currentChat);
+      },
+      {
+        success: "Chat title has been updated: " + title,
+        error: "Unable to update chat title: " + title,
+      }
+    );
   }
 
   async function handleDeleteProjectChat() {
-    await chatApi.handleRequest(async () => {
-      const chatId = chatStore.currentChat.id;
-      if (chatId) {
-        await deleteProjectChat(chatId);
+    const title = chatStore.currentChat.title;
+
+    await chatApi.handleRequest(
+      async () => {
+        const chatId = chatStore.currentChat.id;
+        if (chatId) {
+          await deleteProjectChat(chatId);
+        }
+        chatStore.deleteChat(chatId);
+      },
+      {
+        success: "Chat has been deleted: " + title,
+        error: "Unable to delete chat: " + title,
       }
-      chatStore.deleteChat(chatId);
-    }, {});
+    );
   }
 
   async function handleSendChatMessage(

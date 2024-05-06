@@ -1,5 +1,4 @@
 from copy import deepcopy
-
 from typing import Any, Callable, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import COLON, EMPTY_STRING, NEW_LINE
@@ -183,7 +182,7 @@ class TestAIManager:
         if self.library == "openai":
             return [m["content"] for m in kwargs["messages"]]
         elif self.library == "anthropic":
-            return [kwargs["messages"][0]["content"]]
+            return [EMPTY_STRING.join([m["content"] for m in kwargs["messages"]])]
 
     def on_test_end(self) -> None:
         n_used = self.start_index

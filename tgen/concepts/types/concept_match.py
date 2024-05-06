@@ -7,6 +7,10 @@ class ConceptMatch(TypedEnumDict):
     """
     id: str
     """
-    Index in target artifact where match was found
+    Index in target artifact where match started
     """
-    loc: int
+    start_loc: int
+    """
+    Index in target artifact where match ended
+    """
+    end_loc: int

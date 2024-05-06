@@ -59,11 +59,11 @@ class TestChatMessage extends GenerationalTest {
         ChatDTO chat = getServiceProvider().getChatService().createNewChat(currentUser, projectVersion, chatTitle);
 
         // verify no messages in chat.
-        List<ChatMessageDTO> chatMessages = SafaRequest
+        ChatDTO chatDTO = SafaRequest
             .withRoute(AppRoutes.Chat.Message.MESSAGE_GET)
             .withCustomReplacement("chatId", chat.getId())
-            .getAsArray(ChatMessageDTO.class);
-        assertThat(chatMessages.size()).isEqualTo(0);
+            .getAsType(ChatDTO.class);
+        assertThat(chatDTO.getMessages().size()).isEqualTo(0);
 
         // mock: chat response
         mockChatResponse(responseText, artifactNames);
@@ -85,14 +85,14 @@ class TestChatMessage extends GenerationalTest {
         verifyResponseMessage(responseMessage, responseText, artifactIds);
 
         // verify - retrieve message and response in chat
-        chatMessages = SafaRequest
+        chatDTO = SafaRequest
             .withRoute(AppRoutes.Chat.Message.MESSAGE_GET)
             .withCustomReplacement("chatId", chat.getId())
-            .getAsArray(ChatMessageDTO.class);
+            .getAsType(ChatDTO.class);
 
-        assertThat(chatMessages.size()).isEqualTo(2);
-        verifyUserMessage(chatMessages.get(0), userMessageText);
-        verifyResponseMessage(chatMessages.get(1), responseText, artifactIds);
+        assertThat(chatDTO.getMessages().size()).isEqualTo(2);
+        verifyUserMessage(chatDTO.getMessages().get(0), userMessageText);
+        verifyResponseMessage(chatDTO.getMessages().get(1), responseText, artifactIds);
     }
 
     /**
@@ -109,7 +109,7 @@ class TestChatMessage extends GenerationalTest {
             artifact.setId(aName);
             return artifact;
         }).toList());
-        getServer().setResponse(genResponse);
+        getServer().setJobResponse(genResponse);
     }
 
     /**

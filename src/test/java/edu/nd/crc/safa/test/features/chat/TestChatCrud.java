@@ -8,6 +8,7 @@ import java.util.UUID;
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.CreateChatRequestDTO;
+import edu.nd.crc.safa.features.chat.entities.dtos.EditChatRequestDTO;
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatSharePermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -41,7 +42,7 @@ class TestChatCrud extends ApplicationBaseTest {
         assertThat(userChats.size()).isEqualTo(1);
 
         chat.setTitle(NEW_TITLE); // update
-        chat = updateChat(chat, projectVersion);
+        chat = updateChat(chat.getId(), NEW_TITLE);
         assertThat(chat.getTitle()).isEqualTo(NEW_TITLE);
 
         userChats = getUserChats(projectVersion); // verify: update
@@ -64,11 +65,13 @@ class TestChatCrud extends ApplicationBaseTest {
             .postWithJsonObject(payload, ChatDTO.class);
     }
 
-    private ChatDTO updateChat(ChatDTO chatDTO, ProjectVersion projectVersion) {
+    private ChatDTO updateChat(UUID chatId, String newTitle) {
+        EditChatRequestDTO request = new EditChatRequestDTO();
+        request.setTitle(newTitle);
         return SafaRequest
             .withRoute(AppRoutes.Chat.CHAT_UPDATE)
-            .withVersion(projectVersion)
-            .putWithJsonObject(chatDTO, ChatDTO.class);
+            .withCustomReplacement("chatId", chatId)
+            .putWithJsonObject(request, ChatDTO.class);
     }
 
     private void verifyChat(ChatDTO chat, String title, ChatSharePermission chatPermission) {

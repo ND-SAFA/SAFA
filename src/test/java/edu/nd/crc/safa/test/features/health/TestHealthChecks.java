@@ -19,29 +19,32 @@ import edu.nd.crc.safa.features.comments.entities.persistent.CommentStatus;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentType;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
-import edu.nd.crc.safa.features.health.ConceptGenResponse;
-import edu.nd.crc.safa.features.health.ConceptMatchDTO;
 import edu.nd.crc.safa.features.health.HealthConstants;
-import edu.nd.crc.safa.features.health.HealthGenResponse;
-import edu.nd.crc.safa.features.health.HealthResponse;
+import edu.nd.crc.safa.features.health.entities.ConceptMatchDTO;
+import edu.nd.crc.safa.features.health.entities.HealthResponseDTO;
+import edu.nd.crc.safa.features.health.entities.gen.GenConceptResponse;
+import edu.nd.crc.safa.features.health.entities.gen.GenContradiction;
+import edu.nd.crc.safa.features.health.entities.gen.GenHealthResponse;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.generation.GenerationalTest;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import org.junit.jupiter.api.Test;
 
-class TestHealthGeneration extends GenerationalTest {
+class TestHealthChecks extends GenerationalTest {
     private static final int C1_LOC = 4;
     private static final int MULTI_LOC = 20;
     private static final String TARGET_NAME = "Target";
     private static final String UNDEFINED_CONCEPT_DEF = "Undefined concept.";
-
+    private static final String CONTRADICTION_ID = "C4";
+    private static final String CONTRADICTION_MSG = "this is a contradiction";
 
     /**
      * Direct matches: C1
      * MultiMatches: C2 + C3
      * PredictedMatches: C4
      * UndefinedEntities: U1
+     * Contradiction:
      */
 
     @Test
@@ -59,23 +62,24 @@ class TestHealthGeneration extends GenerationalTest {
 
         mockHealthResponse();
 
-        HealthResponse healthResponse = getServiceProvider()
+        HealthResponseDTO healthResponseDTO = getServiceProvider()
             .getHealthService()
             .performArtifactHealthChecks(projectVersion, targetArtifact);
 
-        List<CommentDTO> healthChecks = healthResponse.getHealthChecks();
+        List<CommentDTO> healthChecks = healthResponseDTO.getHealthChecks();
         UUID versionId = projectVersion.getVersionId();
 
         verifyDirectMatches(healthChecks, versionId, artifactLookup);
         verifyPredictedMatches(healthChecks, versionId, artifactLookup);
         verifyMultiMatches(healthChecks, versionId);
         verifyUndefinedMatches(healthChecks, versionId);
+        verifyContradiction(healthChecks, versionId);
 
         ArtifactCommentResponseDTO artifactComments =
             getServiceProvider().getCommentRetrievalService().getArtifactComments(artifactId);
         assertThat(artifactComments.getComments().size()).isEqualTo(0);
         assertThat(artifactComments.getFlags().size()).isEqualTo(0);
-        assertThat(artifactComments.getHealthChecks().size()).isEqualTo(4);
+        assertThat(artifactComments.getHealthChecks().size()).isEqualTo(5);
 
         healthChecks = artifactComments.getHealthChecks();
 
@@ -83,6 +87,13 @@ class TestHealthGeneration extends GenerationalTest {
         verifyPredictedMatches(healthChecks, versionId, artifactLookup);
         verifyMultiMatches(healthChecks, versionId);
         verifyUndefinedMatches(healthChecks, versionId);
+        verifyContradiction(healthChecks, versionId);
+    }
+
+    private void verifyContradiction(List<CommentDTO> healthChecks, UUID versionId) {
+        MultiArtifactCommentDTO comment = filterType(healthChecks, CommentType.CONTRADICTION, MultiArtifactCommentDTO.class);
+        verifyCommentContent(versionId, comment, CONTRADICTION_MSG);
+        assertThat(comment.getArtifactIds().size()).isEqualTo(1);
     }
 
     private void verifyUndefinedMatches(List<CommentDTO> healthChecks, UUID versionId) {
@@ -135,13 +146,21 @@ class TestHealthGeneration extends GenerationalTest {
     }
 
     public void mockHealthResponse() {
-        HealthGenResponse genResponse = new HealthGenResponse();
-        ConceptGenResponse conceptGenResponse = new ConceptGenResponse();
-        conceptGenResponse.setMatches(List.of(new ConceptMatchDTO("C1", C1_LOC)));
-        conceptGenResponse.setMultiMatches(getTestMultiMatchMap());
-        conceptGenResponse.setPredictedMatches(List.of(asLink("C4")));
-        conceptGenResponse.setUndefinedEntities(List.of(asArtifact("U1")));
-        genResponse.setConceptMatches(conceptGenResponse);
+        GenHealthResponse genResponse = new GenHealthResponse();
+
+        GenConceptResponse genConceptResponse = new GenConceptResponse();
+        genConceptResponse.setMatches(List.of(new ConceptMatchDTO("C1", C1_LOC)));
+        genConceptResponse.setMultiMatches(getTestMultiMatchMap());
+        genConceptResponse.setPredictedMatches(List.of(asLink("C4")));
+        genConceptResponse.setUndefinedEntities(List.of(asArtifact("U1")));
+
+        GenContradiction genContradiction = new GenContradiction();
+        genContradiction.setConflictingIds(List.of(CONTRADICTION_ID));
+        genContradiction.setExplanation(CONTRADICTION_MSG);
+
+        genResponse.setConceptMatches(genConceptResponse);
+        genResponse.setContradictions(genContradiction);
+
         getServer().setJobResponse(genResponse);
     }
 

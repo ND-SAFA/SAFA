@@ -1,10 +1,11 @@
-package edu.nd.crc.safa.features.health;
+package edu.nd.crc.safa.features.health.entities.gen;
 
 import java.util.List;
 import java.util.Map;
 
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
+import edu.nd.crc.safa.features.health.entities.ConceptMatchDTO;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -12,7 +13,7 @@ import lombok.Data;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class ConceptGenResponse {
+public class GenConceptResponse {
     /**
      * List of direct matches with concept artifacts.
      */

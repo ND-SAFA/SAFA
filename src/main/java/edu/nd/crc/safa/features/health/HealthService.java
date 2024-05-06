@@ -27,6 +27,10 @@ import edu.nd.crc.safa.features.comments.repositories.CommentRepository;
 import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
+import edu.nd.crc.safa.features.health.entities.ConceptMatchDTO;
+import edu.nd.crc.safa.features.health.entities.HealthResponseDTO;
+import edu.nd.crc.safa.features.health.entities.gen.GenConceptResponse;
+import edu.nd.crc.safa.features.health.entities.gen.GenHealthResponse;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
@@ -57,9 +61,9 @@ public class HealthService {
      * @param artifact       Artifact generating health checks for.
      * @return Response containing health checks.
      */
-    public HealthResponse performArtifactHealthChecks(ProjectVersion projectVersion, ArtifactAppEntity artifact) {
+    public HealthResponseDTO performArtifactHealthChecks(ProjectVersion projectVersion, ArtifactAppEntity artifact) {
         List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(projectVersion.getProject());
-        HealthGenResponse genResponse = generateHealthChecks(projectVersion, artifact);
+        GenHealthResponse genResponse = generateHealthChecks(projectVersion, artifact);
         Artifact targetArtifact = null;
         if (artifact.getId() != null) {
             targetArtifact = artifactService.findById(artifact.getId());
@@ -74,14 +78,13 @@ public class HealthService {
      * @param targetArtifact Target artifact being checks.
      * @return GEN response.
      */
-    private HealthGenResponse generateHealthChecks(ProjectVersion projectVersion, ArtifactAppEntity targetArtifact) {
+    private GenHealthResponse generateHealthChecks(ProjectVersion projectVersion, ArtifactAppEntity targetArtifact) {
         List<GenerationArtifact> artifacts = artifactService
             .getAppEntities(projectVersion).stream().map(GenerationArtifact::new).collect(Collectors.toList());
         GenerationArtifact targetGenArtifact = new GenerationArtifact(targetArtifact);
         if (targetArtifact.getId() == null) {
             artifacts.add(targetGenArtifact);
         }
-
         return genApi.generateHealthChecks(artifacts, targetGenArtifact);
     }
 
@@ -95,12 +98,12 @@ public class HealthService {
      * @return Response object containing comments.
      */
     @NotNull
-    private HealthResponse saveHealthChecks(ProjectVersion projectVersion,
-                                            List<Artifact> projectArtifacts,
-                                            @Nullable Artifact targetArtifact,
-                                            HealthGenResponse genResponse) {
-        ConceptGenResponse genConceptResponse = genResponse.getConceptMatches();
-        HealthResponse response = new HealthResponse();
+    private HealthResponseDTO saveHealthChecks(ProjectVersion projectVersion,
+                                               List<Artifact> projectArtifacts,
+                                               @Nullable Artifact targetArtifact,
+                                               GenHealthResponse genResponse) {
+        GenConceptResponse genConceptResponse = genResponse.getConceptMatches();
+        HealthResponseDTO response = new HealthResponseDTO();
         Map<String, Artifact> artifactNameLookup = ProjectDataStructures.createEntityLookup(
             projectArtifacts,
             Artifact::getName
@@ -137,36 +140,33 @@ public class HealthService {
         return response;
     }
 
+    /**
+     * Saves contradictions found in gen response.
+     *
+     * @param projectVersion     Project version used to save comment under.
+     * @param artifact           The artifact being commented on.
+     * @param artifactNameLookup Artifact Lookup table indexed by name.
+     * @param response           Gen Response.
+     * @return List of multi-artifact DTOs.
+     */
     public List<MultiArtifactCommentDTO> saveContradictions(ProjectVersion projectVersion,
                                                             Artifact artifact,
                                                             Map<String, Artifact> artifactNameLookup,
-                                                            HealthGenResponse response) {
-        List<String> conflictingIds = response.getConflictingIds();
+                                                            GenHealthResponse response) {
+        List<String> conflictingIds = response.getContradictions().getConflictingIds();
         if (conflictingIds == null || conflictingIds.isEmpty()) {
             return new ArrayList<>();
         }
-        String content = String.format("A contradiction was found with other existing artifacts.");
         Map<Integer, List<CommentArtifact>> commentArtifactMap = createCommentArtifactMap(
             projectVersion,
             artifact,
-            listToMap(response.getConflictingIds(), false),
-            i -> content,
+            listToMap(conflictingIds, false),
+            i -> response.getContradictions().getExplanation(),
             c -> Optional.of(artifactNameLookup.get(c)),
             CommentType.CONTRADICTION
         );
 
-        if (artifact != null) {
-            saveCommentArtifactMap(commentArtifactMap);
-        }
-
-        return mapToDTOs(commentArtifactMap, commentArtifacts -> {
-            List<UUID> artifactIds = commentArtifacts
-                .stream()
-                .map(commentArtifact -> commentArtifact.getArtifactReferenced().getArtifactId())
-                .toList();
-            Comment comment = commentArtifacts.get(0).getComment();
-            return MultiArtifactCommentDTO.fromComment(comment, artifactIds);
-        });
+        return getMultiArtifactCommentDTOS(artifact != null, commentArtifactMap);
     }
 
     /**
@@ -266,18 +266,7 @@ public class HealthService {
             CommentType.MULTI_MATCHED_CONCEPT
         );
 
-        if (targetArtifact != null) {
-            saveCommentArtifactMap(commentArtifactMap);
-        }
-
-        return mapToDTOs(commentArtifactMap, commentArtifacts -> {
-            List<UUID> artifactIds = commentArtifacts
-                .stream()
-                .map(commentArtifact -> commentArtifact.getArtifactReferenced().getArtifactId())
-                .toList();
-            Comment comment = commentArtifacts.get(0).getComment();
-            return MultiArtifactCommentDTO.fromComment(comment, artifactIds);
-        });
+        return getMultiArtifactCommentDTOS(targetArtifact != null, commentArtifactMap);
     }
 
     /**
@@ -385,6 +374,39 @@ public class HealthService {
         return comment;
     }
 
+    /**
+     * Converts CommentMap to multi-artifact DTOs.
+     *
+     * @param saveCommentMap     Whether to save the comment map to the database.
+     * @param commentArtifactMap Map of group to comment artifacts in that group.
+     * @return List of MultiArtifact Comments.
+     */
+    private List<MultiArtifactCommentDTO> getMultiArtifactCommentDTOS(
+        boolean saveCommentMap,
+        Map<Integer, List<CommentArtifact>> commentArtifactMap) {
+        if (saveCommentMap) {
+            saveCommentArtifactMap(commentArtifactMap);
+        }
+
+        return mapToDTOs(commentArtifactMap, commentArtifacts -> {
+            List<UUID> artifactIds = commentArtifacts
+                .stream()
+                .map(commentArtifact -> commentArtifact.getArtifactReferenced().getArtifactId())
+                .toList();
+            Comment comment = commentArtifacts.get(0).getComment();
+            return MultiArtifactCommentDTO.fromComment(comment, artifactIds);
+        });
+    }
+
+    /**
+     * Converts list to a map grouping all concepts under single key or a concept per row.
+     *
+     * @param commentConcepts Concepts to group into map.
+     * @param itemPerRow      If true, each concept is placed on a row by itself. Otherwise, all concepts are placed
+     *                        together.
+     * @param <K>             The type of object being placed.
+     * @return Map of group to concepts in group.
+     */
     @NotNull
     private <K> Map<Integer, List<K>> listToMap(List<K> commentConcepts, boolean itemPerRow) {
         Map<Integer, List<K>> hashMap = new HashMap<>();

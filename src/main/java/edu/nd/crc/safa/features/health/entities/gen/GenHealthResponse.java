@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.health;
+package edu.nd.crc.safa.features.health.entities.gen;
 
 import java.util.List;
 
@@ -10,15 +10,15 @@ import lombok.Data;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class HealthGenResponse {
+public class GenHealthResponse {
     /**
      * List of concept matches.
      */
-    private ConceptGenResponse conceptMatches;
+    private GenConceptResponse conceptMatches;
     /**
      * List of Artifact IDs that experience a contradiction with target artifact.
      */
-    private List<String> conflictingIds;
+    private GenContradiction contradictions;
     /**
      * Links of project artifacts to target artifact.
      */

@@ -21,8 +21,8 @@ import edu.nd.crc.safa.features.generation.summary.SummaryResponse;
 import edu.nd.crc.safa.features.generation.tgen.TGenRequest;
 import edu.nd.crc.safa.features.generation.tgen.TGenResponse;
 import edu.nd.crc.safa.features.health.HealthConstants;
-import edu.nd.crc.safa.features.health.HealthGenRequest;
-import edu.nd.crc.safa.features.health.HealthGenResponse;
+import edu.nd.crc.safa.features.health.entities.gen.GenHealthRequest;
+import edu.nd.crc.safa.features.health.entities.gen.GenHealthResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -48,12 +48,12 @@ public class GenApi implements ITraceGenerationController {
      * @param targetArtifact   Target artifact to generate health checks for.
      * @return Health checks generated for artifact.
      */
-    public HealthGenResponse generateHealthChecks(List<GenerationArtifact> projectArtifacts,
+    public GenHealthResponse generateHealthChecks(List<GenerationArtifact> projectArtifacts,
                                                   GenerationArtifact targetArtifact) {
         GenerationDataset dataset = new GenerationDataset(projectArtifacts);
-        HealthGenRequest request = new HealthGenRequest(dataset, targetArtifact.getId(), HealthConstants.CONCEPT_TYPE);
-        String chatEndpoint = TGenConfig.getEndpoint(HealthConstants.ENDPOINT);
-        return genApiController.performJob(chatEndpoint, request, HealthGenResponse.class, null);
+        GenHealthRequest request = new GenHealthRequest(dataset, targetArtifact.getId(), HealthConstants.CONCEPT_TYPE);
+        String chatEndpoint = TGenConfig.getEndpoint("health");
+        return genApiController.performJob(chatEndpoint, request, GenHealthResponse.class, null);
     }
 
     /**

@@ -7,6 +7,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.health.entities.HealthResponseDTO;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -30,7 +31,8 @@ public class HealthController extends BaseController {
      * @return Response containing all health checks found.
      */
     @PostMapping(AppRoutes.Health.GENERATE)
-    public HealthResponse generateHealthChecks(@PathVariable UUID versionId, @RequestBody ArtifactAppEntity artifact) {
+    public HealthResponseDTO generateHealthChecks(@PathVariable UUID versionId,
+                                                  @RequestBody ArtifactAppEntity artifact) {
         SafaUser currentUser = getCurrentUser();
         ProjectVersion projectVersion = getResourceBuilder()
             .fetchVersion(versionId)

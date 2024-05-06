@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.health;
+package edu.nd.crc.safa.features.health.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

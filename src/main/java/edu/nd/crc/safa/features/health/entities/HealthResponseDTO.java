@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.health;
+package edu.nd.crc.safa.features.health.entities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import edu.nd.crc.safa.features.comments.entities.dtos.comments.CommentDTO;
 import lombok.Data;
 
 @Data
-public class HealthResponse {
+public class HealthResponseDTO {
     /**
      * List of health checks related to an artifact.
      */

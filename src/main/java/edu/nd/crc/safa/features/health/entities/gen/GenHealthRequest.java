@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.health;
+package edu.nd.crc.safa.features.health.entities.gen;
 
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 
@@ -10,7 +10,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class HealthGenRequest {
+public class GenHealthRequest {
     /**
      * List of artifacts in project.
      */

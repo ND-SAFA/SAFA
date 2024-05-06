@@ -1,10 +1,13 @@
 package edu.nd.crc.safa.features.chat.entities.persistent;
 
+import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
+import edu.nd.crc.safa.features.permissions.entities.Permission;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public enum ChatSharePermission {
+public enum ChatSharePermission implements Permission {
     READ(0),
     EDIT(1),
     OWNER(2);
@@ -22,5 +25,21 @@ public enum ChatSharePermission {
      */
     public boolean hasPermission(ChatSharePermission requestedPermission) {
         return requestedPermission.level >= this.level;
+    }
+
+    /**
+     * @return Name of permission level.
+     */
+    @Override
+    public String getName() {
+        return this.name();
+    }
+
+    /**
+     * @return null, no additional check required.
+     */
+    @Override
+    public AdditionalPermissionCheck getAdditionalCheck() {
+        return null;
     }
 }

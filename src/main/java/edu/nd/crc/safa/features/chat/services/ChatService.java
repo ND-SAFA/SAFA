@@ -12,6 +12,7 @@ import edu.nd.crc.safa.features.chat.entities.persistent.ChatShare;
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatSharePermission;
 import edu.nd.crc.safa.features.chat.repositories.ChatRepository;
 import edu.nd.crc.safa.features.chat.repositories.ChatShareRepository;
+import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -54,10 +55,6 @@ public class ChatService {
      * @return The updated chat.
      */
     public ChatDTO updateChat(Chat chat, String newTitle, SafaUser user) {
-        if (!chat.isOwner(user)) {
-            throw new SafaError("Chat is not owned by user making request.");
-        }
-
         ChatSharePermission permission = verifyChatPermission(chat, user, ChatSharePermission.EDIT);
 
         if (newTitle == null || newTitle.isBlank()) {
@@ -124,7 +121,7 @@ public class ChatService {
         ChatShare chatShare = chatShareOptional.get();
         ChatSharePermission chatPermission = chatShare.getPermission();
         if (!chatPermission.hasPermission(requestedPermission)) {
-            throw new SafaError("User does not have sufficient permissions to chat.");
+            throw new MissingPermissionException(requestedPermission);
         }
         return chatShare.getPermission();
     }

@@ -50,7 +50,9 @@ class ChatJob(AbstractJob):
                                            prompt_start=PromptUtil.as_markdown_header("Related Information"),
                                            build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
                                            include_ids=True)
-            chat_prompt = Prompt(f"Use the related information to better understand and respond to the following question: "
+            chat_prompt = Prompt(f"The related information is provided to help you better understand "
+                                 f"and respond to the following question. If you do not need the information to respond,"
+                                 f"you may ignore it. "
                                  f"{NEW_LINE}{chat_content}", title="Query")
             prompt_str = PromptBuilder(prompts=[context_prompt, chat_prompt]).build(model_format_args=self.llm_manager.prompt_args,
                                                                                     artifact=query_artifact)[PromptKeys.PROMPT]

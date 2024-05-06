@@ -30,7 +30,7 @@ sentencepiece==0.1.97
 sentence-transformers==2.5.1
 tokenizers==0.15.2
 tiktoken==0.3.3
-tqdm==4.64.1
+tqdm==4.66.3
 triton==2.1.0
 transformers==4.38.0
 typeguard==2.13.3

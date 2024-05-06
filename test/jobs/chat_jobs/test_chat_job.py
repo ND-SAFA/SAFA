@@ -66,7 +66,7 @@ class TestChatJob(BaseJobTest):
     def _assert_success(self, job: AbstractJob, job_result: JobResult):
         message_meta: MessageMeta = job.result.body
         self.assertEqual(message_meta.message["content"], self.RESPONSE)
-        assert_correct_related_artifacts(self, [self.DATASET.artifact_df.get_artifact(a_id) for a_id in message_meta.artifact_ids])
+        assert_correct_related_artifacts(self, message_meta.artifact_ids)
 
     def response(self, prompt, expected_context_ids=EXPECTED_CONTEXT_IDS, response=RESPONSE, should_be_included=True):
         for a_id in expected_context_ids:

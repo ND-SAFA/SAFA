@@ -3,16 +3,22 @@ from typing import List
 
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.gen.serializers.dataset_serializer import DatasetSerializer
-from api.endpoints.gen.serializers.message_serializer import MessageSerializer
+from api.endpoints.gen.serializers.message_serializer import MessageMetaSerializer, MessageSerializer
 from tgen.common.util.base_object import BaseObject
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.models.llm.abstract_llm_manager import Message
 
 
 @dataclass
+class MessageMeta(BaseObject):
+    message: Message
+    artifact_ids: List[str]
+
+
+@dataclass
 class ChatRequest(BaseObject):
     dataset: ApiDefinition
-    chat_history: List[Message]
+    chat_history: List[MessageMeta]
 
 
 class ChatSerializer(AbstractSerializer):
@@ -20,7 +26,7 @@ class ChatSerializer(AbstractSerializer):
     Serializes the request for performing health checks on an artifact.
     """
     dataset = DatasetSerializer(help_text="The dataset used for context.")
-    chat_history = MessageSerializer(many=True, help_text="List of messages exchanged with the LLM.")
+    chat_history = MessageMetaSerializer(many=True, help_text="List of messages exchanged with the LLM.")
 
     def create(self, validated_data) -> ChatRequest:
         """

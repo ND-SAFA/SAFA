@@ -27,16 +27,17 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
   async function handleGetProjectChats() {
     await chatApi.handleRequest(async () => {
       chatStore.initializeChats(await getProjectChats());
-      await handleLoadProjectChatMessages(chatStore.currentChat.id);
+      await handleLoadProjectChatMessages(chatStore.currentChat);
     }, {});
   }
 
-  async function handleLoadProjectChatMessages(chatId: string) {
-    if (!chatId) {
-      return; // on mounted might have default chat with no id
-    }
+  async function handleLoadProjectChatMessages(chat: ProjectChatSchema) {
+    // Skip loading messages if the chat has yet to be created.
+    if (!chat.id) return;
+
     await chatApi.handleRequest(async () => {
-      chatStore.updateChat(await getProjectChatMessages(chatId));
+      chatStore.switchChat(chat);
+      chatStore.updateChat(await getProjectChatMessages(chat.id));
     }, {});
   }
 

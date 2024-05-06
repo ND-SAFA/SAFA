@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from tgen.common.constants.deliminator_constants import COMMA
 from tgen.contradictions.common_choices import CommonChoices
-from tgen.contradictions.requirement import RequirementConstituent
+from tgen.contradictions.with_decision_tree.requirement import RequirementConstituent
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -98,8 +98,12 @@ def format_response(tag: str, value: str) -> Optional[List[str]]:
 
 CONTRADICTIONS_INSTRUCTIONS = "Consider whether the following software artifact is inconsistent or contradictory with any of the " \
                               "related pieces of information. "
-CONTRADICTIONS_TASK_PROMPT = Prompt("Output the ids of any contradictory or inconsistent information in a comma-deliminated list."
-                                    "If all the information entails or is neutral to the artifact, simply respond with no.",
-                                    title=f"Task",
-                                    response_manager=PromptResponseManager(response_tag="contradictions",
-                                                                           value_formatter=format_response))
+CONTRADICTIONS_TASK_PROMPT = QuestionnairePrompt(
+    question_prompts=[Prompt("Output the ids of any contradictory or inconsistent information in a comma-deliminated list."
+                             "If all the information entails or is neutral to the artifact, simply respond with no.",
+                             response_manager=PromptResponseManager(response_tag="conflicting_ids",
+                                                                    value_formatter=format_response)),
+                      Prompt("If you identify contradictory information, explain why in 1-2 sentences.",
+                             response_manager=PromptResponseManager(response_tag="explanation")
+                             )],
+    use_multi_step_task_instructions=True)

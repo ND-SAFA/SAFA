@@ -96,3 +96,20 @@ class TestStrUtil(BaseTest):
 
     def test_remove_stop_words(self):
         self.assertEqual(StrUtil.remove_stop_words("The cat in the hat"), "cat hat")
+
+    def test_find_start_and_end_loc(self):
+        main_string = "The cat in the hat"
+        str2find = "cat"
+        bad_case = str2find.upper()
+        expected_index = main_string.find(str2find)
+        start_and_end = (expected_index, expected_index + 3)
+        not_found = (-1, -1)
+        self.assertEqual(StrUtil.find_start_and_end_loc(main_string, str2find), start_and_end)
+        self.assertEqual(StrUtil.find_start_and_end_loc(main_string, bad_case), not_found)
+        self.assertEqual(StrUtil.find_start_and_end_loc(main_string, bad_case, ignore_case=True), start_and_end)
+
+        str2find = "at"
+        start_and_end = (start_and_end[0] + 1, start_and_end[-1])
+        self.assertEqual(StrUtil.find_start_and_end_loc(main_string, str2find), start_and_end)
+        self.assertEqual(StrUtil.find_start_and_end_loc(main_string, str2find, start=start_and_end[-1])[0], len(main_string) - 2)
+        self.assertEqual(StrUtil.find_start_and_end_loc(main_string, str2find, end=1), not_found)

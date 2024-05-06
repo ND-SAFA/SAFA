@@ -5,7 +5,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.contradictions.requirement import Requirement, RequirementConstituent
+from tgen.contradictions.with_decision_tree.requirement import Requirement, RequirementConstituent
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame

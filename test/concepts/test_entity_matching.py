@@ -3,6 +3,7 @@ from typing import List
 from test.concepts.constants import ConceptData
 from test.concepts.utils import create_concept_args, create_concept_state
 from tgen.common.util.enum_util import EnumDict
+from tgen.common.util.str_util import StrUtil
 from tgen.concepts.steps.entity_matching_step import EntityMatchingStep
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.base_tests.base_test import BaseTest
@@ -22,7 +23,11 @@ class TestEntityMatching(BaseTest):
         """
         args = create_concept_args()
         state = create_concept_state(args)
-        state.direct_matches = [EnumDict({ArtifactKeys.ID: a_id}) for a_id in ConceptData.DirectMatches]
+        direct_match_locs = [StrUtil.find_start_and_end_loc(args.artifact[ArtifactKeys.CONTENT], a_id, ignore_case=True)
+                             for a_id in ConceptData.DirectMatches]
+        state.direct_matches = [EnumDict({ArtifactKeys.ID: a_id,
+                                          "start_loc": direct_match_locs[i][0],
+                                          "end_loc": direct_match_locs[i][1]}) for i, a_id in enumerate(ConceptData.DirectMatches)]
         state.entity_df = ConceptData.get_entity_df()
 
         self.mock_entity_matching(ai_manager)

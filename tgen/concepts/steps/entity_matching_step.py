@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Set
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.objects.artifact import Artifact
@@ -38,11 +38,12 @@ class EntityMatchingStep(AbstractPipelineStep):
             return
         concepts: List[Artifact] = self.strip_artifact_bodies(state.concept_df.to_artifacts())
 
-        direct_match_ids = [match[ArtifactKeys.ID] for match in state.direct_matches]
+        artifact_content = args.artifact[ArtifactKeys.CONTENT]
+        direct_match_content = {artifact_content[match["start_loc"]:match["end_loc"]] for match in state.direct_matches}
 
-        prompt_builders, prompts = self.create_prompts(entities, concepts, args.llm_manager, direct_match_ids)
+        prompt_builders, prompts = self.create_prompts(entities, concepts, args.llm_manager, direct_match_content)
         entity_predictions = self.generate_predictions(prompts, prompt_builders, args.llm_manager)
-        predicted_links = self.create_predicted_links(entities, entity_predictions, direct_match_ids)
+        predicted_links = self.create_predicted_links(entities, entity_predictions, direct_match_content)
 
         concept_artifact_ids = set([a[ArtifactKeys.ID] for a in concepts])
         predicted_links = [m for m in predicted_links if
@@ -51,19 +52,19 @@ class EntityMatchingStep(AbstractPipelineStep):
 
     @staticmethod
     def create_prompts(entities: List[Artifact], concepts: List[Artifact], llm_manager: AbstractLLMManager,
-                       direct_match_ids: List[str]):
+                       direct_match_content: Set[str]):
         """
         Creates matching prompt for each entity.
         :param entities: Entity artifacts matched against concepts.
         :param concepts: Concept artifacts used to match entities against.
         :param llm_manager: LLM manager used to make predictiosn.
-        :param direct_match_ids: Contains entities that have already been matched in the direct concept matching step.
+        :param direct_match_content: Contains entities that have already been matched in the direct concept matching step.
         :return: Prompts builders used for parsing output and prompts built for each entity.
         """
         prompt_builders = []
         prompts = []
         for entity_artifact in entities:
-            if entity_artifact[ArtifactKeys.ID] in direct_match_ids:
+            if entity_artifact[ArtifactKeys.ID] in direct_match_content:
                 continue
             concept_prompt = MultiArtifactPrompt("# PROJECT ARTIFACTS", build_method=MultiArtifactPrompt.BuildMethod.XML)
             artifact_prompt = ArtifactPrompt(prompt_start=ENTITY_MATCHING_INSTRUCTIONS + NEW_LINE)
@@ -98,18 +99,18 @@ class EntityMatchingStep(AbstractPipelineStep):
 
     @staticmethod
     def create_predicted_links(entities: List[Artifact], entity_predictions: List[Dict],
-                               direct_match_ids: List[str]) -> List[Trace]:
+                               direct_match_content: Set[str]) -> List[Trace]:
         """
         Parses model predictions into links between entities and concepts.
         :param entities: The entities corresponding to each prediction.
         :param entity_predictions: List of predicted concepts for each entity.
-        :param direct_match_ids: Contains entities that have already been matched in the direct concept matching step.
+        :param direct_match_content: Contains entities that have already been matched in the direct concept matching step.
         :return: List of trace links from entities to concepts.
         """
         predicted_links = []
         entity_predictions = iter(entity_predictions)
         for entity_artifact in entities:
-            if entity_artifact[ArtifactKeys.ID] in direct_match_ids:
+            if entity_artifact[ArtifactKeys.ID] in direct_match_content:
                 continue
             entity_response = next(entity_predictions)
             seen_ids = set()

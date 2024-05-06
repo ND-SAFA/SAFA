@@ -1,8 +1,9 @@
-from typing import List
+from typing import List, Tuple
 
 from nltk import WordNetLemmatizer
 
 from tgen.common.constants.deliminator_constants import SPACE
+from tgen.common.util.str_util import StrUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.types.concept_match import ConceptMatch
@@ -52,15 +53,15 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
 
         matches = []
         for concept_index, (main_name, *alternate_names) in enumerate(concept_alternate_names):
-            loc = self._find_match(target_artifact_content, main_name, alternate_names)
-            if loc == -1:
+            start_loc, end_loc = self._find_match(target_artifact_content, main_name, alternate_names)
+            if start_loc == -1:
                 continue
-            concept_match = ConceptMatch(id=concept_artifact_ids[concept_index], loc=loc)
+            concept_match = ConceptMatch(id=concept_artifact_ids[concept_index], start_loc=start_loc, end_loc=end_loc)
             matches.append(concept_match)
 
         state.direct_matches = matches
 
-    def _find_match(self, artifact_content: str, main_name: str, alternate_names: List[str]) -> int:
+    def _find_match(self, artifact_content: str, main_name: str, alternate_names: List[str]) -> Tuple[int, int]:
         """
         Attempts to find lemmatized reference to main name or direct reference to alternate names.
         :param artifact_content: Content of artifact to find concepts in.
@@ -68,16 +69,17 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
         :param alternate_names: List of acronyms to find in artifact content
         :return: Index of where concept is found. -1 if none found.
         """
+        main_start, main_end = StrUtil.find_start_and_end_loc(artifact_content, main_name, ignore_case=True)
+        if main_start > -1:
+            return main_start, main_end
         lemmatized = self.lemmatize(main_name)
-        main_index = artifact_content.lower().find(lemmatized)
-        if main_index > -1:
-            return main_index
-        for m_str in alternate_names:
-            str_index = artifact_content.find(m_str)
-            if str_index == -1:
+        for m_str in [lemmatized] + alternate_names:
+            str_start, str_end = StrUtil.find_start_and_end_loc(artifact_content, m_str, ignore_case=True)
+            if str_start == -1:
                 continue
-            return str_index
-        return -1
+
+            return str_start, str_end
+        return -1, -1
 
     def lemmatize(self, concept: str) -> str:
         """

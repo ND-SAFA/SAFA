@@ -1,5 +1,6 @@
-from typing import Any
+from typing import Any, List
 
+from tgen.chat.message_meta import MessageMeta
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context
 from tgen.common.util.prompt_util import PromptUtil
@@ -7,7 +8,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, CONTENT_KEY, ConversationType
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, CONTENT_KEY
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
@@ -18,7 +19,7 @@ from tgen.tracing.context_finder import ContextFinder
 
 class ChatJob(AbstractJob):
 
-    def __init__(self, job_args: JobArgs, chat_history: ConversationType, llm_manager: AbstractLLMManager = None,
+    def __init__(self, job_args: JobArgs, chat_history: List[MessageMeta], llm_manager: AbstractLLMManager = None,
                  max_context: int = None):
         """
         Initializes the job with the previous chats.
@@ -40,6 +41,7 @@ class ChatJob(AbstractJob):
         related_artifacts = None
         if len(self.chat_history) == 1:
             artifact_df: ArtifactDataFrame = self.job_args.dataset.artifact_df
+            # TODO: Fix API change.
             chat_content = self.chat_history[0][CONTENT_KEY]
             artifact_id = "query_artifact"
             query_artifact = artifact_df.add_artifact(a_id=artifact_id, content=chat_content, layer_id="query")

@@ -37,7 +37,7 @@
         clickable
         :focused="chatStore.currentChat?.id === chat.id"
         :action-cols="1"
-        @click="chatStore.switchChat(chat)"
+        @click="handleSwitchChat(chat)"
       >
         <template #actions>
           <icon-button
@@ -145,6 +145,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
+import { ProjectChatSchema } from "@/types";
 import { chatApiStore, chatStore, layoutStore } from "@/hooks";
 import {
   IconButton,
@@ -168,7 +169,10 @@ const formattedMessages = computed(() => chatStore.currentMessagesDisplay);
  * Sends a chat message to the server.
  */
 function handleSendMessage() {
-  chatApiStore.handleSendChatMessage(currentMessage.value);
+  chatApiStore.handleSendChatMessage(
+    chatStore.currentChat,
+    currentMessage.value
+  );
   currentMessage.value = "";
 }
 
@@ -177,11 +181,22 @@ function handleCreateChat() {
 }
 
 /**
- * Emits an event when enter is clicked.
+ * Switches chat and loads its messages afterwards.
+ * @param chat The chat to switch to.
  */
-function handleKeydown(e?: { key: string }) {
-  if (e?.key === "Enter") {
+function handleSwitchChat(chat: ProjectChatSchema) {
+  chatStore.switchChat(chat);
+  chatApiStore.handleLoadProjectChatMessages(chat.id);
+}
+
+/**
+ * Emits an event when enter is clicked and sends the message associated with the specific chat.
+ * @param e - The keyboard event.
+ */
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === "Enter") {
     handleSendMessage();
+    e.preventDefault(); // To prevent form submission or other default actions
   }
 }
 

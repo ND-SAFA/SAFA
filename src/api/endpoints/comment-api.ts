@@ -201,7 +201,6 @@ export async function generateArtifactHealth(
   artifact: ArtifactSchema
 ): Promise<HealthCheckCollectionSchema> {
   if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
-    console.log("Generating health checks for artifact:", artifact.id);
     return EXAMPLE_COMMENTS;
   }
 

@@ -23,6 +23,20 @@ export interface ChatMessageSchema {
 }
 
 /**
+ * Represents response for a successful send of a user message.
+ */
+export interface ChatMessageSendResponseSchema {
+  /**
+   * Saved user message containing persistent properties (e.g ID and timestamp)
+   */
+  userMessage: ChatMessageSchema;
+  /**
+   * Saved assistant response.
+   */
+  responseMessage: ChatMessageSchema;
+}
+
+/**
  * Represents a chat message between SAFA and a user, with additional display information.
  */
 export interface DisplayChatMessageSchema extends ChatMessageSchema {

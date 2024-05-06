@@ -1,5 +1,6 @@
 import {
   ChatMessageSchema,
+  ChatMessageSendResponseSchema,
   CreateProjectChatSchema,
   ProjectChatSchema,
 } from "@/types";
@@ -11,6 +12,11 @@ const EXAMPLE_SAFA_MESSAGE: ChatMessageSchema = {
   isUser: false,
   message: "Hello! How can I help you?",
   artifactIds: [],
+};
+
+const EXAMPLE_SAFA_MESSAGE_RESPONSE = {
+  userMessage: EXAMPLE_SAFA_MESSAGE,
+  responseMessage: EXAMPLE_SAFA_MESSAGE,
 };
 
 const EXAMPLE_PROJECT_CHAT: ProjectChatSchema = {
@@ -116,17 +122,12 @@ export async function deleteProjectChat(chatId: string): Promise<void> {
  * @param versionId - The unique identifier of the version.
  * @returns All chat dialogues for the project.
  */
-export async function getProjectChats(
-  versionId: string
-): Promise<ProjectChatSchema[]> {
+export async function getProjectChats(): Promise<ProjectChatSchema[]> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
     return [EXAMPLE_NASA_CHAT, EXAMPLE_PROJECT_CHAT];
   }
 
-  return buildRequest<ProjectChatSchema[], "versionId", ChatMessageSchema>(
-    "getChats",
-    { versionId }
-  ).get();
+  return buildRequest<ProjectChatSchema[]>("getChats").get();
 }
 
 /**
@@ -138,15 +139,16 @@ export async function getProjectChats(
 export async function createProjectChatMessage(
   chatId: string,
   message: ChatMessageSchema
-): Promise<ChatMessageSchema> {
+): Promise<ChatMessageSendResponseSchema> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
-    return EXAMPLE_SAFA_MESSAGE;
+    return EXAMPLE_SAFA_MESSAGE_RESPONSE;
   }
 
-  return buildRequest<ChatMessageSchema, "chatId", ChatMessageSchema>(
-    "getChats",
-    { chatId }
-  ).post(message);
+  return buildRequest<
+    ChatMessageSendResponseSchema,
+    "chatId",
+    ChatMessageSchema
+  >("createChatMessage", { chatId }).post(message);
 }
 
 /**
@@ -161,7 +163,7 @@ export async function getProjectChatMessages(
     return EXAMPLE_PROJECT_CHAT;
   }
 
-  return buildRequest<ProjectChatSchema, "chatId">("getChats", {
+  return buildRequest<ProjectChatSchema, "chatId">("getChatMessages", {
     chatId,
   }).get();
 }

@@ -22,6 +22,7 @@ import {
   UploadPanelType,
   CreatorFilePanel,
   ProjectChatSchema,
+  ChatMessageSchema,
 } from "@/types";
 
 export function buildSnackbarMessage(): SnackbarMessage {
@@ -271,9 +272,20 @@ export function buildProjectChat(
 ): ProjectChatSchema {
   return {
     id: chat.id || "",
-    title: chat.title || "",
+    title: chat.title || "New Chat",
     versionId: chat.versionId || "",
     permission: chat.permission || "owner",
     messages: chat.messages || [],
+  };
+}
+
+export function buildProjectChatMessage(
+  chat: Partial<ChatMessageSchema> = {}
+): ChatMessageSchema {
+  return {
+    id: chat?.id || "",
+    isUser: chat?.isUser === undefined ? true : chat.isUser,
+    message: chat?.message || "",
+    artifactIds: chat?.artifactIds || [],
   };
 }

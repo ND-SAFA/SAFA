@@ -1,12 +1,11 @@
-from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, TypedDict
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
+from tgen.contradictions.contradictions_result import ContradictionsResult
 
 
-@dataclass
-class HealthCheckResults:
-    context_traces: Optional[List[EnumDict]] = None
-    conflicting_ids: Optional[List[str]] = None
-    concept_matches: Optional[ConceptPipelineResponse] = None
+class HealthCheckResults(TypedDict):
+    context_traces: Optional[List[EnumDict]]
+    contradictions: Optional[ContradictionsResult]
+    concept_matches: Optional[ConceptPipelineResponse]

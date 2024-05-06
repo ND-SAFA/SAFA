@@ -1,8 +1,8 @@
 from test.contradictions.data_test_requirements import R1, R3, R2, R4, R5
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.contradictions.common_choices import CommonChoices
-from tgen.contradictions.contradiction_decision_nodes import SupportedContradictionDecisionNodes
-from tgen.contradictions.contradictions_tree_builder import ContradictionsTreeBuilder
+from tgen.contradictions.with_decision_tree.contradiction_decision_nodes import SupportedContradictionDecisionNodes
+from tgen.contradictions.with_decision_tree.contradictions_tree_builder import ContradictionsTreeBuilder
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.models.llm.open_ai_manager import OpenAIManager

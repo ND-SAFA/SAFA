@@ -8,9 +8,9 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.str_util import StrUtil
-from tgen.contradictions.contradictions_detector_with_tree import ContradictionsDetectorWithTree
-from tgen.contradictions.requirement import Requirement, RequirementConstituent
 from tgen.contradictions.user_display.bounding_box import BoundingBox
+from tgen.contradictions.with_decision_tree.contradictions_detector_with_tree import ContradictionsDetectorWithTree
+from tgen.contradictions.with_decision_tree.requirement import Requirement, RequirementConstituent
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.decision_tree.path import Path
 

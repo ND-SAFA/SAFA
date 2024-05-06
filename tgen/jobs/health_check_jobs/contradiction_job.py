@@ -1,7 +1,7 @@
 from typing import Any
 
 from tgen.common.util.dict_util import DictUtil
-from tgen.contradictions.contradictions_detector_with_tree import ContradictionsDetectorWithTree
+from tgen.contradictions.with_decision_tree.contradictions_detector_with_tree import ContradictionsDetectorWithTree
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.tracing.ranking.common.ranking_util import RankingUtil

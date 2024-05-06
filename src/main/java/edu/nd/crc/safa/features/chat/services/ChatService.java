@@ -1,10 +1,10 @@
 package edu.nd.crc.safa.features.chat.services;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
@@ -74,9 +74,8 @@ public class ChatService {
      * @return Chats owned by or shared with user.
      */
     public List<ChatDTO> getUserChats(SafaUser user) {
-        List<ChatDTO> ownedChats = chatRepository.findByOwner(user)
-            .stream().map(c -> ChatDTO.fromChat(c, ChatSharePermission.OWNER)).toList();
-        List<ChatDTO> userChats = new ArrayList<>(ownedChats);
+        List<ChatDTO> userChats = chatRepository.findByOwner(user)
+            .stream().map(c -> ChatDTO.fromChat(c, ChatSharePermission.OWNER)).collect(Collectors.toList());
         List<ChatDTO> sharedChats = chatShareRepository
             .findByUser(user)
             .stream()

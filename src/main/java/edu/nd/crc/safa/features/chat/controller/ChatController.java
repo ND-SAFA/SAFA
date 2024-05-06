@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ChatController extends BaseController {
 
-
     public ChatController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
     }

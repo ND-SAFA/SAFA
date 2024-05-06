@@ -39,6 +39,7 @@ public class CommentController extends BaseController {
     /**
      * Creates new comment on artifact.
      *
+     * @param artifactId              Artifact ID to create comment on.
      * @param commentCreateRequestDTO Contains content and type of comment to create.
      * @return DTO of created comment.
      */

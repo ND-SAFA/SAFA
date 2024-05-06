@@ -333,12 +333,13 @@ public class HealthService {
         return conceptComments;
     }
 
-    private <T, K> Map<T, List<CommentArtifact>> createCommentArtifactMap(ProjectVersion projectVersion,
-                                                                          Artifact targetArtifact,
-                                                                          Map<T, List<K>> group2concepts,
-                                                                          Function<T, String> contentCreator,
-                                                                          Function<K, Optional<Artifact>> artifactLookup,
-                                                                          CommentType commentType) {
+    private <T, K> Map<T, List<CommentArtifact>> createCommentArtifactMap(
+        ProjectVersion projectVersion,
+        Artifact targetArtifact,
+        Map<T, List<K>> group2concepts,
+        Function<T, String> contentCreator,
+        Function<K, Optional<Artifact>> artifactLookup,
+        CommentType commentType) {
         Map<T, List<CommentArtifact>> id2artifacts = new HashMap<>();
 
         for (Map.Entry<T, List<K>> entry : group2concepts.entrySet()) {

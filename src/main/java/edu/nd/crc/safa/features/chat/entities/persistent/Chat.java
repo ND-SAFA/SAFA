@@ -23,7 +23,6 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
-
 @Getter
 @Setter
 @AllArgsConstructor

@@ -18,6 +18,7 @@ public class HealthResponse {
      * Adds new checks to health checks.
      *
      * @param newChecks New checks to add.
+     * @param <T>       Type of comment being added.
      */
     public <T extends CommentDTO> void addHealthChecks(List<T> newChecks) {
         this.healthChecks.addAll(newChecks);

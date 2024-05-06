@@ -28,6 +28,7 @@ public class CommentService {
      * Creates comment from request DTO.
      *
      * @param commentCreateRequestDTO Request containing content, type, version id, and artifact id.
+     * @param artifactId              ID of artifact to create comment on.
      * @param author                  User who wrote the comment.
      * @param projectVersion          Project version this comment was created in.
      * @return DTO.

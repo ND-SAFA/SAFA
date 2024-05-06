@@ -24,6 +24,7 @@
         <typography variant="subtitle" value="Chats" />
         <text-button
           text
+          :disabled="chatApiStore.loading"
           label="Create"
           icon="add"
           data-cy="button-add-attribute"
@@ -34,7 +35,7 @@
         v-for="chat in chatStore.chats"
         :key="chat.id"
         :title="chat.title"
-        clickable
+        :clickable="!chatApiStore.loading"
         :focused="chatStore.currentChat?.id === chat.id"
         :action-cols="1"
         @click="handleSwitchChat(chat)"

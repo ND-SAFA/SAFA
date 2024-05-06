@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import { ChatApiHook, ChatMessageSchema, ProjectChatSchema } from "@/types";
+import { buildProjectChatMessage } from "@/util";
 import { chatStore, projectStore, useApi } from "@/hooks";
 import {
   createProjectChat,
@@ -77,12 +78,7 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
     message: string
   ) {
     await chatDialogApi.handleRequest(async () => {
-      const newMessage: ChatMessageSchema = {
-        id: "",
-        isUser: true,
-        message,
-        artifactIds: [],
-      };
+      const newMessage = buildProjectChatMessage({ message });
 
       if (!chat) return;
 

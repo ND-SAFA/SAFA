@@ -118,13 +118,13 @@
             placeholder="Ask a question"
             class="full-width bg-neutral"
             clearable
-            @keydown="handleKeydown($event, chatStore.currentChat)"
+            @keydown="handleKeydown"
           >
             <template #append>
               <icon-button
                 icon="forward"
                 tooltip="Send message"
-                @click="handleSendMessage(chatStore.currentChat)"
+                @click="handleSendMessage"
               />
             </template>
           </q-input>
@@ -168,8 +168,11 @@ const formattedMessages = computed(() => chatStore.currentMessagesDisplay);
 /**
  * Sends a chat message to the server.
  */
-function handleSendMessage(chat: ProjectChatSchema) {
-  chatApiStore.handleSendChatMessage(chat, currentMessage.value);
+function handleSendMessage() {
+  chatApiStore.handleSendChatMessage(
+    chatStore.currentChat,
+    currentMessage.value
+  );
   currentMessage.value = "";
 }
 
@@ -189,11 +192,10 @@ function handleSwitchChat(chat: ProjectChatSchema) {
 /**
  * Emits an event when enter is clicked and sends the message associated with the specific chat.
  * @param e - The keyboard event.
- * @param chat - The chat object to which the message will be sent.
  */
-function handleKeydown(e: KeyboardEvent, chat: ProjectChatSchema) {
+function handleKeydown(e: KeyboardEvent) {
   if (e.key === "Enter") {
-    handleSendMessage(chat);
+    handleSendMessage();
     e.preventDefault(); // To prevent form submission or other default actions
   }
 }

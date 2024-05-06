@@ -1,6 +1,6 @@
 import {
   ChatMessageSchema,
-  ChatMessageSendResponse,
+  ChatMessageSendResponseSchema,
   CreateProjectChatSchema,
   ProjectChatSchema,
 } from "@/types";
@@ -139,15 +139,16 @@ export async function getProjectChats(): Promise<ProjectChatSchema[]> {
 export async function createProjectChatMessage(
   chatId: string,
   message: ChatMessageSchema
-): Promise<ChatMessageSendResponse> {
+): Promise<ChatMessageSendResponseSchema> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
     return EXAMPLE_SAFA_MESSAGE_RESPONSE;
   }
 
-  return buildRequest<ChatMessageSendResponse, "chatId", ChatMessageSchema>(
-    "createChatMessage",
-    { chatId }
-  ).post(message);
+  return buildRequest<
+    ChatMessageSendResponseSchema,
+    "chatId",
+    ChatMessageSchema
+  >("createChatMessage", { chatId }).post(message);
 }
 
 /**

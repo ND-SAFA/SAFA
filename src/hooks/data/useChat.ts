@@ -87,7 +87,7 @@ export const useChat = defineStore("useChat", {
       this.chats = this.chats.filter((chat) => chat.id !== chatId);
 
       if (this.currentChat.id === chatId) {
-        // setes first chat or new empty chat if none left
+        // Sets first chat or new empty chat if none left.
         this.currentChat = this.chats[0] || buildProjectChat();
       }
     },

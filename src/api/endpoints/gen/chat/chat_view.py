@@ -3,6 +3,7 @@ from typing import Dict
 from api.endpoints.gen.chat.chat_serializer import ChatSerializer, ChatRequest
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
+from tgen.chat.message_meta import MessageMeta
 from tgen.jobs.chat_jobs.chat_job import ChatJob
 
 
@@ -15,5 +16,5 @@ def perform_chat(request: ChatRequest) -> Dict:
     """
     job_args = ViewUtil.create_job_args_from_api_definition(request.dataset)
     job = ChatJob(job_args, chat_history=request.chat_history)
-    response, related_artifacts = ViewUtil.run_job(job)
-    return {"response": response, "related_artifacts": related_artifacts}
+    message_meta: MessageMeta = ViewUtil.run_job(job)
+    return {"response": message_meta.message["content"], "related_artifacts": message_meta.artifact_ids}

@@ -21,10 +21,20 @@
       value="There are no active health checks."
     />
     <q-banner v-for="check in artifactHealth" :key="check.content" dense>
-      <flex-box align="center">
+      <flex-box align="start">
         <separator vertical :color="check.color" r="2" style="width: 2px" />
-        <icon size="sm" :variant="check.icon" :color="check.color" />
-        <typography :value="check.content" l="2" />
+        <icon
+          size="sm"
+          :variant="check.icon"
+          :color="check.color"
+          class="q-mt-sm"
+        />
+        <typography
+          :value="check.content"
+          l="2"
+          variant="markdown"
+          class="q-mt-sm"
+        />
       </flex-box>
       <div class="q-ml-sm q-mt-sm">
         <flex-box v-if="check.artifacts.length > 0">

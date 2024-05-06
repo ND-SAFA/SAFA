@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
-import { ChatApiHook, ChatMessageSchema, ProjectChatSchema } from "@/types";
+import { ChatApiHook, ProjectChatSchema } from "@/types";
 import { buildProjectChatMessage } from "@/util";
 import { chatStore, projectStore, useApi } from "@/hooks";
 import {
@@ -114,7 +114,7 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
       chatStore.updateChat({
         ...chat,
         messages: [
-          ...chat.messages.slice(0, -1), // everything but last user message
+          ...chat.messages, // Chat object not mutated, so the user message is not in this list
           messagesCreated.userMessage,
           messagesCreated.responseMessage,
         ],

@@ -8,7 +8,7 @@ import { ENABLED_FEATURES } from "@/util";
 import { buildRequest } from "@/api";
 
 const EXAMPLE_SAFA_MESSAGE: ChatMessageSchema = {
-  id: "1",
+  id: "3",
   isUser: false,
   message: "Hello! How can I help you?",
   artifactIds: [],
@@ -54,6 +54,11 @@ const EXAMPLE_NASA_CHAT: ProjectChatSchema = {
         "MRD1256",
         "MRD1262",
         "MRD1264",
+        "[Feature56] Kernel Profiling and Optimization",
+        "[FR231] Collect RCU Diagnostics and Statistics",
+        "kernel/rcu/tree_exp.h",
+        "kernel/rcu/tree.h",
+        "kernel/rcu/update.c",
       ],
     },
   ],
@@ -141,7 +146,10 @@ export async function createProjectChatMessage(
   message: ChatMessageSchema
 ): Promise<ChatMessageSendResponseSchema> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
-    return EXAMPLE_SAFA_MESSAGE_RESPONSE;
+    return {
+      ...EXAMPLE_SAFA_MESSAGE_RESPONSE,
+      userMessage: message,
+    };
   }
 
   return buildRequest<

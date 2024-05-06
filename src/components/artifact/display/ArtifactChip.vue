@@ -6,7 +6,7 @@
     style="max-width: 300px; height: fit-content"
     clickable
   >
-    <typography :value="props.artifact.name" wrap color="text" />
+    <artifact-name-display :artifact="props.artifact" />
     <q-popup-proxy>
       <artifact-body-display
         clickable
@@ -31,7 +31,7 @@ export default {
 import { computed } from "vue";
 import { ArtifactProps, ColorProps } from "@/types";
 import { selectionStore, timStore } from "@/hooks";
-import { Typography } from "@/components/common";
+import ArtifactNameDisplay from "./ArtifactNameDisplay.vue";
 import ArtifactBodyDisplay from "./ArtifactBodyDisplay.vue";
 
 const props = defineProps<ArtifactProps & ColorProps>();

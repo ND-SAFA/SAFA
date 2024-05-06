@@ -30,6 +30,7 @@
         :variant="props.isHeader ? 'subtitle' : undefined"
         :value="symbolName || fileName"
         ellipsis
+        color="text"
         :data-cy="props.dataCyName"
       />
       <q-tooltip v-if="props.displayTooltip">

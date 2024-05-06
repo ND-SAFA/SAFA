@@ -85,10 +85,10 @@
                   class="q-mr-md q-mt-md"
                 />
               </div>
-              <div class="q-pa-md bg-neutral rounded">
+              <div class="q-pa-md bg-neutral rounded overflow-auto">
                 <typography variant="subtitle" :value="message.userName" />
                 <typography variant="markdown" :value="message.message" />
-                <flex-box v-if="message.artifacts.length > 0">
+                <flex-box v-if="message.artifacts.length > 0" wrap>
                   <artifact-chip
                     v-for="relatedArtifact in message.artifacts"
                     :key="relatedArtifact.id"

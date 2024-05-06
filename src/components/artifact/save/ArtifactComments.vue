@@ -14,6 +14,7 @@
         @click="showResolved = !showResolved"
       />
     </template>
+
     <list-item
       v-for="comment in allComments"
       :key="comment.id"
@@ -85,6 +86,7 @@
         </template>
       </popup-edit-input>
     </list-item>
+
     <q-input
       v-model="newComment"
       autogrow

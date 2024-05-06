@@ -16,10 +16,12 @@
         @click="handleCheckHealth()"
       />
     </template>
+
     <typography
       v-if="artifactHealth.length === 0"
       value="There are no active health checks."
     />
+
     <q-banner v-for="check in artifactHealth" :key="check.content" dense>
       <flex-box align="start">
         <separator vertical :color="check.color" r="2" style="width: 2px" />

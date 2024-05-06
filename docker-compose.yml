@@ -14,18 +14,32 @@ services:
     networks:
     - safa_network
     environment:
-    - BROKER_URL=redis://redis:6379/0
-    - BROKER_USERNAME=guest
-    - BROKER_PASSWORD=guest
     - DEBUG=false
     - ENV_MODE=local
     - N_WORKERS=2
     - DEFAULT_CROSS_ENCODER_MODEL=cross-encoder/ms-marco-TinyBERT-L-2
     - DEFAULT_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
-
+    - BROKER=redis
+    - BROKER_URL=redis://redis:6379/0
+    - BROKER_USERNAME=guest
+    - BROKER_PASSWORD=guest
   redis:
     container_name: redis
     image: redis:alpine
+    networks:
+    - safa_network
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: "rabbitmq:3-management"
+    hostname: rabbitmq
+    environment:
+    - RABBITMQ_DEFAULT_VHOST=tgen_vhost
+    - RABBITMQ_DEFAULT_USER=guest
+    - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+    - "5672:5672" # RabbitMQ
+    - "15672:15672" # Management interface
     networks:
     - safa_network
 

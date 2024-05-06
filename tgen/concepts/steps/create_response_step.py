@@ -49,7 +49,7 @@ class CreateResponseStep(AbstractPipelineStep):
         """
         match_map = {}
         for m in matches:
-            loc = m["loc"]
+            loc = m["start_loc"]
             if loc not in match_map:
                 match_map[loc] = []
             match_map[loc].append(m)

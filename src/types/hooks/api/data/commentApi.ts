@@ -12,13 +12,13 @@ export interface CommentApiHook {
 
   /**
    * Adds a comment to the given artifact.
-   * @param artifactId - The ID of the artifact to add a comment to.
+   * @param artifact - The artifact to add a comment to.
    * @param content - The content of the comment.
    * @param type - The type of comment to add.
    * @param callbacks - Callbacks to run after the comment is added.
    */
   handleAddComment(
-    artifactId: string,
+    artifact: ArtifactSchema,
     content: string,
     type: "flag" | "conversation",
     callbacks?: IOHandlerCallback
@@ -26,34 +26,34 @@ export interface CommentApiHook {
 
   /**
    * Resolves a comment on the given artifact.
-   * @param artifactId - The ID of the artifact to resolve a comment on.
+   * @param artifact - The artifact to resolve a comment on.
    * @param comment - The comment to resolve.
    */
   handleResolveComment(
-    artifactId: string,
+    artifact: ArtifactSchema,
     comment: BasicCommentSchema
   ): Promise<void>;
 
   /**
    * Edits a comment on the given artifact.
-   * @param artifactId - The ID of the artifact to edit a comment on.
+   * @param artifact - The artifact to edit a comment on.
    * @param comment - The comment to edit.
    * @param callbacks - Callbacks to run after the comment is edited.
    */
   handleEditComment(
-    artifactId: string,
+    artifact: ArtifactSchema,
     comment: BasicCommentSchema,
     callbacks?: IOHandlerCallback
   ): Promise<void>;
 
   /**
    * Deletes a comment on the given artifact.
-   * @param artifactId - The ID of the artifact to delete a comment on.
+   * @param artifact - The artifact to delete a comment on.
    * @param commentId - The ID of the comment to delete.
    * @param callbacks - Callbacks to run after the comment is deleted.
    */
   handleDeleteComment(
-    artifactId: string,
+    artifact: ArtifactSchema,
     commentId: string,
     callbacks?: IOHandlerCallback
   ): Promise<void>;

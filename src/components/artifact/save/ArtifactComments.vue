@@ -14,6 +14,7 @@
         @click="showResolved = !showResolved"
       />
     </template>
+
     <list-item
       v-for="comment in allComments"
       :key="comment.id"
@@ -85,6 +86,7 @@
         </template>
       </popup-edit-input>
     </list-item>
+
     <q-input
       v-model="newComment"
       autogrow
@@ -148,7 +150,12 @@ export default {
 import { computed, onMounted, ref, watch } from "vue";
 import { BasicCommentSchema, CommentSchema } from "@/types";
 import { ENABLED_FEATURES, timestampToDisplay } from "@/util";
-import { commentApiStore, commentStore, selectionStore } from "@/hooks";
+import {
+  artifactStore,
+  commentApiStore,
+  commentStore,
+  selectionStore,
+} from "@/hooks";
 import {
   PanelCard,
   ListItem,
@@ -166,6 +173,7 @@ const commentType = ref<"conversation" | "flag">("conversation");
 const editedComment = ref<BasicCommentSchema | null>(null);
 
 const artifactId = computed(() => selectionStore.selectedArtifactId);
+const artifact = computed(() => artifactStore.selectedArtifact);
 
 const allComments = computed(() =>
   commentStore.getCommentsAndFlags(artifactId.value, showResolved.value)
@@ -184,8 +192,10 @@ function handleReset() {
  * Adds a new comment to the artifact.
  */
 function handleAddComment() {
+  if (!artifact.value) return;
+
   commentApiStore.handleAddComment(
-    artifactId.value,
+    artifact.value,
     newComment.value,
     commentType.value,
     {
@@ -199,7 +209,9 @@ function handleAddComment() {
  * @param comment - The comment to resolve.
  */
 function handleResolveComment(comment: BasicCommentSchema) {
-  commentApiStore.handleResolveComment(artifactId.value, comment);
+  if (!artifact.value) return;
+
+  commentApiStore.handleResolveComment(artifact.value, comment);
 }
 
 /**
@@ -226,11 +238,11 @@ function handleCloseEditedComment() {
  * Saves the edited comment.
  */
 function handleSaveEditedComment(content: string) {
-  if (!editedComment.value) return;
+  if (!editedComment.value || !artifact.value) return;
 
   editedComment.value.content = content;
 
-  commentApiStore.handleEditComment(artifactId.value, editedComment.value, {
+  commentApiStore.handleEditComment(artifact.value, editedComment.value, {
     onSuccess: handleReset,
   });
 }
@@ -240,7 +252,9 @@ function handleSaveEditedComment(content: string) {
  * @param comment - The comment to delete.
  */
 function handleDeleteComment(comment: CommentSchema) {
-  commentApiStore.handleDeleteComment(artifactId.value, comment.id);
+  if (!artifact.value) return;
+
+  commentApiStore.handleDeleteComment(artifact.value, comment.id);
 }
 
 onMounted(() => {

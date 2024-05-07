@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 
 import { computed } from "vue";
-import { ChatApiHook, ChatMessageSchema, ProjectChatSchema } from "@/types";
+import { ChatApiHook, ProjectChatSchema } from "@/types";
+import { buildProjectChatMessage } from "@/util";
 import { chatStore, projectStore, useApi } from "@/hooks";
 import {
   createProjectChat,
@@ -27,50 +28,68 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
   async function handleGetProjectChats() {
     await chatApi.handleRequest(async () => {
       chatStore.initializeChats(await getProjectChats());
-      await handleLoadProjectChatMessages(chatStore.currentChat.id);
+      await handleLoadProjectChatMessages(chatStore.currentChat);
     }, {});
   }
 
-  async function handleLoadProjectChatMessages(chatId: string) {
-    if (!chatId) {
-      return; // on mounted might have default chat with no id
-    }
+  async function handleLoadProjectChatMessages(chat: ProjectChatSchema) {
+    // Skip loading messages if the chat has yet to be created.
+    if (!chat.id) return;
+
     await chatApi.handleRequest(async () => {
-      chatStore.updateChat(await getProjectChatMessages(chatId));
+      chatStore.switchChat(chat);
+      chatStore.updateChat(await getProjectChatMessages(chat.id));
     }, {});
   }
 
   async function handleCreateProjectChat(
     title?: string
   ): Promise<ProjectChatSchema | undefined> {
-    let chatCreated; // Define the variable to store the chat creation result
+    let chatCreated: ProjectChatSchema | undefined; // Define the variable to store the chat creation result
+
     await chatApi.handleRequest(async () => {
       chatCreated = await createProjectChat(projectStore.versionId, title);
-      chatStore.addChat(chatCreated); // Use the chatCreated variable
+      chatStore.deleteChat(""); // Delete the unsaved chat to replace.
+      chatStore.addChat(chatCreated); // Add the newly created chat and switch to it.
     }, {});
+
     return chatCreated; // Return the chatCreated variable
   }
 
   async function handleEditProjectChat(title: string) {
-    await chatApi.handleRequest(async () => {
-      const chatId = chatStore.currentChat.id;
+    await chatApi.handleRequest(
+      async () => {
+        const chatId = chatStore.currentChat.id;
 
-      if (!chatId) return;
+        if (!chatId) return;
 
-      chatStore.currentChat.title = title;
+        chatStore.currentChat.title = title;
 
-      await editProjectChat(chatStore.currentChat);
-    }, {});
+        await editProjectChat(chatStore.currentChat);
+      },
+      {
+        success: "Chat title has been updated: " + title,
+        error: "Unable to update chat title: " + title,
+      }
+    );
   }
 
   async function handleDeleteProjectChat() {
-    await chatApi.handleRequest(async () => {
-      const chatId = chatStore.currentChat.id;
-      if (chatId) {
-        await deleteProjectChat(chatId);
+    const title = chatStore.currentChat.title;
+
+    await chatApi.handleRequest(
+      async () => {
+        const chatId = chatStore.currentChat.id;
+        if (chatId) {
+          await deleteProjectChat(chatId);
+        }
+        chatStore.deleteChat(chatId);
+      },
+      {
+        success: "Chat has been deleted: " + title,
+        error: "Unable to delete chat: " + title,
       }
-      chatStore.deleteChat(chatId);
-    }, {});
+    );
   }
 
   async function handleSendChatMessage(
@@ -78,26 +97,9 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
     message: string
   ) {
     await chatDialogApi.handleRequest(async () => {
-      const newMessage: ChatMessageSchema = {
-        id: "",
-        isUser: true,
-        message,
-        artifactIds: [],
-      };
+      const newMessage = buildProjectChatMessage({ message });
 
-      if (!chat) return;
-
-      /**
-       * BUG
-       * Slight problem here, currentChat could be switched at anytime
-       * which is why this now accepts the chat to send the message in.
-       * However, handleCreateProjectChat will create the currentChat
-       * and set the new response there. So, there is a chance that the user
-       * sends their first message, jumps to another chat and sends another message,
-       * and so when the first chat is done creating currentChat could have switched.
-       */
       if (!chat.id) {
-        chatStore.deleteChat(""); // todo: better way to delete empty current chat?
         const chatCreated = await handleCreateProjectChat(chat.title); // sets chat with id in store.
         if (chatCreated) {
           chat = chatCreated;
@@ -117,18 +119,16 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
         newMessage
       );
 
-      const chatMessages = [
-        ...messagesWithNewMessage.slice(0, -1), // everything but last user message
-        messagesCreated.userMessage,
-        messagesCreated.responseMessage,
-      ];
-
-      console.log("New Messages:", chatMessages);
-      chat = { ...chat, messages: chatMessages };
-      chatStore.updateChat(chat);
+      chatStore.updateChat({
+        ...chat,
+        messages: [
+          ...chat.messages, // Chat object not mutated, so the user message is not in this list
+          messagesCreated.userMessage,
+          messagesCreated.responseMessage,
+        ],
+      });
 
       if (chatMessages.length == 2) {
-        // if first chat response then generate title
         const chatWithTitle = await generateChatTitle(chat.id);
         chat = { ...chat, title: chatWithTitle.title };
         chatStore.updateChat(chat);

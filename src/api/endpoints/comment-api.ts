@@ -60,7 +60,7 @@ const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
     {
       id: "13",
       versionId: "1",
-      content: "Product Refresh Rate not found in the project vocabulary.",
+      content: "`Product Refresh Rate` not found in the project vocabulary.",
       userId: "tim@safa.ai",
       status: "active",
       type: "undefined_concept",

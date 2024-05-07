@@ -20,10 +20,10 @@ export interface ChatApiHook {
   handleGetProjectChats(): Promise<void>;
 
   /**
-   * Retrieves messages for given chat and updates store.
-   * @param chatId - ID of chat to load messages for.
+   * Switches to the given chat, then retrieves messages and updates the store.
+   * @param chat - The chat to load messages for.
    */
-  handleLoadProjectChatMessages(chatId: string): Promise<void>;
+  handleLoadProjectChatMessages(chat: ProjectChatSchema): Promise<void>;
 
   /**
    * Creates a new chat for the current project, and sets it as the current chat.

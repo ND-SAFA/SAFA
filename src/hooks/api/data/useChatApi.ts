@@ -119,16 +119,14 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
         newMessage
       );
 
-      chatStore.updateChat({
-        ...chat,
-        messages: [
-          ...chat.messages, // Chat object not mutated, so the user message is not in this list
-          messagesCreated.userMessage,
-          messagesCreated.responseMessage,
-        ],
-      });
+      chat.messages = [
+        ...chat.messages, // Chat object not mutated, so the user message is not in this list
+        messagesCreated.userMessage,
+        messagesCreated.responseMessage,
+      ];
+      chatStore.updateChat(chat);
 
-      if (chatMessages.length == 2) {
+      if (chat.messages.length == 2) {
         const chatWithTitle = await generateChatTitle(chat.id);
         chat = { ...chat, title: chatWithTitle.title };
         chatStore.updateChat(chat);

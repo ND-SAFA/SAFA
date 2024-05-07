@@ -10,3 +10,4 @@ class LLMPromptBuildArgs:
     prompt_suffix: str  # Goes after the prompt.
     completion_prefix: str  # Goes before the completion label during fine-tuning for classification
     completion_suffix: str  # Goes after the completion label during fine-tuning for classification
+    build_system_prompts: bool

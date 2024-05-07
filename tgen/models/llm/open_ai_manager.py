@@ -22,7 +22,8 @@ Res = namedtuple('Res', ['choices'])
 
 
 class OpenAIManager(AbstractLLMManager[OpenAIObject]):
-    prompt_args = LLMPromptBuildArgs(prompt_prefix="", prompt_suffix="\n>", completion_prefix="", completion_suffix="")
+    prompt_args = LLMPromptBuildArgs(prompt_prefix="", prompt_suffix="\n>", completion_prefix="", completion_suffix="",
+                                     build_system_prompts=False)
 
     def __init__(self, llm_args: OpenAIArgs = None):
         """

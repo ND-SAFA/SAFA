@@ -4,7 +4,6 @@ from typing import Any, Dict, List
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.str_util import StrUtil
-from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt
@@ -38,7 +37,7 @@ class PromptBuilder:
         """
         format_vars = {key: val[self._n_built] for key, val in self.format_variables.items() if len(val) > self._n_built}
         prompt_kwargs.update(format_vars)
-        build_all = not isinstance(model_format_args, AnthropicArgs)
+        build_all = not model_format_args.build_system_prompts
         system_prompt = self._build_prompts(build_all=build_all, only_use_system_prompts=True, **prompt_kwargs) \
             if not build_all else None
         base_prompt = self._build_prompts(build_all=build_all, only_use_system_prompts=False, **prompt_kwargs)

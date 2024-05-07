@@ -49,7 +49,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
 
     NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
     prompt_args = LLMPromptBuildArgs(prompt_prefix=EMPTY_STRING, prompt_suffix=EMPTY_STRING, completion_prefix=" ",
-                                     completion_suffix="###")
+                                     completion_suffix="###", build_system_prompts=True)
 
     def __init__(self, llm_args: AnthropicArgs = None):
         """
@@ -102,6 +102,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             """
             index, prompt = payload
             prompt_params = {**params, AnthropicParams.MESSAGES: prompt}
+            if AnthropicParams.SYSTEM in prompt_params and prompt_params[AnthropicParams.SYSTEM] is None:
+                prompt_params.pop(AnthropicParams.SYSTEM)
             local_response = anthropic_client.messages.create(**prompt_params)
             return local_response
 

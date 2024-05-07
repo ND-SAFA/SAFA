@@ -11,7 +11,6 @@ import edu.nd.crc.safa.features.chat.entities.dtos.ChatMessageDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageRequest;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageResponse;
 import edu.nd.crc.safa.features.chat.entities.persistent.GenChatResponse;
-import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.generation.GenerationalTest;
@@ -81,11 +80,7 @@ class TestChatMessage extends GenerationalTest {
     private void mockChatResponse(String responseContent, List<String> artifactNames) {
         GenChatResponse genResponse = new GenChatResponse();
         genResponse.setMessage(responseContent);
-        genResponse.setArtifactIds(artifactNames.stream().map(aName -> {
-            GenerationArtifact artifact = new GenerationArtifact();
-            artifact.setId(aName);
-            return artifact;
-        }).toList());
+        genResponse.setArtifactIds(artifactNames);
         getServer().setJobResponse(genResponse);
     }
 

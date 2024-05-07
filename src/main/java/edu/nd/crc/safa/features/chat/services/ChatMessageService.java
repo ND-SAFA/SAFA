@@ -89,7 +89,11 @@ public class ChatMessageService {
         for (ChatMessage chatMessage : chatMessages) {
             List<String> artifactIds = new ArrayList<>();
             if (message2artifacts.containsKey(chatMessage)) {
-                artifactIds.addAll(message2artifacts.get(chatMessage).stream().map(c -> c.getArtifact().getName()).toList());
+                artifactIds.addAll(message2artifacts
+                    .get(chatMessage)
+                    .stream()
+                    .map(c -> c.getArtifact().getName())
+                    .toList());
             }
             genChatMessages.add(new GenChatMessage(chatMessage, artifactIds));
         }

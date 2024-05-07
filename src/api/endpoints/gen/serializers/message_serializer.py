@@ -30,4 +30,4 @@ class MessageMetaSerializer(AbstractSerializer):
         assert role.upper() in dir(PromptRoles), f"Unknown role: {role}"
         message = Message(content=content, role=role)
 
-        return MessageMeta(message=message, artifact_ids=validated_data["artifact_ids"])
+        return MessageMeta(message=message, artifact_ids=validated_data.get("artifact_ids", []))

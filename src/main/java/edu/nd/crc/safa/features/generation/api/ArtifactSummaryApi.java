@@ -30,7 +30,7 @@ public class ArtifactSummaryApi {
         genApiController.log(logger, String.format("Summarizing %s artifacts.", nArtifacts));
         if (nArtifacts <= SUMMARY_ARTIFACT_THRESHOLD) {
             predictEndpoint = TGenConfig.getEndpoint("summarize-sync");
-            return this.genApiController.sendGenRequest(predictEndpoint, payload, SummaryResponse.class);
+            return this.genApiController.performRequest(predictEndpoint, payload, SummaryResponse.class);
         } else {
             predictEndpoint = TGenConfig.getEndpoint("summarize");
             return genApiController.performJob(predictEndpoint, payload, SummaryResponse.class, logger);

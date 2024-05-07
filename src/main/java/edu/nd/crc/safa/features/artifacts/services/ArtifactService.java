@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactLookupTable;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
@@ -111,5 +112,17 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
             throw new SafaError("Could not find artifact with given ID.");
         }
         return artifactOptional.get();
+    }
+
+    /**
+     * Retrieves generation artifacts for project version.
+     *
+     * @param projectVersion Version of artifacts to retrieve.
+     * @return List of artifacts for GEN.
+     */
+    public ArtifactLookupTable getArtifactLookupTable(ProjectVersion projectVersion) {
+        List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
+            .retrieveVersionEntitiesByProjectVersion(projectVersion);
+        return new ArtifactLookupTable(artifactVersions);
     }
 }

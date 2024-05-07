@@ -9,7 +9,7 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.CreateChatRequestDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.EditChatRequestDTO;
-import edu.nd.crc.safa.features.chat.entities.persistent.ChatSharePermission;
+import edu.nd.crc.safa.features.chat.entities.persistent.ChatPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
@@ -36,7 +36,7 @@ class TestChatCrud extends ApplicationBaseTest {
         assertThat(userChats.size()).isZero();
 
         ChatDTO chat = createChat(projectVersion); // create
-        verifyChat(chat, CreateChatRequestDTO.DEFAULT_TITLE, ChatSharePermission.OWNER);
+        verifyChat(chat, CreateChatRequestDTO.DEFAULT_TITLE, ChatPermission.OWNER);
 
         userChats = getUserChats(projectVersion); // verify : create
         assertThat(userChats.size()).isEqualTo(1);
@@ -48,7 +48,7 @@ class TestChatCrud extends ApplicationBaseTest {
         userChats = getUserChats(projectVersion); // verify: update
         ChatDTO userChat = userChats.get(0);
         assertThat(userChat.getTitle()).isEqualTo(NEW_TITLE);
-        verifyChat(userChats.get(0), NEW_TITLE, ChatSharePermission.OWNER);
+        verifyChat(userChats.get(0), NEW_TITLE, ChatPermission.OWNER);
 
         deleteChat(userChat.getId()); // delete
 
@@ -74,7 +74,7 @@ class TestChatCrud extends ApplicationBaseTest {
             .putWithJsonObject(request, ChatDTO.class);
     }
 
-    private void verifyChat(ChatDTO chat, String title, ChatSharePermission chatPermission) {
+    private void verifyChat(ChatDTO chat, String title, ChatPermission chatPermission) {
         assertThat(chat.getId()).isNotNull();
         assertThat(chat.getTitle()).isNotNull().isEqualTo(title);
         assertThat(chat.getPermission()).isEqualTo(chatPermission);

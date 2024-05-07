@@ -81,6 +81,7 @@ public class AppRoutes {
         private static final String BY_ID = ROOT + "/{chatId}";
         public static final String CHAT_UPDATE = BY_ID;
         public static final String CHAT_DELETE = BY_ID;
+        public static final String CHAT_TITLE = BY_ID + "/title";
 
         public static class Message {
             public static final String MESSAGE_SEND = BY_ID + "/messages";

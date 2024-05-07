@@ -60,5 +60,5 @@ public class ChatShare {
     @Column
     @Enumerated(EnumType.STRING)
     @JdbcType(VarcharJdbcType.class)
-    private ChatSharePermission permission;
+    private ChatPermission permission;
 }

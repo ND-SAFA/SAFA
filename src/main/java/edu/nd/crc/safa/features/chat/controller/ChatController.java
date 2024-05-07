@@ -10,6 +10,8 @@ import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.CreateChatRequestDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.EditChatRequestDTO;
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
+import edu.nd.crc.safa.features.chat.entities.persistent.ChatPermission;
+import edu.nd.crc.safa.features.chat.services.ChatService;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
@@ -31,6 +33,22 @@ public class ChatController extends BaseController {
 
     public ChatController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider) {
         super(resourceBuilder, serviceProvider);
+    }
+
+    /**
+     * Generates new title for chat.
+     *
+     * @param chatId ID of chat to generate title for.
+     * @return Updated ChatDTO.
+     */
+    @PostMapping(AppRoutes.Chat.CHAT_TITLE)
+    public ChatDTO getChatTitle(@PathVariable UUID chatId) {
+        ChatService chatService = getServiceProvider().getChatService();
+        Chat chat = chatService.getChatById(chatId);
+        ChatPermission chatPermission = chatService.verifyChatPermission(chat, getCurrentUser(), ChatPermission.EDIT);
+        String newTitle = chatService.generateChatTitle(chat);
+        chat.setTitle(newTitle);
+        return ChatDTO.fromChat(chat, chatPermission);
     }
 
     /**

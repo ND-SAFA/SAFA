@@ -6,12 +6,16 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
+import edu.nd.crc.safa.features.chat.entities.gen.GenChatMessage;
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
+import edu.nd.crc.safa.features.chat.entities.persistent.ChatPermission;
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatShare;
-import edu.nd.crc.safa.features.chat.entities.persistent.ChatSharePermission;
 import edu.nd.crc.safa.features.chat.repositories.ChatRepository;
 import edu.nd.crc.safa.features.chat.repositories.ChatShareRepository;
+import edu.nd.crc.safa.features.generation.api.GenApi;
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -26,6 +30,27 @@ import org.springframework.stereotype.Service;
 public class ChatService {
     private ChatRepository chatRepository;
     private ChatShareRepository chatShareRepository;
+    private ChatMessageService chatMessageService;
+    private GenApi genApi;
+    private ArtifactService artifactService;
+
+    /**
+     * Generates a new title for chat.
+     *
+     * @param chat The chat to generate title for.
+     * @return Response containing new title.
+     */
+    public String generateChatTitle(Chat chat) {
+        List<GenChatMessage> genChatMessages = chatMessageService.getGenChatMessages(chat);
+        List<GenerationArtifact> generationArtifacts =
+            artifactService
+                .getArtifactLookupTable(chat.getProjectVersion())
+                .getGenerationArtifacts();
+        String generatedTitle = genApi.generateChatTitle(genChatMessages, generationArtifacts).getTitle();
+        chat.setTitle(generatedTitle);
+        this.chatRepository.save(chat);
+        return generatedTitle;
+    }
 
     /**
      * Creates new empty chat.
@@ -43,7 +68,7 @@ public class ChatService {
         chat.setProjectVersion(projectVersion);
         chat.setTitle(title);
         chat = chatRepository.save(chat);
-        return ChatDTO.fromChat(chat, ChatSharePermission.OWNER);
+        return ChatDTO.fromChat(chat, ChatPermission.OWNER);
     }
 
     /**
@@ -55,7 +80,7 @@ public class ChatService {
      * @return The updated chat.
      */
     public ChatDTO updateChat(Chat chat, String newTitle, SafaUser user) {
-        ChatSharePermission permission = verifyChatPermission(chat, user, ChatSharePermission.EDIT);
+        ChatPermission permission = verifyChatPermission(chat, user, ChatPermission.EDIT);
 
         if (newTitle == null || newTitle.isBlank()) {
             throw new SafaError("Unable to save chat with empty title.");
@@ -75,7 +100,7 @@ public class ChatService {
      */
     public List<ChatDTO> getUserChats(SafaUser user) {
         List<ChatDTO> userChats = chatRepository.findByOwner(user)
-            .stream().map(c -> ChatDTO.fromChat(c, ChatSharePermission.OWNER)).collect(Collectors.toList());
+            .stream().map(c -> ChatDTO.fromChat(c, ChatPermission.OWNER)).collect(Collectors.toList());
         List<ChatDTO> sharedChats = chatShareRepository
             .findByUser(user)
             .stream()
@@ -108,17 +133,17 @@ public class ChatService {
      * @param requestedPermission The minimum acceptable permission
      * @return The permission level that user has on the chat.
      */
-    public ChatSharePermission verifyChatPermission(Chat chat, SafaUser user, ChatSharePermission requestedPermission) {
+    public ChatPermission verifyChatPermission(Chat chat, SafaUser user, ChatPermission requestedPermission) {
         Optional<ChatShare> chatShareOptional = chatShareRepository.findByChatAndUser(chat, user);
         if (chat.isOwner(user)) {
-            return ChatSharePermission.OWNER;
+            return ChatPermission.OWNER;
         }
 
         if (chatShareOptional.isEmpty()) {
             throw new SafaError("User does not have permission to chat.");
         }
         ChatShare chatShare = chatShareOptional.get();
-        ChatSharePermission chatPermission = chatShare.getPermission();
+        ChatPermission chatPermission = chatShare.getPermission();
         if (!chatPermission.hasPermission(requestedPermission)) {
             throw new MissingPermissionException(requestedPermission);
         }

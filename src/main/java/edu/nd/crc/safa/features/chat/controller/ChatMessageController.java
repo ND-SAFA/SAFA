@@ -10,7 +10,7 @@ import edu.nd.crc.safa.features.chat.entities.dtos.ChatMessageDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageRequest;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageResponse;
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
-import edu.nd.crc.safa.features.chat.entities.persistent.ChatSharePermission;
+import edu.nd.crc.safa.features.chat.entities.persistent.ChatPermission;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -62,9 +62,9 @@ public class ChatMessageController extends BaseController {
         SafaUser currentUser = getCurrentUser();
         Chat chat = getServiceProvider().getChatService().getChatById(chatId);
         List<ChatMessageDTO> chatMessages = getServiceProvider().getChatMessageService().getChatMessages(chat);
-        ChatSharePermission chatPermission = getServiceProvider().getChatService().verifyChatPermission(chat,
+        ChatPermission chatPermission = getServiceProvider().getChatService().verifyChatPermission(chat,
             currentUser,
-            ChatSharePermission.READ);
+            ChatPermission.READ);
         ChatDTO chatDTO = ChatDTO.fromChat(chat, chatPermission);
         chatDTO.setMessages(chatMessages);
         return chatDTO;

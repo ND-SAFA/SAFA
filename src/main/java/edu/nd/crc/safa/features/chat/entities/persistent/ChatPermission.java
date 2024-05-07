@@ -7,7 +7,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public enum ChatSharePermission implements Permission {
+public enum ChatPermission implements Permission {
     READ(0),
     EDIT(1),
     OWNER(2);
@@ -23,7 +23,7 @@ public enum ChatSharePermission implements Permission {
      * @param requestedPermission Permission expected to be met.
      * @return True if permission is met.
      */
-    public boolean hasPermission(ChatSharePermission requestedPermission) {
+    public boolean hasPermission(ChatPermission requestedPermission) {
         return requestedPermission.level >= this.level;
     }
 

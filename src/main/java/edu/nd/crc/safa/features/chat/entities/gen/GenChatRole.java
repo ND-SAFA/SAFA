@@ -1,4 +1,4 @@
-package edu.nd.crc.safa.features.chat.entities.dtos.gen;
+package edu.nd.crc.safa.features.chat.entities.gen;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 

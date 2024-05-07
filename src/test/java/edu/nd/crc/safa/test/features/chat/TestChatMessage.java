@@ -6,19 +6,16 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatMessageDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageRequest;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageResponse;
 import edu.nd.crc.safa.features.chat.entities.persistent.GenChatResponse;
-import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.generation.GenerationalTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
-import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,45 +29,28 @@ class TestChatMessage extends GenerationalTest {
     @Test
     void testSendChatMessage() throws Exception {
 
-        String artifactBody = "artifact body";
-        String artifactType = "artifact type";
-        String userMessageText = "this is the user message.";
-        String artifactName = "RE-8";
-        String responseText = "Response";
-        String chatTitle = "Hello";
 
         // Create project, version, and artifact.
         SafaUser currentUser = getCurrentUser();
         ProjectVersion projectVersion = rootBuilder.actions(a -> a.createProjectWithVersion(currentUser)).get();
-        ArtifactAppEntity artifact = new ArtifactAppEntity();
-        artifact.setBody(artifactBody);
-        artifact.setType(artifactType);
-        artifact.setName(artifactName);
-        ArtifactAppEntity artifactAdded = this.rootBuilder.actions(a -> a.commit(
-                CommitBuilder
-                    .withVersion(projectVersion)
-                    .withAddedArtifact(artifact)
-            ).getArtifact(ModificationType.ADDED, 0))
-            .get();
-        List<String> artifactNames = List.of(artifactAdded.getName());
-        List<UUID> artifactIds = List.of(artifactAdded.getId());
+        ChatTestData testData = new ChatTestData();
+
+        testData.createProject(this.rootBuilder, projectVersion);
 
         // create chat
-        ChatDTO chat = getServiceProvider().getChatService().createNewChat(currentUser, projectVersion, chatTitle);
+        ChatDTO chat = getServiceProvider().getChatService().createNewChat(currentUser, projectVersion,
+            ChatTestData.chatTitle);
 
         // verify no messages in chat.
-        ChatDTO chatDTO = SafaRequest
-            .withRoute(AppRoutes.Chat.Message.MESSAGE_GET)
-            .withCustomReplacement("chatId", chat.getId())
-            .getAsType(ChatDTO.class);
+        ChatDTO chatDTO = ChatTestData.retrieveChat(chat.getId());
         assertThat(chatDTO.getMessages().size()).isEqualTo(0);
 
         // mock: chat response
-        mockChatResponse(responseText, artifactNames);
+        mockChatResponse(ChatTestData.responseText, testData.getArtifactNames());
 
         // step 1 - create message
         SendChatMessageRequest request = new SendChatMessageRequest();
-        request.setMessage(userMessageText);
+        request.setMessage(ChatTestData.userMessageText);
 
         SendChatMessageResponse response = SafaRequest
             .withRoute(AppRoutes.Chat.Message.MESSAGE_SEND)
@@ -79,20 +59,17 @@ class TestChatMessage extends GenerationalTest {
 
         // verify response
         ChatMessageDTO userMessage = response.getUserMessage();
-        verifyUserMessage(userMessage, userMessageText);
+        verifyUserMessage(userMessage, ChatTestData.userMessageText);
 
         ChatMessageDTO responseMessage = response.getResponseMessage();
-        verifyResponseMessage(responseMessage, responseText, artifactIds);
+        verifyResponseMessage(responseMessage, ChatTestData.responseText, testData.getArtifactIds());
 
         // verify - retrieve message and response in chat
-        chatDTO = SafaRequest
-            .withRoute(AppRoutes.Chat.Message.MESSAGE_GET)
-            .withCustomReplacement("chatId", chat.getId())
-            .getAsType(ChatDTO.class);
+        chatDTO = ChatTestData.retrieveChat(chat.getId());
 
         assertThat(chatDTO.getMessages().size()).isEqualTo(2);
-        verifyUserMessage(chatDTO.getMessages().get(0), userMessageText);
-        verifyResponseMessage(chatDTO.getMessages().get(1), responseText, artifactIds);
+        verifyUserMessage(chatDTO.getMessages().get(0), ChatTestData.userMessageText);
+        verifyResponseMessage(chatDTO.getMessages().get(1), ChatTestData.responseText, testData.getArtifactIds());
     }
 
     /**
@@ -103,8 +80,8 @@ class TestChatMessage extends GenerationalTest {
      */
     private void mockChatResponse(String responseContent, List<String> artifactNames) {
         GenChatResponse genResponse = new GenChatResponse();
-        genResponse.setResponse(responseContent);
-        genResponse.setRelatedArtifacts(artifactNames.stream().map(aName -> {
+        genResponse.setMessage(responseContent);
+        genResponse.setArtifactIds(artifactNames.stream().map(aName -> {
             GenerationArtifact artifact = new GenerationArtifact();
             artifact.setId(aName);
             return artifact;

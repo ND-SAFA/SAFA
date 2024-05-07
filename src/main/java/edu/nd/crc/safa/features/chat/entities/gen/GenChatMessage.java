@@ -1,4 +1,7 @@
-package edu.nd.crc.safa.features.chat.entities.dtos.gen;
+package edu.nd.crc.safa.features.chat.entities.gen;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatMessage;
 
@@ -11,20 +14,28 @@ import lombok.NoArgsConstructor;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GenChatMessage {
+    /**
+     * Content of chat message
+     */
     private String content;
     /**
      * Either "assistant"
      */
     private GenChatRole role;
+    /**
+     * Artifact Ids used in chat.
+     */
+    private List<String> artifactIds = new ArrayList<>();
 
     /**
      * Constructs Gen message from ChatMessage (persistent).
      *
      * @param chatMessage The persisted chat message.
      */
-    public GenChatMessage(ChatMessage chatMessage) {
+    public GenChatMessage(ChatMessage chatMessage, List<String> artifactIds) {
         this.role = GenChatRole.fromIsUser(chatMessage.isUser());
         this.content = chatMessage.getContent();
+        this.artifactIds = artifactIds;
     }
 
     /**

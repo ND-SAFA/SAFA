@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
-import edu.nd.crc.safa.features.chat.entities.persistent.ChatSharePermission;
+import edu.nd.crc.safa.features.chat.entities.persistent.ChatPermission;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
@@ -29,7 +29,7 @@ public class ChatDTO {
     /**
      * Permission user has on chat.
      */
-    private ChatSharePermission permission;
+    private ChatPermission permission;
     /**
      * List of messages in chat.
      */
@@ -46,7 +46,7 @@ public class ChatDTO {
      * @param permission The permission to attach to chat.
      * @return ChatDTO with fields copied from Chat.
      */
-    public static ChatDTO fromChat(Chat chat, ChatSharePermission permission) {
+    public static ChatDTO fromChat(Chat chat, ChatPermission permission) {
         ChatDTO DTO = new ChatDTO();
         DTO.setId(chat.getId());
         DTO.setTitle(chat.getTitle());

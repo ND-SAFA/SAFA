@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactLookupTable;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
-import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
 import edu.nd.crc.safa.features.chat.entities.dtos.ChatMessageDTO;
 import edu.nd.crc.safa.features.chat.entities.dtos.SendChatMessageResponse;
+import edu.nd.crc.safa.features.chat.entities.gen.GenChatMessage;
 import edu.nd.crc.safa.features.chat.entities.persistent.Chat;
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatMessage;
 import edu.nd.crc.safa.features.chat.entities.persistent.ChatMessageArtifact;
@@ -19,7 +19,6 @@ import edu.nd.crc.safa.features.chat.entities.persistent.GenChatResponse;
 import edu.nd.crc.safa.features.chat.repositories.ChatMessageArtifactRepository;
 import edu.nd.crc.safa.features.chat.repositories.ChatMessageRepository;
 import edu.nd.crc.safa.features.generation.api.GenApi;
-import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
@@ -34,7 +33,6 @@ public class ChatMessageService {
     private ChatMessageRepository chatMessageRepository;
     private ChatMessageArtifactRepository chatMessageArtifactRepository;
     private ArtifactService artifactService;
-    private ArtifactVersionRepository artifactVersionRepository;
     private GenApi genApi;
 
     /**
@@ -46,7 +44,7 @@ public class ChatMessageService {
      * @return The response from the AI.
      */
     public SendChatMessageResponse sendChatMessage(Chat chat, String message, SafaUser author) {
-        List<ChatMessage> chatMessages = chatMessageRepository.findByChatOrderByCreatedAtAsc(chat);
+        List<GenChatMessage> genChatMessages = getGenChatMessages(chat);
 
         ChatMessage userMessage = new ChatMessage();
         userMessage.setCreatedAt(LocalDateTime.now());
@@ -57,7 +55,7 @@ public class ChatMessageService {
 
         Pair<ChatMessage, List<ChatMessageArtifact>> response = generateChatResponse(
             userMessage,
-            chatMessages,
+            genChatMessages,
             chat.getProjectVersion());
         ChatMessage responseMessage = response.getValue0();
         List<ChatMessageArtifact> responseMessageArtifacts = response.getValue1();
@@ -73,6 +71,29 @@ public class ChatMessageService {
                 responseMessageArtifacts.stream().map(r -> r.getArtifact().getArtifactId()).toList()
             )
         );
+    }
+
+    /**
+     * Returns the messages for given chat, containing their associated artifact ids if they exist.
+     *
+     * @param chat The chat to retrieve messages for.
+     * @return List of messages in chat.
+     */
+    public List<GenChatMessage> getGenChatMessages(Chat chat) {
+        List<ChatMessage> chatMessages = chatMessageRepository.findByChatOrderByCreatedAtAsc(chat);
+        List<ChatMessageArtifact> chatMessageArtifacts = chatMessageArtifactRepository.findByMessageChat(chat);
+
+        Map<ChatMessage, List<ChatMessageArtifact>> message2artifacts =
+            ProjectDataStructures.createGroupLookup(chatMessageArtifacts, ChatMessageArtifact::getMessage);
+        List<GenChatMessage> genChatMessages = new ArrayList<>();
+        for (ChatMessage chatMessage : chatMessages) {
+            List<String> artifactIds = new ArrayList<>();
+            if (message2artifacts.containsKey(chatMessage)) {
+                artifactIds.addAll(message2artifacts.get(chatMessage).stream().map(c -> c.getArtifact().getName()).toList());
+            }
+            genChatMessages.add(new GenChatMessage(chatMessage, artifactIds));
+        }
+        return genChatMessages;
     }
 
     /**
@@ -105,7 +126,7 @@ public class ChatMessageService {
      * @return DTO of response to user message.
      */
     private Pair<ChatMessage, List<ChatMessageArtifact>> generateChatResponse(ChatMessage userMessage,
-                                                                              List<ChatMessage> chatMessages,
+                                                                              List<GenChatMessage> chatMessages,
                                                                               ProjectVersion projectVersion) {
         ChatMessage responseMessage = new ChatMessage();
         responseMessage.setChat(userMessage.getChat());
@@ -113,25 +134,17 @@ public class ChatMessageService {
         responseMessage.setUser(false);
 
         // Send to gen...
-        List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
-            .retrieveVersionEntitiesByProjectVersion(projectVersion);
-        artifactService.versionToAppEntity(artifactVersions);
-        Map<String, ArtifactVersion> artifactName2Version = ProjectDataStructures.createEntityLookup(
-            artifactVersions, ArtifactVersion::getName);
+        ArtifactLookupTable artifactLookupTable = artifactService.getArtifactLookupTable(projectVersion);
 
-        List<GenerationArtifact> genArtifacts = artifactVersions
-            .stream()
-            .map(GenerationArtifact::new)
-            .toList();
         GenChatResponse genChatResponse = genApi.generateChatResponse(
-            userMessage.getContent(), chatMessages, genArtifacts);
-        responseMessage.setContent(genChatResponse.getResponse());
+            userMessage.getContent(), chatMessages, artifactLookupTable.getGenerationArtifacts());
+        responseMessage.setContent(genChatResponse.getMessage());
         responseMessage.setCreatedAt(LocalDateTime.now());
-        List<ChatMessageArtifact> responseMessageArtifacts = genChatResponse.getRelatedArtifacts().stream()
+        List<ChatMessageArtifact> responseMessageArtifacts = genChatResponse.getArtifactIds().stream()
             .map(genArtifact -> {
                 ChatMessageArtifact chatMessageArtifact = new ChatMessageArtifact();
                 chatMessageArtifact.setMessage(responseMessage);
-                Artifact artifact = artifactName2Version.get(genArtifact.getId()).getArtifact();
+                Artifact artifact = artifactLookupTable.getByName(genArtifact).getArtifact();
                 chatMessageArtifact.setArtifact(artifact);
                 return chatMessageArtifact;
             }).toList();

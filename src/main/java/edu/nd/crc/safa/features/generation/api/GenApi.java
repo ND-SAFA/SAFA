@@ -2,12 +2,11 @@ package edu.nd.crc.safa.features.generation.api;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.TGenConfig;
-import edu.nd.crc.safa.features.chat.entities.dtos.gen.GenChatMessage;
-import edu.nd.crc.safa.features.chat.entities.dtos.gen.GenChatRequest;
-import edu.nd.crc.safa.features.chat.entities.persistent.ChatMessage;
+import edu.nd.crc.safa.features.chat.entities.gen.GenChatMessage;
+import edu.nd.crc.safa.features.chat.entities.gen.GenChatRequest;
+import edu.nd.crc.safa.features.chat.entities.gen.GenChatTitleResponse;
 import edu.nd.crc.safa.features.chat.entities.persistent.GenChatResponse;
 import edu.nd.crc.safa.features.common.RequestService;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
@@ -65,17 +64,28 @@ public class GenApi implements ITraceGenerationController {
      * @return Gen chat response.
      */
     public GenChatResponse generateChatResponse(String userMessageContent,
-                                                List<ChatMessage> chatMessages,
+                                                List<GenChatMessage> chatMessages,
                                                 List<GenerationArtifact> artifacts) {
         GenerationDataset dataset = new GenerationDataset(artifacts);
-        List<GenChatMessage> chatHistory = chatMessages
-            .stream()
-            .map(GenChatMessage::new)
-            .collect(Collectors.toList());
-        chatHistory.add(GenChatMessage.fromUserMessage(userMessageContent));
-        GenChatRequest request = new GenChatRequest(dataset, chatHistory);
+        chatMessages.add(GenChatMessage.fromUserMessage(userMessageContent));
+        GenChatRequest request = new GenChatRequest(dataset, chatMessages);
         String chatEndpoint = TGenConfig.getEndpoint("chat");
         return genApiController.performJob(chatEndpoint, request, GenChatResponse.class, null);
+    }
+
+    /**
+     * Generates name for title of chat.
+     *
+     * @param chatMessages Messages in chat.
+     * @param artifacts    Artifacts in dataset.
+     * @return Title of chat.
+     */
+    public GenChatTitleResponse generateChatTitle(List<GenChatMessage> chatMessages,
+                                                  List<GenerationArtifact> artifacts) {
+        GenerationDataset dataset = new GenerationDataset(artifacts);
+        GenChatRequest request = new GenChatRequest(dataset, chatMessages);
+        String chatEndpoint = TGenConfig.getEndpoint("chat-title");
+        return genApiController.performRequest(chatEndpoint, request, GenChatTitleResponse.class);
     }
 
     /**
@@ -134,7 +144,7 @@ public class GenApi implements ITraceGenerationController {
         int candidates = searchRequest.getDataset().getNumOfCandidates();
         genApiController.log(logger, String.format("Number of candidates: %s", candidates));
         String searchEndpoint = TGenConfig.getEndpoint("tgen-sync");
-        return this.genApiController.sendGenRequest(searchEndpoint, searchRequest, TGenResponse.class);
+        return this.genApiController.performRequest(searchEndpoint, searchRequest, TGenResponse.class);
     }
 
     /**
@@ -149,6 +159,6 @@ public class GenApi implements ITraceGenerationController {
         String cancelEndpoint = TGenConfig.getEndpoint("cancel");
         TGenTask task = new TGenTask();
         task.setTaskId(taskId);
-        TGenStatus status = this.genApiController.sendGenRequest(cancelEndpoint, task, TGenStatus.class);
+        TGenStatus status = this.genApiController.performRequest(cancelEndpoint, task, TGenStatus.class);
     }
 }

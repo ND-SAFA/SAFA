@@ -42,7 +42,7 @@ public class GenApiController {
                             Object payload,
                             Class<T> responseClass,
                             JobLogger logger) {
-        TGenTask<T> task = sendGenRequest(endpoint, payload, TGenTask.class);
+        TGenTask<T> task = performRequest(endpoint, payload, TGenTask.class);
         task.setResponseClass(responseClass);
         setTaskId(logger, task.getTaskId());
         T result = pollTGenTask(task, t -> writeLogs(logger, t), MAX_DURATION, WAIT_SECONDS);
@@ -59,7 +59,7 @@ public class GenApiController {
      * @param <T>           Type of response class.
      * @return Serialized data.
      */
-    public <T> T sendGenRequest(String endpoint,
+    public <T> T performRequest(String endpoint,
                                 Object payload,
                                 Class<T> responseClass) {
         // Step - Send request
@@ -102,7 +102,7 @@ public class GenApiController {
      */
     private <T> T getJobResult(TGenTask<T> task, Class<T> responseClass) {
         String resultEndpoint = TGenConfig.getEndpoint("results");
-        return this.sendGenRequest(resultEndpoint, task, responseClass);
+        return this.performRequest(resultEndpoint, task, responseClass);
     }
 
     /**
@@ -137,7 +137,7 @@ public class GenApiController {
      */
     private void updateTaskStatus(TGenTask task) {
         String statusEndpoint = TGenConfig.getEndpoint("status");
-        TGenStatus tGenStatus = this.sendGenRequest(statusEndpoint, task, TGenStatus.class);
+        TGenStatus tGenStatus = this.performRequest(statusEndpoint, task, TGenStatus.class);
 
         if (tGenStatus.getStatus().hasFailed()) {
             throw new SafaError(tGenStatus.getMessage());

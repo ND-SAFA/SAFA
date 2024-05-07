@@ -31,6 +31,7 @@ public class GenChatMessage {
      * Constructs Gen message from ChatMessage (persistent).
      *
      * @param chatMessage The persisted chat message.
+     * @param artifactIds The artifact ids used in the construction of this message.
      */
     public GenChatMessage(ChatMessage chatMessage, List<String> artifactIds) {
         this.role = GenChatRole.fromIsUser(chatMessage.isUser());

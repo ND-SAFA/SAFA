@@ -2,7 +2,9 @@ import {
   ChatMessageSchema,
   ChatMessageSendResponseSchema,
   CreateProjectChatSchema,
+  EditProjectChatSchema,
   ProjectChatSchema,
+  SendChatMessageSchema,
 } from "@/types";
 import { ENABLED_FEATURES } from "@/util";
 import { buildRequest } from "@/api";
@@ -12,6 +14,7 @@ const EXAMPLE_SAFA_MESSAGE: ChatMessageSchema = {
   isUser: false,
   message: "Hello! How can I help you?",
   artifactIds: [],
+  createdAt: new Date().toISOString(),
 };
 
 const EXAMPLE_SAFA_MESSAGE_RESPONSE = {
@@ -38,6 +41,7 @@ const EXAMPLE_NASA_CHAT: ProjectChatSchema = {
       isUser: true,
       message: "How is the GLM coverage ensured?",
       artifactIds: [],
+      createdAt: new Date().toISOString(),
     },
     {
       id: "2",
@@ -60,6 +64,7 @@ const EXAMPLE_NASA_CHAT: ProjectChatSchema = {
         "kernel/rcu/tree.h",
         "kernel/rcu/update.c",
       ],
+      createdAt: new Date().toISOString(),
     },
   ],
 };
@@ -100,13 +105,12 @@ export async function editProjectChat(
     return chat;
   }
 
-  return buildRequest<
-    ProjectChatSchema,
-    "chatId",
-    Pick<ProjectChatSchema, "title">
-  >("editChat", {
-    chatId: chat.id,
-  }).put({ title: chat.title });
+  return buildRequest<ProjectChatSchema, "chatId", EditProjectChatSchema>(
+    "editChat",
+    {
+      chatId: chat.id,
+    }
+  ).put({ title: chat.title });
 }
 
 /**
@@ -143,19 +147,19 @@ export async function getProjectChats(): Promise<ProjectChatSchema[]> {
  */
 export async function createProjectChatMessage(
   chatId: string,
-  message: ChatMessageSchema
+  message: SendChatMessageSchema
 ): Promise<ChatMessageSendResponseSchema> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
     return {
       ...EXAMPLE_SAFA_MESSAGE_RESPONSE,
-      userMessage: message,
+      userMessage: { ...EXAMPLE_SAFA_MESSAGE, ...message },
     };
   }
 
   return buildRequest<
     ChatMessageSendResponseSchema,
     "chatId",
-    ChatMessageSchema
+    SendChatMessageSchema
   >("createChatMessage", { chatId }).post(message);
 }
 

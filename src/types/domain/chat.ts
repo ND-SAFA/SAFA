@@ -20,7 +20,16 @@ export interface ChatMessageSchema {
    * Artifact IDs referenced in the message.
    */
   artifactIds: string[];
+  /**
+   * ISO timestamp of when the message was created.
+   */
+  createdAt: string;
 }
+
+/**
+ * Represents a new chat message to be sent by a user.
+ */
+export type SendChatMessageSchema = Pick<ChatMessageSchema, "message">;
 
 /**
  * Represents response for a successful send of a user message.
@@ -66,6 +75,9 @@ export interface DisplayChatMessageSchema extends ChatMessageSchema {
   artifacts: ArtifactSchema[];
 }
 
+/**
+ * Represents the permissions for a chat.
+ */
 export type ChatPermissionType = "owner" | "reader" | "editor";
 
 /**
@@ -94,7 +106,15 @@ export interface ProjectChatSchema {
   messages: ChatMessageSchema[];
 }
 
+/**
+ * Represents a new chat dialogue for a project.
+ */
 export type CreateProjectChatSchema = Pick<
   ProjectChatSchema,
   "versionId" | "title"
 >;
+
+/**
+ * Represents an edit to a project chat.
+ */
+export type EditProjectChatSchema = Pick<ProjectChatSchema, "title">;

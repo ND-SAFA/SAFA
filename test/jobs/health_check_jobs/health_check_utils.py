@@ -26,8 +26,7 @@ QUERY_ID = "target"
 EXPECTED_RELATED_ARTIFACTS = EXPECTED_CONTEXT_IDS + EXISTING_CONCEPTS[:2]
 
 
-def assert_correct_related_artifacts(test_case: BaseTest, related_artifacts: List[EnumDict]):
-    related_ids = [a[ArtifactKeys.ID.value] for a in related_artifacts]
+def assert_correct_related_artifacts(test_case: BaseTest, related_ids: List[str]):
     test_case.assertEqual(len(EXPECTED_CONTEXT_IDS), len(related_ids))
     for a_id in EXPECTED_CONTEXT_IDS:
         test_case.assertIn(a_id, related_ids)

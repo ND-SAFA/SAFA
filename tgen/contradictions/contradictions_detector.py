@@ -10,7 +10,7 @@ from tgen.contradictions.contradictions_result import ContradictionsResult
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys, LayerKeys, TraceRelationshipType
+from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys, TraceRelationshipType
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt

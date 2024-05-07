@@ -27,8 +27,8 @@ class PromptBuilder:
         self._create_config()
         self.id = str(uuid.uuid4())
 
-    def build(self, model_format_args: LLMPromptBuildArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs) -> EnumDict[
-        str, str]:
+    def build(self, model_format_args: LLMPromptBuildArgs, correct_completion: Any = EMPTY_STRING,
+              **prompt_kwargs) -> EnumDict[str, str]:
         """
         Generates the prompt and response
         :param model_format_args: Defines the formatting specific to the model
@@ -37,15 +37,16 @@ class PromptBuilder:
         """
         format_vars = {key: val[self._n_built] for key, val in self.format_variables.items() if len(val) > self._n_built}
         prompt_kwargs.update(format_vars)
-        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts]
-        base_prompt = NEW_LINE.join(built_prompts)
+        system_prompt = self._build_prompts(use_system_prompts=True, **prompt_kwargs)
+        base_prompt = self._build_prompts(use_system_prompts=False, **prompt_kwargs)
         prompt = self.format_prompt_for_model(base_prompt, prompt_args=model_format_args)
         completion = self._format_completion(correct_completion, prompt_args=model_format_args)
         self._n_built += 1
         return EnumDict({
             PromptKeys.PROMPT: prompt,
             PromptKeys.COMPLETION: completion,
-            PromptKeys.PROMPT_BUILDER_ID: self.id
+            PromptKeys.PROMPT_BUILDER_ID: self.id,
+            PromptKeys.SYSTEM: system_prompt,
         })
 
     def add_prompt(self, prompt: Prompt, i: int = None) -> None:
@@ -127,6 +128,16 @@ class PromptBuilder:
         :return: A dictionary mapping prompt id to its answers
         """
         return {prompt.args.prompt_id: prompt.parse_response(res) for prompt in self.prompts}
+
+    def _build_prompts(self, use_system_prompts: bool, **prompt_kwargs) -> str:
+        """
+        Builds each prompt and combines them to create one final prompt.
+        :param prompt_kwargs: Args for building each promtp.
+        :return: All prompts built and combined into one final prompt.
+        """
+        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts if prompt.args.system_prompt == use_system_prompts]
+        base_prompt = NEW_LINE.join(built_prompts)
+        return base_prompt
 
     def _create_config(self) -> PromptConfig:
         """

@@ -6,20 +6,20 @@ from django.test import Client
 from api.endpoints.auth_view import AUTH_KEY
 from api.server.app_endpoints import AppEndpoints
 from tests.base_test import BaseTest
+from tgen.chat.message_meta import MessageMeta
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.util.json_util import NpEncoder
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
-from tgen.models.llm.abstract_llm_manager import ConversationType
 
 
 class RequestProxy:
     CLIENT = None
 
     @staticmethod
-    def chat(dataset: ApiDefinition, chat_history: ConversationType) -> List[Trace]:
+    def chat(dataset: ApiDefinition, chat_history: List[MessageMeta]) -> List[Trace]:
         """
         Creates chat with the model.
         :param dataset: The dataset containing project artifacts for context.

@@ -7,7 +7,6 @@ from api.endpoints.gen.serializers.message_serializer import MessageMetaSerializ
 from tgen.chat.message_meta import MessageMeta
 from tgen.common.util.base_object import BaseObject
 from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.models.llm.abstract_llm_manager import Message
 
 
 @dataclass
@@ -39,7 +38,7 @@ class ChatSerializer(AbstractSerializer):
         return ChatRequest(dataset=dataset, chat_history=chat_history)
 
     @staticmethod
-    def _assert_valid_history(chat_history: List[Message]):
+    def _assert_valid_history(chat_history: List[MessageMeta]):
         """
         Asserts chat history constraints.
         :param chat_history: List of messages in chat.
@@ -47,10 +46,10 @@ class ChatSerializer(AbstractSerializer):
         """
         if len(chat_history) == 0:
             raise ValueError("No messages given to chat.")
-        if chat_history[-1]["role"] != "user":
+        if chat_history[-1].message["role"] != "user":
             raise ValueError("Last message must be user message.")
 
         for i in range(0, len(chat_history) - 1):
-            if chat_history[i]["role"] == chat_history[i + 1]["role"]:
-                role = chat_history[i]["role"]
+            if chat_history[i].message["role"] == chat_history[i + 1].message["role"]:
+                role = chat_history[i].message["role"]
                 raise ValueError(f"Found two messages with {role} in a row.")

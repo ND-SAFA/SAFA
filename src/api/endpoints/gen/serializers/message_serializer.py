@@ -12,8 +12,12 @@ class MessageMetaSerializer(AbstractSerializer):
     content = serializers.CharField(help_text="The content of the message given to the LLM.", required=True)
     role = serializers.CharField(help_text="The author of the content (i.e. user or assistant).", max_length=TEXT_MEDIUM,
                                  required=True)
-    artifact_ids = serializers.ListField(help_text="The artifact ids used in the context of the message.", required=True,
-                                         allow_null=False, allow_empty=True)
+    artifact_ids = serializers.ListField(help_text="The artifact ids used in the context of the message.",
+                                         required=True,
+                                         allow_null=False,
+                                         allow_empty=True,
+                                         child=serializers.CharField(help_text="ID of artifact.", allow_null=False, allow_blank=False)
+                                         )
 
     def create(self, validated_data: Dict) -> MessageMeta:
         """

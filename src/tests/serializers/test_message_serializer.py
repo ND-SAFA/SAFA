@@ -1,41 +1,45 @@
-from api.endpoints.gen.hgen.hgen_serializer import HGenRequest, HGenSerializer
-from api.endpoints.gen.serializers.message_serializer import MessageSerializer
+from typing import List
+
+from api.endpoints.gen.serializers.message_serializer import MessageMetaSerializer
 from tests.base_test import BaseTest
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.testres.test_assertions import TestAssertions
+from tgen.chat.message_meta import MessageMeta
 
 
 class TestChatSerializer(BaseTest):
     good_data = {
-        "messages": [{
-            "role": "user",
-            "content": "This is the content of the chat."
-        },
+        "messages": [
+            {
+                "role": "user",
+                "content": "This is the content of the chat.",
+                "artifact_ids": []
+            },
             {
                 "role": "assistant",
-                "content": "This is the response of the model."
+                "content": "This is the response of the model.",
+                "artifact_ids": []
             }
         ]
     }
 
     bad_data = {"messages": [{
-            "role": "unknown",
-            "content": "This is the content of the chat."
-        }
-        ]}
+        "role": "unknown",
+        "content": "This is the content of the chat.",
+        "artifact_ids": []
+    }
+    ]}
 
     def test_positive_serialization(self):
-        message_serializer = MessageSerializer(data=self.good_data['messages'], many=True)
+        message_serializer = MessageMetaSerializer(data=self.good_data['messages'], many=True)
         message_serializer.is_valid(raise_exception=True)
-        chat_history = message_serializer.save()
+        chat_history: List[MessageMeta] = message_serializer.save()
         self.assertEqual(len(chat_history), len(chat_history))
-        for i, message in enumerate(chat_history):
-            self.assertEqual(message["role"], self.good_data["messages"][i]["role"])
-            self.assertEqual(message["content"], self.good_data["messages"][i]["content"])
+        for i, meta in enumerate(chat_history):
+            self.assertEqual(meta.message["role"], self.good_data["messages"][i]["role"])
+            self.assertEqual(meta.message["content"], self.good_data["messages"][i]["content"])
 
     def test_negative_serialization(self):
         try:
-            message_serializer = MessageSerializer(data=self.bad_data['messages'], many=True)
+            message_serializer = MessageMetaSerializer(data=self.bad_data['messages'], many=True)
             message_serializer.is_valid(raise_exception=True)
             chat_history = message_serializer.save()
         except AssertionError:

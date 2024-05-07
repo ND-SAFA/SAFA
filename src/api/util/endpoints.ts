@@ -228,6 +228,7 @@ export enum Endpoint {
   deleteChat = "chat/:chatId",
   getChats = "chat",
   editChat = "chat/:chatId",
+  createChatTitle = "chat/:chatId/title",
   getChatMessages = "chat/:chatId/messages",
   createChatMessage = "chat/:chatId/messages",
 }

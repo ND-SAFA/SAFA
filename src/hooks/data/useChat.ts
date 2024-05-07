@@ -75,7 +75,7 @@ export const useChat = defineStore("useChat", {
         versionId: projectStore.versionId,
         ...chat,
       });
-      this.chats.push(newChat);
+      this.chats = [newChat, ...this.chats];
       this.currentChat = newChat;
     },
     /**

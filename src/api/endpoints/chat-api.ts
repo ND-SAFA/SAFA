@@ -166,3 +166,15 @@ export async function getProjectChatMessages(
     chatId,
   }).get();
 }
+
+/**
+ * Generates title for chat.
+ * @param chatId - ID of chat to generate title for.
+ */
+export async function generateChatTitle(
+  chatId: string
+): Promise<ProjectChatSchema> {
+  return buildRequest<ProjectChatSchema, "chatId">("createChatTitle", {
+    chatId,
+  }).post();
+}

@@ -8,6 +8,7 @@ import {
   createProjectChatMessage,
   deleteProjectChat,
   editProjectChat,
+  generateChatTitle,
   getProjectChatMessages,
   getProjectChats,
 } from "@/api";
@@ -105,9 +106,10 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
         }
       }
 
+      const messagesWithNewMessage = [...chat.messages, newMessage];
       chatStore.updateChat({
         ...chat,
-        messages: [...chat.messages, newMessage],
+        messages: messagesWithNewMessage,
       });
 
       const messagesCreated = await createProjectChatMessage(
@@ -115,14 +117,22 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
         newMessage
       );
 
-      chatStore.updateChat({
-        ...chat,
-        messages: [
-          ...chat.messages.slice(0, -1), // everything but last user message
-          messagesCreated.userMessage,
-          messagesCreated.responseMessage,
-        ],
-      });
+      const chatMessages = [
+        ...messagesWithNewMessage.slice(0, -1), // everything but last user message
+        messagesCreated.userMessage,
+        messagesCreated.responseMessage,
+      ];
+
+      console.log("New Messages:", chatMessages);
+      chat = { ...chat, messages: chatMessages };
+      chatStore.updateChat(chat);
+
+      if (chatMessages.length == 2) {
+        // if first chat response then generate title
+        const chatWithTitle = await generateChatTitle(chat.id);
+        chat = { ...chat, title: chatWithTitle.title };
+        chatStore.updateChat(chat);
+      }
     }, {});
   }
 

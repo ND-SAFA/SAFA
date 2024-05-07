@@ -134,6 +134,7 @@ class PromptBuilder:
     def _build_prompts(self, build_all: bool = True, only_use_system_prompts: bool = False, **prompt_kwargs) -> str:
         """
         Builds each prompt and combines them to create one final prompt.
+        :param build_all: If True, builds all prompts regardless if system prompt or not.
         :param only_use_system_prompts: If True, only builds system prompts.
         :param prompt_kwargs: Args for building each promtp.
         :return: All prompts built and combined into one final prompt.

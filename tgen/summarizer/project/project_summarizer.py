@@ -23,6 +23,7 @@ from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -206,7 +207,8 @@ class ProjectSummarizer(BaseObject):
         save_and_load_path = self._get_responses_save_and_load_path(list(prompt_builders.keys()))
         res = trainer.perform_prediction(raise_exception=False, save_and_load_path=save_and_load_path)
         failures = {i for i, r in enumerate(res.original_response) if isinstance(r, Exception)}
-        parsed_responses = [(res.predictions[i][prompt_builder.get_prompt(-1).id] if i not in failures else res.original_response[i])
+        parsed_responses = [(res.predictions[i][prompt_builder.get_prompt(-1).args.prompt_id]
+                             if i not in failures else res.original_response[i])
                             for i, prompt_builder in enumerate(prompt_builders.values())]
         return parsed_responses
 
@@ -236,7 +238,8 @@ class ProjectSummarizer(BaseObject):
                                                 section_prompt])
         if self.project_summary and section_id in USE_PROJECT_SUMMARY_SECTIONS:
             current_summary = self.project_summary.to_string()
-            prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}", allow_formatting=False), 1)
+            prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}",
+                                             prompt_args=PromptArgs(allow_formatting=False)), 1)
         return prompt_builder
 
     @staticmethod

@@ -1,12 +1,20 @@
+import uuid
 from dataclasses import dataclass
 
 
 @dataclass
 class PromptArgs:
-    """
-    Defines arguments for defining properties for prompt dataset creation.
-    """
-    prompt_prefix: str  # Goes before the prompt.
-    prompt_suffix: str  # Goes after the prompt.
-    completion_prefix: str  # Goes before the completion label during fine-tuning for classification
-    completion_suffix: str  # Goes after the completion label during fine-tuning for classification
+    prompt_id: str = None
+    title: str = None
+    allow_formatting: bool = True
+    system_prompt: bool = False
+
+    def set_id(self, seed: int, overwrite_existing: bool = False) -> None:
+        """
+        Creates and updates the id for the prompt.
+        :param seed: The seed for the id generation.
+        :param overwrite_existing: If True, will set the id even if one already exists.
+        :return: None.
+        """
+        if overwrite_existing or self.prompt_id is None:
+            self.prompt_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(seed)))

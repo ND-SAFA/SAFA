@@ -13,7 +13,7 @@ from tgen.core.args.anthropic_args import AnthropicArgs, AnthropicParams
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, ConversationType
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from tgen.testres.mocking.mock_anthropic import MockAnthropicClient
 
 
@@ -48,8 +48,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
     """
 
     NOT_IMPLEMENTED_ERROR = "Anthropic has not implemented fine-tuned models."
-    prompt_args = PromptArgs(prompt_prefix=EMPTY_STRING, prompt_suffix=EMPTY_STRING, completion_prefix=" ",
-                             completion_suffix="###")
+    prompt_args = LLMPromptBuildArgs(prompt_prefix=EMPTY_STRING, prompt_suffix=EMPTY_STRING, completion_prefix=" ",
+                                     completion_suffix="###")
 
     def __init__(self, llm_args: AnthropicArgs = None):
         """

@@ -14,6 +14,7 @@ from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.supported_prompts.concept_prompts import ENTITY_MATCHING_INSTRUCTIONS, ENTITY_MATCHING_RESPONSE_FORMAT
@@ -70,8 +71,7 @@ class EntityMatchingStep(AbstractPipelineStep):
             artifact_prompt = ArtifactPrompt(prompt_start=ENTITY_MATCHING_INSTRUCTIONS + NEW_LINE)
             response_format = ENTITY_MATCHING_RESPONSE_FORMAT.format(EntityMatchingStep.create_example_xml("ARTIFACT_ID"))
             # `referenced` will make the model speculate about potential matches, using cite
-            instructions_prompt = Prompt(NEW_LINE,
-                                         prompt_id=EntityMatchingStep.PROMPT_ID,
+            instructions_prompt = Prompt(value=NEW_LINE, prompt_args=PromptArgs(prompt_id=EntityMatchingStep.PROMPT_ID),
                                          response_manager=PromptResponseManager(response_tag=EntityMatchingStep.MATCH_TAG,
                                                                                 response_instructions_format=response_format))
             prompt_builder = PromptBuilder(prompts=[concept_prompt, artifact_prompt, instructions_prompt])

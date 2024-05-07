@@ -58,13 +58,13 @@ class TestPromptBuilder(BaseTest):
         prompt_builder = self.get_prompt_builder()
         output = prompt_builder.parse_responses("<question2>test</question2><choice>yes</choice><category>A</category>")
         for prompt in prompt_builder.get_all_prompts():
-            self.assertIn(prompt.id, output)
+            self.assertIn(prompt.args.prompt_id, output)
             if isinstance(prompt, BinaryChoiceQuestionPrompt):
-                self.assertEqual(output[prompt.id]["choice"][0], "yes")
+                self.assertEqual(output[prompt.args.prompt_id]["choice"][0], "yes")
             elif isinstance(prompt, QuestionnairePrompt):
-                self.assertEqual(output[prompt.id]["question2"][0], "test")
+                self.assertEqual(output[prompt.args.prompt_id]["question2"][0], "test")
             elif isinstance(prompt, SelectQuestionPrompt):
-                self.assertEqual(output[prompt.id]["category"][0], "A")
+                self.assertEqual(output[prompt.args.prompt_id]["category"][0], "A")
 
     def test_create_config(self):
         prompt_builder = self.get_prompt_builder()

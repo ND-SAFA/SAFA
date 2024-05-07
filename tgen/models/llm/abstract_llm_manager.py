@@ -12,7 +12,7 @@ from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.tokens.token_costs import INPUT_TOKENS, ModelTokenCost, OUTPUT_TOKENS
 from tgen.pipeline.state import State
-from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 
 AIObject = TypeVar("AIObject")
 
@@ -40,7 +40,7 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
     Interface for all AI utility classes.
     """
 
-    def __init__(self, llm_args: AbstractLLMArgs, prompt_args: PromptArgs, state: State = None):
+    def __init__(self, llm_args: AbstractLLMArgs, prompt_args: LLMPromptBuildArgs, state: State = None):
         """
         Initializes the manager with args used for each request and the prompt args used for creating dataset
         :param llm_args: args used for each request

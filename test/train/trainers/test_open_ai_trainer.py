@@ -111,7 +111,7 @@ class TestOpenAiTrainer(BaseTest):
                                   response_manager=PromptResponseManager(response_tag="response1"))
         response_prompt2 = Prompt("Second response:",
                                   response_manager=PromptResponseManager(response_tag="response2"))
-        prompt_ids = [response_prompt1.id, response_prompt2.id]
+        prompt_ids = [response_prompt1.args.prompt_id, response_prompt2.args.prompt_id]
         prompt_builder1 = PromptBuilder([artifact_prompt, response_prompt1])
         prompt_builder2 = PromptBuilder([artifact_prompt, response_prompt2])
         dataset_creator = TestOpenAiTrainer.get_dataset_creator_with_artifact_df()

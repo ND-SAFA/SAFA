@@ -4,6 +4,7 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.conditional_prompt import ConditionalPrompt
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
@@ -15,9 +16,9 @@ INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} f
                                      "the {source_type} that by answering would provide the most important information "
                                      "to create the {target_type}. Output the minimal set of questions in a new-line "
                                      "delimited list containing at most 10 items. ",
-                                     PromptResponseManager(response_tag="questions",
-                                                           required_tag_ids=USE_ALL_TAGS,
-                                                           ))
+                                     response_manager=PromptResponseManager(response_tag="questions",
+                                                                            required_tag_ids=USE_ALL_TAGS,
+                                                                            ))
 
 DEFINITION_PROMPT = QuestionPrompt(
     "First, write a brief description of what a {target_type} is in a software development project. "
@@ -146,7 +147,7 @@ DB_ENTITY_SPEC_QUESTIONNAIRE = QuestionnairePrompt(
 SEED_PROMPT = Prompt("The above {source_type}(s) were derived from this artifact. "
                      "When creating the {target_type}(s) from {source_type}, "
                      "focus on the functionality in the {source_type} that was likely implemented/derived from it.\n\t"
-                     "{seed_content}", title="Higher-level Reference Artifact")
+                     "{seed_content}", prompt_args=PromptArgs(title="Higher-level Reference Artifact"))
 SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
     question_prompts=[
         QuestionPrompt(
@@ -194,5 +195,5 @@ TITLE_PROMPT = Prompt("Create a title for the {target_type} "
                       "Try to use as much language directly from the {target_type} as possible "
                       "and keep the number of words to 5 or less PRINCIPAL words. "
                       "\nExample: Category Filtering for Product Discovery \n",
-                      PromptResponseManager(response_tag="title", required_tag_ids=USE_ALL_TAGS)
+                      response_manager=PromptResponseManager(response_tag="title", required_tag_ids=USE_ALL_TAGS)
                       )

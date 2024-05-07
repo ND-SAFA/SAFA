@@ -62,7 +62,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         predictions = trainer.perform_prediction(save_and_load_path=save_and_load_path).predictions
         task_prompt: QuestionnairePrompt = prompt_builder.prompts[-1]
         parsed = LLMResponseUtil.extract_predictions_from_response(predictions,
-                                                                   response_prompt_ids=task_prompt.id)
+                                                                   response_prompt_ids=task_prompt.args.prompt_id)
 
         return parsed
 

@@ -7,9 +7,9 @@ from tgen.common.util.str_util import StrUtil
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt
+from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_config import PromptConfig
 
 
@@ -27,7 +27,8 @@ class PromptBuilder:
         self._create_config()
         self.id = str(uuid.uuid4())
 
-    def build(self, model_format_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs) -> EnumDict[str, str]:
+    def build(self, model_format_args: LLMPromptBuildArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs) -> EnumDict[
+        str, str]:
         """
         Generates the prompt and response
         :param model_format_args: Defines the formatting specific to the model
@@ -91,7 +92,7 @@ class PromptBuilder:
         :return: The index of the prompt if it exists, else -1
         """
         for i, prompt in enumerate(self.prompts):
-            if prompt.id == prompt_id:
+            if prompt.args.prompt_id == prompt_id:
                 return i
         return -1
 
@@ -125,7 +126,7 @@ class PromptBuilder:
         :param res: The model response
         :return: A dictionary mapping prompt id to its answers
         """
-        return {prompt.id: prompt.parse_response(res) for prompt in self.prompts}
+        return {prompt.args.prompt_id: prompt.parse_response(res) for prompt in self.prompts}
 
     def _create_config(self) -> PromptConfig:
         """
@@ -148,7 +149,7 @@ class PromptBuilder:
         return self.config
 
     @staticmethod
-    def format_prompt_for_model(base_prompt: str, prompt_args: PromptArgs) -> str:
+    def format_prompt_for_model(base_prompt: str, prompt_args: LLMPromptBuildArgs) -> str:
         """
         Formats the prompt with expected prefix + suffix tokens
         :param base_prompt: The base prompt
@@ -160,7 +161,7 @@ class PromptBuilder:
         return f"{prefix}{base_prompt}{suffix}"
 
     @staticmethod
-    def remove_format_for_model_from_prompt(base_prompt: str, prompt_args: PromptArgs) -> str:
+    def remove_format_for_model_from_prompt(base_prompt: str, prompt_args: LLMPromptBuildArgs) -> str:
         """
         Formats the prompt with expected prefix + suffix tokens
         :param base_prompt: The base prompt
@@ -172,7 +173,7 @@ class PromptBuilder:
         return base_prompt
 
     @staticmethod
-    def _format_completion(base_completion: str, prompt_args: PromptArgs) -> str:
+    def _format_completion(base_completion: str, prompt_args: LLMPromptBuildArgs) -> str:
         """
         Formats the completion with expected prefix + suffix tokens
         :param base_completion: The base completion

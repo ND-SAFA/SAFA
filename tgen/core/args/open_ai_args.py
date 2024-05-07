@@ -50,7 +50,7 @@ class OpenAIArgs(AbstractLLMArgs):
         """
         super_args = DataclassUtil.set_unique_args(self, AbstractLLMArgs, **kwargs)
         DictUtil.update_kwarg_values(super_args, replace_existing=False, model=OPEN_AI_MODEL_DEFAULT)
-        super().__init__(expected_task_params=self._EXPECTED_TASK_PARAMS, **super_args)
+        super().__init__(expected_task_params=self._EXPECTED_TASK_PARAMS, llm_params=OpenAIParams, **super_args)
 
     @overrides(AbstractLLMArgs)
     def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:

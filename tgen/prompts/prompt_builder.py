@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.str_util import StrUtil
+from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt
@@ -37,8 +38,10 @@ class PromptBuilder:
         """
         format_vars = {key: val[self._n_built] for key, val in self.format_variables.items() if len(val) > self._n_built}
         prompt_kwargs.update(format_vars)
-        system_prompt = self._build_prompts(use_system_prompts=True, **prompt_kwargs)
-        base_prompt = self._build_prompts(use_system_prompts=False, **prompt_kwargs)
+        build_all = not isinstance(model_format_args, AnthropicArgs)
+        system_prompt = self._build_prompts(build_all=build_all, only_use_system_prompts=True, **prompt_kwargs) \
+            if not build_all else None
+        base_prompt = self._build_prompts(build_all=build_all, only_use_system_prompts=False, **prompt_kwargs)
         prompt = self.format_prompt_for_model(base_prompt, prompt_args=model_format_args)
         completion = self._format_completion(correct_completion, prompt_args=model_format_args)
         self._n_built += 1
@@ -129,13 +132,15 @@ class PromptBuilder:
         """
         return {prompt.args.prompt_id: prompt.parse_response(res) for prompt in self.prompts}
 
-    def _build_prompts(self, use_system_prompts: bool, **prompt_kwargs) -> str:
+    def _build_prompts(self, build_all: bool = True, only_use_system_prompts: bool = False, **prompt_kwargs) -> str:
         """
         Builds each prompt and combines them to create one final prompt.
+        :param only_use_system_prompts: If True, only builds system prompts.
         :param prompt_kwargs: Args for building each promtp.
         :return: All prompts built and combined into one final prompt.
         """
-        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts if prompt.args.system_prompt == use_system_prompts]
+        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts
+                         if prompt.args.system_prompt == only_use_system_prompts or build_all]
         base_prompt = NEW_LINE.join(built_prompts)
         return base_prompt
 

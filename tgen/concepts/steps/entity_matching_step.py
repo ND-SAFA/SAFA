@@ -91,7 +91,7 @@ class EntityMatchingStep(AbstractPipelineStep):
         """
         output = LLMTrainer.predict_from_prompts(
             llm_manager,
-            prompts=prompts,
+            message_prompts=prompts,
             prompt_builders=prompt_builders
         )
         entity_predictions = [prediction[EntityMatchingStep.PROMPT_ID] for prediction, pb in zip(output.predictions, prompt_builders)]

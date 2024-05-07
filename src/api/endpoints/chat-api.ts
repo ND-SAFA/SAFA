@@ -89,7 +89,7 @@ export async function createProjectChat(
   }
 
   return buildRequest<ProjectChatSchema, string, CreateProjectChatSchema>(
-    "createChat"
+    "chatCollection"
   ).post({ versionId, title });
 }
 
@@ -106,7 +106,7 @@ export async function editProjectChat(
   }
 
   return buildRequest<ProjectChatSchema, "chatId", EditProjectChatSchema>(
-    "editChat",
+    "chat",
     {
       chatId: chat.id,
     }
@@ -121,7 +121,7 @@ export async function deleteProjectChat(chatId: string): Promise<void> {
   if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
     return;
   }
-  return buildRequest<void, "chatId">("deleteChat", {
+  return buildRequest<void, "chatId">("chat", {
     chatId,
   }).delete();
 }
@@ -136,7 +136,7 @@ export async function getProjectChats(): Promise<ProjectChatSchema[]> {
     return [EXAMPLE_NASA_CHAT, EXAMPLE_PROJECT_CHAT];
   }
 
-  return buildRequest<ProjectChatSchema[]>("getChats").get();
+  return buildRequest<ProjectChatSchema[]>("chatCollection").get();
 }
 
 /**
@@ -160,7 +160,7 @@ export async function createProjectChatMessage(
     ChatMessageSendResponseSchema,
     "chatId",
     SendChatMessageSchema
-  >("createChatMessage", { chatId }).post(message);
+  >("chatMessages", { chatId }).post(message);
 }
 
 /**
@@ -175,7 +175,7 @@ export async function getProjectChatMessages(
     return EXAMPLE_PROJECT_CHAT;
   }
 
-  return buildRequest<ProjectChatSchema, "chatId">("getChatMessages", {
+  return buildRequest<ProjectChatSchema, "chatId">("chatMessages", {
     chatId,
   }).get();
 }

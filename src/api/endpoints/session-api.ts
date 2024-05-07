@@ -18,7 +18,7 @@ import { buildRequest } from "@/api";
 export async function createUser(
   user: UserPasswordSchema
 ): Promise<SessionSchema> {
-  return buildRequest<SessionSchema>("createAccount").sessionRequest({
+  return buildRequest<SessionSchema>("accountCreate").sessionRequest({
     method: "POST",
     body: JSON.stringify(user),
   });
@@ -35,7 +35,7 @@ export async function createVerifiedUser(
   user: UserPasswordSchema
 ): Promise<SessionSchema> {
   return buildRequest<SessionSchema, string, UserPasswordSchema>(
-    "createVerifiedAccount"
+    "accountCreateVerified"
   ).post(user);
 }
 
@@ -46,7 +46,7 @@ export async function createVerifiedUser(
  */
 export async function saveUserVerification(token: string): Promise<void> {
   return buildRequest<void, string, { token: string }>(
-    "verifyAccount"
+    "accountVerify"
   ).sessionRequest(
     {
       method: "POST",
@@ -79,7 +79,7 @@ export async function createLoginSession(
  * @throws If no user exists.
  */
 export async function getCurrentUser(): Promise<UserSchema> {
-  return buildRequest<UserSchema>("getAccount").get();
+  return buildRequest<UserSchema>("accountGet").get();
 }
 
 /**
@@ -90,7 +90,7 @@ export async function getCurrentUser(): Promise<UserSchema> {
 export async function createPasswordReset(
   user: UserResetSchema
 ): Promise<void> {
-  await buildRequest<void, string, UserResetSchema>("forgotPassword").put(user);
+  await buildRequest<void, string, UserResetSchema>("accountForgot").put(user);
 }
 
 /**
@@ -103,7 +103,7 @@ export async function createPasswordReset(
 export async function createAdminPasswordReset(
   user: UserResetSchema
 ): Promise<void> {
-  await buildRequest<void, string, UserResetSchema>("forgotPasswordAdmin").put(
+  await buildRequest<void, string, UserResetSchema>("accountForgotAdmin").put(
     user
   );
 }
@@ -117,7 +117,7 @@ export async function createAdminPasswordReset(
 export async function updatePassword(
   password: PasswordResetSchema
 ): Promise<void> {
-  return buildRequest("resetPassword").sessionRequest({
+  return buildRequest("accountReset").sessionRequest({
     method: "PUT",
     body: JSON.stringify(password),
   });
@@ -132,7 +132,7 @@ export async function updatePassword(
 export async function savePassword(
   password: PasswordChangeSchema
 ): Promise<void> {
-  await buildRequest<void, string, PasswordChangeSchema>("updatePassword").put(
+  await buildRequest<void, string, PasswordChangeSchema>("accountChange").put(
     password
   );
 }
@@ -144,7 +144,7 @@ export async function savePassword(
  * @throws The delete request was unsuccessful.
  */
 export async function deleteAccount(password: string): Promise<void> {
-  await buildRequest<void, string, { password: string }>("deleteAccount").post({
+  await buildRequest<void, string, { password: string }>("accountDelete").post({
     password,
   });
 }
@@ -163,7 +163,7 @@ export async function deleteSession(): Promise<void> {
  */
 export async function saveDefaultOrg(defaultOrgId: string): Promise<void> {
   await buildRequest<void, string, Pick<UserSchema, "defaultOrgId">>(
-    "editAccountOrg"
+    "accountOrg"
   ).put({
     defaultOrgId,
   });

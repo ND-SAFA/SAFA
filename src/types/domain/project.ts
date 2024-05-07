@@ -4,7 +4,6 @@ import {
   AttributeLayoutSchema,
   AttributeSchema,
   DocumentSchema,
-  GenerationModelSchema,
   LayoutPositionsSchema,
   MembershipSchema,
   PermissionType,
@@ -126,10 +125,6 @@ export interface ProjectSchema extends IdentifierSchema {
    * Map of artifact ids to their subtree information.
    */
   subtrees: SubtreeMapSchema;
-  /**
-   * List of trained project models.
-   */
-  models: GenerationModelSchema[];
   /**
    * A list of custom attributes used on this project.
    */

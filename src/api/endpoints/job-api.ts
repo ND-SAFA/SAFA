@@ -7,7 +7,7 @@ import { buildRequest } from "@/api";
  * @return Uses list.
  */
 export async function getUserJobs(): Promise<JobSchema[]> {
-  return buildRequest<JobSchema[]>("getUserJobs").get();
+  return buildRequest<JobSchema[]>("jobsUser").get();
 }
 
 /**
@@ -15,7 +15,7 @@ export async function getUserJobs(): Promise<JobSchema[]> {
  * @param projectId
  */
 export async function getProjectJobs(projectId: string): Promise<JobSchema[]> {
-  return buildRequest<JobSchema[]>("getProjectJobs", { projectId }).get();
+  return buildRequest<JobSchema[]>("jobsProject", { projectId }).get();
 }
 
 /**
@@ -24,7 +24,7 @@ export async function getProjectJobs(projectId: string): Promise<JobSchema[]> {
  * @param jobId - The job to delete.
  */
 export async function deleteJobById(jobId: string): Promise<void> {
-  return buildRequest<void, "jobId">("deleteJobById", { jobId }).delete();
+  return buildRequest<void, "jobId">("job", { jobId }).delete();
 }
 
 /**
@@ -33,5 +33,5 @@ export async function deleteJobById(jobId: string): Promise<void> {
  * @param jobId - The job to get logs for.
  */
 export async function getJobLog(jobId: string): Promise<JobLogSchema[][]> {
-  return buildRequest<JobLogSchema[][], "jobId">("getJobLog", { jobId }).get();
+  return buildRequest<JobLogSchema[][], "jobId">("jobLogs", { jobId }).get();
 }

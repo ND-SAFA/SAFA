@@ -97,9 +97,12 @@ export async function getArtifactComments(
     return { ...EXAMPLE_COMMENTS, artifactId };
   }
 
-  return buildRequest<ArtifactCommentsSchema, "artifactId">("getComments", {
-    artifactId,
-  }).get();
+  return buildRequest<ArtifactCommentsSchema, "artifactId">(
+    "commentCollection",
+    {
+      artifactId,
+    }
+  ).get();
 }
 
 /**
@@ -126,7 +129,7 @@ export async function createArtifactComment(
   }
 
   return buildRequest<BasicCommentSchema, "artifactId", CreateCommentSchema>(
-    "createComment",
+    "commentCollection",
     { artifactId }
   ).post(comment);
 }
@@ -149,7 +152,7 @@ export async function editArtifactComment(
     BasicCommentSchema,
     "artifactId" | "commentId",
     BasicCommentSchema
-  >("editComment", { artifactId, commentId: comment.id }).put(comment);
+  >("comment", { artifactId, commentId: comment.id }).put(comment);
 }
 
 /**
@@ -165,7 +168,7 @@ export async function deleteArtifactComment(
     return;
   }
 
-  return buildRequest<void, "artifactId" | "commentId">("deleteComment", {
+  return buildRequest<void, "artifactId" | "commentId">("comment", {
     artifactId,
     commentId,
   }).delete();
@@ -184,7 +187,7 @@ export async function resolveArtifactComment(
     return;
   }
 
-  return buildRequest<void, "artifactId" | "commentId">("resolveComment", {
+  return buildRequest<void, "artifactId" | "commentId">("commentResolve", {
     artifactId,
     commentId,
   }).post();
@@ -205,7 +208,7 @@ export async function generateArtifactHealth(
   }
 
   return buildRequest<HealthCheckCollectionSchema, "versionId", ArtifactSchema>(
-    "generateHealthChecks",
+    "healthChecks",
     { versionId }
   ).post(artifact);
 }

@@ -31,7 +31,6 @@ import {
   subtreeStore,
   timStore,
   traceStore,
-  warningApiStore,
 } from "@/hooks";
 import { fillEndpoint } from "@/api";
 import { pinia } from "@/plugins";
@@ -180,8 +179,6 @@ export const useNotificationApi = defineStore(
           return artifactStore.addOrUpdateArtifacts(project.artifacts);
         case "TRACES":
           return traceStore.addOrUpdateTraceLinks(project.traces);
-        case "WARNINGS":
-          return warningApiStore.handleReload(versionId);
         case "JOBS":
           return jobApiStore.handleReload();
         case "LAYOUT":
@@ -234,11 +231,11 @@ export const useNotificationApi = defineStore(
       }
 
       await stompApiStore.subscribeTo(
-        fillEndpoint("projectTopic", { projectId }),
+        fillEndpoint("topicProject", { projectId }),
         handleEntityChangeMessage
       );
       await stompApiStore.subscribeTo(
-        fillEndpoint("versionTopic", { versionId }),
+        fillEndpoint("topicVersion", { versionId }),
         handleEntityChangeMessage
       );
     }

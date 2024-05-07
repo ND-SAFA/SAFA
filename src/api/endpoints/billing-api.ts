@@ -42,7 +42,7 @@ export function createCostEstimate(
   versionId: string
 ): Promise<CostEstimateSchema> {
   return buildRequest<CostEstimateSchema, "versionId", GenerateArtifactSchema>(
-    "createCostEstimate",
+    "billingEstimate",
     { versionId }
   ).post(config);
 }
@@ -56,7 +56,7 @@ export function createCheckoutSession(
   paymentDetails: PurchaseDetailsSchema
 ): Promise<TransactionSchema> {
   return buildRequest<TransactionSchema, string, PurchaseDetailsSchema>(
-    "createCheckoutSession"
+    "billingCheckout"
   ).post(paymentDetails);
 }
 
@@ -65,7 +65,7 @@ export function createCheckoutSession(
  * @param sessionId - The id of the session to delete.
  */
 export function deleteCheckoutSession(sessionId: string): Promise<void> {
-  return buildRequest<void, "sessionId", void>("deleteCheckoutSession", {
+  return buildRequest<void, "sessionId", void>("billingCheckoutDelete", {
     sessionId,
   }).post();
 }
@@ -79,12 +79,12 @@ export function setOrgPaymentTier(
   organizationId: string,
   tier: OrgPaymentTier
 ): Promise<void> {
-  return buildRequest<void, string, UpdatePaymentTierSchema>(
-    "setOrgPaymentTier"
-  ).put({
-    organizationId,
-    tier,
-  });
+  return buildRequest<void, string, UpdatePaymentTierSchema>("billingTier").put(
+    {
+      organizationId,
+      tier,
+    }
+  );
 }
 
 /**
@@ -94,7 +94,7 @@ export function setOrgPaymentTier(
 export function getAllBillingTransactions(
   orgId: string
 ): Promise<TransactionSchema[]> {
-  return buildRequest<TransactionSchema[], "orgId">("getAllTransactions", {
+  return buildRequest<TransactionSchema[], "orgId">("transactions", {
     orgId,
   }).get();
 }
@@ -106,7 +106,7 @@ export function getAllBillingTransactions(
 export function getMonthlyBillingTransactions(
   orgId: string
 ): Promise<TransactionSchema[]> {
-  return buildRequest<TransactionSchema[], "orgId">("getMonthlyTransactions", {
+  return buildRequest<TransactionSchema[], "orgId">("transactionsMonthly", {
     orgId,
   }).get();
 }

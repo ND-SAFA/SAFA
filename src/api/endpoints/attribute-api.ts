@@ -13,7 +13,7 @@ export async function createAttribute(
   attribute: AttributeSchema
 ): Promise<AttributeSchema> {
   return buildRequest<AttributeSchema, "projectId", AttributeSchema>(
-    "createAttribute",
+    "attributeCollection",
     { projectId }
   ).post(attribute);
 }
@@ -30,7 +30,7 @@ export async function editAttribute(
   attribute: AttributeSchema
 ): Promise<AttributeSchema> {
   return buildRequest<AttributeSchema, "projectId" | "key", AttributeSchema>(
-    "editAttribute",
+    "attribute",
     { projectId, key: attribute.key }
   ).put(attribute);
 }
@@ -45,7 +45,7 @@ export async function deleteAttribute(
   projectId: string,
   attribute: AttributeSchema
 ): Promise<void> {
-  return buildRequest<void, "projectId" | "key">("editAttribute", {
+  return buildRequest<void, "projectId" | "key">("attribute", {
     projectId,
     key: attribute.key,
   }).delete();
@@ -66,7 +66,7 @@ export async function createAttributeLayout(
     AttributeLayoutSchema,
     "projectId",
     AttributeLayoutSchema
-  >("createAttributeLayout", { projectId }).post(layout);
+  >("attributeLayoutCollection", { projectId }).post(layout);
 }
 
 /**
@@ -84,7 +84,7 @@ export async function editAttributeLayout(
     AttributeLayoutSchema,
     "id" | "projectId",
     AttributeLayoutSchema
-  >("editAttributeLayout", { projectId, id: layout.id }).put(layout);
+  >("attributeLayout", { projectId, id: layout.id }).put(layout);
 }
 
 /**
@@ -97,7 +97,7 @@ export async function deleteAttributeLayout(
   projectId: string,
   layout: AttributeLayoutSchema
 ): Promise<void> {
-  return buildRequest<void, "id" | "projectId">("editAttributeLayout", {
+  return buildRequest<void, "id" | "projectId">("attributeLayout", {
     projectId,
     id: layout.id,
   }).delete();

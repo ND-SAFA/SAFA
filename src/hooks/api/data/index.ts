@@ -1,4 +1,3 @@
-export { default as warningApiStore } from "./useWarningApi";
 export { default as artifactApiStore } from "./useArtifactApi";
 export { default as artifactTypeApiStore } from "./useArtifactTypeApi";
 export { default as traceApiStore } from "./useTraceApi";

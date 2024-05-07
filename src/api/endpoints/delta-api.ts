@@ -15,5 +15,5 @@ export async function getProjectDelta(
   return buildRequest<
     VersionDeltaSchema,
     "sourceVersionId" | "targetVersionId"
-  >("getProjectDelta", { sourceVersionId, targetVersionId }).get();
+  >("delta", { sourceVersionId, targetVersionId }).get();
 }

@@ -30,7 +30,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { MatrixSchema, ModelType, OpenableProps } from "@/types";
+import { MatrixSchema, OpenableProps } from "@/types";
 import { traceGenerationApiStore } from "@/hooks";
 import { Typography, TextButton } from "@/components/common";
 import { TraceMatrixCreator } from "@/components/traceLink/save";
@@ -46,7 +46,6 @@ const createEmptyArtifactLevel = (): MatrixSchema[] => [
 ];
 
 const isValid = ref(false);
-const method = ref<ModelType>();
 const matrices = ref(createEmptyArtifactLevel());
 
 const areMatricesValid = computed(() =>
@@ -60,7 +59,6 @@ const areMatricesValid = computed(() =>
  */
 function handleReset(): void {
   isValid.value = false;
-  method.value = undefined;
   matrices.value = createEmptyArtifactLevel();
 }
 
@@ -68,7 +66,7 @@ function handleReset(): void {
  * Attempts to generate the selected trace links.
  */
 function handleSubmit(): void {
-  traceGenerationApiStore.handleGenerate(undefined, matrices.value, {
+  traceGenerationApiStore.handleGenerate(matrices.value, {
     onComplete: () => {
       emit("submit");
       handleReset();

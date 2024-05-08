@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { DocumentSchema } from "@/types";
+import { ViewSchema } from "@/types";
 import { buildDocument } from "@/util";
 import { artifactStore, documentStore, subtreeStore } from "@/hooks";
 import { pinia } from "@/plugins";
@@ -13,7 +13,7 @@ export const useSaveDocument = defineStore("saveDocument", {
     /**
      * A base document being edited.
      */
-    baseDocument: undefined as DocumentSchema | undefined,
+    baseDocument: undefined as ViewSchema | undefined,
     /**
      * The document being created or edited.
      */
@@ -68,7 +68,7 @@ export const useSaveDocument = defineStore("saveDocument", {
     /**
      * @return The finalized document being saved.
      */
-    finalizedDocument(): DocumentSchema {
+    finalizedDocument(): ViewSchema {
       return {
         ...this.editedDocument,
         artifactIds: this.includeChildren

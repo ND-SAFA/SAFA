@@ -2,7 +2,7 @@ export * from "./authentication";
 export * from "./tim";
 export * from "./artifact";
 export * from "./files";
-export * from "./document";
+export * from "./view";
 export * from "./membership";
 export * from "./layout";
 export * from "./project";

@@ -1,13 +1,13 @@
 <template>
   <q-select
-    v-model="documentApiStore.currentDocument"
+    v-model="viewApiStore.currentDocument"
     standout
     bg-color="transparent"
     class="nav-breadcrumb nav-view"
     options-selected-class="primary"
     :options="options"
     :disable="disabled"
-    :loading="documentApiStore.loading"
+    :loading="viewApiStore.loading"
     label="View"
     option-label="name"
     option-value="name"
@@ -15,7 +15,7 @@
   >
     <template #append>
       <flex-box @click.stop="">
-        <document-history />
+        <view-history />
         <icon-button
           v-if="canSave()"
           small
@@ -31,7 +31,7 @@
         opt,
         itemProps,
       }: {
-        opt: DocumentSchema;
+        opt: ViewSchema;
         itemProps: Record<string, unknown>;
       }"
     >
@@ -81,27 +81,27 @@
 
 <script lang="ts">
 /**
- * A selector for switching between documents.
+ * A selector for switching between views.
  */
 export default {
-  name: "DocumentSelector",
+  name: "ViewSelector",
 };
 </script>
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { DocumentSchema } from "@/types";
+import { ViewSchema } from "@/types";
 import { DEFAULT_VIEW_NAME } from "@/util";
 import {
   appStore,
   deltaStore,
-  documentApiStore,
+  viewApiStore,
   documentSaveStore,
   documentStore,
   permissionStore,
 } from "@/hooks";
 import { IconButton, TextButton, ListItem, FlexBox } from "@/components/common";
-import DocumentHistory from "./DocumentHistory.vue";
+import ViewHistory from "./ViewHistory.vue";
 
 const options = computed(() => documentStore.projectDocuments);
 
@@ -112,7 +112,7 @@ const disabled = computed(() => deltaStore.inDeltaView);
  * @param doc - The document to check.
  * @return Whether saving is allowed.
  */
-function canSave(doc = documentApiStore.currentDocument): boolean {
+function canSave(doc = viewApiStore.currentDocument): boolean {
   return (
     doc.name !== DEFAULT_VIEW_NAME &&
     !doc.documentId &&
@@ -142,7 +142,7 @@ function handleCreateOpen(): void {
 /**
  * Opens the document edit panel.
  */
-function handleEditOpen(document: DocumentSchema): void {
+function handleEditOpen(document: ViewSchema): void {
   documentSaveStore.baseDocument = document;
   appStore.openDetailsPanel("document");
 }
@@ -151,6 +151,6 @@ function handleEditOpen(document: DocumentSchema): void {
  * Saves a new document.
  */
 function handleSave(): void {
-  documentApiStore.handleCreatePreset(documentApiStore.currentDocument);
+  viewApiStore.handleCreatePreset(viewApiStore.currentDocument);
 }
 </script>

@@ -1,6 +1,12 @@
 import { IdentifierSchema, MembershipSchema, PermissionType } from "@/types";
 
-export type OrgPaymentTier = "UNLIMITED" | "RECURRING" | "AS_NEEDED";
+/**
+ * The types of payment tiers for an organization.
+ */
+export type OrgPaymentTier =
+  | "UNLIMITED" // Can generate unlimited data
+  | "RECURRING" // Can generate unlimited data, charged monthly
+  | "AS_NEEDED"; // Charged per data generation
 
 /**
  * Represents the billing information for an organization.

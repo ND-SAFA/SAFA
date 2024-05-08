@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 import {
   LayoutPositionsSchema,
-  DocumentSchema,
-  DocumentType,
+  ViewSchema,
+  ViewType,
   ProjectSchema,
 } from "@/types";
 import { buildDocument, DEFAULT_VIEW_NAME, removeMatches } from "@/util";
@@ -31,7 +31,7 @@ export const useDocuments = defineStore("documents", {
       /** All custom project documents. */
       allDocuments: [baseDocument],
       /** The history of documents visited. */
-      history: [] as DocumentSchema[],
+      history: [] as ViewSchema[],
       /** The current index in the history. */
       historyIndex: 0,
     };
@@ -40,7 +40,7 @@ export const useDocuments = defineStore("documents", {
     /**
      * @return All custom documents & the base document.
      */
-    projectDocuments(): DocumentSchema[] {
+    projectDocuments(): ViewSchema[] {
       return [...this.allDocuments, this.baseDocument];
     },
     /**
@@ -52,7 +52,7 @@ export const useDocuments = defineStore("documents", {
     /**
      * @return The current document type.
      */
-    currentType(): DocumentType {
+    currentType(): ViewType {
       return this.currentDocument.type;
     },
     /**
@@ -157,7 +157,7 @@ export const useDocuments = defineStore("documents", {
      * Updates matching documents.
      * @param updatedDocuments - The updated documents.
      */
-    async updateDocuments(updatedDocuments: DocumentSchema[]): Promise<void> {
+    async updateDocuments(updatedDocuments: ViewSchema[]): Promise<void> {
       const updatedIds = updatedDocuments.map((d) => d.documentId);
       const currentDocument = updatedDocuments.find(
         ({ documentId }) => documentId === this.currentId
@@ -178,7 +178,7 @@ export const useDocuments = defineStore("documents", {
      * - In subsets of the base document, hides children of leaf nodes.
      * @param document - The document to switch to.
      */
-    async switchDocuments(document: DocumentSchema): Promise<void> {
+    async switchDocuments(document: ViewSchema): Promise<void> {
       const currentArtifactIds = document.artifactIds;
 
       this.currentDocument = document;
@@ -237,7 +237,7 @@ export const useDocuments = defineStore("documents", {
      * Adds a new document.
      * @param document - The document to add.
      */
-    async addDocument(document: DocumentSchema): Promise<void> {
+    async addDocument(document: ViewSchema): Promise<void> {
       this.allDocuments = removeMatches(this.allDocuments, "documentId", [
         document.documentId,
       ]).concat(document);
@@ -257,7 +257,7 @@ export const useDocuments = defineStore("documents", {
      * - If the document is the current document, the first document will be switched to.
      * @param document - The document, or document id, to delete.
      */
-    async removeDocument(document: string | DocumentSchema): Promise<void> {
+    async removeDocument(document: string | ViewSchema): Promise<void> {
       const deleteDocumentId =
         typeof document === "string" ? document : document.documentId;
       this.allDocuments = this.allDocuments.filter(
@@ -281,7 +281,7 @@ export const useDocuments = defineStore("documents", {
      * @param id - The document id to search for.
      * @return The document, if one exists.
      */
-    getDocument(id: string): DocumentSchema | undefined {
+    getDocument(id: string): ViewSchema | undefined {
       return this.projectDocuments.find(({ documentId }) => documentId === id);
     },
   },

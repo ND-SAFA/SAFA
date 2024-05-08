@@ -3,7 +3,7 @@ export { default as artifactTypeApiStore } from "./useArtifactTypeApi";
 export { default as traceApiStore } from "./useTraceApi";
 export { default as traceMatrixApiStore } from "./useTraceMatrixApi";
 export { default as layoutApiStore } from "./useLayoutApi";
-export { default as documentApiStore } from "./useDocumentApi";
+export { default as viewApiStore } from "./useViewApi";
 export { default as searchApiStore } from "./useSearchApi";
 export { default as deltaApiStore } from "./useDeltaApi";
 export { default as chatApiStore } from "./useChatApi";

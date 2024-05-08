@@ -1,4 +1,4 @@
-import { DocumentType, FTANodeType, SafetyCaseType } from "@/types";
+import { ViewType, FTANodeType, SafetyCaseType } from "@/types";
 
 export type PopupType =
   | "errorModal"
@@ -40,7 +40,7 @@ export type ArtifactCreatorOpenState =
   | boolean
   | SafetyCaseType
   | FTANodeType
-  | DocumentType;
+  | ViewType;
 
 /**
  * Represents the open state of the trace link creator.

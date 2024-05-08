@@ -8,7 +8,7 @@
     <artifact-traces v-else />
     <artifact-comments />
     <artifact-health />
-    <artifact-documents />
+    <artifact-views />
   </details-panel>
 </template>
 
@@ -26,7 +26,7 @@ import { ENABLED_FEATURES } from "@/util";
 import { DetailsPanel } from "@/components/common";
 import {
   ArtifactContent,
-  ArtifactDocuments,
+  ArtifactViews,
   ArtifactTraces,
   ArtifactContext,
 } from "@/components/artifact/display";

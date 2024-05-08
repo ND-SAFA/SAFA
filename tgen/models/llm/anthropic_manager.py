@@ -8,6 +8,7 @@ from tgen.common.constants.environment_constants import ANTHROPIC_KEY
 from tgen.common.logging.logger_manager import logger
 from tgen.common.threading.threading_state import MultiThreadState
 from tgen.common.util.attr_dict import AttrDict
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.core.args.anthropic_args import AnthropicArgs, AnthropicParams
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, ConversationType
@@ -89,6 +90,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         """
         assert AnthropicParams.PROMPT in params, f"Expected {params} to include `prompt`"
         prompts = params.pop(AnthropicParams.PROMPT)
+        system_prompts = DictUtil.get_kwarg_values(params, pop=True, system=[None] * len(prompts))
         logger.info(f"Starting Anthropic batch ({len(prompts)}): {params['model']}")
         prompts = self._format_prompts(prompts)
 
@@ -101,9 +103,10 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             :return: None
             """
             index, prompt = payload
+            system_prompt = system_prompts[index]
             prompt_params = {**params, AnthropicParams.MESSAGES: prompt}
-            if AnthropicParams.SYSTEM in prompt_params and prompt_params[AnthropicParams.SYSTEM] is None:
-                prompt_params.pop(AnthropicParams.SYSTEM)
+            if system_prompt is not None:
+                prompt_params[AnthropicParams.SYSTEM] = system_prompt
             local_response = anthropic_client.messages.create(**prompt_params)
             return local_response
 

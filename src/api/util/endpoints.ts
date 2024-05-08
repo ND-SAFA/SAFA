@@ -189,12 +189,12 @@ export enum Endpoint {
 
   // Chat
 
-  createChat = "chats",
-  deleteChat = "chats/:chatId",
+  chatCollection = "chats",
+  chat = "chats/:chatId",
   getChats = "chats/projects/:projectId",
   editChat = "chats/:chatId",
   createChatTitle = "chats/:chatId/title",
-  getChatMessages = "chats/:chatId/messages",
+  chatMessages = "chats/:chatId/messages",
   createChatMessage = "chats/:chatId/messages",
 }
 

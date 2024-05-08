@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 
+import { computed } from "vue";
 import {
   ArtifactSchema,
   BasicCommentSchema,
@@ -24,6 +25,9 @@ export const useCommentApi = defineStore(
   "useCommentApi",
   (): CommentApiHook => {
     const commentApi = useApi("commentApi");
+    const healthApi = useApi("healthApi");
+
+    const healthLoading = computed(() => healthApi.loading);
 
     async function handleLoadComments(artifactId: string): Promise<void> {
       await commentApi.handleRequest(async () => {
@@ -126,7 +130,7 @@ export const useCommentApi = defineStore(
     async function handleLoadHealthChecks(
       artifact: ArtifactSchema
     ): Promise<void> {
-      await commentApi.handleRequest(
+      await healthApi.handleRequest(
         async () => {
           commentStore.addHealthChecks(
             artifact.id,
@@ -142,6 +146,7 @@ export const useCommentApi = defineStore(
     }
 
     return {
+      healthLoading,
       handleLoadComments,
       handleAddComment,
       handleResolveComment,

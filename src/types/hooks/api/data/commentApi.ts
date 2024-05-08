@@ -1,9 +1,14 @@
+import { ComputedRef } from "vue";
 import { ArtifactSchema, BasicCommentSchema, IOHandlerCallback } from "@/types";
 
 /**
  * Represents actions that can be performed on the comment API.
  */
 export interface CommentApiHook {
+  /**
+   * Whether the health checks are currently loading.
+   */
+  healthLoading: ComputedRef<boolean>;
   /**
    * Loads all comments for the given artifact.
    * @param artifactId - The ID of the artifact to get comments for.

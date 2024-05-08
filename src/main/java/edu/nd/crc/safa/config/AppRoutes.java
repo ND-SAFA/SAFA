@@ -75,8 +75,8 @@ public class AppRoutes {
 
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Chat {
-        private static final String ROOT = "/chat";
-        public static final String CHAT_GET = ROOT;
+        private static final String ROOT = "/chats";
+        public static final String CHAT_GET = ROOT + "/projects/{projectId}";
         public static final String CHAT_CREATE = ROOT;
         private static final String BY_ID = ROOT + "/{chatId}";
         public static final String CHAT_UPDATE = BY_ID;

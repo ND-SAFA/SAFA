@@ -83,7 +83,7 @@ class TestChatCrud extends ApplicationBaseTest {
     private List<ChatDTO> getUserChats(ProjectVersion projectVersion) throws Exception {
         return SafaRequest
             .withRoute(AppRoutes.Chat.CHAT_GET)
-            .withVersion(projectVersion)
+            .withProject(projectVersion.getProject())
             .getAsArray(ChatDTO.class);
     }
 

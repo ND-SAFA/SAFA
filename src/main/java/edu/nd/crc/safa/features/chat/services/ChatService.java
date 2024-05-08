@@ -18,6 +18,7 @@ import edu.nd.crc.safa.features.generation.api.GenApi;
 import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -95,20 +96,21 @@ public class ChatService {
     /**
      * Retrieves all chats accessible to user.
      *
-     * @param user The user whose chats are queried for.
+     * @param user    The user whose chats are queried for.
+     * @param project The project to retrieve chats within.
      * @return Chats owned by or shared with user.
      */
-    public List<ChatDTO> getUserChats(SafaUser user) {
-        List<ChatDTO> userChats = chatRepository.findByOwner(user)
+    public List<ChatDTO> getUserChats(SafaUser user, Project project) {
+        List<ChatDTO> projectChats = chatRepository.findByOwnerAndProjectVersionProject(user, project)
             .stream().map(c -> ChatDTO.fromChat(c, ChatPermission.OWNER)).collect(Collectors.toList());
         List<ChatDTO> sharedChats = chatShareRepository
-            .findByUser(user)
+            .findByUserAndChatProjectVersionProject(user, project)
             .stream()
             .map(cs -> ChatDTO.fromChat(cs.getChat(), cs.getPermission()))
             .toList();
-        userChats.addAll(sharedChats);
-        userChats.sort((chat1, chat2) -> chat2.getUpdatedAt().compareTo(chat1.getUpdatedAt()));
-        return userChats;
+        projectChats.addAll(sharedChats);
+        projectChats.sort((chat1, chat2) -> chat2.getUpdatedAt().compareTo(chat1.getUpdatedAt()));
+        return projectChats;
     }
 
     /**

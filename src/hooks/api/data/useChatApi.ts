@@ -9,6 +9,7 @@ import {
   createProjectChatMessage,
   deleteProjectChat,
   editProjectChat,
+  generateChatTitle,
   getProjectChatMessages,
   getProjectChats,
 } from "@/api";
@@ -26,7 +27,7 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
 
   async function handleGetProjectChats() {
     await chatApi.handleRequest(async () => {
-      chatStore.initializeChats(await getProjectChats());
+      chatStore.initializeChats(await getProjectChats(projectStore.projectId));
       await handleLoadProjectChatMessages(chatStore.currentChat);
     }, {});
   }
@@ -96,8 +97,6 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
     message: string
   ) {
     await chatDialogApi.handleRequest(async () => {
-      const newMessage = buildProjectChatMessage({ message });
-
       if (!chat.id) {
         const chatCreated = await handleCreateProjectChat(chat.title); // sets chat with id in store.
         if (chatCreated) {
@@ -107,24 +106,30 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
         }
       }
 
+      const { messages: priorMessages, id } = chat;
+      const newMessage = buildProjectChatMessage({ message });
+
       chatStore.updateChat({
-        ...chat,
-        messages: [...chat.messages, newMessage],
+        id,
+        messages: [...priorMessages, newMessage],
       });
 
-      const messagesCreated = await createProjectChatMessage(
-        chat.id,
-        newMessage
-      );
+      const messagesCreated = await createProjectChatMessage(id, newMessage);
 
       chatStore.updateChat({
-        ...chat,
+        id,
         messages: [
-          ...chat.messages, // Chat object not mutated, so the user message is not in this list
+          ...priorMessages,
           messagesCreated.userMessage,
           messagesCreated.responseMessage,
         ],
       });
+
+      if (chat.messages.length == 2) {
+        const { title } = await generateChatTitle(id);
+
+        chatStore.updateChat({ id, title });
+      }
     }, {});
   }
 

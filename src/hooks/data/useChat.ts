@@ -75,7 +75,7 @@ export const useChat = defineStore("useChat", {
         versionId: projectStore.versionId,
         ...chat,
       });
-      this.chats.push(newChat);
+      this.chats = [newChat, ...this.chats];
       this.currentChat = newChat;
     },
     /**
@@ -92,17 +92,22 @@ export const useChat = defineStore("useChat", {
       }
     },
     /**
-     * Update the current chat with new data, retaining order of chats.
+     * Update a chat with new data, retaining order of chats.
      * @param chat - The chat data to update.
      */
-    updateChat(chat: ProjectChatSchema): void {
+    updateChat(
+      chat: Pick<ProjectChatSchema, "id"> & Partial<ProjectChatSchema>
+    ): void {
       const index = this.chats.findIndex((c) => c.id === chat.id);
-      if (index === -1) {
-        return;
-      }
-      this.chats[index] = chat;
+
+      if (index === -1) return;
+
+      const fullChat = { ...this.chats[index], ...chat };
+
+      this.chats[index] = fullChat;
+
       if (chat.id === this.currentChat.id) {
-        this.currentChat = chat;
+        this.currentChat = fullChat;
       }
     },
   },

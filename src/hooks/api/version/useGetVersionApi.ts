@@ -10,6 +10,7 @@ import {
 import { versionToString } from "@/util";
 import {
   artifactStore,
+  chatApiStore,
   documentStore,
   logStore,
   projectStore,
@@ -93,6 +94,7 @@ export const useGetVersionApi = defineStore(
 
           await setProjectApiStore.handleSet(project);
           await handleLoadVersions();
+          await chatApiStore.handleGetProjectChats();
 
           if (viewId) {
             // If a view is given, switch to the associated artifact or document.

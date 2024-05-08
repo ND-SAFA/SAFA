@@ -77,7 +77,7 @@ urlpatterns = [
     path(AppEndpoints.TGEN.as_path(suffix="sync"), perform_embedding_search),
     path(AppEndpoints.HGEN.as_path(), perform_hgen),
     path(AppEndpoints.CHAT.as_path(), perform_chat),
-    path(AppEndpoints.CHAT_NAME.as_path(), perform_chat_name),
+    path(AppEndpoints.CHAT_TITLE.as_path(), perform_chat_name),
     path(AppEndpoints.HEALTH.as_path(), perform_health_check),
     path(AppEndpoints.SUMMARIZE.as_path(), perform_summarization_job),
     path(AppEndpoints.SUMMARIZE.as_path(suffix="sync"), perform_summarization_sync),

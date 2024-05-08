@@ -4,9 +4,9 @@ from typing import Callable, Dict, List, Union
 from django.test import Client
 
 from api.endpoints.auth_view import AUTH_KEY
+from api.endpoints.gen.serializers.message_serializer import MessageDTO
 from api.server.app_endpoints import AppEndpoints
 from tests.base_test import BaseTest
-from tgen.chat.message_meta import MessageMeta
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.util.json_util import NpEncoder
@@ -19,15 +19,16 @@ class RequestProxy:
     CLIENT = None
 
     @staticmethod
-    def chat(dataset: ApiDefinition, chat_history: List[MessageMeta]) -> List[Trace]:
+    def chat(dataset: ApiDefinition, chat_history: List[MessageDTO], endpoint=AppEndpoints.CHAT) -> List[Trace]:
         """
         Creates chat with the model.
         :param dataset: The dataset containing project artifacts for context.
         :param chat_history: List of messages exchanged with the model.
+        :param endpoint: The endpoint to send data to.
         :return: The model response and any artifacts used for context.
         """
         data = {"dataset": dataset, "chat_history": chat_history}
-        response = RequestProxy._request(AppEndpoints.CHAT, data)
+        response = RequestProxy._request(endpoint, data)
         return response
 
     @staticmethod

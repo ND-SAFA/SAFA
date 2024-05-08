@@ -11,7 +11,7 @@ class AppEndpoints(Enum):
     HGEN = "hgen"
     TGEN = "tgen"
     CHAT = "chat"
-    CHAT_NAME = "chat-name"
+    CHAT_TITLE = "chat-title"
     SUMMARIZE = "summarize"
     STATUS = "status"
     CANCEL = "cancel"

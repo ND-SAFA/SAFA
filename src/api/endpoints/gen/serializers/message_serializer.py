@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List, TypedDict
 
 from rest_framework import serializers
 
@@ -6,6 +6,12 @@ from api.constants.api_constants import TEXT_MEDIUM
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from tgen.chat.message_meta import MessageMeta
 from tgen.models.llm.abstract_llm_manager import Message, PromptRoles
+
+
+class MessageDTO(TypedDict):
+    artifact_ids: List[str]
+    role: str
+    content: str
 
 
 class MessageMetaSerializer(AbstractSerializer):

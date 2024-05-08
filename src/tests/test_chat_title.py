@@ -1,31 +1,32 @@
 from typing import List
 
 from api.endpoints.gen.serializers.message_serializer import MessageDTO
-from test.jobs.health_check_jobs.health_check_utils import QUERY, assert_correct_related_artifacts, get_dataset_for_context
+from api.server.app_endpoints import AppEndpoints
+from test.jobs.health_check_jobs.health_check_utils import QUERY, get_dataset_for_context
 from tests.base_test import BaseTest
 from tests.common.request_proxy import RequestProxy
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
-class TestChat(BaseTest):
-    RESPONSE = "You should get a cat!"
+class TestChatTitle(BaseTest):
 
     @mock_anthropic
     def test_use_case(self, ai_manager: TestAIManager) -> None:
         """
-        :param ai_manager: The AI manages used to mock responses.
-        :return: None
+        Tests that chat is able to be anam.ed
         """
-        ai_manager.set_responses([self.RESPONSE])
+        expected_title = "chat title"
+        ai_manager.set_responses([PromptUtil.create_xml("title", expected_title)])
         prompt_dataset = get_dataset_for_context()
         artifacts = prompt_dataset.artifact_df.to_artifacts()
         dataset = ApiDefinition(artifacts=artifacts)
         chat_history: List[MessageDTO] = [
-            {"artifact_ids": [], "role": "user", "content": QUERY[ArtifactKeys.CONTENT]}
+            {"artifact_ids": [], "role": "user", "content": QUERY[ArtifactKeys.CONTENT]},
+            {"artifact_ids": [], "role": "assistant", "content": "blah blah"}
         ]
-        response = RequestProxy.chat(dataset, chat_history)
-        self.assertEqual(response["message"], self.RESPONSE)
-        assert_correct_related_artifacts(self, response["artifact_ids"])
+        response = RequestProxy.chat(dataset, chat_history, AppEndpoints.CHAT_TITLE)
+        self.assertEqual(response["title"], "chat title")

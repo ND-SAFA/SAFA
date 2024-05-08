@@ -46,8 +46,6 @@ class ChatSerializer(AbstractSerializer):
         """
         if len(chat_history) == 0:
             raise ValueError("No messages given to chat.")
-        if chat_history[-1].message["role"] != "user":
-            raise ValueError("Last message must be user message.")
 
         for i in range(0, len(chat_history) - 1):
             if chat_history[i].message["role"] == chat_history[i + 1].message["role"]:

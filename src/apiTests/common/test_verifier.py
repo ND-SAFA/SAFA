@@ -70,4 +70,16 @@ class TestVerifier:
             predicted_ids = [p[TraceKeys.child_label()] for p in parent_predictions]
             parent_msg = ",".join(expected_children_ids)
             received_msg = ",".join(predicted_ids)
-            tc.assertEqual(parent_msg, received_msg)
+            received_display = ",".join([TestVerifier.display_trace(p) for p in parent_predictions])
+            tc.assertEqual(parent_msg, received_msg, msg=f"\n\nHashes did not match.\n{parent_msg}\n\n{received_display}")
+
+    @staticmethod
+    def display_trace(trace: Trace) -> str:
+        """
+        Creates display string of trace containing key and score.
+        :param trace: The trace to represent.
+        :return: String representation of the trace.
+        """
+        score = trace[TraceKeys.SCORE]
+        child = trace[TraceKeys.child_label()]
+        return f"{child}({round(score, 2)})"

@@ -7,7 +7,6 @@ import {
   ColorProps,
   DisabledProps,
   ErrorMessageProps,
-  GenerationModelSchema,
   LabelProps,
   MarginProps,
   MultipleProps,
@@ -245,30 +244,6 @@ export interface AttributeListInputProps {
    * The artifact to manage the collection of attributes within.
    */
   artifact: ArtifactSchema;
-}
-
-/**
- * Defines the generation model input component props.
- */
-export interface CustomModelInputProps {
-  /**
-   * The model to manage the selection of.
-   */
-  modelValue: GenerationModelSchema | undefined;
-}
-
-/**
- * Defines the model generation method input component props.
- */
-export interface GenMethodInputProps {
-  /**
-   * The generation method to manage the selection of.
-   */
-  modelValue?: string;
-  /**
-   * If true, only trainable methods are displayed.
-   */
-  onlyTrainable?: boolean;
 }
 
 /**

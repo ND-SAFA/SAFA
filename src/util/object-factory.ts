@@ -4,12 +4,10 @@ import {
   ConfirmDialogueMessage,
   DocumentSchema,
   IdentifierSchema,
-  ModelType,
   VersionDeltaSchema,
   ProjectSchema,
   SessionSchema,
   SnackbarMessage,
-  GenerationModelSchema,
   UserSchema,
   VersionSchema,
   AttributeSchema,
@@ -105,7 +103,6 @@ export function buildProject(project?: Partial<ProjectSchema>): ProjectSchema {
     documents: project?.documents || [],
     layout: project?.layout || {},
     subtrees: project?.subtrees || {},
-    models: project?.models || [],
     attributes: project?.attributes || [],
     attributeLayouts: project?.attributeLayouts || [],
     permissions: project?.permissions || [],
@@ -189,16 +186,6 @@ export function buildDocument(
   };
 }
 
-export function buildModel(
-  model?: Partial<GenerationModelSchema>
-): GenerationModelSchema {
-  return {
-    id: model?.id || "",
-    name: model?.name || "",
-    baseModel: model?.baseModel || "NLBert",
-  };
-}
-
 export function buildAttribute(
   attribute?: Partial<AttributeSchema>
 ): AttributeSchema {
@@ -224,14 +211,10 @@ export function buildAttributeLayout(
 }
 
 export function buildGeneratedMatrix(
-  artifactLevels: MatrixSchema[],
-  method?: ModelType,
-  model?: GenerationModelSchema
+  artifactLevels: MatrixSchema[]
 ): GeneratedMatrixSchema {
   return {
-    method: model?.baseModel || method || undefined,
-    model,
-    artifactLevels: artifactLevels,
+    artifactLevels,
   };
 }
 
@@ -287,5 +270,6 @@ export function buildProjectChatMessage(
     isUser: chat?.isUser === undefined ? true : chat.isUser,
     message: chat?.message || "",
     artifactIds: chat?.artifactIds || [],
+    createdAt: chat?.createdAt || new Date().toISOString(),
   };
 }

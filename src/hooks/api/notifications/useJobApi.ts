@@ -38,7 +38,7 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
     if (!jobId) return;
 
     await stompApiStore.subscribeTo(
-      fillEndpoint("jobTopic", { jobId }),
+      fillEndpoint("topicJobs", { jobId }),
       async (frame) => {
         await jobApi.handleRequest(async () => {
           const job: JobSchema | ChangeMessageSchema = JSON.parse(frame.body);

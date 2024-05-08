@@ -9,7 +9,6 @@
     <artifact-comments />
     <artifact-health />
     <artifact-documents />
-    <artifact-errors />
   </details-panel>
 </template>
 
@@ -29,7 +28,6 @@ import {
   ArtifactContent,
   ArtifactDocuments,
   ArtifactTraces,
-  ArtifactErrors,
   ArtifactContext,
 } from "@/components/artifact/display";
 import {

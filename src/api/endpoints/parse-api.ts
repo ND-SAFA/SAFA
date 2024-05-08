@@ -17,7 +17,7 @@ export async function parseArtifactFile(
   formData.append("file", file);
 
   return buildRequest<ParseArtifactFileSchema, "artifactType", FormData>(
-    "parseArtifactFile",
+    "parseArtifacts",
     { artifactType }
   )
     .withFormData()
@@ -37,7 +37,7 @@ export async function parseTraceFile(
 
   formData.append("file", file);
 
-  return buildRequest<ParseTraceFileSchema, string, FormData>("parseTraceFile")
+  return buildRequest<ParseTraceFileSchema, string, FormData>("parseTraces")
     .withFormData()
     .post(formData);
 }

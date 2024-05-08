@@ -13,7 +13,7 @@ export async function saveDocument(
   document: DocumentSchema
 ): Promise<DocumentSchema> {
   return buildRequest<DocumentSchema, "versionId", DocumentSchema>(
-    "createOrUpdateDocument",
+    "documentCollection",
     { versionId }
   ).post(document);
 }
@@ -27,7 +27,7 @@ export async function saveDocument(
 export async function getDocuments(
   versionId: string
 ): Promise<DocumentSchema[]> {
-  return buildRequest<DocumentSchema[], "versionId">("getProjectDocuments", {
+  return buildRequest<DocumentSchema[], "versionId">("documentCollection", {
     versionId,
   }).get();
 }
@@ -39,7 +39,7 @@ export async function getDocuments(
  * @param documentId - The document to be deleted.
  */
 export async function deleteDocument(documentId: string): Promise<void> {
-  await buildRequest<void, "documentId">("deleteDocument", {
+  await buildRequest<void, "documentId">("document", {
     documentId,
   }).delete();
 }
@@ -49,7 +49,7 @@ export async function deleteDocument(documentId: string): Promise<void> {
  * @param documentId - The document to save.
  */
 export async function setCurrentDocument(documentId: string): Promise<void> {
-  return buildRequest<void, "documentId">("setCurrentDocument", {
+  return buildRequest<void, "documentId">("documentCurrent", {
     documentId,
   }).post();
 }
@@ -58,5 +58,5 @@ export async function setCurrentDocument(documentId: string): Promise<void> {
  * Removes the current document affiliated with current user.
  */
 export async function clearCurrentDocument(): Promise<void> {
-  return buildRequest("clearCurrentDocument").delete();
+  return buildRequest("documentCurrentClear").delete();
 }

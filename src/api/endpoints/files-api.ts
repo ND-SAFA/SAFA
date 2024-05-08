@@ -9,7 +9,7 @@ export async function getProjectFiles(
   versionId: string,
   fileType: "csv" | "json" = "csv"
 ): Promise<string> {
-  return buildRequest<string, "versionId" | "fileType">("getProjectFiles", {
+  return buildRequest<string, "versionId" | "fileType">("projectFiles", {
     versionId,
     fileType,
   })

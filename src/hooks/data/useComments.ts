@@ -183,11 +183,13 @@ export const useComments = defineStore("useComments", {
      * @param artifactId - The unique identifier of the artifact.
      * @param comment - The comment that has been edited.
      */
-    editComment(artifactId: string, comment: BasicCommentSchema): void {
+    editComment(artifactId: string, comment: AnyCommentSchema): void {
       const comments =
         comment.type === "conversation"
           ? this.commentsByArtifactId[artifactId].comments
-          : this.commentsByArtifactId[artifactId].flags;
+          : comment.type === "flag"
+            ? this.commentsByArtifactId[artifactId].flags
+            : this.commentsByArtifactId[artifactId].healthChecks;
       const index = comments.findIndex((c) => c.id === comment.id);
 
       if (index !== -1) {

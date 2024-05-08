@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import {
+  AnyCommentSchema,
   ArtifactSchema,
   BasicCommentSchema,
   CommentApiHook,
@@ -65,7 +66,7 @@ export const useCommentApi = defineStore(
 
     async function handleResolveComment(
       artifact: ArtifactSchema,
-      comment: BasicCommentSchema
+      comment: AnyCommentSchema
     ): Promise<void> {
       await commentApi.handleRequest(
         async () => {

@@ -23,24 +23,37 @@
       value="There are no active health checks."
     />
 
-    <q-banner v-for="check in artifactHealth" :key="check.content" dense>
-      <flex-box align="start">
-        <separator vertical :color="check.color" r="2" style="width: 2px" />
-        <icon
-          size="sm"
-          :variant="check.icon"
-          :color="check.color"
-          class="q-mt-sm"
-        />
-        <typography
-          :value="check.content"
-          l="2"
-          variant="markdown"
-          class="q-mt-sm"
+    <q-banner
+      v-for="check in artifactHealth"
+      :key="check.content"
+      dense
+      class="show-on-hover-parent"
+    >
+      <flex-box justify="between">
+        <flex-box>
+          <separator vertical :color="check.color" r="2" style="width: 2px" />
+          <icon
+            size="sm"
+            :variant="check.icon"
+            :color="check.color"
+            class="q-mt-sm"
+          />
+          <typography
+            :value="check.content"
+            l="2"
+            variant="markdown"
+            class="q-mt-sm"
+          />
+        </flex-box>
+        <icon-button
+          tooltip="Resolve"
+          class="show-on-hover-child"
+          icon="comment-resolve"
+          @click="handleResolveCheck(check)"
         />
       </flex-box>
       <div class="q-ml-sm q-mt-sm">
-        <flex-box v-if="check.artifacts.length > 0">
+        <flex-box v-if="check.artifacts.length > 0" wrap>
           <artifact-chip
             v-for="relatedArtifact in check.artifacts"
             :key="relatedArtifact.id"
@@ -76,6 +89,7 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
+import { AnyCommentSchema } from "@/types";
 import { ENABLED_FEATURES, getIcon } from "@/util";
 import {
   artifactSaveStore,
@@ -92,6 +106,7 @@ import {
   TextButton,
 } from "@/components/common";
 import { ArtifactChip } from "@/components/artifact/display";
+import IconButton from "@/components/common/button/IconButton.vue";
 
 const artifact = computed(() =>
   artifactSaveStore.editedArtifact.body
@@ -112,6 +127,16 @@ function handleCheckHealth(preload?: boolean): void {
   if (preload && !ENABLED_FEATURES.NASA_ARTIFACT_HEALTH_PRELOAD) return;
 
   commentApiStore.handleLoadHealthChecks(artifact.value);
+}
+
+/**
+ * Resolves a comment, hiding it from the list.
+ * @param healthCheck - The health check to resolve.
+ */
+function handleResolveCheck(healthCheck: AnyCommentSchema) {
+  if (!artifact.value) return;
+
+  commentApiStore.handleResolveComment(artifact.value, healthCheck);
 }
 
 onMounted(() => handleCheckHealth(true));

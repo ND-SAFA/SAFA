@@ -1,5 +1,10 @@
 import { ComputedRef } from "vue";
-import { ArtifactSchema, BasicCommentSchema, IOHandlerCallback } from "@/types";
+import {
+  AnyCommentSchema,
+  ArtifactSchema,
+  BasicCommentSchema,
+  IOHandlerCallback,
+} from "@/types";
 
 /**
  * Represents actions that can be performed on the comment API.
@@ -36,7 +41,7 @@ export interface CommentApiHook {
    */
   handleResolveComment(
     artifact: ArtifactSchema,
-    comment: BasicCommentSchema
+    comment: AnyCommentSchema
   ): Promise<void>;
 
   /**

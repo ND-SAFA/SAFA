@@ -190,13 +190,14 @@ class TestLLMTrainer(BaseTest):
         self.assertEqual(res.predictions[0][response_prompt1.args.prompt_id][response_prompt1.get_all_response_tags()[0]][0],
                          response + str(3))
 
-    def assert_message_prompt(self, prompt: str, system_prompt: str, response: str, xml_tag: str,
+    def assert_message_prompt(self, prompt: str, expected_system_prompt: str, response: str, xml_tag: str,
                               system_prompt_identifier):
-        expected_in_prompt: bool = system_prompt_identifier not in prompt
+        user_prompt, system_prompt = prompt if isinstance(prompt, tuple) else (prompt, None)
+        expected_in_prompt: bool = system_prompt_identifier not in user_prompt
         if expected_in_prompt:
-            self.assertIn(system_prompt, prompt)
+            self.assertIn(expected_system_prompt, user_prompt)
         else:
-            self.assertNotIn(system_prompt, prompt)
+            self.assertNotIn(expected_system_prompt, user_prompt)
         return PromptUtil.create_xml(xml_tag, response)
 
     @mock_openai

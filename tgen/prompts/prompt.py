@@ -70,14 +70,16 @@ class Prompt:
         """
         return self.response_manager.get_all_tag_ids()
 
-    def get_value(self, value_prefix: str = EMPTY_STRING, value_suffix: str = EMPTY_STRING):
+    def structure_value(self, value: str = None, value_prefix: str = EMPTY_STRING, value_suffix: str = EMPTY_STRING):
         """
         Gets the value with any additional prefix or suffix added.
+        :param value: The value to structure.
         :param value_prefix: Goes before the value.
         :param value_suffix: Goes after the value.
         :return: The value with any additional prefix or suffix added.
         """
-        return f"{value_prefix}{self.value}{value_suffix}" if self.value else EMPTY_STRING
+        value = self.value if not value else value
+        return f"{value_prefix}{value}{value_suffix}" if self.value else EMPTY_STRING
 
     def _build(self, **kwargs) -> str:
         """

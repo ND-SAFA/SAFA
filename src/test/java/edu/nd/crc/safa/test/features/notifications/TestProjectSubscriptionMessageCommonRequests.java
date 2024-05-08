@@ -32,7 +32,8 @@ class TestProjectSubscriptionMessageCommonRequests extends ApplicationBaseTest {
             .actions(a -> a
                 .createNewUser(otherUserName, otherUserName, false, this))
             .and("Root User: Sharing project with new user")
-            .request((s, r) -> r.project().shareProject(s.getProject("project"), otherUserName, ProjectRole.VIEWER))
+            .request((s, r) -> r.project().addUserToProject(s.getProject("project"), otherUserName,
+                ProjectRole.VIEWER, getCurrentUser()))
             .and()
             .notifications((s, n) -> n
                     .getEntityMessage(getCurrentUser()))

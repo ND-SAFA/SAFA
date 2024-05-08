@@ -11,7 +11,7 @@ from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.steps.step_summarize_artifacts import StepSummarizeArtifacts
@@ -158,7 +158,7 @@ class TestSummarizer(BaseTest):
         return orig_content
 
     @staticmethod
-    def get_chunk_summary_prompts(prompt_args: PromptArgs, summarizer):
+    def get_chunk_summary_prompts(prompt_args: LLMPromptBuildArgs, summarizer):
         def build_prompt(chunk):
             prompt_dict = summarizer.code_prompt_builder.build(prompt_args,
                                                                artifact={ArtifactKeys.CONTENT: chunk})

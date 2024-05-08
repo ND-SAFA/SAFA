@@ -64,7 +64,8 @@ class TestProjectSummarizer(BaseTest):
 
     def test_create_prompt_builder(self):
         def prompt_builder_test(summarizer: ProjectSummarizer):
-            prompt_builder = summarizer._create_prompt_builder(PS_OVERVIEW_TITLE, PROJECT_SUMMARY_MAP.get(PS_OVERVIEW_TITLE).value)
+            prompt_builder = summarizer._create_prompt_builder(PS_OVERVIEW_TITLE,
+                                                               PROJECT_SUMMARY_MAP.get(PS_OVERVIEW_TITLE).value)
             artifact_df = summarizer.dataset.artifact_df
             prompt = prompt_builder.build(artifacts=[artifact for _, artifact in artifact_df.itertuples()],
                                           model_format_args=AnthropicManager.prompt_args)[PromptKeys.PROMPT]
@@ -110,7 +111,7 @@ class TestProjectSummarizer(BaseTest):
         self.assertEqual(self.NEW_SECTIONS[self.NEW_SECTION_TITLE], new_section_prompt)
 
         existing_section_prompt = summarizer.get_section_prompt_by_id(PS_DATA_FLOW_TITLE)
-        self.assertEqual(PROJECT_SUMMARY_MAP[PS_DATA_FLOW_TITLE].value.id, existing_section_prompt.id)
+        self.assertEqual(PROJECT_SUMMARY_MAP[PS_DATA_FLOW_TITLE].value.args.prompt_id, existing_section_prompt.args.prompt_id)
 
     def test_all_project_sections(self):
         section_order = ProjectSummarizer._get_all_project_sections(self.ARGS)

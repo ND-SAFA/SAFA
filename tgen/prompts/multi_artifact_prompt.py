@@ -11,6 +11,7 @@ from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 
 
 class MultiArtifactPrompt(Prompt):
@@ -35,10 +36,12 @@ class MultiArtifactPrompt(Prompt):
                  data_type: DataType = DataType.ARTIFACT,
                  starting_num: int = 1,
                  include_ids: bool = True,
+                 prompt_args: PromptArgs = None,
                  **artifact_params):
         """
         Constructor for making a prompt containing many artifacts.
         :param prompt_start: The prefix to attach to prompt.
+        :param prompt_args: The args to the base prompt.
         :param build_method: The method to build the prompt (determines prompt format).
         :param data_type: Whether the data is coming from artifacts or traces
         :param starting_num: The number to start the artifacts at if using numbered build method
@@ -53,7 +56,7 @@ class MultiArtifactPrompt(Prompt):
         self.artifact_params = artifact_params
         self.data_type = data_type
         self.starting_num = starting_num
-        super().__init__(value=prompt_start)
+        super().__init__(value=prompt_start, prompt_args=prompt_args)
 
     @overrides(Prompt)
     def _build(self, artifacts: List[EnumDict], **kwargs) -> str:
@@ -63,7 +66,7 @@ class MultiArtifactPrompt(Prompt):
         :param kwargs: Ignored
         :return: The formatted prompt
         """
-        prompt = f"{NEW_LINE}{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
+        prompt = self.get_value(value_prefix=NEW_LINE, value_suffix=NEW_LINE)
         if self.build_method in self.build_methods:
             artifact_params = deepcopy(self.artifact_params)
             artifact_tokens = [TokenCalculator.estimate_num_tokens(artifact[ArtifactKeys.CONTENT]) for artifact in artifacts]

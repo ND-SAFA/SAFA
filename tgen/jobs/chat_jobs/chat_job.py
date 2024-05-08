@@ -15,6 +15,7 @@ from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.tracing.context_finder import ContextFinder
 
@@ -63,7 +64,7 @@ class ChatJob(AbstractJob):
                 chat_prompt = Prompt(f"The related information is provided to help you better understand "
                                      f"and respond to the following question. If you do not need the information to respond,"
                                      f"you may ignore it. "
-                                     f"{NEW_LINE}{chat_content}", title="Query")
+                                     f"{NEW_LINE}{chat_content}", prompt_args=PromptArgs(title="Query"))
                 prompt_str = PromptBuilder(prompts=[context_prompt, chat_prompt]).build(model_format_args=self.llm_manager.prompt_args,
                                                                                         artifact=query_artifact)[PromptKeys.PROMPT]
                 meta.message["content"] = prompt_str

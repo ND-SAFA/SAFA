@@ -12,7 +12,8 @@ class PromptDataFrame(AbstractProjectDataFrame):
     """
 
     OPTIONAL_COLUMNS = [PromptKeys.COMPLETION.value,
-                        PromptKeys.PROMPT_BUILDER_ID.value]
+                        PromptKeys.PROMPT_BUILDER_ID.value,
+                        PromptKeys.SYSTEM.value]
 
     @classmethod
     def index_name(cls) -> str:

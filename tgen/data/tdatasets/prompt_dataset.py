@@ -19,7 +19,7 @@ from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.model_manager import ModelManager
-from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.summarizer.summary import Summary
 
@@ -110,7 +110,7 @@ class PromptDataset(iDataset):
         return self.project_file_id
 
     def get_prompt_dataframe(self, prompt_builders: Union[List[PromptBuilder], PromptBuilder] = None,
-                             prompt_args: PromptArgs = None) -> PromptDataFrame:
+                             prompt_args: LLMPromptBuildArgs = None) -> PromptDataFrame:
         """
         Gets the prompt dataframe containing prompts and completions
         :param prompt_args: The arguments for properly formatting the prompt
@@ -160,7 +160,7 @@ class PromptDataset(iDataset):
             self.trace_dataset.artifact_df = artifact_df
         self.__state_has_changed = True
 
-    def _get_generation_method(self, prompt_args: PromptArgs, prompt_builder: PromptBuilder) -> Callable:
+    def _get_generation_method(self, prompt_args: LLMPromptBuildArgs, prompt_builder: PromptBuilder) -> Callable:
         """
         Returns the generation method for building prompts.
         :param prompt_args: The prompt configuration for a LLM.
@@ -181,7 +181,7 @@ class PromptDataset(iDataset):
         else:
             return self._generate_prompts_dataframe_without_artifacts
 
-    def _generate_prompts_entries_from_traces(self, prompt_builder: PromptBuilder, prompt_args: PromptArgs) -> List:
+    def _generate_prompts_entries_from_traces(self, prompt_builder: PromptBuilder, prompt_args: LLMPromptBuildArgs) -> List:
         """
         Converts trace links in to prompt format for generation model.
         :param prompt_builder: The generator of prompts for the dataset
@@ -205,7 +205,7 @@ class PromptDataset(iDataset):
         FileUtil.delete_file_safely(save_path)
         return entries
 
-    def _build_artifact_prompts(self, prompt_builder: PromptBuilder, prompt_args: PromptArgs, **kwargs) -> List:
+    def _build_artifact_prompts(self, prompt_builder: PromptBuilder, prompt_args: LLMPromptBuildArgs, **kwargs) -> List:
         """
         Creates a prompt for each artifact in project.
         :param prompt_builder: The generator of prompts for the dataset
@@ -222,7 +222,7 @@ class PromptDataset(iDataset):
             entries.append(entry)
         return entries
 
-    def _generate_prompts_entries_from_all_artifacts(self, prompt_builder: PromptBuilder, prompt_args: PromptArgs) -> List:
+    def _generate_prompts_entries_from_all_artifacts(self, prompt_builder: PromptBuilder, prompt_args: LLMPromptBuildArgs) -> List:
         """
         Converts all artifacts in to prompt format for generation model.
         :param prompt_builder: The generator of prompts for the dataset
@@ -233,7 +233,7 @@ class PromptDataset(iDataset):
         prompt_entry = self._create_prompt(prompt_builder=prompt_builder, prompt_args=prompt_args, artifacts=artifacts)
         return [prompt_entry]
 
-    def _generate_prompts_dataframe_without_artifacts(self, prompt_builder: PromptBuilder, prompt_args: PromptArgs) -> List:
+    def _generate_prompts_dataframe_without_artifacts(self, prompt_builder: PromptBuilder, prompt_args: LLMPromptBuildArgs) -> List:
         """
         Builds the prompt in the format for generation model without artifacts or traces.
         :param prompt_builder: The generator of prompts for the dataset
@@ -245,7 +245,7 @@ class PromptDataset(iDataset):
         return [entry]
 
     @staticmethod
-    def _create_prompt(prompt_builder: PromptBuilder, prompt_args: PromptArgs, **prompt_kwargs) -> Optional[EnumDict]:
+    def _create_prompt(prompt_builder: PromptBuilder, prompt_args: LLMPromptBuildArgs, **prompt_kwargs) -> Optional[EnumDict]:
         """
         Creates a prompt entry using the given builder.
         :param prompt_builder: Builds the prompt.

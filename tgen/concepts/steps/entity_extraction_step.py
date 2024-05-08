@@ -10,6 +10,7 @@ from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
@@ -61,10 +62,10 @@ class EntityExtractionStep(AbstractPipelineStep):
         :param artifact_prompt_title: Title placed on top of artifact content.s
         :return: The parsed response from the LLM.
         """
-        artifact_prompt = Prompt(artifact_content, title=artifact_prompt_title)
+        artifact_prompt = Prompt(artifact_content, prompt_args=PromptArgs(title=artifact_prompt_title))
         prompt_builder = PromptBuilder(prompts=[artifact_prompt, instructions_prompt])
         output = LLMTrainer.predict_from_prompts(
             llm_manager,
             prompt_builder,
         )
-        return output.predictions[0][instructions_prompt.id]
+        return output.predictions[0][instructions_prompt.args.prompt_id]

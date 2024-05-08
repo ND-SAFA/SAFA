@@ -22,4 +22,4 @@ class TestBinaryChoiceQuestionPrompt(BaseTest):
 
     def get_prompt(self):
         return BinaryChoiceQuestionPrompt(self.CHOICES, self.PROMPT, response_tag=self.TAG,
-                                          default_factory=lambda t, v: self.DEFAULT, required=False)
+                                          default_factory=lambda t, v: self.DEFAULT)

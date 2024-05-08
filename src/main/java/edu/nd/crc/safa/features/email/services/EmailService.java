@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.features.email.services;
 
+import edu.nd.crc.safa.features.memberships.entities.db.MembershipInviteToken;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -59,4 +61,13 @@ public interface EmailService {
             sendGenerationFailed(recipient, projectVersion, jobEntity);
         }
     }
+
+    /**
+     * Send an email with a link inviting a user to be a member in an {@link IEntityWithMembership}
+     *
+     * @param recipient The email of the recipient
+     * @param entity The entity
+     * @param token The token to use to accept/decline the invite
+     */
+    void sendMembershipInvite(String recipient, IEntityWithMembership entity, MembershipInviteToken token);
 }

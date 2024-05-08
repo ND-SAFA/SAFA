@@ -4,18 +4,21 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.FendPathConfig;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
+import edu.nd.crc.safa.features.email.services.EmailService;
 import edu.nd.crc.safa.features.memberships.entities.app.InviteTokenAppEntity;
-import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.MembershipInviteToken;
 import edu.nd.crc.safa.features.memberships.services.MembershipInviteService;
+import edu.nd.crc.safa.features.memberships.services.MembershipService;
+import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,14 +30,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class MembershipInviteController extends BaseController {
 
     private final MembershipInviteService inviteService;
-
-    @Value("${fend.accept-invite-path}")
-    private String acceptInvitePath;
+    private final FendPathConfig fendPathConfig;
+    private final EmailService emailService;
+    private final MembershipService membershipService;
 
     public MembershipInviteController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
-                                      MembershipInviteService inviteService) {
+                                      MembershipInviteService inviteService, FendPathConfig fendPathConfig,
+                                      EmailService emailService, MembershipService membershipService) {
         super(resourceBuilder, serviceProvider);
         this.inviteService = inviteService;
+        this.fendPathConfig = fendPathConfig;
+        this.emailService = emailService;
+        this.membershipService = membershipService;
     }
 
     /**
@@ -50,9 +57,13 @@ public class MembershipInviteController extends BaseController {
         SafaUser user = getCurrentUser();
 
         MembershipInviteToken token = inviteService.generateSharingToken(entityId, inviteRequest.getRole(), user);
-        InviteTokenAppEntity tokenResponse = new InviteTokenAppEntity(token, acceptInvitePath);
+        InviteTokenAppEntity tokenResponse = new InviteTokenAppEntity(token, fendPathConfig.getAcceptInviteUrl());
 
-        // TODO send email
+        String email = inviteRequest.getEmail();
+        if (email != null && !email.isBlank()) {
+            IEntityWithMembership entity = membershipService.getEntity(entityId);
+            emailService.sendMembershipInvite(email, entity, token);
+        }
 
         return tokenResponse;
     }
@@ -64,9 +75,9 @@ public class MembershipInviteController extends BaseController {
      * @return The new membership that was created
      */
     @PutMapping(AppRoutes.Memberships.Invites.ACCEPT_INVITE)
-    public IEntityMembership acceptInvite(@RequestParam UUID token) {
+    public MembershipAppEntity acceptInvite(@RequestParam UUID token) {
         SafaUser user = getCurrentUser();
-        return inviteService.useToken(token, user);
+        return new MembershipAppEntity(inviteService.useToken(token, user));
     }
 
     /**

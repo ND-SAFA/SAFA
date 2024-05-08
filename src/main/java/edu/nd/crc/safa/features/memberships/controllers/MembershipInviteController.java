@@ -8,7 +8,7 @@ import edu.nd.crc.safa.config.FendPathConfig;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.email.services.EmailService;
-import edu.nd.crc.safa.features.memberships.entities.app.InviteTokenAppEntity;
+import edu.nd.crc.safa.features.memberships.entities.app.InviteTokenDTO;
 import edu.nd.crc.safa.features.memberships.entities.db.MembershipInviteToken;
 import edu.nd.crc.safa.features.memberships.services.MembershipInviteService;
 import edu.nd.crc.safa.features.memberships.services.MembershipService;
@@ -53,11 +53,11 @@ public class MembershipInviteController extends BaseController {
      * @return A generated invite token
      */
     @PostMapping(AppRoutes.Memberships.Invites.BY_ENTITY_ID)
-    public InviteTokenAppEntity createInvite(@PathVariable UUID entityId, @RequestBody InviteRequest inviteRequest) {
+    public InviteTokenDTO createInvite(@PathVariable UUID entityId, @RequestBody InviteRequestDTO inviteRequest) {
         SafaUser user = getCurrentUser();
 
         MembershipInviteToken token = inviteService.generateSharingToken(entityId, inviteRequest.getRole(), user);
-        InviteTokenAppEntity tokenResponse = new InviteTokenAppEntity(token, fendPathConfig.getAcceptInviteUrl());
+        InviteTokenDTO tokenResponse = new InviteTokenDTO(token, fendPathConfig.getAcceptInviteUrl());
 
         String email = inviteRequest.getEmail();
         if (email != null && !email.isBlank()) {
@@ -91,7 +91,7 @@ public class MembershipInviteController extends BaseController {
     }
 
     @Data
-    public static class InviteRequest {
+    public static class InviteRequestDTO {
         @NotNull
         @NotEmpty
         private String role;

@@ -7,12 +7,12 @@ import edu.nd.crc.safa.features.memberships.entities.db.MembershipInviteToken;
 import lombok.Data;
 
 @Data
-public class InviteTokenAppEntity {
+public class InviteTokenDTO {
     private String token;
     private LocalDateTime expiration;
     private String url;
 
-    public InviteTokenAppEntity(MembershipInviteToken token, String urlPathFormat) {
+    public InviteTokenDTO(MembershipInviteToken token, String urlPathFormat) {
         this.token = token.getId().toString();
         this.expiration = token.getExpiration();
         this.url = String.format(urlPathFormat, this.token);

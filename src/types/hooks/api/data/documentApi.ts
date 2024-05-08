@@ -2,8 +2,8 @@ import { ComputedRef } from "vue/dist/vue";
 import { WritableComputedRef } from "vue";
 import {
   ArtifactSchema,
-  DocumentSchema,
-  DocumentType,
+  ViewSchema,
+  ViewType,
   IOHandlerCallback,
 } from "@/types";
 
@@ -19,7 +19,7 @@ export interface DocumentApiHook {
    * The current loaded document.
    * - Reactively loads the current document when set.
    */
-  currentDocument: WritableComputedRef<DocumentSchema>;
+  currentDocument: WritableComputedRef<ViewSchema>;
   /**
    * Creates a new document and updates app state.
    *
@@ -29,7 +29,7 @@ export interface DocumentApiHook {
    */
   handleCreate(
     name: string,
-    type: DocumentType,
+    type: ViewType,
     artifactIds: string[]
   ): Promise<void>;
   /**
@@ -39,7 +39,7 @@ export interface DocumentApiHook {
    * @param callbacks - The callbacks to call on success, error, and complete.
    */
   handleCreatePreset(
-    document: DocumentSchema,
+    document: ViewSchema,
     callbacks?: IOHandlerCallback
   ): Promise<void>;
   /**
@@ -47,7 +47,7 @@ export interface DocumentApiHook {
    *
    * @param document - The document to edit.
    */
-  handleUpdate(document: DocumentSchema): Promise<void>;
+  handleUpdate(document: ViewSchema): Promise<void>;
   /**
    * Deletes the document and updates app state.
    * Switches documents if the current one has been deleted.
@@ -73,5 +73,5 @@ export interface DocumentApiHook {
    *
    * @param document - The current document.
    */
-  handleSwitch(document: DocumentSchema): Promise<void>;
+  handleSwitch(document: ViewSchema): Promise<void>;
 }

@@ -2,7 +2,7 @@ import {
   ArtifactSchema,
   CommitSchema,
   ConfirmDialogueMessage,
-  DocumentSchema,
+  ViewSchema,
   IdentifierSchema,
   VersionDeltaSchema,
   ProjectSchema,
@@ -172,9 +172,7 @@ export function buildCommit(version: VersionSchema): CommitSchema {
   };
 }
 
-export function buildDocument(
-  document?: Partial<DocumentSchema>
-): DocumentSchema {
+export function buildDocument(document?: Partial<ViewSchema>): ViewSchema {
   return {
     documentId: document?.documentId || "",
     project: document?.project || buildProjectIdentifier(),

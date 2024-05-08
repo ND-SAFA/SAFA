@@ -3,7 +3,7 @@ import {
   ArtifactTypeSchema,
   AttributeLayoutSchema,
   AttributeSchema,
-  DocumentSchema,
+  ViewSchema,
   LayoutPositionsSchema,
   MembershipSchema,
   PermissionType,
@@ -115,7 +115,7 @@ export interface ProjectSchema extends IdentifierSchema {
   /**
    * The different documents for this project.
    */
-  documents: DocumentSchema[];
+  documents: ViewSchema[];
 
   /**
    * Map of artifact ids to their position in the default graph.

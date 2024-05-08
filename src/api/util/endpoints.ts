@@ -131,10 +131,10 @@ export enum Endpoint {
 
   // Documents
 
-  documentCollection = "projects/versions/:versionId/documents",
-  document = "projects/documents/:documentId",
-  documentCurrent = "projects/documents/current/:documentId",
-  documentCurrentClear = "projects/documents/current",
+  viewCollection = "projects/versions/:versionId/documents",
+  view = "projects/documents/:viewId",
+  viewCurrent = "projects/documents/current/:viewId",
+  viewCurrentClear = "projects/documents/current",
 
   // Delta
 

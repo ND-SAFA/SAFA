@@ -8,6 +8,7 @@
     <template #title-actions>
       <text-button
         text
+        :loading="commentApiStore.healthLoading"
         color="primary"
         label="Health"
         icon="health"

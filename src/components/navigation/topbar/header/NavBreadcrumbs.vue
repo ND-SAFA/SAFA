@@ -11,7 +11,7 @@
       <version-selector />
     </q-breadcrumbs-el>
     <q-breadcrumbs-el v-if="displayProjectOptions">
-      <document-selector />
+      <view-selector />
     </q-breadcrumbs-el>
 
     <q-breadcrumbs-el v-if="displayPageTitle">
@@ -58,7 +58,7 @@ import { useRoute } from "vue-router";
 import { projectStore, useScreen } from "@/hooks";
 import { Routes } from "@/router";
 import { ProjectSelector, VersionSelector } from "@/components/project";
-import { DocumentSelector } from "@/components/document";
+import { ViewSelector } from "@/components/view";
 import { IconButton, Typography } from "@/components/common";
 import { OrganizationSelector } from "@/components/organization";
 import FlexBox from "@/components/common/display/content/FlexBox.vue";

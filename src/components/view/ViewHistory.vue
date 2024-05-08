@@ -28,10 +28,10 @@
 
 <script lang="ts">
 /**
- * Displays buttons for going back and forward in the document history.
+ * Displays buttons for going back and forward in the view history.
  */
 export default {
-  name: "DocumentHistory",
+  name: "ViewHistory",
 };
 </script>
 

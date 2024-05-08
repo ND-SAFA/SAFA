@@ -73,7 +73,7 @@ class ContradictionsDetector:
         output = LLMTrainer.predict_from_prompts(self.args.llm_manager, prompt_builder,
                                                  save_and_load_path=save_and_load_path,
                                                  artifact=query_artifact)
-        response = LLMResponseUtil.extract_predictions_from_response(output.predictions, task_prompt.id)[0]
+        response = LLMResponseUtil.extract_predictions_from_response(output.predictions, task_prompt.args.prompt_id)[0]
         tags = task_prompt.get_all_response_tags()
         result = ContradictionsResult(**{tag: response[tag][0] if len(response[tag]) else None for tag in tags})
         self._filter_unknown_ids(result, id2context[query_id])

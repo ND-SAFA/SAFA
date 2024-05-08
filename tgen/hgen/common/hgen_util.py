@@ -1,8 +1,8 @@
 import os
 import re
+from typing import Dict, List, Set, Tuple, Union
 
 import pandas as pd
-from typing import Dict, List, Set, Tuple, Union
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
@@ -111,7 +111,7 @@ class HGenUtil:
                     predictions_path = FileUtil.safely_join_paths(hgen_args.export_dir, filename)
                     names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
                                                      prediction_step=PredictionStep.NAME,
-                                                     dataset=dataset, response_prompt_ids=name_prompt.id,
+                                                     dataset=dataset, response_prompt_ids=name_prompt.args.prompt_id,
                                                      tags_for_response=name_prompt.response_manager.response_tag,
                                                      return_first=True,
                                                      export_path=predictions_path)

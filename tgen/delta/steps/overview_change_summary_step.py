@@ -130,7 +130,7 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
                    ]
         output = get_prediction_output(args, artifact_df, state, categories=categories,
                                        prompts=prompts)
-        return output[0][task_prompt.id]
+        return output[0][task_prompt.args.prompt_id]
 
     @staticmethod
     def _match_change_type(types: List[str], change_type_mapping: Dict[str, Any]) -> str:

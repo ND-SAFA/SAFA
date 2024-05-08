@@ -15,6 +15,7 @@ from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.tracing.context_finder import ContextFinder
 

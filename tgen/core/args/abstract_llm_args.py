@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
+from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Type, Union
 
-from tgen.common.util.base_object import BaseObject
 from tgen.common.constants.open_ai_constants import TEMPERATURE_DEFAULT
+from tgen.common.logging.logger_manager import logger
+from tgen.common.util.base_object import BaseObject
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.models.llm.llm_task import LLMCompletionType
@@ -14,6 +16,7 @@ class AbstractLLMArgs(BaseObject, ABC):
     """
     Defines abstract class for arguments of an AI library.
     """
+    llm_params: Type
     expected_task_params: Dict[TrainerTask, List[str]]
     model: str
     temperature: float = TEMPERATURE_DEFAULT
@@ -48,6 +51,12 @@ class AbstractLLMArgs(BaseObject, ABC):
             params = self._add_params_for_task(task_type, params)
             params = self._add_library_params(task_type, params, instructions=instructions)
         params.update(kwargs)
+
+        expected_params = set(vars(self.llm_params).values())
+        for param in deepcopy(params):
+            if param not in expected_params:
+                params.pop(param)
+                logger.warning(f"Removing unexpected param for {self.__class__}: {param}")
         return params
 
     def _add_params_for_task(self, task: Union[TrainerTask, LLMCompletionType], params: Dict = None) -> Dict:

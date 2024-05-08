@@ -15,6 +15,7 @@ from tgen.data.keys.structure_keys import TraceKeys
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.tracing_request import TracingRequest
@@ -284,7 +285,7 @@ class RankingUtil:
             uses_specification = PROJECT_SUMMARY_HEADER in project_summary
             context_formatted = project_summary if uses_specification \
                 else f"# Project Summary\n{project_summary}"
-            prompt = Prompt(context_formatted, allow_formatting=False)
+            prompt = Prompt(context_formatted, prompt_args=PromptArgs(allow_formatting=False))
             prompt_builder.add_prompt(prompt)
 
     @staticmethod

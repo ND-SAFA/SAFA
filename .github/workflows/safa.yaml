@@ -45,6 +45,7 @@ jobs:
       run: |
         python src/api/manage.py test src/apiTests
       env:
+        DEFAULT_EMBEDDING_MODEL: "sentence-transformers/all-MiniLM-L6-v2"
         DEPLOYMENT: test
         DJANGO_SETTINGS_MODULE: api.server.settings
         SECRET_KEY: "qc&bx49=cmhwi)^a+v@2e%^_hp(3a)e3+49q!lxj_p8oza7$^z"

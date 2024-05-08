@@ -138,7 +138,7 @@ export async function getProjectChats(
     return [EXAMPLE_NASA_CHAT, EXAMPLE_PROJECT_CHAT];
   }
 
-  return buildRequest<ProjectChatSchema[]>("getChats", { projectId }).get();
+  return buildRequest<ProjectChatSchema[]>("chatProject", { projectId }).get();
 }
 
 /**
@@ -189,7 +189,7 @@ export async function getProjectChatMessages(
 export async function generateChatTitle(
   chatId: string
 ): Promise<ProjectChatSchema> {
-  return buildRequest<ProjectChatSchema, "chatId">("createChatTitle", {
+  return buildRequest<ProjectChatSchema, "chatId">("chatTitle", {
     chatId,
   }).post();
 }

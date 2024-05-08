@@ -21,21 +21,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { watch } from "vue";
-import { chatApiStore, layoutStore, projectStore } from "@/hooks";
+import { layoutStore } from "@/hooks";
 import ProjectChatMessages from "./ProjectChatMessages.vue";
 import ProjectChatList from "./ProjectChatList.vue";
-
-// Watch the projectId for changes.
-watch(
-  () => projectStore.projectId,
-  (newProjectId) => {
-    if (newProjectId !== "") {
-      chatApiStore.handleGetProjectChats();
-    }
-  },
-  {
-    immediate: true, // This option triggers the handler immediately with the current value on mount.
-  }
-);
 </script>

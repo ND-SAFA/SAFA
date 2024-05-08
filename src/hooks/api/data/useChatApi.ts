@@ -97,8 +97,6 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
     message: string
   ) {
     await chatDialogApi.handleRequest(async () => {
-      const newMessage = buildProjectChatMessage({ message });
-
       if (!chat.id) {
         const chatCreated = await handleCreateProjectChat(chat.title); // sets chat with id in store.
         if (chatCreated) {
@@ -108,28 +106,29 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
         }
       }
 
-      const messagesWithNewMessage = [...chat.messages, newMessage];
+      const { messages: priorMessages, id } = chat;
+      const newMessage = buildProjectChatMessage({ message });
+
       chatStore.updateChat({
-        ...chat,
-        messages: messagesWithNewMessage,
+        id,
+        messages: [...priorMessages, newMessage],
       });
 
-      const messagesCreated = await createProjectChatMessage(
-        chat.id,
-        newMessage
-      );
+      const messagesCreated = await createProjectChatMessage(id, newMessage);
 
-      chat.messages = [
-        ...chat.messages, // Chat object not mutated, so the user message is not in this list
-        messagesCreated.userMessage,
-        messagesCreated.responseMessage,
-      ];
-      chatStore.updateChat(chat);
+      chatStore.updateChat({
+        id,
+        messages: [
+          ...priorMessages,
+          messagesCreated.userMessage,
+          messagesCreated.responseMessage,
+        ],
+      });
 
       if (chat.messages.length == 2) {
-        const chatWithTitle = await generateChatTitle(chat.id);
-        chat = { ...chat, title: chatWithTitle.title };
-        chatStore.updateChat(chat);
+        const { title } = await generateChatTitle(id);
+
+        chatStore.updateChat({ id, title });
       }
     }, {});
   }

@@ -66,7 +66,8 @@ class TestVerifier:
         """
         resulting_parent2children = RankingUtil.group_trace_predictions(resulting_predictions, TraceKeys.parent_label())
         for parent_id, expected_children_ids in expected_parent_predictions.items():
-            parent_preditions = sorted(resulting_parent2children[parent_id], key=lambda t: t["score"], reverse=True)
-            for expected_artifact_id, prediction in zip(expected_children_ids, parent_preditions):
-                predicted_artifact_id = prediction[TraceKeys.child_label()]
-                tc.assertEqual(expected_artifact_id, predicted_artifact_id, msg=f"Parent: {parent_id}")
+            parent_predictions = sorted(resulting_parent2children[parent_id], key=lambda t: t["score"], reverse=True)
+            predicted_ids = [p[TraceKeys.child_label()] for p in parent_predictions]
+            parent_msg = ",".join(expected_children_ids)
+            received_msg = ",".join(predicted_ids)
+            tc.assertEqual(parent_msg, received_msg)

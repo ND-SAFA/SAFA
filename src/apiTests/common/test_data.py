@@ -4,8 +4,8 @@ from unittest import TestCase
 
 import pandas as pd
 
-from tests.common.data_encoder import DataEncoder
-from tests.common.test_constants import CHILD_TYPE, FR_ARTIFACT_PATH, PARENT_TYPE, SOURCE_CODE_PATH, SUMMARY_JSON_PATH, SUMMARY_PATH
+from apiTests.common.data_encoder import DataEncoder
+from apiTests.common.test_constants import CHILD_TYPE, FR_ARTIFACT_PATH, PARENT_TYPE, SOURCE_CODE_PATH, SUMMARY_JSON_PATH, SUMMARY_PATH
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace_layer import TraceLayer
 from tgen.common.util.enum_util import EnumDict

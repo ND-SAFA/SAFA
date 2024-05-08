@@ -6,7 +6,7 @@ from django.test import Client
 from api.endpoints.auth_view import AUTH_KEY
 from api.endpoints.gen.serializers.message_serializer import MessageDTO
 from api.server.app_endpoints import AppEndpoints
-from tests.base_test import BaseTest
+from apiTests.base_test import BaseTest
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.util.json_util import NpEncoder

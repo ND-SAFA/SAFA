@@ -1,9 +1,9 @@
 from typing import List
 
-from tests.base_test import BaseTest
-from tests.common.request_proxy import RequestProxy
-from tests.common.test_data import TestData
-from tests.common.test_data_creator import TestDataCreator
+from apiTests.base_test import BaseTest
+from apiTests.common.request_proxy import RequestProxy
+from apiTests.common.test_data import TestData
+from apiTests.common.test_data_creator import TestDataCreator
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil

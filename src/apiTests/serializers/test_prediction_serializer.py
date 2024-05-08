@@ -1,6 +1,6 @@
 from api.endpoints.gen.trace.trace_serializer import TraceSerializer
-from tests.base_test import BaseTest
-from tests.common.test_data import TestData, TestSubset
+from apiTests.base_test import BaseTest
+from apiTests.common.test_data import TestData, TestSubset
 
 
 class TestPredictionSerializer(BaseTest):

@@ -43,7 +43,7 @@ jobs:
 
     - name: Run unit tests
       run: |
-        python src/api/manage.py test src/tests
+        python src/api/manage.py test src/apiTests
       env:
         DEPLOYMENT: test
         DJANGO_SETTINGS_MODULE: api.server.settings

@@ -1,9 +1,9 @@
 from typing import List
 
 from api.endpoints.gen.serializers.message_serializer import MessageDTO
+from apiTests.base_test import BaseTest
+from apiTests.common.request_proxy import RequestProxy
 from test.jobs.health_check_jobs.health_check_utils import QUERY, assert_correct_related_artifacts, get_dataset_for_context
-from tests.base_test import BaseTest
-from tests.common.request_proxy import RequestProxy
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.testres.mocking.mock_anthropic import mock_anthropic

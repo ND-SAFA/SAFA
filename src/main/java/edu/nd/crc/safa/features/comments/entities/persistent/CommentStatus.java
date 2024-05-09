@@ -16,4 +16,13 @@ public enum CommentStatus {
     public String toLower() {
         return this.name().toLowerCase();
     }
+
+    /**
+     * Toggles the status of the comment.
+     *
+     * @return New comment status.
+     */
+    public CommentStatus toggle() {
+        return this.equals(ACTIVE) ? RESOLVED : ACTIVE;
+    }
 }

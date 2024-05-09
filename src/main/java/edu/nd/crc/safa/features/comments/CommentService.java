@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.comments.entities.dtos.comments.CommentDTO;
 import edu.nd.crc.safa.features.comments.entities.persistent.Comment;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentStatus;
 import edu.nd.crc.safa.features.comments.repositories.CommentRepository;
+import edu.nd.crc.safa.features.comments.services.CommentRetrievalService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class CommentService {
+    private CommentRetrievalService commentRetrievalService;
     private CommentRepository commentRepository;
     private ArtifactService artifactService;
 
@@ -85,11 +87,13 @@ public class CommentService {
      * Marks comment as resolved.
      *
      * @param commentId Id of comment to resolve.
+     * @return CommentDTO after comment saved.
      */
-    public void resolveComment(UUID commentId) {
+    public CommentDTO toggleResolve(UUID commentId) {
         Comment comment = getCommentById(commentId);
-        comment.setStatus(CommentStatus.RESOLVED);
+        comment.setStatus(comment.getStatus().toggle());
         this.commentRepository.save(comment);
+        return commentRetrievalService.retrieveCommentDTO(comment);
     }
 
     /**

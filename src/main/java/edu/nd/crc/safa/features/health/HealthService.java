@@ -72,6 +72,19 @@ public class HealthService {
     }
 
     /**
+     * Deletes health checks associated with artifact.
+     *
+     * @param artifact The artifact to delete health checks for.
+     */
+    public void clearArtifactHealthChecks(Artifact artifact) {
+        List<Comment> artifactHealthChecks = this.commentRepository.findByArtifactOrderByCreatedAtAsc(artifact)
+            .stream()
+            .filter(c -> c.getType().isHealthCheck())
+            .toList();
+        this.commentRepository.deleteAll(artifactHealthChecks);
+    }
+
+    /**
      * Calls GEN API to generate health checks.
      *
      * @param projectVersion Project version used to retrieve artifact content.
@@ -310,12 +323,11 @@ public class HealthService {
         List<CommentConcept> conceptComments = new ArrayList<>();
         for (GenerationArtifact undefinedEntity : undefinedEntities) {
             String content = String.format(UNKNOWN_CONTENT, undefinedEntity.getId());
-            String conceptName = String.format("%s:%s", undefinedEntity.getId(), undefinedEntity.getContent());
             Comment comment = asMatchedConcept(projectVersion, targetArtifact, CommentType.UNDEFINED_CONCEPT, content);
 
             CommentConcept commentConcept = new CommentConcept();
             commentConcept.setComment(comment);
-            commentConcept.setConceptName(conceptName);
+            commentConcept.setConceptName(undefinedEntity.getId());
 
             conceptComments.add(commentConcept);
         }

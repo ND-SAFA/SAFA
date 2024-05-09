@@ -13,11 +13,12 @@ import edu.nd.crc.safa.test.features.generation.GenerationalTest;
 
 import org.junit.jupiter.api.Test;
 
-class TestHealthChecks extends GenerationalTest {
-
-
+class TestHealthCheckClear extends GenerationalTest {
+    /**
+     * Tests that health checks performed a second time will clear the initial health checks.
+     */
     @Test
-    void testHealthChecks() throws Exception {
+    void testHealthChecksClear() {
         ProjectVersion projectVersion = rootBuilder.actions(a -> a.createProjectWithVersion(getCurrentUser())).get();
         HealthCheckTestData testData = new HealthCheckTestData();
 
@@ -25,23 +26,25 @@ class TestHealthChecks extends GenerationalTest {
         ArtifactAppEntity targetArtifact = new ArtifactAppEntity();
         targetArtifact.setId(artifactId);
 
-        List<Artifact> projectArtifacts =
-            getServiceProvider().getArtifactRepository().getProjectArtifacts(projectVersion.getProject());
+        List<Artifact> projectArtifacts = getServiceProvider()
+            .getArtifactRepository()
+            .getProjectArtifacts(projectVersion.getProject());
+        HealthCheckTestVerifier testVerifier = new HealthCheckTestVerifier(projectVersion, projectArtifacts);
 
+        // Step - Trigger health
         mockHealthResponse(testData.createMockGenHealthResponse());
 
         HealthResponseDTO healthResponseDTO = getServiceProvider()
             .getHealthService()
             .performArtifactHealthChecks(projectVersion, targetArtifact);
 
-        HealthCheckTestVerifier testVerifier = new HealthCheckTestVerifier(projectVersion, projectArtifacts);
+
         testVerifier.verifyHealthResponse(healthResponseDTO);
 
         ArtifactCommentResponseDTO artifactComments =
             getServiceProvider().getCommentRetrievalService().getArtifactComments(artifactId);
 
         testVerifier.verifyArtifactComments(artifactComments);
-
     }
 
     public void mockHealthResponse(GenHealthResponse genResponse) {

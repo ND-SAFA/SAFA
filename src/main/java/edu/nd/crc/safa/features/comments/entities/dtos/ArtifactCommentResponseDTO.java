@@ -2,11 +2,10 @@ package edu.nd.crc.safa.features.comments.entities.dtos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import edu.nd.crc.safa.features.comments.entities.dtos.comments.ArtifactCommentDTO;
 import edu.nd.crc.safa.features.comments.entities.dtos.comments.CommentDTO;
-import edu.nd.crc.safa.features.comments.entities.dtos.comments.MultiArtifactCommentDTO;
-import edu.nd.crc.safa.features.comments.entities.dtos.comments.UndefinedConceptCommentDTO;
 import edu.nd.crc.safa.features.comments.entities.persistent.CommentType;
 
 import lombok.AllArgsConstructor;
@@ -31,35 +30,26 @@ public class ArtifactCommentResponseDTO {
     /**
      * Creates response DTO from the different types of comments, placing each into its corresponding DTO property.
      *
-     * @param commentDTOS              DTOs containing only comment information.
-     * @param artifactCommentDTOS      DTOs containing linked concepts.
-     * @param multiArtifactCommentDTOS DTOs containing linked artifacts.
-     * @param unknownCommentDTOS       Unknown concepts in artifact.
+     * @param id2dto Map of comment ID to DTO.
      * @return Response DTO.
      */
-    public static ArtifactCommentResponseDTO fromTypes(List<CommentDTO> commentDTOS,
-                                                       List<ArtifactCommentDTO> artifactCommentDTOS,
-                                                       List<UndefinedConceptCommentDTO> unknownCommentDTOS,
-                                                       List<MultiArtifactCommentDTO> multiArtifactCommentDTOS) {
+    public static ArtifactCommentResponseDTO fromTypes(Map<UUID, CommentDTO> id2dto) {
         List<CommentDTO> comments = new ArrayList<>();
         List<CommentDTO> flags = new ArrayList<>();
         List<CommentDTO> healthChecks = new ArrayList<>();
 
-        for (CommentDTO commentDTO : commentDTOS) {
-            CommentType commentType = commentDTO.getType();
+        for (Map.Entry<UUID, CommentDTO> entry : id2dto.entrySet()) {
+            CommentDTO dto = entry.getValue();
+            CommentType commentType = dto.getType();
 
             if (commentType == CommentType.CONVERSATION) {
-                comments.add(commentDTO);
+                comments.add(dto);
             } else if (commentType == CommentType.FLAG) {
-                flags.add(commentDTO);
+                flags.add(dto);
             } else {
-                healthChecks.add(commentDTO);
+                healthChecks.add(dto);
             }
         }
-
-        healthChecks.addAll(unknownCommentDTOS);
-        healthChecks.addAll(artifactCommentDTOS);
-        healthChecks.addAll(multiArtifactCommentDTOS);
 
         return new ArtifactCommentResponseDTO(comments, flags, healthChecks);
     }

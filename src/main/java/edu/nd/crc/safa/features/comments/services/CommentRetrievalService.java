@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.comments.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,19 +42,29 @@ public class CommentRetrievalService {
     private ArtifactService artifactService;
 
     /**
-     * Retrieves comments for artifact.
+     * Retrieves DTO for give comment.
      *
-     * @param artifactId ID of artifact whose comments are retrieved.
-     * @return Response containing comments grouped by properties.
+     * @param comment Comment to retrieve properties and convert to DTO.
+     * @return DTO.
      */
-    public ArtifactCommentResponseDTO getArtifactComments(UUID artifactId) {
-        Artifact artifact = artifactService.findById(artifactId);
+    public CommentDTO retrieveCommentDTO(Comment comment) {
+        Map<UUID, CommentDTO> id2comment = retrieveCommentDTOS(List.of(comment));
+        return id2comment.get(comment.getId());
+    }
+
+    /**
+     * Retrieves DTOS for given comments.
+     *
+     * @param comments The comments to add additional properties and construct DTO from.
+     * @return Map of UUID to list of DTOs.
+     */
+    public Map<UUID, CommentDTO> retrieveCommentDTOS(List<Comment> comments) {
         List<Comment> textTypes = new ArrayList<>();
         List<Comment> matchedArtifactComments = new ArrayList<>();
         List<Comment> unknownConceptComments = new ArrayList<>();
         List<Comment> multiArtifactComments = new ArrayList<>();
 
-        for (Comment comment : commentRepository.findByArtifactOrderByCreatedAtAsc(artifact)) {
+        for (Comment comment : comments) {
             CommentType commentType = comment.getType();
             if (TEXT_TYPES.contains(commentType)) {
                 textTypes.add(comment);
@@ -68,12 +79,33 @@ public class CommentRetrievalService {
             }
         }
 
-        return ArtifactCommentResponseDTO.fromTypes(
-            toTextComments(textTypes),
-            toArtifactComments(matchedArtifactComments),
-            toUnknownConceptComments(unknownConceptComments),
-            toMultiArtifactComments(multiArtifactComments)
-        );
+        Map<UUID, CommentDTO> id2dto = new HashMap<>();
+
+        addToMap(toTextComments(textTypes), id2dto);
+        addToMap(toArtifactComments(matchedArtifactComments), id2dto);
+        addToMap(toUnknownConceptComments(unknownConceptComments), id2dto);
+        addToMap(toMultiArtifactComments(multiArtifactComments), id2dto);
+
+        return id2dto;
+    }
+
+    public <T extends CommentDTO> void addToMap(List<T> dtos, Map<UUID, CommentDTO> id2comment) {
+        for (CommentDTO dto : dtos) {
+            id2comment.put(dto.getId(), dto);
+        }
+    }
+
+    /**
+     * Retrieves comments for artifact.
+     *
+     * @param artifactId ID of artifact whose comments are retrieved.
+     * @return Response containing comments grouped by properties.
+     */
+    public ArtifactCommentResponseDTO getArtifactComments(UUID artifactId) {
+        Artifact artifact = artifactService.findById(artifactId);
+        List<Comment> artifactComments = commentRepository.findByArtifactOrderByCreatedAtAsc(artifact);
+        Map<UUID, CommentDTO> id2dto = retrieveCommentDTOS(artifactComments);
+        return ArtifactCommentResponseDTO.fromTypes(id2dto);
     }
 
     /**

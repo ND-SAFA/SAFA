@@ -93,7 +93,7 @@ public class CommentController extends BaseController {
      * @param commentId ID of comment to mark as resolved.
      */
     @PutMapping(AppRoutes.Comments.COMMENT_RESOLVE)
-    public void resolveComment(@PathVariable UUID commentId) {
+    public CommentDTO resolveComment(@PathVariable UUID commentId) {
         SafaUser currentUser = getCurrentUser();
         CommentService commentService = this.getServiceProvider().getCommentService();
         Comment comment = commentService.getCommentById(commentId);
@@ -101,7 +101,7 @@ public class CommentController extends BaseController {
             .withVersion(comment.getVersion())
             .asUser(currentUser)
             .withPermission(ProjectPermission.EDIT);
-        commentService.resolveComment(commentId);
+        return commentService.toggleResolve(commentId);
     }
 
     /**

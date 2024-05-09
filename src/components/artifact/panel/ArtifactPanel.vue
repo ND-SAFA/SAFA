@@ -4,7 +4,7 @@
       <artifact-buttons />
     </template>
     <artifact-content />
-    <artifact-context v-if="ENABLED_FEATURES.NASA_ARTIFACT_RELATIONS" />
+    <artifact-context v-if="permissionStore.isNASA" />
     <artifact-traces v-else />
     <artifact-comments />
     <artifact-health />
@@ -22,7 +22,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ENABLED_FEATURES } from "@/util";
+import { permissionStore } from "@/hooks";
 import { DetailsPanel } from "@/components/common";
 import {
   ArtifactContent,

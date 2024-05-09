@@ -14,7 +14,7 @@
         <save-artifact-buttons />
       </template>
     </panel-card>
-    <artifact-health v-if="ENABLED_FEATURES.NASA_ARTIFACT_HEALTH_NEW" />
+    <artifact-health v-if="permissionStore.isNASA" />
   </details-panel>
 </template>
 
@@ -28,8 +28,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ENABLED_FEATURES } from "@/util";
-import { appStore } from "@/hooks";
+import { appStore, permissionStore } from "@/hooks";
 import { DetailsPanel, PanelCard, TextButton } from "@/components/common";
 import {
   SaveArtifactInputs,

@@ -1,6 +1,6 @@
 <template>
   <panel-card
-    v-if="ENABLED_FEATURES.NASA_ARTIFACT_COMMENT"
+    v-if="permissionStore.isNASA"
     borderless
     collapsable
     title="Feedback"
@@ -152,11 +152,12 @@ export default {
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { BasicCommentSchema, CommentSchema } from "@/types";
-import { ENABLED_FEATURES, timestampToDisplay } from "@/util";
+import { timestampToDisplay } from "@/util";
 import {
   artifactStore,
   commentApiStore,
   commentStore,
+  permissionStore,
   selectionStore,
 } from "@/hooks";
 import {

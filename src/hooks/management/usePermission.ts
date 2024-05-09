@@ -35,6 +35,13 @@ export const usePermission = defineStore("permissionStore", {
     isSuperuserActive(): boolean {
       return !!sessionStore.user.admin?.active;
     },
+    /**
+     * TODO: handle this check based on the account.
+     * @return Whether the user can use NASA functionality.
+     */
+    isNASA(): boolean {
+      return !!sessionStore.user.admin;
+    },
   },
   actions: {
     /**

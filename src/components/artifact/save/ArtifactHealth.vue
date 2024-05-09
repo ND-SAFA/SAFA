@@ -1,6 +1,6 @@
 <template>
   <panel-card
-    v-if="ENABLED_FEATURES.NASA_ARTIFACT_HEALTH"
+    v-if="permissionStore.isNASA"
     borderless
     collapsable
     title="Artifact Health"
@@ -100,14 +100,15 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue";
+import { computed } from "vue";
 import { AnyCommentSchema } from "@/types";
-import { ENABLED_FEATURES, getIcon } from "@/util";
+import { getIcon } from "@/util";
 import {
   artifactSaveStore,
   artifactStore,
   commentApiStore,
   commentStore,
+  permissionStore,
 } from "@/hooks";
 import {
   PanelCard,
@@ -133,10 +134,8 @@ const artifactHealth = computed(() =>
 /**
  * Generates health checks for the current artifact.
  */
-function handleCheckHealth(preload?: boolean): void {
+function handleCheckHealth(): void {
   if (!artifact.value) return;
-
-  if (preload && !ENABLED_FEATURES.NASA_ARTIFACT_HEALTH_PRELOAD) return;
 
   commentApiStore.handleLoadHealthChecks(artifact.value);
 }
@@ -150,11 +149,4 @@ function handleResolveCheck(healthCheck: AnyCommentSchema) {
 
   commentApiStore.handleResolveComment(artifact.value, healthCheck);
 }
-
-onMounted(() => handleCheckHealth(true));
-
-watch(
-  () => artifact.value,
-  () => handleCheckHealth(true)
-);
 </script>

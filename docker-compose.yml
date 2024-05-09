@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        TASK_MANAGER: redis
     env_file: .env
     ports:
     - "4000:80"
@@ -28,7 +30,7 @@ services:
     image: redis:alpine
     networks:
     - safa_network
-    
+
 networks:
   safa_network:
 

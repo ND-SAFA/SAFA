@@ -19,8 +19,11 @@
       v-for="comment in allComments"
       :key="comment.id"
       dense
-      :class="comment.type === 'flag' ? 'bd-secondary' : 'bd-transparent'"
-      style="border-width: 0 0 0 2px !important"
+      :class="
+        comment.type === 'flag'
+          ? 'artifact-comment artifact-flag'
+          : 'artifact-comment'
+      "
       :action-cols="3"
     >
       <popup-edit-input

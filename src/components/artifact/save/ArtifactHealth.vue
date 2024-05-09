@@ -31,7 +31,12 @@
     >
       <flex-box justify="between">
         <flex-box>
-          <separator vertical :color="check.color" r="2" style="width: 2px" />
+          <separator
+            vertical
+            :color="check.color"
+            r="2"
+            class="artifact-check"
+          />
           <icon
             size="sm"
             :variant="check.icon"
@@ -68,7 +73,7 @@
             :color="check.color"
             outline
             :icon="getIcon('health-unknown')"
-            style="max-width: 300px; height: fit-content"
+            class="artifact-check-chip"
           >
             <typography :value="concept" wrap color="text" />
           </q-chip>

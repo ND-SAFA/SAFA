@@ -18,8 +18,7 @@
 
       <div
         v-if="!chatApiStore.loading"
-        style="max-width: 60vw; max-height: 70vh"
-        class="overflow-auto q-pa-md"
+        class="overflow-auto q-pa-md chat-wrapper chat-messages"
       >
         <list-item
           v-for="(message, idx) in formattedMessages"
@@ -49,18 +48,17 @@
           </flex-box>
         </list-item>
       </div>
+
       <flex-box
         v-if="chatApiStore.loading || chatApiStore.loadingResponse"
         justify="center"
         t="4"
-        style="height: 40px"
+        class="chat-wrapper chat-loading"
       >
         <q-circular-progress color="primary" indeterminate size="md" />
       </flex-box>
-      <div
-        style="max-width: 60vw; width: 100%; position: absolute; bottom: 20px"
-        class="full-width q-px-md"
-      >
+
+      <div class="full-width q-px-md chat-wrapper chat-input">
         <q-input
           v-model="currentMessage"
           outlined

@@ -189,6 +189,10 @@ export async function getProjectChatMessages(
 export async function generateChatTitle(
   chatId: string
 ): Promise<ProjectChatSchema> {
+  if (ENABLED_FEATURES.NASA_PROJECT_CHAT_MOCKUP) {
+    return EXAMPLE_PROJECT_CHAT;
+  }
+
   return buildRequest<ProjectChatSchema, "chatId">("chatTitle", {
     chatId,
   }).post();

@@ -184,6 +184,7 @@ export enum Endpoint {
 
   commentCollection = "comments/artifact/:artifactId",
   comment = "comments/:commentId",
+  commentContent = "comments/:commentId/content",
   commentResolve = "comments/:commentId/resolve",
   healthChecks = "health/versions/:versionId",
 

@@ -152,7 +152,7 @@ export async function editArtifactComment(
     BasicCommentSchema,
     "artifactId" | "commentId",
     BasicCommentSchema
-  >("comment", { artifactId, commentId: comment.id }).put(comment);
+  >("commentContent", { artifactId, commentId: comment.id }).put(comment);
 }
 
 /**
@@ -190,7 +190,7 @@ export async function resolveArtifactComment(
   return buildRequest<void, "artifactId" | "commentId">("commentResolve", {
     artifactId,
     commentId,
-  }).post();
+  }).put();
 }
 
 /**

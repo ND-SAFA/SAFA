@@ -4,7 +4,12 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.TGenConfig;
+import edu.nd.crc.safa.features.chat.entities.gen.GenChatMessage;
+import edu.nd.crc.safa.features.chat.entities.gen.GenChatRequest;
+import edu.nd.crc.safa.features.chat.entities.gen.GenChatTitleResponse;
+import edu.nd.crc.safa.features.chat.entities.persistent.GenChatResponse;
 import edu.nd.crc.safa.features.common.RequestService;
+import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.generation.common.TGenStatus;
 import edu.nd.crc.safa.features.generation.common.TGenTask;
@@ -14,6 +19,9 @@ import edu.nd.crc.safa.features.generation.summary.SummaryRequest;
 import edu.nd.crc.safa.features.generation.summary.SummaryResponse;
 import edu.nd.crc.safa.features.generation.tgen.TGenRequest;
 import edu.nd.crc.safa.features.generation.tgen.TGenResponse;
+import edu.nd.crc.safa.features.health.HealthConstants;
+import edu.nd.crc.safa.features.health.entities.gen.GenHealthRequest;
+import edu.nd.crc.safa.features.health.entities.gen.GenHealthResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.traces.ITraceGenerationController;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
@@ -31,6 +39,54 @@ public class GenApi implements ITraceGenerationController {
     private final ArtifactSummaryApi artifactSummaryApi;
     private final GenerateLinksApi generateLinksApi;
     private final GenApiController genApiController;
+
+    /**
+     * Generates health check for target artifacts.
+     *
+     * @param projectArtifacts List of artifacts in project.
+     * @param targetArtifact   Target artifact to generate health checks for.
+     * @return Health checks generated for artifact.
+     */
+    public GenHealthResponse generateHealthChecks(List<GenerationArtifact> projectArtifacts,
+                                                  GenerationArtifact targetArtifact) {
+        GenerationDataset dataset = new GenerationDataset(projectArtifacts);
+        GenHealthRequest request = new GenHealthRequest(dataset, targetArtifact.getId(), HealthConstants.CONCEPT_TYPE);
+        String chatEndpoint = TGenConfig.getEndpoint("health");
+        return genApiController.performJob(chatEndpoint, request, GenHealthResponse.class, null);
+    }
+
+    /**
+     * Sends request to GEN to response to chat message.
+     *
+     * @param userMessageContent User message to respond to.
+     * @param chatMessages       Previous messages in chat.
+     * @param artifacts          Projects artifacts used in context.
+     * @return Gen chat response.
+     */
+    public GenChatResponse generateChatResponse(String userMessageContent,
+                                                List<GenChatMessage> chatMessages,
+                                                List<GenerationArtifact> artifacts) {
+        GenerationDataset dataset = new GenerationDataset(artifacts);
+        chatMessages.add(GenChatMessage.fromUserMessage(userMessageContent));
+        GenChatRequest request = new GenChatRequest(dataset, chatMessages);
+        String chatEndpoint = TGenConfig.getEndpoint("chat");
+        return genApiController.performJob(chatEndpoint, request, GenChatResponse.class, null);
+    }
+
+    /**
+     * Generates name for title of chat.
+     *
+     * @param chatMessages Messages in chat.
+     * @param artifacts    Artifacts in dataset.
+     * @return Title of chat.
+     */
+    public GenChatTitleResponse generateChatTitle(List<GenChatMessage> chatMessages,
+                                                  List<GenerationArtifact> artifacts) {
+        GenerationDataset dataset = new GenerationDataset(artifacts);
+        GenChatRequest request = new GenChatRequest(dataset, chatMessages);
+        String chatEndpoint = TGenConfig.getEndpoint("chat-title");
+        return genApiController.performRequest(chatEndpoint, request, GenChatTitleResponse.class);
+    }
 
     /**
      * Generates project summary.
@@ -88,7 +144,7 @@ public class GenApi implements ITraceGenerationController {
         int candidates = searchRequest.getDataset().getNumOfCandidates();
         genApiController.log(logger, String.format("Number of candidates: %s", candidates));
         String searchEndpoint = TGenConfig.getEndpoint("tgen-sync");
-        return this.genApiController.sendGenRequest(searchEndpoint, searchRequest, TGenResponse.class);
+        return this.genApiController.performRequest(searchEndpoint, searchRequest, TGenResponse.class);
     }
 
     /**
@@ -103,6 +159,6 @@ public class GenApi implements ITraceGenerationController {
         String cancelEndpoint = TGenConfig.getEndpoint("cancel");
         TGenTask task = new TGenTask();
         task.setTaskId(taskId);
-        TGenStatus status = this.genApiController.sendGenRequest(cancelEndpoint, task, TGenStatus.class);
+        TGenStatus status = this.genApiController.performRequest(cancelEndpoint, task, TGenStatus.class);
     }
 }

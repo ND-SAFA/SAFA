@@ -76,6 +76,16 @@ public class ResourceBuilder {
     }
 
     /**
+     * Sets project version as entity.
+     *
+     * @param projectVersion The project version to set.
+     * @return Object holder with project version.
+     */
+    public ObjectHolder<ProjectVersion> withVersion(ProjectVersion projectVersion) {
+        return membershipEntityHolder(projectVersion);
+    }
+
+    /**
      * Fetch a team by ID.
      *
      * @param teamId The ID of the team
@@ -140,7 +150,7 @@ public class ResourceBuilder {
      * than simply referencing other objects that have memberships)
      *
      * @param value The entity
-     * @param <T> The type of the entity
+     * @param <T>   The type of the entity
      * @return An object holder for the entity
      */
     private <T extends IEntityWithMembership> ObjectHolder<T> membershipEntityHolder(T value) {
@@ -153,9 +163,9 @@ public class ResourceBuilder {
     /**
      * Utility function for creating object holders for entities that can easily be linked to a project
      *
-     * @param value The entity
+     * @param value            The entity
      * @param projectRetriever A function that allows us to get the project for this entity
-     * @param <T> The type of the entity
+     * @param <T>              The type of the entity
      * @return An object holder for the entity
      */
     private <T> ObjectHolder<T> entityWithProjectHolder(T value, Function<T, Project> projectRetriever) {
@@ -178,6 +188,40 @@ public class ResourceBuilder {
     }
 
     /**
+     * Functional interface for checking if a user has a permission associated with some object
+     *
+     * @param <T> The type of the object
+     */
+    @FunctionalInterface
+    private interface CheckPermissionFunction<T> {
+        /**
+         * Check that the user has given permissions for the held object and thrown an error if not.
+         *
+         * @param permissions The permissions to check
+         * @param user        The user to check for
+         * @param value       The value of the object in the object holder
+         */
+        boolean apply(Set<Permission> permissions, SafaUser user, T value) throws SafaError;
+    }
+
+    /**
+     * Functional interface for checking if a user has an {@link AdditionalPermissionCheck} associated with some object
+     *
+     * @param <T> The type of the object
+     */
+    @FunctionalInterface
+    private interface CheckAdditionalCheckFunction<T> {
+        /**
+         * Check that the user has a given additional check for the held object and thrown an error if not.
+         *
+         * @param check The thing to check
+         * @param user  The user to check for
+         * @param value The value of the object in the object holder
+         */
+        boolean apply(AdditionalPermissionCheck check, SafaUser user, T value) throws SafaError;
+    }
+
+    /**
      * An ObjectHolder is used to be able to quickly check permissions on objects
      *
      * @param <T> The type being held
@@ -189,10 +233,10 @@ public class ResourceBuilder {
 
         private final Set<Permission> missingPermissions = new HashSet<>();
         private final List<String> failedAdditionalChecks = new ArrayList<>();
-        private boolean allowed = true;
         private final CheckPermissionFunction<T> hasPermissionFunction;
         private final CheckPermissionFunction<T> hasAnyPermissionFunction;
         private final CheckAdditionalCheckFunction<T> hasAdditionalCheckFunction;
+        private boolean allowed = true;
         private SafaUser checkUser = null;
 
         private ObjectHolder(T value,
@@ -307,7 +351,7 @@ public class ResourceBuilder {
          * Check the check object passes for the given user
          *
          * @param check The thing to check
-         * @param user The user to check for
+         * @param user  The user to check for
          * @return This
          * @throws SafaError If the user doesn't have the permissions
          */
@@ -357,40 +401,6 @@ public class ResourceBuilder {
             }
         }
 
-    }
-
-    /**
-     * Functional interface for checking if a user has a permission associated with some object
-     *
-     * @param <T> The type of the object
-     */
-    @FunctionalInterface
-    private interface CheckPermissionFunction<T> {
-        /**
-         * Check that the user has given permissions for the held object and thrown an error if not.
-         *
-         * @param permissions The permissions to check
-         * @param user        The user to check for
-         * @param value       The value of the object in the object holder
-         */
-        boolean apply(Set<Permission> permissions, SafaUser user, T value) throws SafaError;
-    }
-
-    /**
-     * Functional interface for checking if a user has an {@link AdditionalPermissionCheck} associated with some object
-     *
-     * @param <T> The type of the object
-     */
-    @FunctionalInterface
-    private interface CheckAdditionalCheckFunction<T> {
-        /**
-         * Check that the user has a given additional check for the held object and thrown an error if not.
-         *
-         * @param check The thing to check
-         * @param user  The user to check for
-         * @param value The value of the object in the object holder
-         */
-        boolean apply(AdditionalPermissionCheck check, SafaUser user, T value) throws SafaError;
     }
 
 }

@@ -19,7 +19,7 @@ public class VersionCalculator {
 
     public static <V extends IVersionEntity> List<V> getEntitiesAtVersion(ProjectVersion projectVersion,
                                                                           List<V> versionEntities) {
-        Map<UUID, List<V>> entityMap = ProjectDataStructures.groupEntitiesByProperty(versionEntities,
+        Map<UUID, List<V>> entityMap = ProjectDataStructures.createGroupLookup(versionEntities,
             IVersionEntity::getBaseEntityId);
         return calculateVersionEntitiesAtProjectVersion(projectVersion, entityMap);
     }

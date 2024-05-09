@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.features.generation.common;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -41,5 +42,12 @@ public class GenerationArtifact {
         this.content = artifact.getBody();
         this.summary = artifact.getSummary();
         this.layerId = artifact.getType();
+    }
+
+    public GenerationArtifact(ArtifactVersion artifactVersion) {
+        this.id = artifactVersion.getArtifact().getName();
+        this.content = artifactVersion.getContent();
+        this.summary = artifactVersion.getSummary();
+        this.layerId = artifactVersion.getTypeName();
     }
 }

@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 
 /**
  * Contains data structures for accessing project data.
@@ -61,8 +62,8 @@ public class ProjectDataStructures {
      * @param <P>             The type of property to group by.
      * @return Map of
      */
-    public static <A, P> Map<P, List<A>> groupEntitiesByProperty(List<A> versionEntities,
-                                                                 Function<A, P> idGetter) {
+    public static <A, P> Map<P, List<A>> createGroupLookup(Iterable<A> versionEntities,
+                                                           Function<A, P> idGetter) {
         Map<P, List<A>> entityHashtable = new HashMap<>();
         for (A versionEntity : versionEntities) {
             P entityId = idGetter.apply(versionEntity);
@@ -72,6 +73,31 @@ public class ProjectDataStructures {
                 List<A> newList = new ArrayList<>();
                 newList.add(versionEntity);
                 entityHashtable.put(entityId, newList);
+            }
+        }
+        return entityHashtable;
+    }
+
+    /**
+     * Groups given entities by the property defined by getter.
+     *
+     * @param versionEntities The list of entities to group.
+     * @param idGetter        The function to determine the property for each entity.
+     * @param <A>             The type of entity being grouped.
+     * @param <P>             The type of property to group by.
+     * @return Map of
+     */
+    public static <A, P> Map<P, A> createEntityLookup(List<A> versionEntities,
+                                                      Function<A, P> idGetter) {
+        Map<P, A> entityHashtable = new HashMap<>();
+        for (A versionEntity : versionEntities) {
+            P entityId = idGetter.apply(versionEntity);
+            if (entityHashtable.containsKey(entityId)) {
+                throw new SafaError(String.format("Multiple items found to single ID %s", entityId));
+            } else {
+                List<A> newList = new ArrayList<>();
+                newList.add(versionEntity);
+                entityHashtable.put(entityId, versionEntity);
             }
         }
         return entityHashtable;

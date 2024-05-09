@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.generation.common;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,12 @@ public class GenerationDataset {
 
     @JsonIgnore
     private Map<String, List<String>> layerIds = new HashMap<>();
+
+    public GenerationDataset(List<GenerationArtifact> artifacts) {
+        this.links = new ArrayList<>();
+        this.layers = new ArrayList<>();
+        this.artifacts = artifacts;
+    }
 
     public GenerationDataset(List<GenerationArtifact> artifacts, List<TraceLayer> layers) {
         this.artifacts = artifacts;

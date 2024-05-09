@@ -75,7 +75,7 @@ public class ArtifactPositionService {
         Map<UUID, LayoutPosition> layout = new HashMap<>();
         List<ArtifactPosition> artifactPositionsAcrossVersions = this.artifactPositionRepository
             .getByProjectAndDocumentId(projectVersion.getProject(), documentId);
-        Map<UUID, List<ArtifactPosition>> id2pos = ProjectDataStructures.groupEntitiesByProperty(
+        Map<UUID, List<ArtifactPosition>> id2pos = ProjectDataStructures.createGroupLookup(
             artifactPositionsAcrossVersions,
             ap -> ap.getArtifact().getArtifactId());
         for (Map.Entry<UUID, List<ArtifactPosition>> entry : id2pos.entrySet()) {

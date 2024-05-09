@@ -3,18 +3,23 @@ services:
   bend:
     depends_on: [ "mysql" ]
     container_name: bend
-    build: .
+    build:
+      context: .
+      args:
+        - SPRING_PROFILE=dev
     ports:
       - 3000:80
     networks:
       - safa
     environment:
-      - TGEN_ENDPOINT=http://localhost:4000
+      - SERVER_ADDRESS=0.0.0.0
+      - TGEN_ENDPOINT=http://host.docker.internal:4000
       - DB_URL=jdbc:mysql://mysql/safa-db
+      - PORT=3000
   mysql:
     image: mysql:8.0
     hostname: mysql
-    container_name: mysql-db
+    container_name: mysql
     deploy:
       resources:
         limits:

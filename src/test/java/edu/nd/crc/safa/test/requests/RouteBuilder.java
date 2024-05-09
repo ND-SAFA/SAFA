@@ -163,6 +163,12 @@ public class RouteBuilder<T extends RouteBuilder<T>> {
         return (T) this;
     }
 
+    public T withCustomReplacement(String paramName, Object paramValue) {
+        String targetQuery = String.format("{%s}", paramName);
+        this.path = this.path.replace(targetQuery, paramValue.toString());
+        return (T) this;
+    }
+
     public T withPathVariable(String name, String value) {
         this.path = this.path.replace(String.format("{%s}", name), value);
         return (T) this;

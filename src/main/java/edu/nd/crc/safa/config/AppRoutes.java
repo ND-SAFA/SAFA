@@ -59,8 +59,34 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Comments {
+        public static final String COMMENT_CREATE = "/comments/artifact/{artifactId}";
+        public static final String COMMENT_GET = "/comments/artifact/{artifactId}";
+        public static final String COMMENT_RESOLVE = "/comments/{commentId}/resolve";
+        private static final String BY_ID = "/comments/{commentId}";
+        public static final String COMMENT_UPDATE_CONTENT = BY_ID + "/content";
+        public static final String COMMENT_DELETE = BY_ID;
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Commits {
         public static final String COMMIT_CHANGE = Projects.ROOT + "/versions/{versionId}/commit";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Chat {
+        private static final String ROOT = "/chats";
+        public static final String CHAT_GET = ROOT + "/projects/{projectId}";
+        public static final String CHAT_CREATE = ROOT;
+        private static final String BY_ID = ROOT + "/{chatId}";
+        public static final String CHAT_UPDATE = BY_ID;
+        public static final String CHAT_DELETE = BY_ID;
+        public static final String CHAT_TITLE = BY_ID + "/title";
+
+        public static class Message {
+            public static final String MESSAGE_SEND = BY_ID + "/messages";
+            public static final String MESSAGE_GET = BY_ID + "/messages";
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)
@@ -164,13 +190,18 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Health {
+        public static final String GENERATE = "/health/versions/{versionId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Projects {
         protected static final String ROOT = "/projects";
         public static final String BY_ID = ROOT + "/{projectId}";
+        public static final String TRANSFER_OWNERSHIP = BY_ID + "/transfer";
         public static final String GET_PROJECTS = ROOT;
         public static final String DELETE_PROJECT_BY_ID = ROOT + "/{projectId}";
         public static final String CREATE_OR_UPDATE_PROJECT_META = ROOT;
-        public static final String TRANSFER_OWNERSHIP = BY_ID + "/transfer";
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Membership {
@@ -339,8 +370,8 @@ public class AppRoutes {
         public static class Transaction {
             public static final String ROOT = Billing.ROOT + "/transactions";
             public static final String BY_ORG = ROOT + "/{orgId}";
-            public static final String MONTHLY = ROOT + "/month";
             public static final String BY_ORG_MONTHLY = BY_ORG + "/month";
+            public static final String MONTHLY = ROOT + "/month";
         }
     }
 

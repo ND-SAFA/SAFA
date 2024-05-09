@@ -2,12 +2,17 @@ package edu.nd.crc.safa.features.artifacts.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactLookupTable;
+import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
+import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.common.IAppEntityService;
+import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.VersionCalculator;
@@ -19,6 +24,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Service
 public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
+    private final ArtifactRepository artifactRepository;
     private IVersionRepository<ArtifactVersion, ArtifactAppEntity> artifactVersionRepository;
 
     /**
@@ -78,7 +84,13 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
         return versionToAppEntity(artifactAtVersion);
     }
 
-    private List<ArtifactAppEntity> versionToAppEntity(List<ArtifactVersion> artifactVersions) {
+    /**
+     * Converts list of artifact versions to app entities.
+     *
+     * @param artifactVersions Artifact versions entities to convert.
+     * @return List of artifact app entities.
+     */
+    public List<ArtifactAppEntity> versionToAppEntity(List<ArtifactVersion> artifactVersions) {
         List<ArtifactAppEntity> artifacts = new ArrayList<>();
         for (ArtifactVersion artifactVersion : artifactVersions) {
             ArtifactAppEntity artifactAppEntity = this.artifactVersionRepository
@@ -86,5 +98,31 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
             artifacts.add(artifactAppEntity);
         }
         return artifacts;
+    }
+
+    /**
+     * Retrieves artifact with given ID.
+     *
+     * @param artifactId ID of artifact.
+     * @return Artifact.
+     */
+    public Artifact findById(UUID artifactId) {
+        Optional<Artifact> artifactOptional = artifactRepository.findById(artifactId);
+        if (artifactOptional.isEmpty()) {
+            throw new SafaError("Could not find artifact with given ID.");
+        }
+        return artifactOptional.get();
+    }
+
+    /**
+     * Retrieves generation artifacts for project version.
+     *
+     * @param projectVersion Version of artifacts to retrieve.
+     * @return List of artifacts for GEN.
+     */
+    public ArtifactLookupTable getArtifactLookupTable(ProjectVersion projectVersion) {
+        List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
+            .retrieveVersionEntitiesByProjectVersion(projectVersion);
+        return new ArtifactLookupTable(artifactVersions);
     }
 }

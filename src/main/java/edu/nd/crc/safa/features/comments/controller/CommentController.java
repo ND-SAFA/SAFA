@@ -91,6 +91,7 @@ public class CommentController extends BaseController {
      * Marks a comment as resolved.
      *
      * @param commentId ID of comment to mark as resolved.
+     * @return The comment with updated content.
      */
     @PutMapping(AppRoutes.Comments.COMMENT_RESOLVE)
     public CommentDTO resolveComment(@PathVariable UUID commentId) {

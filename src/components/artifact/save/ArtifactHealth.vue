@@ -50,12 +50,19 @@
             class="q-mt-sm"
           />
         </flex-box>
-        <icon-button
-          tooltip="Resolve"
-          class="show-on-hover-child"
-          icon="comment-resolve"
-          @click="handleResolveCheck(check)"
-        />
+        <flex-box class="show-on-hover-child">
+          <icon-button
+            v-if="check.action"
+            :tooltip="check.action.tooltip"
+            :icon="check.action.icon"
+            @click="check.action.perform()"
+          />
+          <icon-button
+            tooltip="Resolve"
+            icon="comment-resolve"
+            @click="handleResolveCheck(check)"
+          />
+        </flex-box>
       </flex-box>
       <div class="q-ml-sm q-mt-sm">
         <flex-box v-if="check.artifacts.length > 0" wrap>
@@ -74,8 +81,6 @@
             outline
             :icon="getIcon('health-unknown')"
             class="artifact-check-chip"
-            clickable
-            @click="check.action()"
           >
             <typography :value="concept" wrap color="text" />
           </q-chip>

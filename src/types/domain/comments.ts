@@ -142,7 +142,11 @@ export type DisplayableHealthCheckSchema = AnyCommentSchema & {
   /**
    * Acts on the health check.
    */
-  action(): void;
+  action?: {
+    icon: IconVariant;
+    tooltip: string;
+    perform(): void;
+  };
 };
 
 /**

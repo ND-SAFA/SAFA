@@ -55,7 +55,7 @@ const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
       type: "cited_concept",
       createdAt: new Date(Date.now()).toISOString(),
       updatedAt: new Date(Date.now()).toISOString(),
-      conceptArtifactId: "Launch Services",
+      conceptArtifactId: "3127b181-c19b-45a4-a3c2-67d21c264f59",
     },
     {
       id: "13",
@@ -78,8 +78,8 @@ const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
       createdAt: new Date(Date.now()).toISOString(),
       updatedAt: new Date(Date.now()).toISOString(),
       conceptArtifactIds: [
-        "Data Collection Platforms (DCP)",
-        "Data Collection System (DCS)",
+        "020f5e2d-185e-429c-89d4-1b28c992c271",
+        "cfe01bb5-f242-493c-93f1-59e478ba2014",
       ],
     },
   ],

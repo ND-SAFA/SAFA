@@ -9,7 +9,7 @@ import {
   IconVariant,
   ThemeColor,
 } from "@/types";
-import { artifactSaveStore, artifactStore } from "@/hooks";
+import { artifactSaveStore, artifactStore, traceSaveStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -112,12 +112,20 @@ export const useComments = defineStore("useComments", {
               health.type === "undefined_concept"
                 ? [health.undefinedConcept]
                 : [],
-            action: (() => {
+            action: ((): DisplayableHealthCheckSchema["action"] => {
               switch (health.type) {
                 case "cited_concept":
-                  return;
                 case "predicted_concept":
-                  return;
+                  return {
+                    tooltip: "Trace to concept",
+                    icon: "create-trace",
+                    perform: () =>
+                      traceSaveStore.openPanel({
+                        type: "both",
+                        targetIds: [artifactId],
+                        sourceIds: [health.conceptArtifactId],
+                      }),
+                  };
                 case "undefined_concept":
                   return {
                     tooltip: "Create concept",
@@ -129,10 +137,17 @@ export const useComments = defineStore("useComments", {
                         parentId: artifactId,
                       }),
                   };
-                case "contradiction":
-                  return;
                 case "multi_matched_concept":
-                  return;
+                  return {
+                    tooltip: "Trace to concept",
+                    icon: "create-trace",
+                    perform: () =>
+                      traceSaveStore.openPanel({
+                        type: "both",
+                        targetIds: [artifactId],
+                        sourceIds: health.conceptArtifactIds,
+                      }),
+                  };
                 default:
                   return;
               }

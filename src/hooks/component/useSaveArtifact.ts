@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ArtifactSchema } from "@/types";
+import { ArtifactCreatorOpenState, ArtifactSchema } from "@/types";
 import { buildArtifact } from "@/util";
 import {
   selectionStore,
@@ -108,11 +108,7 @@ export const useSaveArtifact = defineStore("saveArtifact", {
      *
      * @param openTo - What to open to.
      */
-    openPanel(openTo: {
-      isNewArtifact?: boolean;
-      artifact?: Partial<ArtifactSchema>;
-      parentId?: string;
-    }): void {
+    openPanel(openTo: ArtifactCreatorOpenState): void {
       const { isNewArtifact, artifact, parentId } = openTo;
 
       if (isNewArtifact) {

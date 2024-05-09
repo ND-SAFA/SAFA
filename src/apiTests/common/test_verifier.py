@@ -56,17 +56,31 @@ class TestVerifier:
                 test_case.assertEqual(e_value, r_value, msg=f"{r_value}\n\nEXPECTED VALUE\n\n{e_value}")
 
     @staticmethod
-    def verify_order(tc: TestCase, expected_parent_predictions: Dict, resulting_predictions: List[Trace]) -> None:
+    def verify_order(tc: TestCase, expected_parent_predictions: Dict, resulting_predictions: List[Trace], msg_suffix="") -> None:
         """
         Verifies the order of the trace links for each parent.
         :param tc: The test case to use to make assertions with.
         :param expected_parent_predictions: Map of parent to its ranked list of children.
         :param resulting_predictions: The predictions to verify the ranked order of children.
+        :param msg_suffix:
         :return: None.
         """
         resulting_parent2children = RankingUtil.group_trace_predictions(resulting_predictions, TraceKeys.parent_label())
         for parent_id, expected_children_ids in expected_parent_predictions.items():
-            parent_preditions = sorted(resulting_parent2children[parent_id], key=lambda t: t["score"], reverse=True)
-            for expected_artifact_id, prediction in zip(expected_children_ids, parent_preditions):
-                predicted_artifact_id = prediction[TraceKeys.child_label()]
-                tc.assertEqual(expected_artifact_id, predicted_artifact_id, msg=f"Parent: {parent_id}")
+            parent_predictions = sorted(resulting_parent2children[parent_id], key=lambda t: t["score"], reverse=True)
+            predicted_ids = [p[TraceKeys.child_label()] for p in parent_predictions]
+            parent_msg = ",".join(expected_children_ids)
+            received_msg = ",".join(predicted_ids)
+            received_display = ",".join([TestVerifier.display_trace(p) for p in parent_predictions])
+            tc.assertEqual(parent_msg, received_msg, msg=f"\n\nHashes did not match.\n{parent_msg}\n\n{received_display}{msg_suffix}")
+
+    @staticmethod
+    def display_trace(trace: Trace) -> str:
+        """
+        Creates display string of trace containing key and score.
+        :param trace: The trace to represent.
+        :return: String representation of the trace.
+        """
+        score = trace[TraceKeys.SCORE]
+        child = trace[TraceKeys.child_label()]
+        return f"{child}({round(score, 2)})"

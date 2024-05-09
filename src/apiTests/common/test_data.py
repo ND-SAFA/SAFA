@@ -4,8 +4,8 @@ from unittest import TestCase
 
 import pandas as pd
 
-from tests.common.data_encoder import DataEncoder
-from tests.common.test_constants import CHILD_TYPE, FR_ARTIFACT_PATH, PARENT_TYPE, SOURCE_CODE_PATH, SUMMARY_JSON_PATH, SUMMARY_PATH
+from apiTests.common.data_encoder import DataEncoder
+from apiTests.common.test_constants import CHILD_TYPE, FR_ARTIFACT_PATH, PARENT_TYPE, SOURCE_CODE_PATH, SUMMARY_JSON_PATH, SUMMARY_PATH
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace_layer import TraceLayer
 from tgen.common.util.enum_util import EnumDict
@@ -33,6 +33,8 @@ class TestArtifacts(Enum):
 
 
 subset2artifacts = {TestSubset.SOURCE: 4, TestSubset.FULL: 6}
+
+IGNORED_ARTIFACT_COLS = {"chunks"}
 
 
 class TestData:
@@ -122,7 +124,10 @@ class TestData:
             expected_artifact = artifact_query[0]
             for k, v in expected_artifact.items():
                 if v is None:
-                    tc.assertIsNone(a[k])
+                    if k not in a:
+                        tc.assertIn(k, IGNORED_ARTIFACT_COLS)
+                        continue
+                    tc.assertIsNone(a.get(k))
                 if isinstance(v, str):
                     tc.assertEqual(v.strip(), a[k].strip())
                 else:

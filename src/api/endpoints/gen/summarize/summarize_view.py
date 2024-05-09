@@ -2,6 +2,7 @@ from api.endpoints.gen.summarize.summarize_serializer import SummarizeRequest, S
 from api.endpoints.handler.dataset_converter import create_api_dataset
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
+from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
 
@@ -13,7 +14,8 @@ def perform_summarize_request(data: SummarizeRequest, **kwargs) -> SummaryRespon
     :return: The same artifacts with content as summary.
     """
     dataset_creator = create_api_dataset(data.artifacts, project_summary=data.project_summary)
-    summarize_job = SummarizeJob(dataset_creator=dataset_creator, **kwargs)
+    job_args = JobArgs(dataset_creator=dataset_creator)
+    summarize_job = SummarizeJob(job_args, **kwargs)
     summary_response = ViewUtil.run_job(summarize_job)
     return summary_response
 

@@ -5,8 +5,10 @@ SHELL ["/bin/bash", "-c"]
 RUN pip install --upgrade pip
 
 ## Step - Install requirements
-COPY tgen/requirements.txt /app/tgen/
 ADD tgen/requirements/ /app/tgen/requirements/
+RUN pip3 install -r /app/tgen/requirements/base-requirements.txt
+
+COPY tgen/requirements.txt /app/tgen/
 RUN pip3 install -r /app/tgen/requirements.txt
 
 COPY requirements.txt /app/

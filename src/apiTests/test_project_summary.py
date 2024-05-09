@@ -1,7 +1,7 @@
-from tests.base_test import BaseTest
-from tests.common.request_proxy import RequestProxy
-from tests.common.test_data_creator import TestDataCreator
-from tests.common.test_verifier import TestVerifier
+from apiTests.base_test import BaseTest
+from apiTests.common.request_proxy import RequestProxy
+from apiTests.common.test_data_creator import TestDataCreator
+from apiTests.common.test_verifier import TestVerifier
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse
@@ -29,4 +29,4 @@ class TestProjectSummary(BaseTest):
 
         section_bodies = list(section_body_map.values())
         TestVerifier.assert_all_in(self, summary, section_bodies)
-        TestVerifier.verify_artifacts(self, artifacts, response_artifacts, ignore_keys=[ArtifactKeys.SUMMARY])
+        TestVerifier.verify_artifacts(self, artifacts, response_artifacts, ignore_keys=[ArtifactKeys.SUMMARY, ArtifactKeys.CHUNKS])

@@ -1,7 +1,7 @@
-from tests.base_test import BaseTest
-from tests.common.request_proxy import RequestProxy
-from tests.common.test_constants import CHILD_TYPE, PARENT_TYPE
-from tests.common.test_data import TestArtifacts, TestData
+from apiTests.base_test import BaseTest
+from apiTests.common.request_proxy import RequestProxy
+from apiTests.common.test_constants import CHILD_TYPE, PARENT_TYPE
+from apiTests.common.test_data import TestArtifacts, TestData
 from tgen.common.objects.artifact import Artifact
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.testres.mocking.mock_anthropic import mock_anthropic

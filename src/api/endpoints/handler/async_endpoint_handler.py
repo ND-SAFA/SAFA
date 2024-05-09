@@ -11,7 +11,7 @@ from api.endpoints.handler.ihandler import IHandler
 from tgen.common.logging.log_capture import LogCapture
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
-from tgen.embeddings.model_cache import ModelCache
+from tgen.relationship_manager.model_cache import ModelCache
 
 
 class AsyncEndpointHandler(IHandler):

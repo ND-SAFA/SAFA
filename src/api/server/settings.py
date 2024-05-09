@@ -13,15 +13,15 @@ import json
 import os.path
 import sys
 
-from celery_s3.backends import S3Backend
 from kombu.serialization import register
+
+from .paths import load_source_code_paths
+
+load_source_code_paths()
 
 from tgen.common.constants import anthropic_constants
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
-from .paths import load_source_code_paths
-
-load_source_code_paths()
 
 from pathlib import Path
 
@@ -160,7 +160,6 @@ https://docs.celeryq.dev/en/stable/index.html
 TODO: broker_connection_retry_on_startup needs to be set
 """
 
-CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'  # 'api.celery.S3Backend'
 CELERY_TIMEZONE = "America/New_York"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 1440 * 60  # 1 Day
@@ -175,16 +174,21 @@ CELERY_ACCEPT_CONTENT = ['NpEncoder']
 CELERY_TASK_SERIALIZER = 'NpEncoder'
 CELERY_RESULT_SERIALIZER = 'NpEncoder'
 
-if 'BACKEND_ACCESS_ID' in os.environ:  # collect static will be running this without env file
+GEN_BROKER = os.environ.get("BROKER", "celery")
+
+if GEN_BROKER == "celery":
+    from celery_s3.backends import S3Backend
+
     base_path = f"/{ENV_NAME}"
+    CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
     CELERY_S3_BACKEND_SETTINGS = {
-        'aws_access_key_id': f'{os.environ["BACKEND_ACCESS_ID"]}',
-        'aws_secret_access_key': f'{os.environ["BACKEND_SECRET_KEY"]}',
-        'bucket': f'{os.environ["BACKEND_BUCKET_NAME"]}',
+        'aws_access_key_id': f'{os.environ.get("BACKEND_ACCESS_ID", "")}',
+        'aws_secret_access_key': f'{os.environ.get("BACKEND_SECRET_KEY", "")}',
+        'bucket': f'{os.environ.get("BACKEND_BUCKET_NAME", "")}',
         'reduced_redundancy': True,
         'base_path': bytes(base_path, "utf-8")  # See `Rabbit Hole Fix`
-
     }
+    print("using s3 for back-end.")
 """"
 FootNotes:
 

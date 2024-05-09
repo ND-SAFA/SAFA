@@ -1,7 +1,7 @@
-from tests.base_test import BaseTest
-from tests.common.request_proxy import RequestProxy
-from tests.common.test_data import TestData, TestSubset
-from tests.common.test_verifier import TestVerifier
+from apiTests.base_test import BaseTest
+from apiTests.common.request_proxy import RequestProxy
+from apiTests.common.test_data import TestData, TestSubset
+from apiTests.common.test_verifier import TestVerifier
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
@@ -28,4 +28,4 @@ class TestTGen(BaseTest):
             TestVerifier.verify_order(self, {
                 "FR1": ["/Artifact.java", "/ArtifactService.java", "/TraceLink.java", "/TraceLinkService.java"],
                 "FR2": ["/TraceLink.java", "/TraceLinkService.java", "/Artifact.java", "/ArtifactService.java"]
-            }, trace_predictions)
+            }, trace_predictions, msg_suffix=f"\n while sync={sync}")

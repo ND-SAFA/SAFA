@@ -28,18 +28,12 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { watch } from "vue";
 import { ENABLED_FEATURES } from "@/util";
-import { appStore, artifactSaveStore, artifactStore } from "@/hooks";
+import { appStore } from "@/hooks";
 import { DetailsPanel, PanelCard, TextButton } from "@/components/common";
 import {
   SaveArtifactInputs,
   SaveArtifactButtons,
   ArtifactHealth,
 } from "@/components/artifact/save";
-
-watch(
-  () => artifactStore.selectedArtifact,
-  () => artifactSaveStore.resetArtifact()
-);
 </script>

@@ -1,5 +1,3 @@
-import { ViewType, FTANodeType, SafetyCaseType } from "@/types";
-
 export type PopupType =
   | "errorModal"
   | "navPanel"
@@ -32,15 +30,6 @@ export interface PopupStateMap
   saveTrace: boolean;
   drawTrace: boolean;
 }
-
-/**
- * Represents the open state of the artifact creator.
- */
-export type ArtifactCreatorOpenState =
-  | boolean
-  | SafetyCaseType
-  | FTANodeType
-  | ViewType;
 
 /**
  * Represents the open state of the trace link creator.

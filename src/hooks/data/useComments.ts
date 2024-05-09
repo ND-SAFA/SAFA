@@ -9,7 +9,7 @@ import {
   IconVariant,
   ThemeColor,
 } from "@/types";
-import { artifactStore } from "@/hooks";
+import { artifactSaveStore, artifactStore } from "@/hooks";
 import { pinia } from "@/plugins";
 
 /**
@@ -112,6 +112,24 @@ export const useComments = defineStore("useComments", {
               health.type === "undefined_concept"
                 ? [health.undefinedConcept]
                 : [],
+            action: () => {
+              switch (health.type) {
+                case "cited_concept":
+                  return;
+                case "predicted_concept":
+                  return;
+                case "undefined_concept":
+                  return artifactSaveStore.openPanel({
+                    isNewArtifact: true,
+                    artifact: { name: health.undefinedConcept },
+                    parentId: artifactId,
+                  });
+                case "contradiction":
+                  return;
+                case "multi_matched_concept":
+                  return;
+              }
+            },
           }));
 
       if (artifactId) {

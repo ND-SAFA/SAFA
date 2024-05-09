@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-import { ArtifactCreatorOpenState, ArtifactSchema } from "@/types";
+import { ArtifactSchema } from "@/types";
 import { buildArtifact } from "@/util";
 import {
   selectionStore,
@@ -86,13 +86,21 @@ export const useSaveArtifact = defineStore("saveArtifact", {
   actions: {
     /**
      * Resets the state of the artifact to the selected artifact.
+     * @param updatedArtifact - Any artifact fields to set in the new edited artifact.
+     * @param parentId - Any parent artifact to link to.
      */
-    resetArtifact(): void {
-      const artifact = artifactStore.selectedArtifact;
+    resetArtifact(
+      updatedArtifact: Partial<ArtifactSchema> = {},
+      parentId = ""
+    ): void {
+      const baseArtifact = artifactStore.selectedArtifact;
 
-      this.editedArtifact = buildArtifact(artifact);
-      this.isNameValid = !!artifact?.name;
-      this.parentId = "";
+      this.editedArtifact = buildArtifact({
+        ...(baseArtifact || {}),
+        ...updatedArtifact,
+      });
+      this.isNameValid = !!this.editedArtifact.name;
+      this.parentId = parentId;
     },
 
     /**
@@ -101,14 +109,19 @@ export const useSaveArtifact = defineStore("saveArtifact", {
      * @param openTo - What to open to.
      */
     openPanel(openTo: {
-      type?: ArtifactCreatorOpenState;
       isNewArtifact?: boolean;
+      artifact?: Partial<ArtifactSchema>;
+      parentId?: string;
     }): void {
-      const { isNewArtifact } = openTo;
+      const { isNewArtifact, artifact, parentId } = openTo;
 
-      if (isNewArtifact) selectionStore.clearSelections();
+      if (isNewArtifact) {
+        selectionStore.clearSelections();
+      } else if (artifact?.id) {
+        selectionStore.selectArtifact(artifact.id);
+      }
 
-      this.resetArtifact();
+      this.resetArtifact(artifact, parentId);
       appStore.openDetailsPanel("saveArtifact");
     },
   },

@@ -139,6 +139,10 @@ export type DisplayableHealthCheckSchema = AnyCommentSchema & {
    * Concepts referenced by the health check.
    */
   concepts: string[];
+  /**
+   * Acts on the health check.
+   */
+  action(): void;
 };
 
 /**

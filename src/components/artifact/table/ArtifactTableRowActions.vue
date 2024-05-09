@@ -56,7 +56,6 @@ import {
   artifactSaveStore,
   layoutStore,
   permissionStore,
-  selectionStore,
   traceSaveStore,
   viewsStore,
 } from "@/hooks";
@@ -72,9 +71,8 @@ const displayActions = computed(() =>
  * Opens the edit artifact window.
  */
 function handleEdit() {
-  selectionStore.selectArtifact(props.artifact.id);
   artifactSaveStore.openPanel({
-    isNewArtifact: false,
+    artifact: props.artifact,
   });
 }
 

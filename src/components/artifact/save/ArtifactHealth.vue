@@ -74,6 +74,8 @@
             outline
             :icon="getIcon('health-unknown')"
             class="artifact-check-chip"
+            clickable
+            @click="check.action()"
           >
             <typography :value="concept" wrap color="text" />
           </q-chip>

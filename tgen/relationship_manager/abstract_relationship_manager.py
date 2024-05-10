@@ -4,11 +4,11 @@ import os
 import uuid
 from abc import abstractmethod
 from copy import deepcopy
+from typing import Any, Dict, List, Union
 
 import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
-from typing import Any, Dict, List, Union
 
 from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from tgen.common.logging.logger_manager import logger

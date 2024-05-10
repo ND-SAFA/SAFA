@@ -16,6 +16,7 @@ from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.math_util import MathUtil
 from tgen.common.util.override import overrides
+from tgen.common.util.st_util import STUtil
 from tgen.common.util.tf_util import TFUtil
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
@@ -24,9 +25,9 @@ from tgen.core.trainers.st.st_evaluator import STEvaluator
 from tgen.core.wb.wb_manager import WBManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
 from tgen.models.model_manager import ModelManager
 from tgen.models.model_properties import ModelArchitectureType, ModelTask
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class STTrainer(HuggingFaceTrainer, ABC):
@@ -64,7 +65,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         :return: None
         """
         self.complete_device_setup()
-        train_examples = to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
+        train_examples = STUtil.to_input_examples(self.train_dataset, use_scores=self.trainer_args.use_scores, model=self.model)
         train_batch_sampler = BalancedBatchSampler(train_examples, batch_size=self.args.train_batch_size)
         n_samples = len(train_batch_sampler)
         evaluator = STEvaluator(self, self.evaluation_roles, self.trainer_args.metric_for_best_model) if self.has_dataset(
@@ -118,7 +119,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         self.model.eval()
         self._current_eval_role = dataset_role
         dataset = self._get_dataset(dataset_role)
-        input_examples = to_input_examples(dataset)
+        input_examples = STUtil.to_input_examples(dataset)
         labels = [e.label for e in input_examples]
         device_scores = self.predict_similarity_scores(input_examples, device=self.device)
         host_scores = device_scores.cpu().tolist()

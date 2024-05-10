@@ -7,7 +7,7 @@ from tgen.common.constants.hugging_face_constants import NEG_LINK
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.data.keys.csv_keys import CSVKeys
-from tgen.embeddings.embeddings_manager import EmbeddingsManager
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 class STUtil:
@@ -65,7 +65,8 @@ class STUtil:
         s_text, t_text = input_example.texts
         s_embedding = embeddings_manager.get_embedding(s_text)
         t_embedding = embeddings_manager.get_embedding(t_text)
-        score = EmbeddingUtil.calculate_similarity(s_embedding, t_embedding)
+
+        score = embeddings_manager.compare_artifact(s_text, t_text)
         return score
 
     @staticmethod
@@ -76,7 +77,7 @@ class STUtil:
         :param input_examples: The list of input examples to calculate similarities for.
         :return: Prediction output containing scores as predictions and labels as label ids.
         """
-        unique_content = list(set(ListUtil.flatten([e.texts for e in input_examples])))
+        unique_content = ListUtil.flatten([e.texts for e in input_examples])
         embeddings_manager = EmbeddingsManager.create_from_content(unique_content, model=model, show_progress_bar=False)
         scores = []
         labels = []

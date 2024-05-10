@@ -8,7 +8,7 @@ from torch.nn import Parameter
 from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.override import overrides
-from tgen.common.util.tf_util import create_loss_function
+from tgen.common.util.tf_util import TFUtil
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st.st_mlp import STMLP
 from tgen.core.trainers.st_loss_functions import SupportedSTLossFunctions
@@ -39,8 +39,10 @@ class STMLPTrainer(STTrainer):
         model_manager.arch_type = ModelArchitectureType.SIAMESE
         super().__init__(trainer_args, model_manager, trainer_dataset_manager, **kwargs)
         self.min_eval_steps = max_steps_before_eval
-        self.loss_function = create_loss_function(SupportedSTLossFunctions, self.trainer_args.st_loss_function, "WEIGHTED_MSE",
-                                                  possible_params={"device": self.device})
+        self.loss_function = TFUtil.create_loss_function(SupportedSTLossFunctions,
+                                                         self.trainer_args.st_loss_function,
+                                                         "WEIGHTED_MSE",
+                                                         possible_params={"device": self.device})
         self.mlp = STMLP.build(self.model, [512, 256], nn.ReLU)
         self.starting_learning_rate = 1e-3
         self.ending_learning_rate = 5e-5

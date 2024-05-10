@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from typing import Dict
 
+from tgen.common.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, \
+    LOGPROBS_DEFAULT, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT
 from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.override import overrides
-from tgen.common.constants.open_ai_constants import COMPUTE_CLASSIFICATION_METRICS_DEFAULT, LEARNING_RATE_MULTIPLIER_DEFAULT, \
-    LOGPROBS_DEFAULT, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT
 from tgen.core.args.abstract_llm_args import AbstractLLMArgs
 from tgen.core.trainers.trainer_task import TrainerTask
-from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 
 
 class OpenAIParams:
@@ -37,7 +37,7 @@ class OpenAIArgs(AbstractLLMArgs):
     compute_classification_metrics: bool = COMPUTE_CLASSIFICATION_METRICS_DEFAULT
     model_suffix: str = None
     max_tokens: int = MAX_TOKENS_DEFAULT
-    prompt_args: PromptArgs = None
+    prompt_args: LLMPromptBuildArgs = None
     _EXPECTED_TASK_PARAMS = {TrainerTask.TRAIN: [OpenAIParams.MODEL, OpenAIParams.MODEL_SUFFIX, OpenAIParams.N_EPOCHS,
                                                  OpenAIParams.LEARNING_RATE_MULTIPLIER],
                              TrainerTask.PREDICT: [OpenAIParams.MODEL, OpenAIParams.TEMPERATURE, OpenAIParams.MAX_TOKENS,
@@ -50,7 +50,7 @@ class OpenAIArgs(AbstractLLMArgs):
         """
         super_args = DataclassUtil.set_unique_args(self, AbstractLLMArgs, **kwargs)
         DictUtil.update_kwarg_values(super_args, replace_existing=False, model=OPEN_AI_MODEL_DEFAULT)
-        super().__init__(expected_task_params=self._EXPECTED_TASK_PARAMS, **super_args)
+        super().__init__(expected_task_params=self._EXPECTED_TASK_PARAMS, llm_params=OpenAIParams, **super_args)
 
     @overrides(AbstractLLMArgs)
     def _add_library_params(self, task: TrainerTask, params: Dict, instructions: Dict) -> Dict:

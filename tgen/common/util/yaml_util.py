@@ -31,7 +31,7 @@ class CustomLoader(SafeLoader):
             # start = timeit.timeit()
             class_path = node.tag.split(COLON)[-1]
             cls = ReflectionUtil.get_cls_from_path(class_path)
-            if ReflectionUtil.is_function(cls) or "builtins" in class_path:
+            if ReflectionUtil.is_function(cls) or "builtins" in class_path and "Exception" not in class_path:
                 return cls
             if isinstance(cls, EnumMeta):
                 if isinstance(node.value, str):

@@ -52,8 +52,8 @@ class LayerDataFrame(AbstractProjectDataFrame):
         :param target_type: The type of the target layer
         :return: The newly added linked layer
         """
-        return self.add_or_update_row({LayerKeys.SOURCE_TYPE: source_type,
-                                       LayerKeys.TARGET_TYPE: target_type})
+        return self.add_row({LayerKeys.SOURCE_TYPE: source_type,
+                             LayerKeys.TARGET_TYPE: target_type})
 
     def as_list(self) -> List[Tuple[str, str]]:
         """

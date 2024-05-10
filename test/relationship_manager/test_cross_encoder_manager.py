@@ -3,12 +3,12 @@ import random
 import mock
 from sentence_transformers import CrossEncoder
 
+from tgen.common.constants.hugging_face_constants import SMALL_CROSS_ENCODER
 from tgen.relationship_manager.cross_encoder_manager import CrossEncoderManager
 from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestCrossEncoderManager(BaseTest):
-    test_model = "cross-encoder/ms-marco-TinyBERT-L-2"
     artifacts1 = ["Dogs are really cute.", "Car goes vroom."]
     artifacts2 = ["Fire trucks are loud.", "Dogs pee on fire hydrants."]
 
@@ -39,5 +39,5 @@ class TestCrossEncoderManager(BaseTest):
         ids2 = [f"B_{i}" for i, _ in enumerate(self.artifacts2)]
         content_map = {i: content for i, content in zip(ids1, self.artifacts1)}
         content_map.update({i: content for i, content in zip(ids2, self.artifacts2)})
-        ce_manager = CrossEncoderManager(content_map, model_name=self.test_model)
+        ce_manager = CrossEncoderManager(content_map, model_name=SMALL_CROSS_ENCODER)
         return ce_manager, ids1, ids2

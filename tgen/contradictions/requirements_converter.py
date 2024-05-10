@@ -5,18 +5,18 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.contradictions.requirement import Requirement, RequirementConstituent
+from tgen.contradictions.with_decision_tree.requirement import Requirement, RequirementConstituent
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.supported_prompts.requirements_contradiction_prompts import CONSTITUENT2TAG
+from tgen.prompts.supported_prompts.contradiction_prompts import CONSTITUENT2TAG
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 
@@ -39,17 +39,16 @@ class RequirementsConverter:
         """
         dataset = PromptDataset(artifact_df=ArtifactDataFrame(artifacts))
         task_prompt = SupportedPrompts.REQUIREMENT_EXTRACT_CONSTITUENTS.value
-        prompt_builder = PromptBuilder([ArtifactPrompt(prompt_start=f"{PromptUtil.as_markdown_header('REQUIREMENT')}\n",
+        prompt_builder = PromptBuilder([ArtifactPrompt(prompt_args=PromptArgs(f"{PromptUtil.as_markdown_header('REQUIREMENT')}\n"),
                                                        include_id=False, build_method=ArtifactPrompt.BuildMethod.BASE),
                                         task_prompt])
         trainer_state = LLMTrainerState(prompt_builders=prompt_builder,
-                                        trainer_dataset_manager=TrainerDatasetManager.create_from_datasets(
-                                            {DatasetRole.EVAL: dataset}),
+                                        trainer_dataset_manager=TrainerDatasetManager.create_from_datasets(eval=dataset),
                                         llm_manager=self.llm_manager)
         trainer = LLMTrainer(trainer_state)
         res = trainer.perform_prediction(save_and_load_path=FileUtil.safely_join_paths(self.export_path,
                                                                                        "artifact2requirement_response.yaml"))
-        requirements = [self._create_requirement(r[task_prompt.id], art[ArtifactKeys.ID]) for art, r in
+        requirements = [self._create_requirement(r[task_prompt.args.prompt_id], art[ArtifactKeys.ID]) for art, r in
                         zip(artifacts, res.predictions)]
         return requirements
 

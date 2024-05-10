@@ -1,15 +1,15 @@
 import uuid
 from typing import Any, Dict, List
 
-from tgen.common.util.enum_util import EnumDict
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.str_util import StrUtil
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt
+from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_config import PromptConfig
 
 
@@ -27,7 +27,8 @@ class PromptBuilder:
         self._create_config()
         self.id = str(uuid.uuid4())
 
-    def build(self, model_format_args: PromptArgs, correct_completion: Any = EMPTY_STRING, **prompt_kwargs) -> EnumDict[str, str]:
+    def build(self, model_format_args: LLMPromptBuildArgs, correct_completion: Any = EMPTY_STRING,
+              **prompt_kwargs) -> EnumDict[str, str]:
         """
         Generates the prompt and response
         :param model_format_args: Defines the formatting specific to the model
@@ -36,15 +37,18 @@ class PromptBuilder:
         """
         format_vars = {key: val[self._n_built] for key, val in self.format_variables.items() if len(val) > self._n_built}
         prompt_kwargs.update(format_vars)
-        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts]
-        base_prompt = NEW_LINE.join(built_prompts)
+        build_all = not model_format_args.build_system_prompts
+        system_prompt = self._build_prompts(build_all=build_all, only_use_system_prompts=True, **prompt_kwargs) \
+            if not build_all else None
+        base_prompt = self._build_prompts(build_all=build_all, only_use_system_prompts=False, **prompt_kwargs)
         prompt = self.format_prompt_for_model(base_prompt, prompt_args=model_format_args)
         completion = self._format_completion(correct_completion, prompt_args=model_format_args)
         self._n_built += 1
         return EnumDict({
             PromptKeys.PROMPT: prompt,
             PromptKeys.COMPLETION: completion,
-            PromptKeys.PROMPT_BUILDER_ID: self.id
+            PromptKeys.PROMPT_BUILDER_ID: self.id,
+            PromptKeys.SYSTEM: system_prompt,
         })
 
     def add_prompt(self, prompt: Prompt, i: int = None) -> None:
@@ -91,7 +95,7 @@ class PromptBuilder:
         :return: The index of the prompt if it exists, else -1
         """
         for i, prompt in enumerate(self.prompts):
-            if prompt.id == prompt_id:
+            if prompt.args.prompt_id == prompt_id:
                 return i
         return -1
 
@@ -125,7 +129,20 @@ class PromptBuilder:
         :param res: The model response
         :return: A dictionary mapping prompt id to its answers
         """
-        return {prompt.id: prompt.parse_response(res) for prompt in self.prompts}
+        return {prompt.args.prompt_id: prompt.parse_response(res) for prompt in self.prompts}
+
+    def _build_prompts(self, build_all: bool = True, only_use_system_prompts: bool = False, **prompt_kwargs) -> str:
+        """
+        Builds each prompt and combines them to create one final prompt.
+        :param build_all: If True, builds all prompts regardless if system prompt or not.
+        :param only_use_system_prompts: If True, only builds system prompts.
+        :param prompt_kwargs: Args for building each promtp.
+        :return: All prompts built and combined into one final prompt.
+        """
+        built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts
+                         if prompt.args.system_prompt == only_use_system_prompts or build_all]
+        base_prompt = NEW_LINE.join(built_prompts) if built_prompts or not only_use_system_prompts else None
+        return base_prompt
 
     def _create_config(self) -> PromptConfig:
         """
@@ -148,7 +165,7 @@ class PromptBuilder:
         return self.config
 
     @staticmethod
-    def format_prompt_for_model(base_prompt: str, prompt_args: PromptArgs) -> str:
+    def format_prompt_for_model(base_prompt: str, prompt_args: LLMPromptBuildArgs) -> str:
         """
         Formats the prompt with expected prefix + suffix tokens
         :param base_prompt: The base prompt
@@ -160,7 +177,7 @@ class PromptBuilder:
         return f"{prefix}{base_prompt}{suffix}"
 
     @staticmethod
-    def remove_format_for_model_from_prompt(base_prompt: str, prompt_args: PromptArgs) -> str:
+    def remove_format_for_model_from_prompt(base_prompt: str, prompt_args: LLMPromptBuildArgs) -> str:
         """
         Formats the prompt with expected prefix + suffix tokens
         :param base_prompt: The base prompt
@@ -172,7 +189,7 @@ class PromptBuilder:
         return base_prompt
 
     @staticmethod
-    def _format_completion(base_completion: str, prompt_args: PromptArgs) -> str:
+    def _format_completion(base_completion: str, prompt_args: LLMPromptBuildArgs) -> str:
         """
         Formats the completion with expected prefix + suffix tokens
         :param base_completion: The base completion

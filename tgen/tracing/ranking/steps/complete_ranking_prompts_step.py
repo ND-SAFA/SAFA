@@ -45,10 +45,10 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
                    for p_name in args.parent_ids]
         save_and_load_path = LLMResponseUtil.generate_response_save_and_load_path(
             state.get_path_to_state_checkpoint(args.export_dir), "ranking_response") if args.export_dir else args.export_dir
-        predictions = LLMTrainer.predict_from_prompts(llm_manager=args.ranking_llm_model_manager, prompt_builder=prompt_builder,
-                                                      prompts=prompts, save_and_load_path=save_and_load_path).predictions
+        predictions = LLMTrainer.predict_from_prompts(llm_manager=args.ranking_llm_model_manager, prompt_builders=prompt_builder,
+                                                      message_prompts=prompts, save_and_load_path=save_and_load_path).predictions
         task_prompt = prompt_builder.prompts[-1]
-        parsed_answers = LLMResponseUtil.extract_predictions_from_response(predictions, response_prompt_ids=task_prompt.id,
+        parsed_answers = LLMResponseUtil.extract_predictions_from_response(predictions, response_prompt_ids=task_prompt.args.prompt_id,
                                                                            tags_for_response=
                                                                            task_prompt.response_manager.get_all_tag_ids()[0])
 
@@ -93,7 +93,7 @@ class CompleteRankingPromptsStep(AbstractPipelineStep[RankingArgs, RankingState]
 
         RankingUtil.add_project_summary_prompt(prompt_builder, state)
 
-        prompt_builder.add_prompt(MultiArtifactPrompt(prompt_prefix=PromptUtil.as_markdown_header(ARTIFACT_HEADER),
+        prompt_builder.add_prompt(MultiArtifactPrompt(prompt_start=PromptUtil.as_markdown_header(ARTIFACT_HEADER),
                                                       build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                       include_ids=True))
 

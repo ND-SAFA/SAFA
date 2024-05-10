@@ -74,7 +74,8 @@ class MultiThreadState:
         """
         if self.collect_results:
             assert index is not None, "Expected index to be provided when collect results is activated."
-            self.result_list[index] = result
+            if result:
+                self.result_list[index] = result
         self.progress_bar.update()
 
     def on_item_fail(self, e: Exception, index: int) -> None:

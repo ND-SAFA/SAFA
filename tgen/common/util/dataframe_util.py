@@ -1,8 +1,8 @@
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
-from typing import Any, Callable, Dict, List, Optional, Union
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 
@@ -38,7 +38,8 @@ class DataFrameUtil:
         :param filter_lambda: The lambda determining which rows to keep.
         :return: DataFrame containing filtered rows.
         """
-        return df[df.apply(filter_lambda, axis=1)]
+        filter_df = df.apply(filter_lambda, axis=1)
+        return df[filter_df]
 
     @staticmethod
     def filter_df_by_index(df: pd.DataFrame, index_to_filter: List[Any]) -> pd.DataFrame:
@@ -114,7 +115,8 @@ class DataFrameUtil:
         :return: The column value if exists, otherwise None is returned.
         """
         potential_value = row.get(col_name, default_value)
-        return DataFrameUtil.get_optional_value(potential_value, allow_empty)
+        result = DataFrameUtil.get_optional_value(potential_value, allow_empty)
+        return result if result is not None else default_value
 
     @staticmethod
     def get_optional_value(potential_value: Any, allow_empty: bool = True) -> Optional[Any]:

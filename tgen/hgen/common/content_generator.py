@@ -1,6 +1,5 @@
 import math
 import uuid
-
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
@@ -56,7 +55,7 @@ class ContentGenerator:
         export_path = FileUtil.safely_join_paths(self.state.export_dir, generations_filename)
         generated_artifacts_tag = task_prompt.response_manager.get_all_tag_ids()[0]
         generations = HGenUtil.get_predictions(prompt_builder, hgen_args=self.args, prediction_step=PredictionStep.GENERATION,
-                                               dataset=self.source_dataset, response_prompt_ids={task_prompt.id},
+                                               dataset=self.source_dataset, response_prompt_ids={task_prompt.args.prompt_id},
                                                tags_for_response={generated_artifacts_tag}, return_first=return_first,
                                                export_path=export_path)
         return generations
@@ -193,7 +192,7 @@ class ContentGenerator:
         :param additional_response_instructions: If provided, will be used to instruct the model how to format the response.
         :return: The prompt used for the primary creation task
         """
-        task_prompt.id = self.TASK_PROMPT_ID
+        task_prompt.args.prompt_id = self.TASK_PROMPT_ID
         use_context = False
         for c_prompt in task_prompt.child_prompts:
             if isinstance(c_prompt, ContextPrompt):
@@ -263,7 +262,7 @@ class ContentGenerator:
         :param multi_artifact_params: Any additional params to the prompt.
         :return: The prompt that will be used to supply the LLM with the source artifacts.
         """
-        artifact_prompt_kwargs = dict(prompt_prefix=PromptUtil.as_markdown_header(f"{source_type.upper()}S:"),
+        artifact_prompt_kwargs = dict(prompt_start=PromptUtil.as_markdown_header(f"{source_type.upper()}S:"),
                                       build_method=build_method,
                                       include_ids=build_method == MultiArtifactPrompt.BuildMethod.XML,
                                       data_type=MultiArtifactPrompt.DataType.ARTIFACT,

@@ -1,4 +1,5 @@
 from tgen.common.constants.deliminator_constants import PERIOD
+from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.chunk import Chunk
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
@@ -60,7 +61,7 @@ class TestArtifactDataFrame(BaseTest):
         a_dataframe.add_artifact(chunked_id, chunked_content, chunks=["Chunk1", "Chunk2"])
         a_dataframe.add_artifact(ignored_id, ignored_content)
         artifact_ids = {a_id for a_id in a_dataframe.index if a_id != "ignored"}
-    
+
         chunk_map = a_dataframe.chunk(SentenceChunker(), artifact_ids=artifact_ids,
                                       unchunked_only=False)
         expected_chunked_artifacts = {unchunked_id: unchunked_content, chunked_id: chunked_content}
@@ -76,6 +77,18 @@ class TestArtifactDataFrame(BaseTest):
         self.assertEqual(a_dataframe.get_chunk_by_id(chunk_id), chunk_map[chunk_id])
         self.assertIsNone(a_dataframe.get_chunk_by_id(Chunk.get_chunk_id(ignored_id, 5)))
         self.assertIsNone(a_dataframe.get_chunk_by_id(Chunk.get_chunk_id("unknown", 0)))
+
+    def test_update_or_add_values(self):
+        a_dataframe = self.get_artifact_data_frame()
+        existing_artifact_id = a_dataframe.index.to_list()[0]
+        new_artifact_id = "new_id"
+        updated_artifact = Artifact(id=existing_artifact_id, content="updated content", layer_id="updated layer")
+        new_artifact = Artifact(id=new_artifact_id, content="new content", layer_id="new layer")
+        updated_df = ArtifactDataFrame.update_or_add_values(a_dataframe, [updated_artifact, new_artifact])
+        self.assertEqual(updated_df.get_row(existing_artifact_id)[ArtifactKeys.CONTENT], updated_artifact[ArtifactKeys.CONTENT])
+        self.assertNotEqual(a_dataframe.get_row(existing_artifact_id)[ArtifactKeys.CONTENT], updated_artifact[ArtifactKeys.CONTENT])
+        self.assertEqual(updated_df.get_row(new_artifact_id)[ArtifactKeys.CONTENT], new_artifact[ArtifactKeys.CONTENT])
+        self.assertNotIn(new_artifact_id, a_dataframe)
 
     def _assert_chunking(self, chunk_map, expected_chunked_artifacts):
         chunks = {}

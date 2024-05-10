@@ -1,5 +1,5 @@
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from tgen.testres.base_tests.base_test import BaseTest
 
 
@@ -8,7 +8,7 @@ class BasePromptTest(BaseTest):
     Provides utility testing methods for prompt testing.
     """
 
-    def verify_prompt(self, generated_prompt, prompt_args: PromptArgs) -> None:
+    def verify_prompt(self, generated_prompt, prompt_args: LLMPromptBuildArgs) -> None:
         """
         Verifies that generated prompt contains separators and other library specific formatting.
         :param generated_prompt: The generated prompt to check.

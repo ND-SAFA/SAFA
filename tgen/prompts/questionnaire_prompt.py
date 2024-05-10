@@ -8,6 +8,7 @@ from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.prompts.multi_prompt import MultiPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 
 TASK_HEADER = 'TASKS:'
@@ -20,7 +21,7 @@ class QuestionnairePrompt(MultiPrompt):
 
     def __init__(self, question_prompts: Union[List[Prompt], Dict[int, Prompt]], instructions: str = EMPTY_STRING,
                  response_manager: PromptResponseManager = None, enumeration_chars: List[str] = ascii_uppercase,
-                 use_multi_step_task_instructions: bool = False, prompt_id: str = None):
+                 use_multi_step_task_instructions: bool = False, prompt_args: PromptArgs = None):
         """
         Initializes the questionnaire with the instructions and the questions that will make up the prompt
         :param question_prompts: The list of question prompts to include in the questionnaire
@@ -28,13 +29,13 @@ class QuestionnairePrompt(MultiPrompt):
         :param response_manager: Manages the responses from the prompt
         :param enumeration_chars: The list of characters to use to enumerate the questions (must include one for each question)
         :param use_multi_step_task_instructions: If True, uses default instructions for task involving multiple steps
-        :param prompt_id: Prompt ID to override.
+        :param prompt_args: The args to the base prompt.
         """
         self.enumeration_chars = enumeration_chars
         self.use_bullets_for_enumeration = len(self.enumeration_chars) == 1
         self.use_multi_step_task_instructions = use_multi_step_task_instructions
         super().__init__(main_prompt_value=instructions, child_prompts=question_prompts,
-                         response_manager=response_manager, prompt_id=prompt_id)
+                         response_manager=response_manager, prompt_args=prompt_args)
 
     def set_instructions(self, instructions: str) -> None:
         """

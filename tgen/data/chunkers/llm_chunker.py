@@ -42,5 +42,5 @@ class LLMChunker(AbstractChunker):
                                         llm_manager=self.llm_manager)
         trainer = LLMTrainer(trainer_state)
         res = trainer.perform_prediction()
-        chunks = [r[task_prompt.id][task_prompt.get_all_response_tags()[0]] for r in res.predictions]
+        chunks = [r[task_prompt.args.prompt_id][task_prompt.get_all_response_tags()[0]] for r in res.predictions]
         return chunks

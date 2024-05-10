@@ -5,21 +5,18 @@ from typing import Union
 from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE, TAB, EMPTY_STRING
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.steps.step_summarize_artifacts import StepSummarizeArtifacts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_openai import mock_openai
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_DATA_DIR
 
@@ -32,7 +29,7 @@ class TestSummarizer(BaseTest):
     MODEL_NAME = "gpt-4"
     MAX_COMPLETION_TOKENS = 500
 
-    @mock_openai
+    @mock_anthropic
     def test_summarize(self, response_manager: TestAIManager):
         """
         Tests ability to summarize single artifacts.
@@ -45,7 +42,7 @@ class TestSummarizer(BaseTest):
         content_summary = summarizer.summarize_single(content="This is some text.")
         self.assertEqual(content_summary, NL_SUMMARY)
 
-    @mock_openai
+    @mock_anthropic
     def test_code_or_exceeds_limit_true(self, ai_manager: TestAIManager):
         ai_manager.mock_summarization()
         short_text = "This is a short text under the token limit"
@@ -53,7 +50,7 @@ class TestSummarizer(BaseTest):
         content_summary = summarizer.summarize_single(content=short_text)
         self.assertEqual(content_summary, short_text)  # shouldn't have summarized
 
-    @mock_openai
+    @mock_anthropic
     def test_code_summarization(self, ai_manager: TestAIManager):
         ai_manager.set_responses([lambda prompt: self.get_response(prompt, ArtifactSummaryTypes.CODE_BASE, CODE_SUMMARY)])
         CODE_SUMMARY = "CODE_SUMMARY"
@@ -61,7 +58,7 @@ class TestSummarizer(BaseTest):
         content_summary = summarizer.summarize_single(self.CODE_CONTENT, a_id="file.py")
         self.assertEqual(content_summary, CODE_SUMMARY)
 
-    @mock_openai
+    @mock_anthropic
     def test_summarize_bulk(self, response_manager: TestAIManager):
         """
         Tests ability to summarize in bulk while still using chunkers.
@@ -85,7 +82,7 @@ class TestSummarizer(BaseTest):
         self.assertEqual(NL_SUMMARY, summaries[0])
         self.assertEqual(PL_SUMMARY, summaries[1])
 
-    @mock_openai
+    @mock_anthropic
     def test_summarize_bulk_summarize_code_only(self, response_manager: TestAIManager):
         """
         Tests bulk summaries with code or exceeds limit only.
@@ -150,8 +147,7 @@ class TestSummarizer(BaseTest):
     def get_summarizer(self, **kwargs):
         internal_kwargs = {"summarize_code_only": False}
         internal_kwargs.update(kwargs)
-        llm_manager = OpenAIManager(OpenAIArgs())
-        summarizer = ArtifactsSummarizer(llm_manager_for_artifact_summaries=llm_manager, **internal_kwargs)
+        summarizer = ArtifactsSummarizer(**internal_kwargs)
         return summarizer
 
     @staticmethod
@@ -162,7 +158,7 @@ class TestSummarizer(BaseTest):
         return orig_content
 
     @staticmethod
-    def get_chunk_summary_prompts(prompt_args: PromptArgs, summarizer):
+    def get_chunk_summary_prompts(prompt_args: LLMPromptBuildArgs, summarizer):
         def build_prompt(chunk):
             prompt_dict = summarizer.code_prompt_builder.build(prompt_args,
                                                                artifact={ArtifactKeys.CONTENT: chunk})

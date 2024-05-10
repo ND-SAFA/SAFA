@@ -6,6 +6,7 @@ from tgen.common.util.dataclass_util import DataclassUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 
 TASK_HEADER = 'TASKS:'
@@ -16,19 +17,20 @@ class MultiPrompt(Prompt):
     Contains a list of questions for the model to answer
     """
 
-    def __init__(self, child_prompts: Union[List[Prompt], Dict[int, Prompt]], main_prompt_value: str = EMPTY_STRING, **prompt_vars):
+    def __init__(self, child_prompts: Union[List[Prompt], Dict[int, Prompt]], main_prompt_value: str = EMPTY_STRING,
+                 prompt_args: PromptArgs = None, response_manager: PromptResponseManager = None):
         """
         Selects a prompt based on some condition.
         :param child_prompts: List of all candidate prompts that can be used.
-        :param prompt_selector: The prompt will selected based on the conditional value.
         :param main_prompt_value: The value of the main prompt.
-        :param prompt_vars: Any additional params for the prompt class.
+        :param prompt_args: Any additional params for the prompt class.
+        :param response_manager: Handles response parsing from LLM.
         """
         if isinstance(child_prompts, Dict):
             starting_number = min(child_prompts.keys())
             child_prompts = [child_prompts[i] for i in range(starting_number, len(child_prompts) + starting_number)]
         self.child_prompts = [deepcopy(prompt) for prompt in child_prompts]
-        super().__init__(main_prompt_value, **prompt_vars)
+        super().__init__(main_prompt_value, prompt_args=prompt_args, response_manager=response_manager)
 
     def get_response_tags_for_prompt(self, prompt_index: int) -> Union[str, List[str]]:
         """

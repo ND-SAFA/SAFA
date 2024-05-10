@@ -5,13 +5,12 @@ from tgen.core.args.anthropic_args import AnthropicArgs
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.trainer_task import TrainerTask
-from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.llm_job import LLMJob
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.models.llm.anthropic_manager import AnthropicManager
@@ -27,11 +26,11 @@ class TracingJob(AbstractJob):
     Performs filtering with little claude before ranking with big claude.
     """
 
-    def __init__(self, dataset_creator: AbstractDatasetCreator, select_top_predictions: bool = True,
+    def __init__(self, job_args: JobArgs, select_top_predictions: bool = True,
                  filter_llm_manager: AbstractLLMManager = None, prediction_threshold: float = 0.5):
         """
         Constructs job for dataset at given role.
-        :param dataset_creator: Creates the dataset to evaluate.
+        :param job_args: Contains dataset and other common arguments to jobs in general.
         :param select_top_predictions: If true, selects the top predictions. Otherwise, all predictions are returned.
         :param filter_llm_manager: The llm manager to classify trace links into buckets.
         :param prediction_threshold: The threshold (in percentile) to apply to consider a prediction as positive.
@@ -39,8 +38,7 @@ class TracingJob(AbstractJob):
         if filter_llm_manager is None:
             llm_args = AnthropicArgs(model="claude-instant-v1", temperature=0)
             filter_llm_manager = AnthropicManager(llm_args=llm_args)
-        super().__init__()
-        self.dataset_creator = dataset_creator
+        super().__init__(job_args, require_data=True)
         self.filter_llm_manager = filter_llm_manager
         self.select_top_predictions = select_top_predictions
         self.prediction_threshold = prediction_threshold
@@ -51,8 +49,8 @@ class TracingJob(AbstractJob):
         :param kwargs: Any keyword arguments.
         :return: The trace output.
         """
-        trainer_dataset_manager = TrainerDatasetManager(eval_dataset_creator=self.dataset_creator)
-        dataset: TraceDataset = trainer_dataset_manager[DatasetRole.EVAL]
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets(eval=self.job_args.dataset)
+        dataset: TraceDataset = self.job_args.dataset
         dataset.artifact_df.drop_large_files()
         prompt_dataset = PromptDataset(trace_dataset=dataset)
 

@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Union
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.override import overrides
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 
@@ -29,6 +30,7 @@ class SelectQuestionPrompt(QuestionPrompt):
                  response_tag: str = None,
                  multiple_responses_allowed: bool = False,
                  categories_are_continuous: bool = False,
+                 prompt_args: PromptArgs = None,
                  **response_manager_args):
         """
         Initializes the prompt with the categories that a model can select
@@ -39,7 +41,8 @@ class SelectQuestionPrompt(QuestionPrompt):
         :param response_format: The format of the response
         :param response_tag: The tag to use for the response
         :param multiple_responses_allowed: If True, accepts multiple answers instead of a single category
-        :param default_factory: Method to define a default if response is not as expected
+        :param default_factory: Method to define a default if response is not as expected.
+        :param prompt_args: The args to the base prompt.
         :param categories_are_continuous: Whether categories contain continous variables.
         """
         expected_responses = None
@@ -67,7 +70,7 @@ class SelectQuestionPrompt(QuestionPrompt):
                                                  if expected_responses is None else expected_responses,
                                                  expected_response_type=type(category_names[0]),
                                                  **response_manager_args)
-        super().__init__(f"{question}{self.instructions}",
+        super().__init__(f"{question}{self.instructions}", prompt_args=prompt_args,
                          response_manager=response_manager)
 
     @overrides(QuestionPrompt)

@@ -1,7 +1,7 @@
 import re
 import string
 import uuid
-from typing import List, Union, Set, Dict
+from typing import List, Union, Set, Dict, Tuple
 
 from nltk.corpus import stopwords
 
@@ -233,3 +233,26 @@ class StrUtil:
         input_string += SPACE
         pattern = re.compile(r'[.!?;]+ ')
         return [line.strip() for line in re.split(pattern, input_string) if line.strip()]
+
+    @staticmethod
+    def find_start_and_end_loc(main_string: str, string2find: str,
+                               ignore_case: bool = False,
+                               start: int = 0, end: int = None) -> Tuple[int, int]:
+        """
+        Finds the start and end location of the concept.
+        :param main_string: The artifact content to find concept in.
+        :param string2find: The concept to find.
+        :param ignore_case: If True, makes everything lower case.
+        :param start: The index to start at.
+        :param end: The index to end at.
+        :return: The start and end location of the concept.
+        """
+        if ignore_case:
+            main_string = main_string.lower()
+            string2find = string2find.lower()
+        end = len(main_string) if end is None else end
+        start_index = main_string.find(string2find, start, end)
+        end_index = start_index
+        if start_index > -1:
+            end_index += len(string2find)
+        return start_index, end_index

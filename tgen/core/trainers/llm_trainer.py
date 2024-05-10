@@ -1,11 +1,12 @@
 import json
 from collections import OrderedDict
-from typing import Any, Dict, List, Union, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from openai.api_resources.fine_tune import FineTune
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.core.args.open_ai_args import OpenAIParams
@@ -68,13 +69,15 @@ class LLMTrainer(AbstractTrainer):
         return res
 
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,
-                           datasets: Union[List[iDataset], iDataset] = None, prompts: List[str] = None,
+                           datasets: Union[List[iDataset], iDataset] = None, message_prompts: List[str] = None,
+                           system_prompts: List[str] = None,
                            save_and_load_path: str = EMPTY_STRING, raise_exception: bool = True) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
         :param datasets: The dataset to use instead of from the dataset manager
-        :param prompts: The list of prompts to use instead of making from the dataset
+        :param message_prompts: The list of prompts to use instead of making from the dataset
+        :param system_prompts: List of existing system prompts if applicable.
         :param save_and_load_path: The path to load or save response
         :param raise_exception: If True, raises an exception if a response fails
         :return: THe prediction response
@@ -82,7 +85,7 @@ class LLMTrainer(AbstractTrainer):
         assert not save_and_load_path or save_and_load_path.endswith(FileUtil.YAML_EXT), "Response must be saved to yaml file."
 
         datasets = self._get_dataset(dataset_role, datasets)
-        prompt_df, prompts = self._get_prompts_for_predictions(datasets, prompts)
+        prompt_df, message_prompts, system_prompts = self._get_prompts_for_predictions(datasets, message_prompts, system_prompts)
 
         reloaded = LLMResponseUtil.reload_responses(save_and_load_path)
         missing_generations = isinstance(reloaded, List) or reloaded is None
@@ -90,7 +93,8 @@ class LLMTrainer(AbstractTrainer):
         if missing_generations:
             res = self.llm_manager.make_completion_request(
                 completion_type=self.completion_type,
-                prompt=prompts,
+                prompt=message_prompts,
+                system=system_prompts,
                 original_responses=reloaded,
                 raise_exception=raise_exception and not save_and_load_path)
             LLMResponseUtil.save_responses(res, save_and_load_path)
@@ -100,7 +104,7 @@ class LLMTrainer(AbstractTrainer):
         LLMResponseUtil.get_failed_responses(res, raise_exception=raise_exception)
 
         batch_responses = LLMResponseUtil.get_batch_responses(res)
-        debugging = [p + NEW_LINE + str(r) for p, r in zip(prompts, batch_responses)]
+        debugging = [p + NEW_LINE + str(r) for p, r in zip(message_prompts, batch_responses)]
         prompt_builder_map = OrderedDict({prompt_builder.id: prompt_builder
                                           for prompt_builder in (self.prompt_builders
                                                                  if isinstance(self.prompt_builders, list)
@@ -116,34 +120,50 @@ class LLMTrainer(AbstractTrainer):
 
     @staticmethod
     def predict_from_prompts(llm_manager: AbstractLLMManager,
-                             prompt_builder: PromptBuilder,
-                             prompts: List[Prompt] = None,
+                             prompt_builders: Union[PromptBuilder, List[PromptBuilder]] = None,
+                             message_prompts: List[Prompt] = None,
+                             system_prompts: List[Prompt] = None,
                              save_and_load_path: str = EMPTY_STRING,
                              raise_exception: bool = True,
                              **prompt_kwargs) -> TracePredictionOutput:
         """
         Makes generation predictions from a list of prompts
         :param llm_manager: The llm manager to use for predictions
-        :param prompt_builder: The prompt builder to parse the response (or additionally create prompts)
-        :param prompts: The list of prompts to use unless built from prompt_builder
+        :param prompt_builders: The prompt builder to parse the response (or additionally create prompts)
+        :param message_prompts: The list of prompts to use unless built from prompt_builder
+        :param system_prompts: List of existing system prompts if applicable.
         :param save_and_load_path: Path used to load or save predictions
-         :param raise_exception: If True, raises an exception if a response fails
+        :param raise_exception: If True, raises an exception if a response fails
         :param prompt_kwargs: Additional arguments used when building prompts (optionally)
         :return: The output from the predictions
         """
-        if not prompts:
-            prompts = [prompt_builder.build(llm_manager.prompt_args, **prompt_kwargs)[PromptKeys.PROMPT]]
-        prompt_df = PromptDataFrame({PromptKeys.PROMPT: prompts,
-                                     PromptKeys.COMPLETION: [EMPTY_STRING for _ in prompts],
-                                     PromptKeys.PROMPT_BUILDER_ID: [prompt_builder.id for _ in prompts]})
+        if not isinstance(prompt_builders, list):
+            prompt_builders = [prompt_builders]
+        if not message_prompts:
+            prompt_dicts = [pb.build(llm_manager.prompt_args, **prompt_kwargs) for pb in prompt_builders]
+            message_prompts = [prompt[PromptKeys.PROMPT] for prompt in prompt_dicts]
+            system_prompts = [prompt[PromptKeys.SYSTEM] for prompt in prompt_dicts]
+        if not system_prompts:
+            system_prompts = [None for _ in message_prompts]
+
+        prompt_builder_ids = [pb.id for pb in prompt_builders]
+        if len(prompt_builder_ids) != len(message_prompts):
+            assert len(prompt_builder_ids) == 1, "Mismatch between # of prompts and builders"
+            prompt_builder_ids = [prompt_builder_ids[0] for _ in message_prompts]
+
+        prompt_df = PromptDataFrame({PromptKeys.PROMPT: message_prompts,
+                                     PromptKeys.COMPLETION: [EMPTY_STRING for _ in message_prompts],
+                                     PromptKeys.PROMPT_BUILDER_ID: prompt_builder_ids,
+                                     PromptKeys.SYSTEM: system_prompts})
         dataset = PromptDataset(prompt_df=prompt_df)
-        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
-        initial_state = LLMTrainerState(llm_manager=llm_manager, prompt_builders=prompt_builder,
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets(eval=dataset)
+        initial_state = LLMTrainerState(llm_manager=llm_manager, prompt_builders=prompt_builders,
                                         trainer_dataset_manager=trainer_dataset_manager)
         trainer = LLMTrainer(initial_state)
         return trainer.perform_prediction(save_and_load_path=save_and_load_path,
                                           raise_exception=raise_exception,
-                                          prompts=list(prompt_df[PromptKeys.PROMPT]))
+                                          message_prompts=list(prompt_df[PromptKeys.PROMPT]),
+                                          system_prompts=system_prompts)
 
     def cleanup(self) -> None:
         """
@@ -228,24 +248,30 @@ class LLMTrainer(AbstractTrainer):
         output = TracePredictionOutput(prediction_entries=prediction_entries, metrics=all_metrics, label_ids=all_label_ids)
         return output
 
-    def _get_prompts_for_predictions(self, datasets: Optional[List[PromptDataset]], prompts: List[str] = None) -> Tuple[
-        PromptDataFrame, List[str]]:
+    def _get_prompts_for_predictions(self, datasets: Optional[List[PromptDataset]],
+                                     message_prompts: List[str] = None,
+                                     system_prompts: List[str] = None) -> Tuple[PromptDataFrame, List[str], List[Optional[str]]]:
         """
         Gets the prompts to use for prediction.
         :param datasets: Dataset to fill in artifacts and traces in the prompt.
-        :param prompts: List of existing prompts if applicable.
+        :param message_prompts: List of existing message prompts if applicable.
+        :param system_prompts: List of existing system prompts if applicable.
         :return: The prompts dataframe and list of corresponding prompts.
         """
-        if not prompts:
+        if not message_prompts:
             prompt_df = self._create_prompts_for_prediction(datasets, self.prompt_builders)
-            prompts = list(prompt_df[PromptKeys.PROMPT])
+            message_prompts = list(prompt_df[PromptKeys.PROMPT])
         else:
             if datasets:
                 assert len(datasets) == 1, "If prompts are provided, only one dataset may be used"
                 prompt_df = datasets[0].get_prompt_dataframe()
             else:
-                prompt_df = PromptDataFrame({PromptKeys.PROMPT: prompts})
-        return prompt_df, prompts
+                system_prompts = [None for _ in message_prompts] if not system_prompts else system_prompts
+                prompt_df = PromptDataFrame({PromptKeys.PROMPT: message_prompts,
+                                             PromptKeys.SYSTEM: system_prompts})
+        if not system_prompts:
+            system_prompts = [DataFrameUtil.get_optional_value_from_df(row, PromptKeys.SYSTEM) for _, row in prompt_df.itertuples()]
+        return prompt_df, message_prompts, system_prompts
 
     def _create_prompts_for_prediction(self, datasets: Union[PromptDataset, List[PromptDataset]],
                                        prompt_builders: Union[PromptBuilder, List[PromptBuilder]]) -> PromptDataFrame:

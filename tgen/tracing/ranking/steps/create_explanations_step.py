@@ -11,7 +11,6 @@ from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
@@ -55,8 +54,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         prompt_builder = CreateExplanationsStep._create_prompt_builder(state)
         prompt_builder.format_prompts_with_var(target_type=args.types_to_trace[0], source_type=args.types_to_trace[1])
 
-        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL:
-                                                                                  PromptDataset(trace_dataset=filter_dataset)})
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets(eval=PromptDataset(trace_dataset=filter_dataset))
         save_and_load_path = LLMResponseUtil.generate_response_save_and_load_path(
             state.get_path_to_state_checkpoint(args.export_dir), "explanation_response") if args.export_dir else args.export_dir
         trainer = LLMTrainer(LLMTrainerState(llm_manager=args.explanation_llm_model, prompt_builders=prompt_builder,
@@ -64,7 +62,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         predictions = trainer.perform_prediction(save_and_load_path=save_and_load_path).predictions
         task_prompt: QuestionnairePrompt = prompt_builder.prompts[-1]
         parsed = LLMResponseUtil.extract_predictions_from_response(predictions,
-                                                                   response_prompt_ids=task_prompt.id)
+                                                                   response_prompt_ids=task_prompt.args.prompt_id)
 
         return parsed
 
@@ -127,7 +125,7 @@ class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):
         prompt_builder.add_prompt(MultiArtifactPrompt(build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN,
                                                       data_type=MultiArtifactPrompt.DataType.TRACES,
                                                       include_ids=True,
-                                                      prompt_prefix=PromptUtil.as_markdown_header("ARTIFACTS")
+                                                      prompt_start=PromptUtil.as_markdown_header("ARTIFACTS")
                                                       ))
         task_prompt: QuestionnairePrompt = SupportedPrompts.EXPLANATION_TASK.value
         score_prompt = task_prompt.get_prompt_by_primary_tag(RANKING_SCORE_TAG)

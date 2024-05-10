@@ -11,7 +11,7 @@ def anthropic_response_formatter(responses: List[str]):
     """
     assert isinstance(responses, list), "Expected list as response from anthropic mock."
     assert len(responses) == 1, "Expected single response in anthropic responses."
-    res = AttrDict({"completion": responses[0]})
+    res = AttrDict({"content": [AttrDict({"text": responses[0]})]})
     return res
 
 

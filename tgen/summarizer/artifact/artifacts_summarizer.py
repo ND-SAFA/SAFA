@@ -21,6 +21,7 @@ from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX, \
     NL_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX
@@ -306,6 +307,6 @@ class ArtifactsSummarizer(BaseObject):
                 prompts.insert(0, context_prompt)
             if project_summary_string:
                 prompts.insert(0, summary_prefixes[i])
-                prompts.insert(1, Prompt(project_summary_string, allow_formatting=False))
+                prompts.insert(1, Prompt(project_summary_string, prompt_args=PromptArgs(allow_formatting=False)))
             prompt_builders.append(PromptBuilder(prompts=prompts))
         return prompt_builders[0], prompt_builders[1]

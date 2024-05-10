@@ -7,7 +7,7 @@ from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, UNDERSCORE
 from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS, PS_QUESTIONS_HEADER, \
     USE_PROJECT_SUMMARY_SECTIONS
-from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_SUMMARY_TOKENS, BODY_VERSION_TITLE
+from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_COMPLETION_TOKENS, BODY_VERSION_TITLE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.file_util import FileUtil
@@ -18,12 +18,12 @@ from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
@@ -37,7 +37,7 @@ class ProjectSummarizer(BaseObject):
 
     def __init__(self, summarizer_args: SummarizerArgs, dataset: PromptDataset = None,
                  project_summary_versions: List[Summary] = None,
-                 reload_existing: bool = True, n_tokens: int = DEFAULT_SUMMARY_TOKENS,
+                 reload_existing: bool = True, n_tokens: int = DEFAULT_COMPLETION_TOKENS,
                  summarizer_id: str = str(uuid.uuid4())):
         """
         Generates a system specification document for containing all artifacts.
@@ -200,14 +200,15 @@ class ProjectSummarizer(BaseObject):
         self.llm_manager.llm_args.set_max_tokens(self.n_tokens)
         self.llm_manager.llm_args.temperature = 0
 
-        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
+        trainer_dataset_manager = TrainerDatasetManager.create_from_datasets(eval=dataset)
         trainer = LLMTrainer(LLMTrainerState(llm_manager=self.llm_manager,
                                              prompt_builders=list(prompt_builders.values()),
                                              trainer_dataset_manager=trainer_dataset_manager))
         save_and_load_path = self._get_responses_save_and_load_path(list(prompt_builders.keys()))
         res = trainer.perform_prediction(raise_exception=False, save_and_load_path=save_and_load_path)
         failures = {i for i, r in enumerate(res.original_response) if isinstance(r, Exception)}
-        parsed_responses = [(res.predictions[i][prompt_builder.get_prompt(-1).id] if i not in failures else res.original_response[i])
+        parsed_responses = [(res.predictions[i][prompt_builder.get_prompt(-1).args.prompt_id]
+                             if i not in failures else res.original_response[i])
                             for i, prompt_builder in enumerate(prompt_builders.values())]
         return parsed_responses
 
@@ -222,8 +223,8 @@ class ProjectSummarizer(BaseObject):
                                                                 f"to be a {QuestionnairePrompt.__class__.__name__}"
         content_prompt = SupportedPrompts.PROJECT_SUMMARY_CONTEXT_ARTIFACTS.value if self.dataset \
             else SupportedPrompts.PROJECT_SUMMARY_CONTEXT_VERSIONS.value
-        prompt_prefix = BODY_ARTIFACT_TITLE if self.dataset else BODY_VERSION_TITLE
-        artifacts_prompt = MultiArtifactPrompt(prompt_prefix=prompt_prefix,
+        prompt_start = BODY_ARTIFACT_TITLE if self.dataset else BODY_VERSION_TITLE
+        artifacts_prompt = MultiArtifactPrompt(prompt_start=prompt_start,
                                                build_method=MultiArtifactPrompt.BuildMethod.XML,
                                                xml_tags=ArtifactPrompt.DEFAULT_XML_TAGS
                                                if self.dataset else {"versions": ["id", "body"]},
@@ -237,7 +238,8 @@ class ProjectSummarizer(BaseObject):
                                                 section_prompt])
         if self.project_summary and section_id in USE_PROJECT_SUMMARY_SECTIONS:
             current_summary = self.project_summary.to_string()
-            prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}", allow_formatting=False), 1)
+            prompt_builder.add_prompt(Prompt(f"# Current Document\n\n{current_summary}",
+                                             prompt_args=PromptArgs(allow_formatting=False)), 1)
         return prompt_builder
 
     @staticmethod

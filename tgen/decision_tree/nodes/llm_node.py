@@ -34,7 +34,7 @@ class LLMNode(AbstractNode):
                                       response_format="Enclose your answer in {}",
                                       response_tag=RESPONSE_TAG,
                                       loose_response_validation=True)
-        prompt.id = PROMPT_ID
+        prompt.args.prompt_id = PROMPT_ID
         prompt.format_value(**input_variables)
         builder = PromptBuilder([prompt])
         return builder

@@ -7,7 +7,6 @@ from tgen.common.objects.chunk import Chunk
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.override import overrides
 from tgen.common.util.str_util import StrUtil
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
 from tgen.data.chunkers.sentence_chunker import SentenceChunker
@@ -24,19 +23,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
     """
 
     OPTIONAL_COLUMNS = [StructuredKeys.Artifact.SUMMARY.value, StructuredKeys.Artifact.CHUNKS.value]
-    _DEFAULT_FOR_OPTIONAL_COLS = None
-
-    @overrides(AbstractProjectDataFrame)
-    def process_data(self) -> None:
-        """
-        Sets the index of the dataframe and performs any other processing steps
-        :return: None
-        """
-        super().process_data()
-        if not self.empty:
-            for col in self.OPTIONAL_COLUMNS:
-                if col not in self.columns:
-                    self[col] = [self._DEFAULT_FOR_OPTIONAL_COLS for _ in self.index]
+    DEFAULT_FOR_OPTIONAL_COLS = EnumDict({StructuredKeys.Artifact.SUMMARY: None, StructuredKeys.Artifact.CHUNKS: None})
 
     @classmethod
     def index_name(cls) -> str:
@@ -77,8 +64,9 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         for a in artifacts:
             self.add_artifact(**a)
 
-    def add_artifact(self, a_id: Any, content: str, layer_id: Any = "1", summary: str = _DEFAULT_FOR_OPTIONAL_COLS,
-                     chunks: List[str] = _DEFAULT_FOR_OPTIONAL_COLS) -> EnumDict:
+    def add_artifact(self, a_id: Any, content: str, layer_id: Any = "1",
+                     summary: str = DEFAULT_FOR_OPTIONAL_COLS[ArtifactKeys.SUMMARY],
+                     chunks: List[str] = DEFAULT_FOR_OPTIONAL_COLS[ArtifactKeys.CHUNKS]) -> EnumDict:
         """
         Adds artifact to dataframe
         :param a_id: The id of the Artifact
@@ -90,7 +78,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         row_as_dict = {ArtifactKeys.ID: a_id, ArtifactKeys.CONTENT: content, ArtifactKeys.LAYER_ID: layer_id,
                        ArtifactKeys.SUMMARY: summary, ArtifactKeys.CHUNKS: chunks}
-        return self.add_or_update_row(row_as_dict)
+        return self.add_row(row_as_dict)
 
     def get_artifact(self, artifact_id: Any, throw_exception: bool = False) -> EnumDict:
         """
@@ -160,12 +148,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         Converts entries in data frame to converts.
         :return: The list of artifacts.
         """
-        artifacts = [Artifact(id=artifact_id,
-                              content=artifact_row[ArtifactKeys.CONTENT],
-                              layer_id=artifact_row[ArtifactKeys.LAYER_ID],
-                              summary=artifact_row[ArtifactKeys.SUMMARY],
-                              chunks=artifact_row[ArtifactKeys.CHUNKS])
-                     for artifact_id, artifact_row in self.itertuples()]
+        artifacts = [Artifact(**artifact_row) for artifact_id, artifact_row in self.itertuples()]
         return artifacts
 
     def get_body(self, artifact_id: str) -> str:

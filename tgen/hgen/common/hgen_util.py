@@ -15,7 +15,6 @@ from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.models.llm.llm_task import LLMCompletionType
@@ -58,10 +57,10 @@ class HGenUtil:
         load_path = FileUtil.safely_join_paths(hgen_args.load_dir, file_name)
         load_path = FileUtil.add_ext(load_path, FileUtil.YAML_EXT) if load_path else load_path
         if dataset is None:
-            predictions = LLMTrainer.predict_from_prompts(llm_manager=llm_manager, prompt_builder=prompt_builder,
+            predictions = LLMTrainer.predict_from_prompts(llm_manager=llm_manager, prompt_builders=prompt_builder,
                                                           save_and_load_path=load_path).predictions
         else:
-            dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
+            dataset_manager = TrainerDatasetManager.create_from_datasets(eval=dataset)
             trainer = LLMTrainer(LLMTrainerState(llm_manager=llm_manager,
                                                  trainer_dataset_manager=dataset_manager,
                                                  prompt_builders=prompt_builder,
@@ -112,7 +111,7 @@ class HGenUtil:
                     predictions_path = FileUtil.safely_join_paths(hgen_args.export_dir, filename)
                     names = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args,
                                                      prediction_step=PredictionStep.NAME,
-                                                     dataset=dataset, response_prompt_ids=name_prompt.id,
+                                                     dataset=dataset, response_prompt_ids=name_prompt.args.prompt_id,
                                                      tags_for_response=name_prompt.response_manager.response_tag,
                                                      return_first=True,
                                                      export_path=predictions_path)

@@ -1,10 +1,10 @@
-import uuid
 from typing import Any, Dict, List
 
-from tgen.common.constants.deliminator_constants import SPACE, NEW_LINE
+from tgen.common.constants.deliminator_constants import SPACE, NEW_LINE, EMPTY_STRING
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
+from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 
 
@@ -14,21 +14,18 @@ class Prompt:
     """
     SEED = 1
 
-    def __init__(self, value: str, response_manager: PromptResponseManager = None, prompt_id: str = None, title: str = None,
-                 allow_formatting: bool = True):
+    def __init__(self, value: str = EMPTY_STRING, prompt_args: PromptArgs = None,
+                 response_manager: PromptResponseManager = None):
         """
         Initialize with the value of the prompt
-        :param value: The value of the prompt
-        :param response_manager: Handles creating response instructions and parsing response
-        :param prompt_id: Specify specific id for the prompt
-        :param title: The markdown style title to put at the start of the prompt text.
-        :param allow_formatting: Whether to allow formatting the prompts.
+        :param value: The content of the prompt.
+        :param prompt_args: The arguments defining the prompt.
+        :param response_manager: Handles parsing responses from the LLM.
         """
         self.value = value
-        self.title = title
-        self.id = prompt_id if prompt_id is not None else str(uuid.uuid5(uuid.NAMESPACE_DNS, str(Prompt.SEED)))
+        self.args = prompt_args if prompt_args else PromptArgs()
+        self.args.set_id(Prompt.SEED)
         self.response_manager = response_manager if response_manager else PromptResponseManager(include_response_instructions=False)
-        self.allow_formatting = allow_formatting
         Prompt.SEED += 1
 
     def build(self, **kwargs) -> str:
@@ -51,7 +48,7 @@ class Prompt:
         :param kwargs: Key, value pairs to format the prompt with
         :return: The formatted value
         """
-        if not self.allow_formatting:
+        if not self.args.allow_formatting:
             return self.value
         value = StrUtil.format_selective(self.value, *args, **kwargs)
         if update_value:
@@ -73,6 +70,17 @@ class Prompt:
         """
         return self.response_manager.get_all_tag_ids()
 
+    def structure_value(self, value: str = None, value_prefix: str = EMPTY_STRING, value_suffix: str = EMPTY_STRING):
+        """
+        Gets the value with any additional prefix or suffix added.
+        :param value: The value to structure.
+        :param value_prefix: Goes before the value.
+        :param value_suffix: Goes after the value.
+        :return: The value with any additional prefix or suffix added.
+        """
+        value = self.value if not value else value
+        return f"{value_prefix}{value}{value_suffix}" if self.value else EMPTY_STRING
+
     def _build(self, **kwargs) -> str:
         """
         Used to fulfill api, specific method of building for a prompt may be defined in child classes
@@ -81,8 +89,8 @@ class Prompt:
         """
         update_value = DictUtil.get_kwarg_values(kwargs=kwargs, update_value=False, pop=True)
         value = self.format_value(update_value=update_value, **kwargs)
-        if self.title:
-            value = f"{PromptUtil.as_markdown_header(self.title)}{NEW_LINE}{value}"
+        if self.args.title:
+            value = f"{PromptUtil.as_markdown_header(self.args.title)}{NEW_LINE}{value}"
         return value
 
     def __repr__(self) -> str:

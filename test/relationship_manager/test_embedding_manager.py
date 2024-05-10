@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 import numpy as np
 from sentence_transformers.SentenceTransformer import SentenceTransformer
 
+from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.yaml_util import YamlUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -65,7 +66,7 @@ class TestEmbeddingManager(BaseTest):
         content_map2 = {"new_artifact1": "a1",
                         "new_artifact2": "a2"}
         embedding_manager2 = EmbeddingsManager(content_map=content_map2,
-                                               model_name="sentence-transformers/all-MiniLM-L6-v2")
+                                               model_name=SMALL_EMBEDDING_MODEL)
         embedding_manager2.create_embedding_map(subset_ids=["new_artifact1"])
         embedding_manager1.merge(embedding_manager2)
         content_map1.update(content_map2)
@@ -83,5 +84,5 @@ class TestEmbeddingManager(BaseTest):
         embedding_arrays = [np.asarray(emb) for emb in embeddings]
         if encode_mock:
             encode_mock.side_effect = [embedding_arrays[:3], embedding_arrays[3:]]
-        embedding_manager = EmbeddingsManager(content_map=content_map, model_name="sentence-transformers/all-MiniLM-L6-v2")
+        embedding_manager = EmbeddingsManager(content_map=content_map, model_name=SMALL_EMBEDDING_MODEL)
         return content_map, embedding_manager

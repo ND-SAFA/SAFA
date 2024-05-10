@@ -1,87 +1,47 @@
-from test.contradictions.data_test_requirements import REQUIREMENTS, get_artifact_content, get_response_for_req, R2, R3, R1, R4, R5
-from tgen.common.objects.artifact import Artifact
+from test.contradictions.data_test_requirements import get_contradictions_dataset, EXPECTED_CONTRADICTIONS
+from tgen.common.constants.deliminator_constants import COMMA
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.contradictions.common_choices import CommonChoices
-from tgen.contradictions.contradiction_decision_nodes import SupportedContradictionDecisionNodes
+from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.contradictions.contradictions_detector import ContradictionsDetector
-from tgen.contradictions.contradictions_tree_builder import ContradictionsTreeBuilder
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys, LayerKeys
-from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.decision_tree.nodes.llm_node import LLMNode
+from tgen.data.keys.structure_keys import TraceKeys, TraceRelationshipType
+from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_openai import mock_openai
+from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestContradictionsDetector(BaseTest):
-    LAYER_ID = "requirement"
 
-    @mock_openai
+    @mock_anthropic
     def test_detect_all(self, test_ai_manager: TestAIManager):
-        responses = [get_response_for_req(r) for r in REQUIREMENTS]
-        responses.extend([self.fake_question_answers for i in range(8)])
-        test_ai_manager.set_responses(responses)
-        content = [get_artifact_content(r) for r in REQUIREMENTS]
-        artifact_df = ArtifactDataFrame({ArtifactKeys.ID: [str(i + 1) for i in range(len(content))],
-                                         ArtifactKeys.CONTENT: content,
-                                         ArtifactKeys.LAYER_ID: [self.LAYER_ID for _ in range(len(content))]})
-        links = [("1", "2"), ("2", "3"), ("1", "4"), ("4", "5")]
-        expected_outcomes = [SupportedContradictionDecisionNodes.IDEM_CONTRADICTION,
-                             SupportedContradictionDecisionNodes.SIMPLEX_CONTRADICTION,
-                             SupportedContradictionDecisionNodes.NONE,
-                             SupportedContradictionDecisionNodes.ALIUS_CONTRADICTION,
-                             ]
-        trace_df = TraceDataFrame({TraceKeys.SOURCE: [link[0] for link in links], TraceKeys.TARGET: [link[1] for link in links]})
-        trace_dataset = TraceDataset(artifact_df, trace_df, LayerDataFrame({LayerKeys.SOURCE_TYPE: [self.LAYER_ID],
-                                                                            LayerKeys.TARGET_TYPE: [self.LAYER_ID]}))
-        detector = ContradictionsDetector(trace_dataset)
-        results = detector.detect_all()
-        for i, link in enumerate(links):
-            expected_outcome = expected_outcomes[i]
-            trace_id = trace_df.get_link(source_id=link[0], target_id=link[1])[TraceKeys.LINK_ID]
-            if expected_outcome != SupportedContradictionDecisionNodes.NONE:
-                self.assertIn(trace_id,
-                              results[expected_outcome.value.description])
-            else:
-                self.assertFalse(any([trace_id in contradictions for contradictions in results.values()]))
+        task_prompt: QuestionnairePrompt = SupportedPrompts.CONTRADICTIONS_TASK.value
+        contradictions_tag = task_prompt.get_response_tags_for_prompt(0)
+        explanation_tag = task_prompt.get_response_tags_for_prompt(1)
+        contradicting_id = "2"
+        explanation = "This is why there is a contradiction."
+        test_ai_manager.set_responses(
+            [PromptUtil.create_xml(contradictions_tag, COMMA.join(EXPECTED_CONTRADICTIONS[contradicting_id] + ["3", "bad id"])) +
+             PromptUtil.create_xml(explanation_tag, explanation),
+             PromptUtil.create_xml(contradictions_tag, "There are no contradictions"),
+             PromptUtil.create_xml(contradictions_tag, "No")])
 
-    @mock_openai
-    def test_single(self, test_ai_manager: TestAIManager):
-        responses = [get_response_for_req(r) for r in [R1, R2]]
-        responses.extend([self.fake_question_answers for i in range(2)])
-        test_ai_manager.set_responses(responses)
-        path = ContradictionsDetector.detect_single_pair(Artifact(id="1", content=get_artifact_content(R1), layer_id=self.LAYER_ID),
-                                                         Artifact(id="2", content=get_artifact_content(R2), layer_id=self.LAYER_ID))
-        self.assertEqual(path.get_final_decision(), SupportedContradictionDecisionNodes.IDEM_CONTRADICTION.value.description)
+        args = ContradictionsArgs(dataset=get_contradictions_dataset())
+        detector = ContradictionsDetector(args)
+        results = detector.detect(contradicting_id)
+        self.assertEqual(results["conflicting_ids"], EXPECTED_CONTRADICTIONS[contradicting_id])
+        self.assertEqual(results["explanation"], explanation)
+        # check related context added to trace dataframe
+        context_link = args.dataset.trace_dataset.trace_df.get_link(source_id=contradicting_id,
+                                                                    target_id=EXPECTED_CONTRADICTIONS[contradicting_id][0])
+        self.assertIsNotNone(context_link)
+        self.assertEqual(context_link[TraceKeys.RELATIONSHIP_TYPE], TraceRelationshipType.CONTEXT)
 
-    def fake_question_answers(self, prompt: str):
-        q1: LLMNode = ContradictionsTreeBuilder().get_question_node(1).select_branch(CommonChoices.NO)
-        q2: LLMNode = ContradictionsTreeBuilder().get_question_node(2).select_branch(CommonChoices.NO)
-        q3: LLMNode = ContradictionsTreeBuilder().get_question_node(3)
-        q5: LLMNode = ContradictionsTreeBuilder().get_question_node(5).select_branch(CommonChoices.NO)
-        q6: LLMNode = ContradictionsTreeBuilder().get_question_node(6)
-        if q1.get_formatted_question((R2, R3)) in prompt:
-            return PromptUtil.create_xml("answer", CommonChoices.YES)
-        elif q2.get_formatted_question((R1, R2)) in prompt:
-            return PromptUtil.create_xml("answer", CommonChoices.NO)
-        elif q2.get_formatted_question((R2, R3)) in prompt:
-            return PromptUtil.create_xml("answer", CommonChoices.NO)
-        elif q3.get_formatted_question((R1, R2)) in prompt:
-            return PromptUtil.create_xml("answer", CommonChoices.YES)
-        elif q3.get_formatted_question((R2, R3)) in prompt:
-            return PromptUtil.create_xml("answer", CommonChoices.YES)
-        elif q1.get_formatted_question((R1, R4)) in prompt:
-            return PromptUtil.create_xml("answer", CommonChoices.NO)
-        elif q2.get_formatted_question((R4, R5)) in prompt:
-            return PromptUtil.create_xml("answer", CommonChoices.NO)
-        elif q3.get_formatted_question((R4, R5)) in prompt:
-            return PromptUtil.create_xml("answer", CommonChoices.YES)
-        elif q5.get_formatted_question((R4, R5)) in prompt:
-            return PromptUtil.create_xml("answer", CommonChoices.NO)
-        elif q6.get_formatted_question((R4, R5)) in prompt:
-            return PromptUtil.create_xml("answer", CommonChoices.YES)
-        else:
-            print("hi")
+        results = detector.detect("1")
+        self.assertIsNot(results["conflicting_ids"], EXPECTED_CONTRADICTIONS[contradicting_id])
+        self.assertFalse(results["explanation"])
+
+        results = detector.detect("1")
+        self.assertIsNot(results, EXPECTED_CONTRADICTIONS[contradicting_id])
+        self.assertIsNot(results["conflicting_ids"], EXPECTED_CONTRADICTIONS[contradicting_id])
+        self.assertFalse(results["explanation"])

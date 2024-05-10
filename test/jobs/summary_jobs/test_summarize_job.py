@@ -5,6 +5,7 @@ from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.jobs.abstract_job import AbstractJob
+from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
@@ -35,7 +36,8 @@ class TestSummarizeJob(BaseJobTest):
         responses = self.get_summarize_responses()[:self.N_ARTIFACTS]
 
         ai_manager.set_responses(responses)
-        job = SummarizeJob(self.get_project().get_dataset(),
+        job_args = JobArgs(dataset=self.get_project().get_dataset())
+        job = SummarizeJob(job_args,
                            is_subset=True, summarize_code_only=False, do_resummarize_artifacts=True)
         job.run()
         self.assert_output_on_success(job, job.result, resummarized=False)
@@ -71,7 +73,8 @@ class TestSummarizeJob(BaseJobTest):
                 self.assertIn(self.NL_SUMMARY, artifact[ArtifactKeys.SUMMARY])
 
     def _get_job(self) -> AbstractJob:
-        return SummarizeJob(self.get_project().get_dataset(), summarize_code_only=False, do_resummarize_artifacts=True)
+        return SummarizeJob(JobArgs(dataset=self.get_project().get_dataset()),
+                            summarize_code_only=False, do_resummarize_artifacts=True)
 
     def get_project(self):
         return GenerationTestProject()

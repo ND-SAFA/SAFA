@@ -3,7 +3,7 @@ from math import floor
 from tgen.common.constants.deliminator_constants import L_CARROT, R_CARROT
 from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
     RANKING_ID_TAG, RANKING_MAX_SCORE, RANKING_PARENT_SUMMARY_TAG, \
-    RANKING_SCORE_TAG, RANKING_MIN_SCORE, ARTIFACT_HEADER, JUSTIFICATION_TAG, RANKING_EXPLANATION_TAG, DEFAULT_SCORE
+    RANKING_SCORE_TAG, RANKING_MIN_SCORE, ARTIFACT_HEADER, RANKING_EXPLANATION_TAG, DEFAULT_SCORE
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.prompts.prompt import Prompt
@@ -81,8 +81,8 @@ QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps 
                                                                                                     "for EACH artifact inside of {}"),
                                 use_multi_step_task_instructions=True,
                                 question_prompts=[QuestionPrompt("Provide the ID of the artifact being processed ",
-                                                                 PromptResponseManager(response_tag=RANKING_ID_TAG,
-                                                                                       expected_response_type=int)),
+                                                                 response_manager=PromptResponseManager(response_tag=RANKING_ID_TAG,
+                                                                                                        expected_response_type=int)),
                                                   QuestionnairePrompt(instructions=f"Within "
                                                                                    f"{PromptUtil.create_xml(RANKING_EXPLANATION_TAG)} "
                                                                                    f"provide three complete sentences "

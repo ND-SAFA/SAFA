@@ -4,8 +4,8 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.contradictions.common_choices import CommonChoices
-from tgen.contradictions.contradiction_decision_nodes import SupportedContradictionDecisionNodes
-from tgen.contradictions.requirement import RequirementConstituent, Requirement
+from tgen.contradictions.with_decision_tree.contradiction_decision_nodes import SupportedContradictionDecisionNodes
+from tgen.contradictions.with_decision_tree.requirement import RequirementConstituent, Requirement
 from tgen.decision_tree.nodes.abstract_node import AbstractNode
 from tgen.decision_tree.nodes.conditional_node import ConditionalNode
 from tgen.decision_tree.nodes.llm_node import LLMNode

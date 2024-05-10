@@ -12,42 +12,42 @@ DIFF_SUMMARY_TASKS = {
     1: QuestionPrompt("First, check if any imports or dependencies were added or removed "
                       "based only on lines added (+) and removed (-) and summarize it if so. "
                       "Otherwise respond with 'no changes with dependencies or imports'.",
-                      PromptResponseManager(response_tag="dependencies-imports")),
+                      response_manager=PromptResponseManager(response_tag="dependencies-imports")),
     2: QuestionPrompt("Next, check if any variables, methods or class names were renamed "
                       "based only on lines added (+) and removed (-) and summarize it if so. "
                       "Otherwise respond with 'no renaming'.",
-                      PromptResponseManager(response_tag="renamed-vars")),
+                      response_manager=PromptResponseManager(response_tag="renamed-vars")),
     3: QuestionPrompt("Check if the code was restructured or reordered but the overall functionality remained the same"
                       "based only on lines added (+) and removed (-) and summarize it if so. "
                       "Otherwise respond with 'no refactors'",
-                      PromptResponseManager(response_tag="refactored")),
+                      response_manager=PromptResponseManager(response_tag="refactored")),
     4: QuestionPrompt("Check if any new functionality or feature was added based only on lines added (+) and removed (-) "
                       "and summarize it if so. "
                       "Otherwise respond with 'no new functionality'.",
-                      PromptResponseManager(response_tag="new-func")),
+                      response_manager=PromptResponseManager(response_tag="new-func")),
     5: QuestionPrompt("Check if any existing functionality or feature was modified based only on lines added (+) and removed (-)"
                       "and summarize it if so. "
                       "Otherwise respond with 'no modified functionality'",
-                      PromptResponseManager(response_tag="modified-func")),
+                      response_manager=PromptResponseManager(response_tag="modified-func")),
     6: QuestionPrompt("Check if any functionality or feature was removed based only on lines added (+) and removed (-) "
                       "and summarize it if so. "
                       "Otherwise respond with 'no removed functionality'",
-                      PromptResponseManager(response_tag="removed-func")),
+                      response_manager=PromptResponseManager(response_tag="removed-func")),
     7: QuestionPrompt("Check if any bugs were fixed based only on lines added (+) and removed (-) "
                       "and summarize the fixes if so. "
                       "Otherwise respond with 'no bug fixes'.",
-                      PromptResponseManager(response_tag="bug-fixes")),
+                      response_manager=PromptResponseManager(response_tag="bug-fixes")),
     8: QuestionPrompt("Now, using all your responses, summarize the changes that were made to the code. ",
-                      PromptResponseManager(response_tag="summary", required_tag_ids=USE_ALL_TAGS)),
+                      response_manager=PromptResponseManager(response_tag="summary", required_tag_ids=USE_ALL_TAGS)),
     9: QuestionPrompt("Summarize how the changes may impact the system "
                       "Avoid speculation - "
                       "only include potential impacts that can be reasonably inferred from the information provided.",
-                      PromptResponseManager(response_tag="impact", required_tag_ids=USE_ALL_TAGS)),
+                      response_manager=PromptResponseManager(response_tag="impact", required_tag_ids=USE_ALL_TAGS)),
 }
 ADDED_PROMPT = QuestionPrompt("Identify what new functionality was added in this code file",
-                              PromptResponseManager(response_tag="new-func"))
+                              response_manager=PromptResponseManager(response_tag="new-func"))
 DELETED_PROMPT = QuestionPrompt("Identify what existing functionality was removed in this code file",
-                                PromptResponseManager(response_tag="removed-func"))
+                                response_manager=PromptResponseManager(response_tag="removed-func"))
 DIFF_SUMMARY_STARTER_PROMPT = Prompt(f"You are an expert on a software project and a change has recently been made to the project. "
                                      f"Below is a software specification for the project, context/documentation surrounding the code, "
                                      f"the original version of the code file, "
@@ -71,7 +71,7 @@ CHANGE_SUMMARY_TASKS = {
                       "For each group, provide a detailed meaningful description of the change as well as the affected files, "
                       "and ONE change type that BEST describes the change. "
                       "Change types: {categories}.",
-                      PromptResponseManager(
+                      response_manager=PromptResponseManager(
                           value_formatter=lambda tag, val: [v.replace(NEW_LINE, EMPTY_STRING).strip() for v in val.split(COMMA)]
                           if tag == "filenames" or tag == "type" else val,
                           required_tag_ids=USE_ALL_TAGS,
@@ -84,13 +84,13 @@ CHANGE_SUMMARY_TASKS = {
     2: QuestionPrompt("Then, create a summary that gives an overview of all changes and the key highlights. "
                       "The goal of the summary is to consolidate all of the change analysis into a high-level overview that "
                       "captures the most important updates and focuses on communicating the key takeaways. ",
-                      PromptResponseManager(response_tag="low-level-summary", required_tag_ids=USE_ALL_TAGS)),
+                      response_manager=PromptResponseManager(response_tag="low-level-summary", required_tag_ids=USE_ALL_TAGS)),
     3: QuestionPrompt("Finally, summarize the changes "
                       "but in non-technical terms for someone unfamiliar with the codebase. "
                       "Focus on aspects that are most important from a user's perspective, "
                       "based only on the information provided about the system and changes. "
                       "Do not make assumptions or guesses about impact that is not clear from the given information. ",
-                      PromptResponseManager(response_tag="user-level-summary", required_tag_ids=USE_ALL_TAGS)),
+                      response_manager=PromptResponseManager(response_tag="user-level-summary", required_tag_ids=USE_ALL_TAGS)),
 }
 
 CHANGE_SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
@@ -103,5 +103,5 @@ IMPACTS_PROMPT = Prompt("TASK: Based on your understanding of the system, the ch
                         "Consider how the updates may impact "
                         "performance, reliability, security, sustainability, and usability. "
                         "Focus on identifying plausible effects using the information provided, but avoid speculation. ",
-                        PromptResponseManager(response_tag="potential-impact", required_tag_ids=USE_ALL_TAGS)
+                        response_manager=PromptResponseManager(response_tag="potential-impact", required_tag_ids=USE_ALL_TAGS)
                         )

@@ -17,6 +17,7 @@ class SelectByThresholdScaledByArtifacts(iSelector):
         :param threshold: The threshold to filter by
         :param threshold_based_on_dist: If True, calculates a threshold based on the distribution of the data.
         :param min_score: The minimum score in the range (uses the minimum child score if none if provided.
+        :param artifact_type: The type of artifact (parent or child) to normalize by.
         :return: filtered list of entries
         """
         artifact2traces = RankingUtil.group_trace_predictions(candidate_entries, artifact_type)

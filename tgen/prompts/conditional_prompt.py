@@ -3,19 +3,24 @@ from typing import Callable, List
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.prompts.multi_prompt import MultiPrompt
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.prompt_response_manager import PromptResponseManager
 
 
 class ConditionalPrompt(MultiPrompt):
 
-    def __init__(self, candidate_prompts: List[Prompt], prompt_selector: Callable, **prompt_vars):
+    def __init__(self, candidate_prompts: List[Prompt], prompt_selector: Callable,
+                 prompt_args: PromptArgs = None, response_manager: PromptResponseManager = None):
         """
         Selects a prompt based on some condition.
         :param candidate_prompts: List of all candidate prompts that can be chosen
         :param prompt_selector: The prompt will selected based on the conditional value
-        :param prompt_vars: Any additional params for the prompt class
+        :param prompt_args: Any additional params for the prompt class
+        :param response_manager: Handles parsing the response from the LLM.
         """
         self.prompt_selector = prompt_selector
-        super().__init__(main_prompt_value=EMPTY_STRING, child_prompts=candidate_prompts, **prompt_vars)
+        super().__init__(main_prompt_value=EMPTY_STRING, child_prompts=candidate_prompts, prompt_args=prompt_args,
+                         response_manager=response_manager)
 
     def _build(self, **kwargs) -> str:
         """

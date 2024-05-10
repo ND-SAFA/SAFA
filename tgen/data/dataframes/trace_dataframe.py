@@ -1,12 +1,13 @@
-from typing import Any, Dict, List, Set, Type
+from typing import Any, Dict, List, Set, Type, Union
 
 import numpy as np
 
 from tgen.common.objects.trace import Trace
+from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
-from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys, TraceRelationshipType
 
 
 class TraceDataFrame(AbstractProjectDataFrame):
@@ -15,7 +16,12 @@ class TraceDataFrame(AbstractProjectDataFrame):
     """
     OPTIONAL_COLUMNS = [StructuredKeys.Trace.LABEL.value,
                         StructuredKeys.Trace.SCORE.value,
-                        StructuredKeys.Trace.EXPLANATION.value]
+                        StructuredKeys.Trace.EXPLANATION.value,
+                        StructuredKeys.Trace.RELATIONSHIP_TYPE.value]
+    DEFAULT_FOR_OPTIONAL_COLS = EnumDict({StructuredKeys.Trace.RELATIONSHIP_TYPE: TraceRelationshipType.TRACEABILITY,
+                                          StructuredKeys.Trace.LABEL.value: np.NAN,
+                                          StructuredKeys.Trace.SCORE.value: np.NAN,
+                                          StructuredKeys.Trace.EXPLANATION.value: None})
 
     def __init__(self, *args, **kwargs):
         """
@@ -73,7 +79,12 @@ class TraceDataFrame(AbstractProjectDataFrame):
             self.add_link(source=link["source"], target=link["target"], label=link["label"], score=link.get("score", None),
                           explanation=link.get("explanation", None))
 
-    def add_link(self, source: str, target: str, label: int = 0, score: float = np.NAN, explanation: str = None) -> EnumDict:
+    def add_link(self, source: str, target: str,
+                 label: int = DEFAULT_FOR_OPTIONAL_COLS[TraceKeys.LABEL],
+                 score: float = DEFAULT_FOR_OPTIONAL_COLS[TraceKeys.SCORE],
+                 explanation: str = DEFAULT_FOR_OPTIONAL_COLS[TraceKeys.EXPLANATION],
+                 relationship_type: Union[TraceRelationshipType, str] = DEFAULT_FOR_OPTIONAL_COLS[TraceKeys.RELATIONSHIP_TYPE]) \
+            -> EnumDict:
         """
         Adds link to dataframe
         :param source: The id of the source
@@ -81,26 +92,39 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param label: The label of the link (1 if True link, 0 otherwise)
         :param score: The score of the generated links.
         :param explanation: The explanation for generated trace link.
+        :param relationship_type: The type of relationship between the artifacts.
         :return: The newly added link
         """
         link_id = TraceDataFrame.generate_link_id(source, target)
-        return self.add_or_update_row(
-            self.link_as_dict(source_id=source, target_id=target, label=label, link_id=link_id, score=score,
-                              explanation=explanation))
+        return self.add_row(
+            self.link_as_dict(source_id=source, target_id=target, link_id=link_id, label=label, score=score, explanation=explanation,
+                              relationship_type=relationship_type))
 
-    def get_links(self, true_only: bool = False, true_link_threshold: float = None) -> List[EnumDict]:
+    def get_links(self, true_only: bool = False, true_link_threshold: float = 0) -> List[EnumDict]:
         """
         Returns the links in the data frame.
         :param true_only: If True, only returns links with positive id.
         :param true_link_threshold: If selecting positive links only, considers scored links as true if above threshold.
+        (Set to None to only consider links with labels)
         :return: Traces in data frame.
         """
-        true_only = true_only or true_link_threshold is not None
-        links = []
-        for link_id, link in self.itertuples():
-            if not true_only or link[TraceKeys.LABEL] == 1 or (true_link_threshold and link[TraceKeys.SCORE] >= true_link_threshold):
-                links.append(link)
+        true_only = true_only or bool(true_link_threshold)
+        links = [link for link_id, link in self.itertuples() if not true_only or
+                 self.is_true_link(link, true_link_threshold=true_link_threshold)]
         return links
+
+    @staticmethod
+    def is_true_link(link: EnumDict, true_link_threshold: float = 0) -> bool:
+        """
+        Determines whether the link is a true (positive) link.
+        :param link: The link to determine if it is true.
+        :param true_link_threshold: If selecting positive links only, considers scored links as true if above threshold.
+        (Set to None to only consider links with labels)
+        """
+        use_scores = true_link_threshold is not None
+        if link[TraceKeys.LABEL] == 0:
+            return False
+        return link[TraceKeys.LABEL] == 1 or (use_scores and link[TraceKeys.SCORE] >= true_link_threshold)
 
     def get_link(self, link_id: int = None, source_id: Any = None, target_id: Any = None) -> EnumDict:
         """
@@ -116,8 +140,11 @@ class TraceDataFrame(AbstractProjectDataFrame):
         return self.get_row(link_id)
 
     @staticmethod
-    def link_as_dict(source_id: str, target_id: str, label: int = 0, link_id: int = None, score: float = np.NAN,
-                     explanation: str = None) -> Dict[TraceKeys, Any]:
+    def link_as_dict(source_id: str, target_id: str, link_id: int = None, label: int = DEFAULT_FOR_OPTIONAL_COLS[TraceKeys.LABEL],
+                     score: float = DEFAULT_FOR_OPTIONAL_COLS[TraceKeys.SCORE],
+                     explanation: str = DEFAULT_FOR_OPTIONAL_COLS[TraceKeys.EXPLANATION],
+                     relationship_type: str = DEFAULT_FOR_OPTIONAL_COLS[TraceKeys.RELATIONSHIP_TYPE]) \
+            -> Dict[TraceKeys, Any]:
         """
         Creates a dictionary mapping column names to the corresponding link information
         :param source_id: The id of the source artifact
@@ -126,11 +153,14 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :param link_id: The id of the link
         :param score: The score of the generated link.
         :param explanation: Explanation for generated trace link.
+        :param relationship_type: The type of relationship between the artifacts.
         :return: A dictionary mapping column names to the corresponding link information
         """
+        relationship_type = relationship_type
         dict_ = {TraceKeys.LINK_ID: link_id} if link_id else {}
         dict_.update({TraceKeys.SOURCE: source_id, TraceKeys.TARGET: target_id,
-                      TraceKeys.LABEL: label, TraceKeys.SCORE: score, TraceKeys.EXPLANATION: explanation})
+                      TraceKeys.LABEL: label, TraceKeys.SCORE: score, TraceKeys.EXPLANATION: explanation,
+                      TraceKeys.RELATIONSHIP_TYPE: relationship_type})
         return EnumDict(dict_)
 
     @staticmethod
@@ -195,15 +225,30 @@ class TraceDataFrame(AbstractProjectDataFrame):
         orphans = all_artifact_ids.difference(linked_artifacts)
         return orphans
 
-    def get_parents(self, artifact_id: str) -> List[str]:
+    def get_parent_ids(self, artifact_id: str) -> List[str]:
         """
         Returns the parent artifact ids of given artifact.
         :param artifact_id: Id of artifact to find parents for.
         :return: Parent ids of artifact.
         """
-        query_df = self[(self[TraceKeys.child_label()] == artifact_id) & (~self[TraceKeys.SCORE.value].isna())]
+        query_df = self.filter_for_parents_or_children(artifact_id)
         parent_ids = list(query_df[TraceKeys.TARGET.value])
         return parent_ids
+
+    def filter_for_parents_or_children(self, artifact_id: str,
+                                       artifact_key: Union[str, TraceKeys] = TraceKeys.child_label()) -> "TraceDataFrame":
+        """
+        Filters dataframe to find all children or parents of the artifact.
+        :param artifact_id: The id to look for.
+        :param artifact_key: The key that the artifact will be under (child label means all parents are returned and vice versa).
+        :return: Dataframe with traces of only the children or parents of the artifact.
+        """
+        artifact_key = artifact_key.value if isinstance(artifact_key, TraceKeys) else artifact_key
+        query_df = self.filter_by_row(lambda row: row[artifact_key] == artifact_id and
+                                                  (DataFrameUtil.get_optional_value_from_df(row, TraceKeys.SCORE.value,
+                                                                                            default_value=0) > 0
+                                                   or row[TraceKeys.LABEL.value] == 1))
+        return query_df
 
     def get_artifact_ids(self, artifact_role: TraceKeys = None, linked_only: bool = False) -> Set[str]:
         """
@@ -219,3 +264,18 @@ class TraceDataFrame(AbstractProjectDataFrame):
                     continue
                 artifact_ids.add(trace[key])
         return artifact_ids
+
+    def get_relationships(self, artifact_id: str, artifact_key: str = None) -> List[EnumDict]:
+        """
+        Finds traces related to the artifact.
+        If an artifact key is provided, will only look for traces with trace[artifact_key] == artifact_id.
+        :param artifact_id: The id to look for.
+        :param artifact_key: The key that the artifact will be under (child label means all parents are returned and vice versa).
+        :return: List of all traces related to the artifact.
+        """
+        all_relationships = []
+        for key in [TraceKeys.child_label(), TraceKeys.parent_label()]:
+            if artifact_key == key or not artifact_key:
+                relations = self.filter_for_parents_or_children(artifact_id, key).get_links()
+                all_relationships.extend(relations)
+        return all_relationships

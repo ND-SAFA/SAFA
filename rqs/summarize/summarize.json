@@ -9,17 +9,19 @@
           "no_project_summary": "[NO_PROJECT_SUMMARY_BOOL]",
           "use_context_in_code_summaries": "[USE_CONTEXT_IN_CODE_SUMMARIES_BOOL]",
           "include_subset_by_dir": "[INCLUDE_SUBSET_BY_DIR_OPTIONAL]",
-          "dataset_creator": {
-            "object_type": "PROMPT",
-            "trace_dataset_creator": {
-              "object_type": "TRACE",
-              "project_reader": {
-                "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+          "job_args": {
+            "dataset_creator": {
+              "object_type": "PROMPT",
+              "trace_dataset_creator": {
+                "object_type": "TRACE",
+                "project_reader": {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+                }
               }
-            }
-          },
-          "export_dir": "[OUTPUT_PATH]/summarize/[CURRENT_PROJECT]"
+            },
+            "export_dir": "[OUTPUT_PATH]/summarize/[CURRENT_PROJECT]"
+          }
         }
       ]
     }

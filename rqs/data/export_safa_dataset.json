@@ -4,9 +4,9 @@
       "jobs": [
         {
           "object_type": "CREATE_DATASETS",
-          "export_path": "[OUTPUT_PATH]/safa-exports/[CURRENT_PROJECT]",
           "format_type": "SAFA",
-          "job_args": {
+           "job_args": {
+            "export_dir": "[OUTPUT_PATH]/safa-exports/[CURRENT_PROJECT]"
           },
           "trainer_dataset_manager": {
             "train_dataset_creator": {

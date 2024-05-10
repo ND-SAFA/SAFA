@@ -14,10 +14,11 @@ CODE_SUMMARY = [ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION_HEADE
                        "use only information directly from the code. "
                        "Enclose your answer in <draft></draft>."
                        f"\n\nThen, create a cohesive, detailed paragraph, encapsulating all the details from your draft. "
-                       "Focus on describing the behavior provided to the user while interweaving the details of how it provides such behavior."
+                       "Focus on describing the behavior provided to the user "
+                       "while interweaving the details of how it provides such behavior."
                        "Write in an active voice and assume your audience is familiar with software system this code belongs to. "
                        "Do not make conclusions about the code and only provide information.",
-                       PromptResponseManager(response_tag="summary"))
+                       response_manager=PromptResponseManager(response_tag="summary"))
                 ]
 
 CODE_SUMMARY_AS_NL = [ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION_HEADER),
@@ -32,7 +33,7 @@ CODE_SUMMARY_AS_NL = [ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION
                              "\n\nThen, using your notes, create a {target_type} artifact for this code that describes the behavior "
                              "provided to the user. You should use the following format when creating the {target_type}\n"
                              "{format} ",
-                             PromptResponseManager(response_tag="summary"))
+                             response_manager=PromptResponseManager(response_tag="summary"))
                       ]
 
 NL_SUMMARY = [
@@ -45,7 +46,7 @@ NL_SUMMARY = [
            "Follow the format TITLE - KEYWORDS. "
            "Write in an active voice and assume your audience is familiar with software system this artifact belongs to."
            "\n\n",
-           PromptResponseManager(response_tag="descrip")),
+           response_manager=PromptResponseManager(response_tag="descrip")),
     ArtifactPrompt(include_id=False, prompt_start="\n", build_method=ArtifactPrompt.BuildMethod.XML)]
 
 CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX = QuestionPrompt("Use the information below to understand the project.")

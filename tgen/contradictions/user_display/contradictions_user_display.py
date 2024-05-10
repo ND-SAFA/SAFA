@@ -8,9 +8,9 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.str_util import StrUtil
-from tgen.contradictions.contradictions_detector import ContradictionsDetector
-from tgen.contradictions.requirement import Requirement, RequirementConstituent
 from tgen.contradictions.user_display.bounding_box import BoundingBox
+from tgen.contradictions.with_decision_tree.contradictions_detector_with_tree import ContradictionsDetectorWithTree
+from tgen.contradictions.with_decision_tree.requirement import Requirement, RequirementConstituent
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.decision_tree.path import Path
 
@@ -90,7 +90,7 @@ class ContradictionsUserDisplay:
         else:
             artifacts = [Artifact(id=f"R{i}", content=req, layer_id="Requirement") for i, req in enumerate(requirements)]
             try:
-                decision_tree_path = ContradictionsDetector.detect_single_pair(*artifacts)
+                decision_tree_path = ContradictionsDetectorWithTree.detect_single_pair(*artifacts)
                 self.root.after(0, self._create_result_popup, decision_tree_path)
             except Exception:
                 logger.exception("An error occurred. ")

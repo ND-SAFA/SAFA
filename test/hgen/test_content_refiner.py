@@ -1,5 +1,6 @@
 from test.hgen.hgen_test_utils import HGenTestConstants, get_test_hgen_args
 from tgen.clustering.base.cluster import Cluster
+from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -49,7 +50,8 @@ class TestContentRefiner(BaseTest):
         orig_cluster2keep = "0"
         duplicate_cluster_map = {"0": Cluster.from_artifact_map({str(i): us
                                                                  for i, us in enumerate(HGenTestConstants.user_stories)
-                                                                 if i > int(orig_cluster2keep)})}
+                                                                 if i > int(orig_cluster2keep)},
+                                                                model_name=SMALL_EMBEDDING_MODEL)}
         generated_artifacts_df = ArtifactDataFrame({ArtifactKeys.ID: [str(i) for i in range(len(HGenTestConstants.user_stories))],
                                                     ArtifactKeys.CONTENT: [us for us in HGenTestConstants.user_stories],
                                                     ArtifactKeys.LAYER_ID: ["source" for _ in HGenTestConstants.user_stories]})

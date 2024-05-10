@@ -1,5 +1,6 @@
 from typing import Optional, List
 
+from tgen.common.constants.deliminator_constants import UNDERSCORE
 from tgen.common.objects.chunk import Chunk
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict

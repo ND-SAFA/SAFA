@@ -23,6 +23,7 @@ class StructuredKeys:
         LABEL = "label"
         SCORE = "score"
         EXPLANATION = "explanation"
+        RELATIONSHIP_TYPE = "relationship_type"
 
         @classmethod
         def parent_label(cls) -> "Trace":
@@ -79,3 +80,8 @@ class StructuredKeys:
 TraceKeys = StructuredKeys.Trace
 ArtifactKeys = StructuredKeys.Artifact
 LayerKeys = StructuredKeys.LayerMapping
+
+
+class TraceRelationshipType:
+    TRACEABILITY = "traceability"
+    CONTEXT = "context"

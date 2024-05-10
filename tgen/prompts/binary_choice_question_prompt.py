@@ -1,6 +1,7 @@
-from typing import Callable, List
+from typing import List
 
-from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
+from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 
 
@@ -13,15 +14,16 @@ class BinaryChoiceQuestionPrompt(QuestionPrompt):
     RESPONSE_INSTRUCTIONS2 = "Enclose your choice inside of {}"
     RESPONSE_TAG = "choice"
 
-    def __init__(self, choices: List, question: str, response_tag: str = None, default_factory: Callable = None,
-                 required: bool = False):
+    def __init__(self, choices: List, question: str, response_tag: str = None, prompt_args: PromptArgs = None,
+                 **additional_response_args):
         """
         Initializes the prompt with the categories that a model can select
         :param choices: A list of the choices available to the model
         :param question: The question being asked
         :param response_tag: The tag the model should enclose its response in
         :param default_factory: Method to define a default if response is not as expected
-        :param required: Whether to require all tags be present when parsing LLM response.
+        :param prompt_args: The args to the base prompt.
+        :param additional_response_args: Any additional params to the response manager.
         """
         self.choices = choices
         response_instructions = f"{self.RESPONSE_INSTRUCTIONS1.format(*choices)} {self.RESPONSE_INSTRUCTIONS2}"
@@ -30,6 +32,5 @@ class BinaryChoiceQuestionPrompt(QuestionPrompt):
                                                  response_instructions_format=response_instructions,
                                                  expected_responses={response_tag: self.choices},
                                                  expected_response_type={response_tag: type(choices[0])},
-                                                 required_tag_ids=USE_ALL_TAGS if required else set(),
-                                                 default_factory=default_factory)
-        super().__init__(value=question, response_manager=response_manager)
+                                                 **additional_response_args)
+        super().__init__(value=question, response_manager=response_manager, prompt_args=prompt_args)

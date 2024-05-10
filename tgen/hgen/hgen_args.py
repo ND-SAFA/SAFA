@@ -8,6 +8,7 @@ from tgen.common.constants.model_constants import get_best_default_llm_manager_l
     get_best_default_llm_manager_short_context
 from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
+from tgen.common.constants.ranking_constants import DEFAULT_COMPLETION_TOKENS
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
@@ -24,10 +25,6 @@ class PredictionStep(Enum):
     GENERATION = auto()
     REFINEMENT = auto()
     NAME = auto()
-
-
-DEFAULT_MAX_TOKENS = 50000
-DEFAULT_MAX_TOKENS_SMALL = 2000
 
 
 @dataclass
@@ -179,10 +176,7 @@ class HGenArgs(PipelineArgs, BaseObject):
         self.llm_managers[PredictionStep.FORMAT.value] = self.inputs_llm_manager
         for e in PredictionStep:
             if e.value not in self.max_tokens:
-                if e in [PredictionStep.NAME, PredictionStep.FORMAT]:
-                    self.max_tokens[e.value] = DEFAULT_MAX_TOKENS_SMALL
-                else:
-                    self.max_tokens[e.value] = DEFAULT_MAX_TOKENS
+                self.max_tokens[e.value] = DEFAULT_COMPLETION_TOKENS
 
     def _set_export_dir(self) -> None:
         """

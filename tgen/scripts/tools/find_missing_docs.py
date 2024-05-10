@@ -15,7 +15,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 
 NodeType = AST
-EXCLUDES = ["tgen/tgen/testres", "tgen/test"]
+EXCLUDES = ["tgen/tgen/testres", "tgen/test", "venv"]
 DEFAULT_TGEN_PATH = os.path.join(ROOT_PATH, "tgen")
 IGNORED_PARAM_NAMES = ["self", "cls", "_"]
 DEFAULT_COMPLEXITY_THRESHOLD = 7
@@ -141,7 +141,7 @@ def print_missing_headers(paths: List[str] = None, throw_error: bool = False) ->
     """
     if paths is None or len(paths) == 0:
         paths = [DEFAULT_TGEN_PATH]
-        
+
     for directory_path in paths:
         errors = calculate_missing_doc_map(directory_path)
 

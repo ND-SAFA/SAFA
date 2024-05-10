@@ -8,11 +8,11 @@ from tgen.common.constants.ranking_constants import CHANGE_IMPACT_TAG, DERIVATIO
     RANKING_ARTIFACT_TAG, RANKING_EXPLANATION_TAG, RANKING_ID_TAG, RANKING_SCORE_TAG, SUB_SYSTEMS_TAG
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.core.args.anthropic_args import AnthropicParams
 
 DEFAULT_SCORE = 0.5
 DEFAULT_EXPLANATION = "EXPLANATION"
 SUMMARY_TAGS = {"summary", "descrip"}
-
 
 
 class TestAIManager:
@@ -28,7 +28,7 @@ class TestAIManager:
         self.require_used_all_responses = require_used_all_responses
 
     def __call__(self, *args, **kwargs) -> List[str]:
-        prompts_global = self.get_prompts(kwargs)
+        prompts_global, system_prompt = self.get_prompts(kwargs)
         handled_responses, manual_prompts = self.run_prompt_handlers(prompts_global)
 
         n_manual_prompts = len(manual_prompts)
@@ -37,7 +37,9 @@ class TestAIManager:
         self.n_used += n_manual_prompts
         self.mock_calls += n_manual_prompts
 
-        manual_responses = [r(manual_prompts[i]) if callable(r) else r for i, r in enumerate(manual_responses)]
+        inputs4callables = [(manual_prompts[i], system_prompt) if system_prompt else manual_prompts[i]
+                            for i, r in enumerate(manual_responses)]
+        manual_responses = [r(inputs4callables[i]) if callable(r) else r for i, r in enumerate(manual_responses)]
         responses = handled_responses + manual_responses
         responses = self.response_formatter(responses)
 
@@ -181,9 +183,9 @@ class TestAIManager:
 
     def get_prompts(self, kwargs: Dict):
         if self.library == "openai":
-            return [m["content"] for m in kwargs["messages"]]
+            return [m["content"] for m in kwargs["messages"]], None
         elif self.library == "anthropic":
-            return [kwargs["prompt"]]
+            return [EMPTY_STRING.join([m["content"] for m in kwargs[AnthropicParams.MESSAGES]])], kwargs.get(AnthropicParams.SYSTEM)
 
     def on_test_end(self) -> None:
         n_used = self.start_index

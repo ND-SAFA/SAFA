@@ -11,10 +11,10 @@ from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
 from tgen.delta.delta_util import get_prediction_output
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
 class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
@@ -93,7 +93,7 @@ class IndividualDiffSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
         results = {}
         for pred, filename in zip(output, ids):
             results[filename] = {}
-            res = {tag: val[0].lstrip(NEW_LINE) if val else no_res for tag, val in pred[questionnaire.id].items()}
+            res = {tag: val[0].lstrip(NEW_LINE) if val else no_res for tag, val in pred[questionnaire.args.prompt_id].items()}
             for category in ChangeType.get_granular_change_type_categories():
                 category_tag = DASH.join(SeparateJoinedWordsStep.separate_deliminated_word(category.name.lower()))
                 category_res: str = res.get(category_tag, no_res)

@@ -2,9 +2,9 @@ from collections import OrderedDict
 from typing import Any, Dict, List
 
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.enum_util import EnumDict
-from tgen.common.logging.logger_manager import logger
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -12,10 +12,10 @@ from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
 from tgen.delta.delta_util import get_prediction_output
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
 class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
@@ -123,14 +123,14 @@ class OverviewChangeSummaryStep(AbstractPipelineStep[DeltaArgs, DeltaState]):
             [ct.value.lower() for ct in ChangeType.get_granular_change_type_categories()])
         prompts = [SupportedPrompts.DELTA_CHANGE_SUMMARY_STARTER.value,
                    MultiArtifactPrompt(
-                       prompt_prefix=PromptUtil.as_markdown_header("CHANGES:"),
+                       prompt_start=PromptUtil.as_markdown_header("CHANGES:"),
                        build_method=MultiArtifactPrompt.BuildMethod.XML,
                        xml_tags={"file-change": ["filename", "description"]}),
                    task_prompt
                    ]
         output = get_prediction_output(args, artifact_df, state, categories=categories,
                                        prompts=prompts)
-        return output[0][task_prompt.id]
+        return output[0][task_prompt.args.prompt_id]
 
     @staticmethod
     def _match_change_type(types: List[str], change_type_mapping: Dict[str, Any]) -> str:

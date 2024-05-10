@@ -9,6 +9,7 @@ from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.prompts.prompt import Prompt
+from tgen.prompts.prompt_args import PromptArgs
 
 
 class ArtifactPrompt(Prompt):
@@ -27,11 +28,12 @@ class ArtifactPrompt(Prompt):
         XML = auto()
         BASE = auto()
 
-    def __init__(self, prompt_start: str = EMPTY_STRING, build_method: BuildMethod = BuildMethod.BASE,
+    def __init__(self, prompt_start: str = EMPTY_STRING, prompt_args: PromptArgs = None, build_method: BuildMethod = BuildMethod.BASE,
                  include_id: bool = True, xml_tags: Dict[str, List[str]] = None, use_summary: bool = True):
         """
         Constructor for making a prompt from an artifact
-        :param prompt_start: The prefix to the prompt.
+        :param prompt_start: Goes before the artifact.
+        :param prompt_args: The args to the base prompt.
         :param build_method: The method to build the prompt (determines prompt format)
         :param xml_tags: If building using XML, specify the names of the tags as such {outer_tag: [id_tag, body_tag]}
         :param use_summary: If True, won't use the artifact's summary when constructing
@@ -46,7 +48,9 @@ class ArtifactPrompt(Prompt):
         }
         self.use_summary = use_summary
         self.include_id = include_id
-        super().__init__(value=prompt_start, allow_formatting=False)
+        prompt_args = PromptArgs() if not prompt_args else prompt_args
+        prompt_args.allow_formatting = False
+        super().__init__(value=prompt_start, prompt_args=prompt_args)
 
     @overrides(Prompt)
     def _build(self, artifact: EnumDict, **kwargs) -> str:
@@ -56,7 +60,7 @@ class ArtifactPrompt(Prompt):
         :param kwargs: Ignored
         :return: The formatted prompt
         """
-        prompt = f"{NEW_LINE}{self.value}{NEW_LINE}" if self.value else EMPTY_STRING
+        prompt = self.structure_value(super()._build(**kwargs), NEW_LINE, NEW_LINE)
         if self.build_method not in self.build_methods:
             raise NameError(f"Unknown Build Method: {self.build_method}")
         build_method = self.build_methods[self.build_method]

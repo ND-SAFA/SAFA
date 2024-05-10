@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, List, Set, Type, TypeVar, Union
+from typing import Any, Dict, Generic, List, Set, Type, TypeVar, Union, TypedDict
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
@@ -12,9 +12,27 @@ from tgen.models.llm.llm_responses import SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.models.tokens.token_costs import INPUT_TOKENS, ModelTokenCost, OUTPUT_TOKENS
 from tgen.pipeline.state import State
-from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 
 AIObject = TypeVar("AIObject")
+
+
+class PromptRoles:
+    USER = "user"
+    ASSISTANT = "assistant"
+
+
+ROLE_KEY = "role"
+CONTENT_KEY = "content"
+
+
+class Message(TypedDict):
+    content: str
+    role: str
+
+
+MessageType = Dict[str, str]
+ConversationType = List[Message]
 
 
 class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
@@ -22,7 +40,7 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
     Interface for all AI utility classes.
     """
 
-    def __init__(self, llm_args: AbstractLLMArgs, prompt_args: PromptArgs, state: State = None):
+    def __init__(self, llm_args: AbstractLLMArgs, prompt_args: LLMPromptBuildArgs, state: State = None):
         """
         Initializes the manager with args used for each request and the prompt args used for creating dataset
         :param llm_args: args used for each request
@@ -72,6 +90,16 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
                                                                                   raise_exception=False)
         translated_response = self.translate_to_response(completion_type, llm_response, **params)
         return translated_response
+
+    @staticmethod
+    def convert_prompt_to_message(prompt: str, role: str = PromptRoles.USER) -> MessageType:
+        """
+        Converts a prompt to the expected format for messages between the user and assistant.
+        :param prompt: The prompt/content of the message.
+        :param role: The role specifies if the message is from the user or assistant.
+        :return: Dictionary containing message content and role.
+        """
+        return Message(role=role, content=prompt)
 
     @abstractmethod
     def make_completion_request_impl(self, raise_exception: bool = True, original_responses: List = None,

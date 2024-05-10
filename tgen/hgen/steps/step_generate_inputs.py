@@ -5,16 +5,16 @@ import bs4
 from yaml.constructor import SafeConstructor
 
 from tgen.common.constants.path_constants import INPUTS_FOR_GENERATION_PATH
-from tgen.common.util.file_util import FileUtil
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
 class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
@@ -99,7 +99,7 @@ class GenerateInputsStep(AbstractPipelineStep[HGenArgs, HGenState]):
             prompt_builder = PromptBuilder(prompts=[prompt])
             prompt_builder.format_prompts_with_var(target_type=hgen_args.target_type, source_type=hgen_args.source_type)
             predictions = HGenUtil.get_predictions(prompt_builder, hgen_args=hgen_args, prediction_step=step,
-                                                   response_prompt_ids=prompt.id)[0]
+                                                   response_prompt_ids=prompt.args.prompt_id)[0]
             inputs.update(predictions)
         return inputs
 

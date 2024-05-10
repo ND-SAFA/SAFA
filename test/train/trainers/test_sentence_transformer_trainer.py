@@ -16,7 +16,7 @@ from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_data_manager import TestDataManager
 
 
-class TestSentenceTransformerTrainer(TestCase):
+class TestSTTrainer(TestCase):
     def test_training(self):
         """
         Tests that sentence transformer trainer is able to train and calculates metrics every epoch.

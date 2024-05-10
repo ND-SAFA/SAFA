@@ -97,7 +97,7 @@ class RQDefinition:
             self.inquirer_variables()
 
         if not self.confirm():
-            if not self.confirm("Edit Variables?", body=EMPTY_STRING):
+            if not self.confirm("Edit Specific Variable?", body=EMPTY_STRING):
                 self.clear_variable_values()
                 self.inquirer_variables()
             else:

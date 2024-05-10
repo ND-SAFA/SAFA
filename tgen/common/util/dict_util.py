@@ -293,7 +293,5 @@ class DictUtil:
         grouped_items = {}
         for obj in objs:
             obj_key = key_lambda(obj)
-            if obj_key not in grouped_items:
-                grouped_items[obj_key] = []
-            grouped_items[obj_key].append(obj)
+            DictUtil.set_or_append_item(grouped_items, obj_key, obj)
         return grouped_items

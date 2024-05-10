@@ -1,5 +1,6 @@
-import datasets
 from typing import Dict, List
+
+import datasets
 
 from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.common.util.enum_util import EnumDict
@@ -49,7 +50,7 @@ class ConfusionMatrixAtThresholdMetric(AbstractTraceMetric):
         return self.calculate_confusion_matrix(references, predicted_labels)
 
     @staticmethod
-    def calculate_confusion_matrix(y_true: List[float], predictions: List[float]):
+    def calculate_confusion_matrix(y_true: List[float], y_pred: List[float]):
         """
         Computes confusion matrix between actual and predicted labels.
         :param y_true: List of true labels.

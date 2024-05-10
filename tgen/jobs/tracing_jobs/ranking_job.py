@@ -103,7 +103,7 @@ class RankingJob(AbstractJob):
         layer_dataset = PromptDataset(artifact_df=selected_artifacts, trace_dataset=full_dataset.trace_dataset,
                                       project_summary=full_dataset.project_summary)
         if not self.relationship_manager and self.relationship_manager_type:
-            model_name = DictUtil.get_kwarg_values(self.ranking_kwargs, model_name=None)
+            model_name = DictUtil.get_kwarg_values(self.ranking_kwargs, embedding_model_name=None)
             kwargs = DictUtil.update_kwarg_values({}, model_name=model_name) if model_name else {}
             self.relationship_manager = self.relationship_manager_type.value(**kwargs)
         pipeline_args = RankingArgs(dataset=layer_dataset,

@@ -5,7 +5,7 @@
         {
           "object_type": "CHAT",
           "max_context": 10,
-          "chat_history": [{"role":  "user", "content":  "[QUESTION]"}],
+          "chat_history": [{"message": {"role":  "user", "content":  "[QUESTION]"}}],
           "job_args": {
             "dataset_creator": {
               "object_type": "PROMPT",

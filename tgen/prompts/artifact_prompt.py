@@ -60,7 +60,7 @@ class ArtifactPrompt(Prompt):
         :param kwargs: Ignored
         :return: The formatted prompt
         """
-        prompt = self.get_value(value_prefix=NEW_LINE, value_suffix=NEW_LINE)
+        prompt = self.structure_value(super()._build(**kwargs), NEW_LINE, NEW_LINE)
         if self.build_method not in self.build_methods:
             raise NameError(f"Unknown Build Method: {self.build_method}")
         build_method = self.build_methods[self.build_method]

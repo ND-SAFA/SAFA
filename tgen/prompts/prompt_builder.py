@@ -141,7 +141,7 @@ class PromptBuilder:
         """
         built_prompts = [prompt.build(**prompt_kwargs) for prompt in self.prompts
                          if prompt.args.system_prompt == only_use_system_prompts or build_all]
-        base_prompt = NEW_LINE.join(built_prompts) if built_prompts else None
+        base_prompt = NEW_LINE.join(built_prompts) if built_prompts or not only_use_system_prompts else None
         return base_prompt
 
     def _create_config(self) -> PromptConfig:

@@ -66,7 +66,7 @@ class MultiArtifactPrompt(Prompt):
         :param kwargs: Ignored
         :return: The formatted prompt
         """
-        prompt = self.get_value(value_prefix=NEW_LINE, value_suffix=NEW_LINE)
+        prompt = self.structure_value(super()._build(**kwargs), NEW_LINE, NEW_LINE)
         if self.build_method in self.build_methods:
             artifact_params = deepcopy(self.artifact_params)
             artifact_tokens = [TokenCalculator.estimate_num_tokens(artifact[ArtifactKeys.CONTENT]) for artifact in artifacts]

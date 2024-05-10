@@ -16,8 +16,7 @@ from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.math_util import MathUtil
 from tgen.common.util.override import overrides
-from tgen.common.util.st_util import to_input_examples
-from tgen.common.util.tf_util import move_features_to_device, move_tensor_to_device, set_gradients
+from tgen.common.util.tf_util import TFUtil
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.st.balanced_batch_sampler import BalancedBatchSampler
@@ -195,8 +194,8 @@ class STTrainer(HuggingFaceTrainer, ABC):
             source_features = self.model.tokenize(source_sentences)
             target_features = self.model.tokenize(target_sentences)
 
-            move_features_to_device(self.device, source_features)
-            move_features_to_device(self.device, target_features)
+            TFUtil.move_features_to_device(self.device, source_features)
+            TFUtil.move_features_to_device(self.device, target_features)
 
             source_embeddings = self.model(source_features)['sentence_embedding']
             target_embeddings = self.model(target_features)['sentence_embedding']
@@ -214,7 +213,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         assert self.starting_learning_rate is not None
         model_parameters = list(self.model.parameters())
         additional_parameters = list(self.get_additional_training_parameters())
-        set_gradients(model_parameters, requires_grad=not self.trainer_args.freeze_base)
+        TFUtil.set_gradients(model_parameters, requires_grad=not self.trainer_args.freeze_base)
         parameters = model_parameters + additional_parameters
         trainable_params = [p for p in parameters if p.requires_grad]
         optimizer = optim.Adam(trainable_params, lr=self.starting_learning_rate)
@@ -284,7 +283,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
         """
         labels = [e.label for e in input_examples]
         labels_tensor = torch.Tensor(labels)
-        return move_tensor_to_device(labels_tensor, device)
+        return TFUtil.move_tensor_to_device(labels_tensor, device)
 
     @abstractmethod
     def move_training_modules(self, device: torch.device) -> None:

@@ -5,7 +5,7 @@ from sentence_transformers import InputExample
 from torch import cosine_similarity
 
 from tgen.common.util.override import overrides
-from tgen.common.util.tf_util import create_loss_function
+from tgen.common.util.tf_util import TFUtil
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st_loss_functions import SupportedSTLossFunctions
 from tgen.core.trainers.st_trainer import STTrainer
@@ -83,4 +83,4 @@ class STEmbeddingTrainer(STTrainer):
         :return: The loss function.
         """
         # using MLP losses because it's assumed that embeddings will always be compared via cosine similarity.
-        return create_loss_function(SupportedSTLossFunctions, self.trainer_args.st_loss_function, "mse")
+        return TFUtil.create_loss_function(SupportedSTLossFunctions, self.trainer_args.st_loss_function, "mse")

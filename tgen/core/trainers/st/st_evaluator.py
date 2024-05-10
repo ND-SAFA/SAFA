@@ -1,18 +1,17 @@
 from typing import List
 
-from sentence_transformers import SentenceTransformer
 from sentence_transformers.evaluation import SentenceEvaluator
 
-from tgen.common.constants.hugging_face_constants import DEFAULT_EVAL_METRIC, SEPARATOR_BAR
+from tgen.common.constants.hugging_face_constants import SEPARATOR_BAR
 from tgen.common.logging.logger_manager import logger
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
+from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.wb.wb_manager import WBManager
 from tgen.data.tdatasets.dataset_role import DatasetRole
 
 
-class SentenceTransformerEvaluator(SentenceEvaluator):
-    def __init__(self, trainer: "SentenceTransformerTrainer", evaluation_roles: List[DatasetRole],
-                 evaluator_metric: str = DEFAULT_EVAL_METRIC):
+class STEvaluator(SentenceEvaluator):
+    def __init__(self, trainer: HuggingFaceTrainer, evaluation_roles: List[DatasetRole], evaluator_metric: str):
         """
         Evaluates dataset under role with given trainer.
         :param trainer: The trainer used to predict on the dataset.
@@ -23,9 +22,8 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
         self.evaluation_roles = evaluation_roles
         self.evaluator_metric = evaluator_metric
         self.metrics = []
-        self.current_loss = 0
 
-    def __call__(self, model: SentenceTransformer, **kwargs) -> float:
+    def __call__(self, *args, **kwargs) -> float:
         """
         Evaluates the model on the evaluation dataset.
         :param model: The model to evaluate.
@@ -46,15 +44,5 @@ class SentenceTransformerEvaluator(SentenceEvaluator):
             role2metrics[eval_role] = metrics
 
         self.metrics.append(role2metrics)
-        loss = self.update_loss()
-        WBManager.log(role2metrics, {"loss": loss}, step=self.trainer.params.global_step)
+        WBManager.log(role2metrics, step=self.trainer.state.global_step)
         return validation_metrics[self.evaluator_metric]
-
-    def update_loss(self):
-        """
-        Updates the current loss.
-        :return: The loss occurring since last session.
-        """
-        loss = self.trainer.total_loss - self.current_loss
-        self.current_loss = self.trainer.total_loss
-        return loss

@@ -26,7 +26,7 @@ class EmbeddingsManager(AbstractRelationshipManager):
 
     def __init__(self, content_map: Dict[str, str] = None, model_name: str = DEFAULT_EMBEDDING_MODEL,
                  model: SentenceTransformer = None,
-                 show_progress_bar: bool = True, create_embeddings_on_init: bool = False):
+                 show_progress_bar: bool = True, create_embeddings_on_init: bool = False, as_tensors: bool = False):
         """
         Initializes the embedding manager with the content used to create embeddings
         :param content_map: Maps id to the corresponding content
@@ -37,7 +37,7 @@ class EmbeddingsManager(AbstractRelationshipManager):
         """
         self._embedding_map = {}
         self.__ordered_ids = []
-
+        self._as_tensors = as_tensors
         super().__init__(model_name=model_name, show_progress_bar=show_progress_bar, content_map=content_map, model=model)
 
         if create_embeddings_on_init:
@@ -256,7 +256,7 @@ class EmbeddingsManager(AbstractRelationshipManager):
         artifact_contents = self.get_artifact_contents(subset_ids, include_ids)
         show_progress_bar = self._determine_show_progress_bar(artifact_contents, "Calculating embeddings for artifacts...", batch_size)
         embeddings = self.get_model().encode(artifact_contents, batch_size=batch_size,
-                                             show_progress_bar=show_progress_bar)
+                                             show_progress_bar=show_progress_bar, convert_to_tensor=self._as_tensors)
         return embeddings if return_as_list else embeddings[0]
 
     def __set_embedding_order(self, ordered_ids: List[Any] = None) -> None:

@@ -1,5 +1,6 @@
-import datasets
 from typing import Dict, List
+
+import datasets
 
 from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.common.util.enum_util import EnumDict

@@ -97,7 +97,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         self.eval_dataset = self._get_dataset(DatasetRole.VAL)
         self.model = self.model_manager.get_model()
         if self.trainer_args.do_training_eval:
-            self._evaluate()
+            self._evaluate(step=0)
         hf_train_output = self.train(resume_from_checkpoint=self.trainer_args.checkpoint_path)
         train_output = TraceTrainOutput(train_output=hf_train_output)
         if self.trainer_args.do_training_eval:
@@ -116,7 +116,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         if not self.has_dataset(dataset_role):
             raise Exception(f"Trainer does not have dataset for {dataset_role}.")
         output = self.predict(dataset_role)
-        display_metrics = {k: output.metrics[k] for k in DISPLAY_METRICS if k in output.metrics}
+        display_metrics = {k: round(output.metrics[k], 4) for k in DISPLAY_METRICS if k in output.metrics}
         logger.log_with_title(f"{dataset_role.name.title()} Metrics", display_metrics)
         trace_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role]
         prediction_entries = trace_dataset.trace_df.get_links()
@@ -173,7 +173,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         FileUtil.move_dir_contents(best_model_path, model_dir_path, delete_after_move=False)
         logger.info(f"Best model at: {model_dir_path}")
 
-    def _evaluate(self) -> Dict[DatasetRole, TracePredictionOutput]:
+    def _evaluate(self, **kwargs) -> Dict[DatasetRole, TracePredictionOutput]:
         """
         Performs an evaluation on the training output using the EVAL dataset if provided
         :return: Map of dataset role evaluated to its prediction output.
@@ -189,7 +189,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
                 logger.warning(f"No {dataset_role} dataset. Skipping evaluation.")
                 continue
 
-        WBManager.log({r: output.metrics for r, output in results.items()})
+        WBManager.log({r: output.metrics for r, output in results.items()}, **kwargs)
         return results
 
     @overrides(Trainer)
@@ -213,6 +213,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         if n_labels == 0:
             logger.info("Could not evaluate predictions because no true labels are present.")
             return {}
+        
         metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                          link_ids=trace_dataset.get_ordered_link_ids(),
                                          trace_predictions=output.predictions)

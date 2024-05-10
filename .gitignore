@@ -27,3 +27,5 @@ application-credentials.json
 *.pem
 *.env
 wandb/**
+wandb/**
+*/wandb

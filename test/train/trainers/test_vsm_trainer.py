@@ -14,7 +14,7 @@ from tgen.testres.test_data_manager import TestDataManager
 class TestVSMTrainer(BaseTraceTest):
     EXPECTED_PREDICTION_SIZE = TestDataManager.get_n_candidates()
     TEST_METRIC_DEFINITION = [["map", ["map"]],
-                              ["f", ["f1", "f2"]]]
+                              ["classification", ["precision", "recall", "f1", "f2"]]]
     TEST_METRICS_NAMES = [m for m, aliases in TEST_METRIC_DEFINITION]
 
     def test_perform_prediction(self):

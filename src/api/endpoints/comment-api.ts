@@ -5,85 +5,7 @@ import {
   CreateCommentSchema,
   HealthCheckCollectionSchema,
 } from "@/types";
-import { ENABLED_FEATURES } from "@/util";
 import { buildRequest } from "@/api";
-
-const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
-  artifactId: "",
-  comments: [
-    {
-      id: "1",
-      versionId: "1",
-      content: "Has anyone had a chance to review this requirement yet?",
-      userId: "tim@safa.ai",
-      createdAt: new Date(Date.now()).toISOString(),
-      updatedAt: new Date(Date.now()).toISOString(),
-      status: "active",
-      type: "conversation",
-    },
-  ],
-  flags: [
-    {
-      id: "2",
-      versionId: "1",
-      content: "There is a potential issue with this requirement.",
-      userId: "tim@safa.ai",
-      createdAt: new Date(Date.now()).toISOString(),
-      updatedAt: new Date(Date.now()).toISOString(),
-      status: "active",
-      type: "flag",
-    },
-  ],
-  healthChecks: [
-    {
-      id: "11",
-      versionId: "1",
-      content: "MRD1258 indicates a product refresh rate of 20 seconds.",
-      userId: "tim@safa.ai",
-      status: "active",
-      type: "contradiction",
-      createdAt: new Date(Date.now()).toISOString(),
-      updatedAt: new Date(Date.now()).toISOString(),
-      artifactIds: ["MRD1258"],
-    },
-    {
-      id: "12",
-      versionId: "1",
-      content: "This requirement references the following concept.",
-      userId: "tim@safa.ai",
-      status: "active",
-      type: "cited_concept",
-      createdAt: new Date(Date.now()).toISOString(),
-      updatedAt: new Date(Date.now()).toISOString(),
-      conceptArtifactId: "3127b181-c19b-45a4-a3c2-67d21c264f59",
-    },
-    {
-      id: "13",
-      versionId: "1",
-      content: "`Product Refresh Rate` not found in the project vocabulary.",
-      userId: "tim@safa.ai",
-      status: "active",
-      type: "undefined_concept",
-      createdAt: new Date(Date.now()).toISOString(),
-      updatedAt: new Date(Date.now()).toISOString(),
-      undefinedConcept: "Product Refresh Rate",
-    },
-    {
-      id: "13",
-      versionId: "1",
-      content: "DCP matched with multiple concepts. Which did you mean?",
-      userId: "tim@safa.ai",
-      status: "active",
-      type: "multi_matched_concept",
-      createdAt: new Date(Date.now()).toISOString(),
-      updatedAt: new Date(Date.now()).toISOString(),
-      conceptArtifactIds: [
-        "020f5e2d-185e-429c-89d4-1b28c992c271",
-        "cfe01bb5-f242-493c-93f1-59e478ba2014",
-      ],
-    },
-  ],
-};
 
 /**
  * Get the comments for an artifact.
@@ -93,10 +15,6 @@ const EXAMPLE_COMMENTS: ArtifactCommentsSchema = {
 export async function getArtifactComments(
   artifactId: string
 ): Promise<ArtifactCommentsSchema> {
-  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
-    return { ...EXAMPLE_COMMENTS, artifactId };
-  }
-
   return buildRequest<ArtifactCommentsSchema, "artifactId">(
     "commentCollection",
     {
@@ -115,19 +33,6 @@ export async function createArtifactComment(
   artifactId: string,
   comment: CreateCommentSchema
 ): Promise<BasicCommentSchema> {
-  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
-    return {
-      id: Math.random().toString(),
-      versionId: comment.versionId,
-      content: comment.content,
-      type: comment.type,
-      userId: "tim@safa.ai",
-      createdAt: new Date(Date.now()).toISOString(),
-      updatedAt: new Date(Date.now()).toISOString(),
-      status: "active",
-    };
-  }
-
   return buildRequest<BasicCommentSchema, "artifactId", CreateCommentSchema>(
     "commentCollection",
     { artifactId }
@@ -144,10 +49,6 @@ export async function editArtifactComment(
   artifactId: string,
   comment: BasicCommentSchema
 ): Promise<BasicCommentSchema> {
-  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
-    return comment;
-  }
-
   return buildRequest<
     BasicCommentSchema,
     "artifactId" | "commentId",
@@ -164,10 +65,6 @@ export async function deleteArtifactComment(
   artifactId: string,
   commentId: string
 ): Promise<void> {
-  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
-    return;
-  }
-
   return buildRequest<void, "artifactId" | "commentId">("comment", {
     artifactId,
     commentId,
@@ -183,10 +80,6 @@ export async function resolveArtifactComment(
   artifactId: string,
   commentId: string
 ): Promise<void> {
-  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
-    return;
-  }
-
   return buildRequest<void, "artifactId" | "commentId">("commentResolve", {
     artifactId,
     commentId,
@@ -203,10 +96,6 @@ export async function generateArtifactHealth(
   versionId: string,
   artifact: ArtifactSchema
 ): Promise<HealthCheckCollectionSchema> {
-  if (ENABLED_FEATURES.NASA_ARTIFACT_COMMENT_MOCKUP) {
-    return EXAMPLE_COMMENTS;
-  }
-
   return buildRequest<HealthCheckCollectionSchema, "versionId", ArtifactSchema>(
     "healthChecks",
     { versionId }

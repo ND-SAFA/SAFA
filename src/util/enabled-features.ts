@@ -13,7 +13,4 @@ export const ENABLED_FEATURES = {
   GENERATE_SUMMARIES: false,
 
   SIGN_UP: true,
-
-  NASA_ARTIFACT_COMMENT_MOCKUP: true,
-  NASA_PROJECT_CHAT_MOCKUP: true,
 };

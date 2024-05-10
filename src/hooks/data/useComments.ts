@@ -133,7 +133,10 @@ export const useComments = defineStore("useComments", {
                     perform: () =>
                       artifactSaveStore.openPanel({
                         isNewArtifact: true,
-                        artifact: { name: health.undefinedConcept },
+                        artifact: {
+                          name: health.undefinedConcept,
+                          type: "Concept",
+                        },
                         parentId: artifactId,
                       }),
                   };

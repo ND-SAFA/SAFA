@@ -45,7 +45,7 @@ export async function createProjectCreationJob(
   payload: CreateProjectByJsonSchema
 ): Promise<JobSchema> {
   return buildRequest<JobSchema, string, CreateProjectByJsonSchema>(
-    "createProjectJob"
+    "jobProjects"
   ).post(payload);
 }
 
@@ -69,9 +69,7 @@ export async function createProjectUploadJob(
     formData.append("files", file);
   });
 
-  return buildRequest<JobSchema, string, FormData>(
-    "createProjectThroughFlatFiles"
-  )
+  return buildRequest<JobSchema, string, FormData>("jobProjectsUpload")
     .withFormData()
     .post(formData);
 }
@@ -94,10 +92,9 @@ export async function createFlatFileUploadJob(
     formData.append("files", file);
   });
 
-  return buildRequest<JobSchema, "versionId", FormData>(
-    "updateProjectThroughFlatFiles",
-    { versionId }
-  )
+  return buildRequest<JobSchema, "versionId", FormData>("jobProjectsVersion", {
+    versionId,
+  })
     .withFormData()
     .post(formData);
 }
@@ -108,7 +105,7 @@ export async function createFlatFileUploadJob(
  * @return All project identifiers.
  */
 export async function getProjects(): Promise<IdentifierSchema[]> {
-  return buildRequest<IdentifierSchema[]>("project").get();
+  return buildRequest<IdentifierSchema[]>("projectCollection").get();
 }
 
 /**
@@ -119,7 +116,7 @@ export async function getProjects(): Promise<IdentifierSchema[]> {
 export async function getTeamProjects(
   teamId: string
 ): Promise<IdentifierSchema[]> {
-  return buildRequest<IdentifierSchema[], "teamId">("getTeamProjects", {
+  return buildRequest<IdentifierSchema[], "teamId">("projectTeam", {
     teamId,
   }).get();
 }
@@ -130,7 +127,7 @@ export async function getTeamProjects(
  * @param projectId - The project ID to delete.
  */
 export async function deleteProject(projectId: string): Promise<void> {
-  return buildRequest<void, "projectId">("updateProject", {
+  return buildRequest<void, "projectId">("project", {
     projectId,
   }).delete();
 }
@@ -147,7 +144,7 @@ export async function setProjectOwner(
   newOwner: TransferProjectSchema
 ): Promise<IdentifierSchema> {
   return buildRequest<IdentifierSchema, "projectId", TransferProjectSchema>(
-    "transferProject",
+    "projectTransfer",
     {
       projectId,
     }

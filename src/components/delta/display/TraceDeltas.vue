@@ -1,5 +1,5 @@
 <template>
-  <panel-card v-if="inDeltaView" title="Trace Links" collapsable>
+  <panel-card v-if="inDeltaView" title="Trace Links" collapsable borderless>
     <delta-button-group
       is-traces
       delta-type="added"

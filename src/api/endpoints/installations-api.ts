@@ -10,7 +10,10 @@ import { buildRequest } from "@/api";
 export async function getProjectInstallations(
   projectId: string
 ): Promise<InstallationSchema[]> {
-  return buildRequest<InstallationSchema[], "projectId">("getInstallations", {
-    projectId,
-  }).get();
+  return buildRequest<InstallationSchema[], "projectId">(
+    "projectInstallations",
+    {
+      projectId,
+    }
+  ).get();
 }

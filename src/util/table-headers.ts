@@ -3,7 +3,6 @@ import {
   AttributeSchema,
   FlatArtifact,
   FlatTraceLink,
-  GenerationModelSchema,
   IdentifierSchema,
   InstallationSchema,
   JobSchema,
@@ -20,7 +19,6 @@ export const actionsColumn: TableColumn<
   | IdentifierSchema
   | VersionSchema
   | InstallationSchema
-  | GenerationModelSchema
   | MembershipSchema
   | Record<string, string>
 > = {

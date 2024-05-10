@@ -1,6 +1,6 @@
 <template>
   <details-panel panel="displayProject" data-cy="panel-artifact-type">
-    <project-overview-display />
+    <project-overview-display borderless />
   </details-panel>
 </template>
 

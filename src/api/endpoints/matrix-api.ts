@@ -14,7 +14,7 @@ export async function createTraceMatrix(
   targetType: string
 ): Promise<void> {
   return buildRequest<void, "versionId" | "sourceType" | "targetType">(
-    "createTraceMatrix",
+    "traceMatrix",
     { versionId, sourceType, targetType }
   ).post();
 }
@@ -32,7 +32,7 @@ export async function deleteTraceMatrix(
   targetType: string
 ): Promise<void> {
   return buildRequest<void, "versionId" | "sourceType" | "targetType">(
-    "deleteTraceMatrix",
+    "traceMatrix",
     { versionId, sourceType, targetType }
   ).delete();
 }

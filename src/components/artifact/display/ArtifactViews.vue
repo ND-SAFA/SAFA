@@ -1,5 +1,5 @@
 <template>
-  <panel-card v-if="doDisplay" title="Views" collapsable>
+  <panel-card v-if="doDisplay" title="Views" collapsable borderless>
     <list>
       <list-item
         v-for="doc in documents"
@@ -7,7 +7,7 @@
         clickable
         tooltip
         :title="doc.name"
-        @click="documentApiStore.handleSwitch(doc)"
+        @click="viewApiStore.handleSwitch(doc)"
       />
     </list>
   </panel-card>
@@ -15,16 +15,16 @@
 
 <script lang="ts">
 /**
- * Displays the selected node's documents.
+ * Displays the selected node's views.
  */
 export default {
-  name: "ArtifactDocuments",
+  name: "ArtifactViews",
 };
 </script>
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { artifactStore, documentApiStore, documentStore } from "@/hooks";
+import { artifactStore, viewApiStore, documentStore } from "@/hooks";
 import { List, ListItem, PanelCard } from "@/components/common";
 
 const artifact = computed(() => artifactStore.selectedArtifact);

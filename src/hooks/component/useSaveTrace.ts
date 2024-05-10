@@ -200,8 +200,8 @@ export const useSaveTrace = defineStore("saveTrace", {
       } else if (openTo.type === "target") {
         this.targetIds = [openTo.artifactId];
       } else {
-        this.sourceIds = [openTo.sourceId];
-        this.targetIds = [openTo.targetId];
+        this.sourceIds = openTo.sourceIds;
+        this.targetIds = openTo.targetIds;
       }
     },
     /**

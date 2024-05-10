@@ -3,8 +3,7 @@ import {
   ArtifactTypeSchema,
   AttributeLayoutSchema,
   AttributeSchema,
-  DocumentSchema,
-  GenerationModelSchema,
+  ViewSchema,
   LayoutPositionsSchema,
   MembershipSchema,
   PermissionType,
@@ -116,7 +115,7 @@ export interface ProjectSchema extends IdentifierSchema {
   /**
    * The different documents for this project.
    */
-  documents: DocumentSchema[];
+  documents: ViewSchema[];
 
   /**
    * Map of artifact ids to their position in the default graph.
@@ -126,10 +125,6 @@ export interface ProjectSchema extends IdentifierSchema {
    * Map of artifact ids to their subtree information.
    */
   subtrees: SubtreeMapSchema;
-  /**
-   * List of trained project models.
-   */
-  models: GenerationModelSchema[];
   /**
    * A list of custom attributes used on this project.
    */

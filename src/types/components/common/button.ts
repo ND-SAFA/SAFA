@@ -96,6 +96,10 @@ export interface TextButtonProps
    * If true, the button label will be hidden.
    */
   hideLabel?: boolean;
+  /**
+   * The icon rotation degrees.
+   */
+  iconRotate?: number;
 }
 
 /**

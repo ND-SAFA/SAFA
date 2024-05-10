@@ -42,7 +42,7 @@ const reject = ref<() => void>(() => {});
 const relTransform = ref("");
 
 const className = computed(
-  () => `cy-container bg-neutral ${props.class || ""}`
+  () => `cy-container bg-background ${props.class || ""}`
 );
 
 /**

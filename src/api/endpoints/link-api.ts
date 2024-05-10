@@ -1,8 +1,4 @@
-import {
-  JobSchema,
-  TraceLinkSchema,
-  TrainOrGenerateLinksSchema,
-} from "@/types";
+import { JobSchema, TraceLinkSchema, GenerateLinksSchema } from "@/types";
 import { buildRequest } from "@/api/util";
 
 /**
@@ -14,7 +10,7 @@ import { buildRequest } from "@/api/util";
 export async function getGeneratedLinks(
   versionId: string
 ): Promise<TraceLinkSchema[]> {
-  return buildRequest<TraceLinkSchema[], "versionId">("getGeneratedLinks", {
+  return buildRequest<TraceLinkSchema[], "versionId">("linksGenerated", {
     versionId,
   }).get();
 }
@@ -26,26 +22,9 @@ export async function getGeneratedLinks(
  * @return The created job.
  */
 export async function createGeneratedLinks(
-  config: TrainOrGenerateLinksSchema
+  config: GenerateLinksSchema
 ): Promise<JobSchema> {
-  return buildRequest<JobSchema, string, TrainOrGenerateLinksSchema>(
-    "generateLinksJob"
-  ).post(config);
-}
-
-/**
- * Trains a model between source and target artifacts.
- *
- * @param projectId - The project to train for.
- * @param config - Model training configuration.
- * @return The created job.
- */
-export async function createModelTraining(
-  projectId: string,
-  config: TrainOrGenerateLinksSchema
-): Promise<JobSchema> {
-  return buildRequest<JobSchema, "projectId", TrainOrGenerateLinksSchema>(
-    "trainModelJob",
-    { projectId }
+  return buildRequest<JobSchema, string, GenerateLinksSchema>(
+    "jobLinksGenerate"
   ).post(config);
 }

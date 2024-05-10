@@ -111,6 +111,8 @@ export const useSelection = defineStore("selection", {
      * @param artifactId - The artifact to select.
      */
     selectArtifact(artifactId: string): void {
+      if (this.selectedArtifactId === artifactId) return;
+
       this.selectedTraceLinkIds = ["", ""];
       this.selectedArtifactId = artifactId;
 

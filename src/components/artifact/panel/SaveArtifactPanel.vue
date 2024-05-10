@@ -8,12 +8,13 @@
         @click="appStore.openDetailsPanel('displayArtifact')"
       />
     </template>
-    <panel-card title="Save Artifact">
+    <panel-card title="Save Artifact" borderless>
       <save-artifact-inputs />
       <template #actions>
         <save-artifact-buttons />
       </template>
     </panel-card>
+    <artifact-health v-if="permissionStore.isNASA" />
   </details-panel>
 </template>
 
@@ -27,16 +28,11 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { watch } from "vue";
-import { appStore, artifactSaveStore, artifactStore } from "@/hooks";
+import { appStore, permissionStore } from "@/hooks";
 import { DetailsPanel, PanelCard, TextButton } from "@/components/common";
 import {
   SaveArtifactInputs,
   SaveArtifactButtons,
+  ArtifactHealth,
 } from "@/components/artifact/save";
-
-watch(
-  () => artifactStore.selectedArtifact,
-  () => artifactSaveStore.resetArtifact()
-);
 </script>

@@ -49,11 +49,6 @@ export interface SearchQuerySchema {
    */
   searchTypes: string[];
   /**
-   * The model to predict links with.
-   * @default Our best model.
-   */
-  model?: string;
-  /**
    * How many of the top predictions to include.
    * @default 5
    */

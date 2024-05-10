@@ -7,9 +7,9 @@
     :width="width"
     :class="className"
   >
-    <div class="q-pa-sm q-mb-md bg-background">
+    <div class="q-pa-sm q-mb-md bg-neutral">
       <delta-panel />
-      <document-panel />
+      <view-panel />
       <project-overview-panel />
       <artifact-panel />
       <artifact-body-panel />
@@ -40,7 +40,7 @@ export default {
 import { computed } from "vue";
 import { appStore, useScreen } from "@/hooks";
 import { DeltaPanel } from "@/components/delta/panel";
-import { DocumentPanel } from "@/components/document";
+import { ViewPanel } from "@/components/view";
 import {
   ArtifactPanel,
   ArtifactBodyPanel,
@@ -67,7 +67,7 @@ const openState = computed(() => appStore.popups.detailsPanel);
 const drawerOpen = computed(() => typeof openState.value === "string");
 
 const className = computed(
-  () => `bg-background nav-panel nav-panel-${openState.value}`
+  () => `bg-neutral nav-panel nav-panel-${openState.value}`
 );
 
 const width = computed(() => {

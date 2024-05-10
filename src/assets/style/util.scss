@@ -60,6 +60,18 @@
   }
 }
 
+.show-on-hover-parent {
+  .show-on-hover-child {
+    opacity: 0;
+  }
+
+  &:hover {
+    .show-on-hover-child {
+      opacity: 1;
+    }
+  }
+}
+
 // Sticky
 
 .sticky-top {

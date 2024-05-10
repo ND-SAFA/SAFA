@@ -2,14 +2,12 @@ import {
   ArtifactSchema,
   CommitSchema,
   ConfirmDialogueMessage,
-  DocumentSchema,
+  ViewSchema,
   IdentifierSchema,
-  ModelType,
   VersionDeltaSchema,
   ProjectSchema,
   SessionSchema,
   SnackbarMessage,
-  GenerationModelSchema,
   UserSchema,
   VersionSchema,
   AttributeSchema,
@@ -21,6 +19,8 @@ import {
   TraceLinkSchema,
   UploadPanelType,
   CreatorFilePanel,
+  ProjectChatSchema,
+  ChatMessageSchema,
 } from "@/types";
 
 export function buildSnackbarMessage(): SnackbarMessage {
@@ -103,7 +103,6 @@ export function buildProject(project?: Partial<ProjectSchema>): ProjectSchema {
     documents: project?.documents || [],
     layout: project?.layout || {},
     subtrees: project?.subtrees || {},
-    models: project?.models || [],
     attributes: project?.attributes || [],
     attributeLayouts: project?.attributeLayouts || [],
     permissions: project?.permissions || [],
@@ -173,9 +172,7 @@ export function buildCommit(version: VersionSchema): CommitSchema {
   };
 }
 
-export function buildDocument(
-  document?: Partial<DocumentSchema>
-): DocumentSchema {
+export function buildDocument(document?: Partial<ViewSchema>): ViewSchema {
   return {
     documentId: document?.documentId || "",
     project: document?.project || buildProjectIdentifier(),
@@ -184,16 +181,6 @@ export function buildDocument(
     artifactIds: document?.artifactIds || [],
     description: document?.description || "",
     layout: document?.layout || {},
-  };
-}
-
-export function buildModel(
-  model?: Partial<GenerationModelSchema>
-): GenerationModelSchema {
-  return {
-    id: model?.id || "",
-    name: model?.name || "",
-    baseModel: model?.baseModel || "NLBert",
   };
 }
 
@@ -222,14 +209,10 @@ export function buildAttributeLayout(
 }
 
 export function buildGeneratedMatrix(
-  artifactLevels: MatrixSchema[],
-  method?: ModelType,
-  model?: GenerationModelSchema
+  artifactLevels: MatrixSchema[]
 ): GeneratedMatrixSchema {
   return {
-    method: model?.baseModel || method || undefined,
-    model,
-    artifactLevels: artifactLevels,
+    artifactLevels,
   };
 }
 
@@ -262,5 +245,29 @@ export function buildTeam(team: Partial<TeamSchema> = {}): TeamSchema {
     members: team.members || [],
     projects: team.projects || [],
     permissions: team?.permissions || [],
+  };
+}
+
+export function buildProjectChat(
+  chat: Partial<ProjectChatSchema> = {}
+): ProjectChatSchema {
+  return {
+    id: chat.id || "",
+    title: chat.title || "New Chat",
+    versionId: chat.versionId || "",
+    permission: chat.permission || "owner",
+    messages: chat.messages || [],
+  };
+}
+
+export function buildProjectChatMessage(
+  chat: Partial<ChatMessageSchema> = {}
+): ChatMessageSchema {
+  return {
+    id: chat?.id || "",
+    isUser: chat?.isUser === undefined ? true : chat.isUser,
+    message: chat?.message || "",
+    artifactIds: chat?.artifactIds || [],
+    createdAt: chat?.createdAt || new Date().toISOString(),
   };
 }

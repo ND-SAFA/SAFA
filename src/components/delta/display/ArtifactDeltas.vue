@@ -1,5 +1,5 @@
 <template>
-  <panel-card v-if="inDeltaView" title="Artifacts" collapsable>
+  <panel-card v-if="inDeltaView" title="Artifacts" collapsable borderless>
     <delta-button-group
       delta-type="added"
       :items="addedArtifacts"

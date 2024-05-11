@@ -81,7 +81,7 @@ class PackageTracer:
         """
         artifact_ids_set = set(trace_dataset.artifact_df.index)
         for package in packages:
-            trace_dataset.artifact_df.add_artifact(a_id=package,
+            trace_dataset.artifact_df.add_artifact(id=package,
                                                    layer_id=package_artifact_type,
                                                    content=EMPTY_STRING,
                                                    summary=EMPTY_STRING)

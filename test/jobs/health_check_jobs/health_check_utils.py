@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from test.concepts.test_entity_extraction import TestEntityExtraction
 from test.concepts.test_entity_matching import TestEntityMatching
@@ -65,11 +65,11 @@ def get_dataset_for_context(include_query: bool = False):
 
 def get_dataset_for_health_checks():
     dataset = get_dataset_for_context()
-    dataset.artifact_df.add_artifact(a_id=QUERY_ID,
+    dataset.artifact_df.add_artifact(id=QUERY_ID,
                                      content=QUERY_CONTENT,
                                      layer_id="artifacts")
     for i, concept in enumerate(EXISTING_CONCEPTS):
-        dataset.artifact_df.add_artifact(a_id=concept,
+        dataset.artifact_df.add_artifact(id=concept,
                                          content=concept,
                                          layer_id=CONCEPT_LAYER_ID)
     return dataset

@@ -4,9 +4,11 @@
       <artifact-buttons />
     </template>
     <artifact-content />
-    <artifact-traces />
-    <artifact-documents />
-    <artifact-errors />
+    <artifact-context v-if="permissionStore.isNASA" />
+    <artifact-traces v-else />
+    <artifact-comments />
+    <artifact-health />
+    <artifact-views />
   </details-panel>
 </template>
 
@@ -20,12 +22,17 @@ export default {
 </script>
 
 <script setup lang="ts">
+import { permissionStore } from "@/hooks";
 import { DetailsPanel } from "@/components/common";
 import {
   ArtifactContent,
-  ArtifactDocuments,
+  ArtifactViews,
   ArtifactTraces,
-  ArtifactErrors,
+  ArtifactContext,
 } from "@/components/artifact/display";
-import { ArtifactButtons } from "@/components/artifact/save";
+import {
+  ArtifactButtons,
+  ArtifactComments,
+  ArtifactHealth,
+} from "@/components/artifact/save";
 </script>

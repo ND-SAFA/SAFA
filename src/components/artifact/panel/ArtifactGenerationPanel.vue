@@ -1,6 +1,6 @@
 <template>
   <details-panel panel="generateArtifact">
-    <panel-card title="Generate Artifacts">
+    <panel-card title="Generate Artifacts" borderless>
       <q-btn-group flat class="q-mb-md">
         <text-button
           v-bind="buttonProps('single')"

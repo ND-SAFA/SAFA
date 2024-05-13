@@ -1,7 +1,7 @@
 <template>
   <q-btn-group flat class="q-mx-sm nav-mode-select">
     <text-button
-      v-bind="buttonProps(options.tim)"
+      v-bind="buttonProps('tim')"
       :hide-label="smallWindow"
       label="Types"
       data-cy="button-nav-tim"
@@ -11,7 +11,7 @@
       <q-tooltip> The types of artifacts and how they relate </q-tooltip>
     </text-button>
     <text-button
-      v-bind="buttonProps(options.tree)"
+      v-bind="buttonProps('tree')"
       :hide-label="smallWindow"
       :disabled="artifactStore.largeNodeCount"
       label="Tree"
@@ -22,9 +22,9 @@
       <q-tooltip> {{ treeTooltip }} </q-tooltip>
     </text-button>
     <text-button
-      v-bind="buttonProps(options.table)"
+      v-bind="buttonProps('table')"
       :hide-label="smallWindow"
-      :disabled="artifactStore.allArtifacts.length === 0"
+      :disabled="!hasArtifacts"
       label="Table"
       data-cy="button-nav-table"
       icon="view-table"
@@ -33,10 +33,22 @@
       <q-tooltip> Tables of artifacts and trace links </q-tooltip>
     </text-button>
     <delta-mode-button
-      v-bind="buttonProps(options.delta)"
+      v-bind="buttonProps('delta')"
       :hide-label="smallWindow"
       @click="handleDeltaView"
     />
+    <text-button
+      v-if="permissionStore.isNASA"
+      v-bind="buttonProps('chat')"
+      :hide-label="smallWindow"
+      :disabled="!hasArtifacts"
+      label="Chat"
+      data-cy="button-nav-chat"
+      icon="comment"
+      @click="handleChatView"
+    >
+      <q-tooltip> Chat with your project data </q-tooltip>
+    </text-button>
   </q-btn-group>
 </template>
 
@@ -57,17 +69,11 @@ import {
   artifactStore,
   deltaStore,
   layoutStore,
+  permissionStore,
   useScreen,
 } from "@/hooks";
 import { TextButton } from "@/components/common";
 import DeltaModeButton from "./DeltaModeButton.vue";
-
-const options: Record<GraphMode, GraphMode> = {
-  tim: "tim",
-  tree: "tree",
-  table: "table",
-  delta: "delta",
-};
 
 const { smallWindow } = useScreen();
 
@@ -79,6 +85,8 @@ const treeTooltip = computed(() => {
         'To view a tree, visit "Table" view and select the tree icon next to an artifact, or create a new custom "View" above.'
     : "A graph of related artifacts";
 });
+
+const hasArtifacts = computed(() => artifactStore.allArtifacts.length > 0);
 
 /**
  * Returns props for a mode button.
@@ -141,6 +149,15 @@ function handleDeltaView(): void {
 
   appStore.openDetailsPanel("delta");
   updateValue();
+}
+
+/**
+ * Opens chat view.
+ */
+function handleChatView(): void {
+  layoutStore.mode = "chat";
+
+  appStore.closeSidePanels();
 }
 
 onMounted(() => updateValue());

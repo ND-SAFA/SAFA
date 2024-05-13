@@ -1,6 +1,6 @@
 <template>
   <details-panel panel="document" @open="handleReset">
-    <panel-card title="Save View">
+    <panel-card title="Save View" borderless>
       <text-input
         v-model="editedDocument.name"
         label="Name"
@@ -74,16 +74,16 @@
 
 <script lang="ts">
 /**
- * Allows for creating and editing documents.
+ * Allows for creating and editing views.
  */
 export default {
-  name: "DocumentPanel",
+  name: "ViewPanel",
 };
 </script>
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import { appStore, documentApiStore, documentSaveStore } from "@/hooks";
+import { appStore, viewApiStore, documentSaveStore } from "@/hooks";
 import {
   ArtifactInput,
   ArtifactTypeInput,
@@ -134,7 +134,7 @@ function handleSaveChildren() {
  * Attempts to save the document.
  */
 function handleSubmit() {
-  documentApiStore.handleSave({
+  viewApiStore.handleSave({
     onSuccess: () => handleClose(),
   });
 }
@@ -143,7 +143,7 @@ function handleSubmit() {
  * Attempts to delete the document after confirming.
  */
 function handleDelete() {
-  documentApiStore.handleDelete({
+  viewApiStore.handleDelete({
     onSuccess: () => handleClose(),
   });
 }

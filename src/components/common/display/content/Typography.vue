@@ -1,5 +1,5 @@
 <template>
-  <div v-if="expandable" class="width-100">
+  <div v-if="markdown" class="width-100">
     <q-markdown
       v-if="expanded"
       no-heading-anchor-links
@@ -22,6 +22,7 @@
         @click.stop="handleCopy"
       />
       <q-btn
+        v-if="expandable"
         flat
         dense
         size="sm"
@@ -39,7 +40,7 @@
         <q-separator vertical class="q-mx-xs" />
         <q-tooltip :delay="300"> {{ expandLabel }} </q-tooltip>
       </q-btn>
-      <q-markdown v-if="expanded" no-heading-anchor-links>
+      <q-markdown v-if="expanded" no-heading-anchor-links class="full-width">
         {{ "```" + codeExt + "\n" + value + "\n```" }}
       </q-markdown>
       <div v-else :class="className + ' text-textCaption'">Code hidden</div>
@@ -121,7 +122,12 @@ const className = useMargins(props, () => [
   [props.variant === "small", "text-subtitle2"],
   [props.variant === "caption", "text-caption text-textCaption"],
   [props.variant === "code", "text-body1"],
-  [props.variant === "body" || props.variant === "expandable", "text-body1"],
+  [
+    props.variant === "body" ||
+      props.variant === "expandable" ||
+      props.variant === "markdown",
+    "text-body1",
+  ],
   [props.el === "a", "text-primary"],
   ["align", `text-${props.align}`],
   [!!props.color && !darkMode.value, `text-${props.color}`],
@@ -138,13 +144,18 @@ const className = useMargins(props, () => [
 
 const baseExpanded = computed(
   () =>
-    props.defaultExpanded &&
-    props.variant !== "code" &&
-    (props.collapseLength === 0 ||
-      String(props.value).length < props.collapseLength)
+    props.variant === "markdown" ||
+    (props.defaultExpanded &&
+      props.variant !== "code" &&
+      (props.collapseLength === 0 ||
+        String(props.value).length < props.collapseLength))
 );
 
 const expanded = ref(baseExpanded.value);
+
+const markdown = computed(
+  () => props.variant === "expandable" || props.variant === "markdown"
+);
 
 const expandable = computed(() => props.variant === "expandable");
 

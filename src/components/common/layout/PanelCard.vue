@@ -24,7 +24,7 @@
           v-if="props.collapsable || !!slots['title-actions']"
           align="center"
         >
-          <slot name="title-actions" />
+          <slot v-if="!props.collapsable || expanded" name="title-actions" />
           <icon-button
             v-if="props.collapsable"
             small
@@ -84,6 +84,7 @@ const props = withDefaults(defineProps<PanelCardProps>(), {
   icon: undefined,
   class: "",
   containerClass: "",
+  borderless: false,
 });
 
 const slots = useSlots();
@@ -92,11 +93,21 @@ const expanded = ref(true);
 
 const color = computed(() => (props.minimal ? "transparent" : props.color));
 
-const padding = computed(() => (props.minimal ? "q-pa-xs" : "q-pa-md"));
+const padding = computed(() => {
+  if (props.borderless) {
+    return "q-px-md";
+  } else if (props.minimal) {
+    return "q-pa-xs";
+  } else {
+    return "q-pa-md";
+  }
+});
 
 const className = computed(
   () =>
-    `overflow-hidden bg-neutral ${padding.value} bd-${color.value} ${props.class}`
+    `overflow-hidden bg-neutral ${padding.value} ` +
+    (props.borderless ? " " : `bd-${color.value} `) +
+    props.class
 );
 
 const containerClassName = computed(() => `q-mb-md ${props.containerClass}`);

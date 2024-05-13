@@ -1,8 +1,14 @@
 <template>
-  <panel-card v-if="artifacts.length > 0" :title="artifactsLabel" collapsable>
+  <panel-card
+    v-if="artifacts.length > 0"
+    :title="artifactsLabel"
+    collapsable
+    borderless
+  >
     <template #title-actions>
       <text-button
         text
+        small
         label="View Artifacts"
         icon="view-tree"
         @click="viewsStore.addDocumentOfTypes([name])"
@@ -12,6 +18,7 @@
       :artifacts="artifacts"
       data-cy="list-selected-artifacts"
       item-data-cy="list-selected-artifact-item"
+      class="bg-background rounded"
       @click="viewsStore.addDocumentOfNeighborhood($event)"
     />
   </panel-card>

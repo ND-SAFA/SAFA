@@ -5,8 +5,6 @@ import {
   MatrixSchema,
   FlatTraceLink,
   IOHandlerCallback,
-  ModelType,
-  GenerationModelSchema,
   TraceGenerationApiHook,
 } from "@/types";
 import { buildGeneratedMatrix } from "@/util";
@@ -18,7 +16,7 @@ import {
   projectStore,
   traceStore,
 } from "@/hooks";
-import { createGeneratedLinks, createModelTraining } from "@/api";
+import { createGeneratedLinks } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -76,7 +74,6 @@ export const useTraceGenerationApi = defineStore(
     }
 
     async function handleGenerate(
-      method: ModelType | undefined,
       matrices: MatrixSchema[],
       callbacks: IOHandlerCallback
     ): Promise<void> {
@@ -87,7 +84,7 @@ export const useTraceGenerationApi = defineStore(
       await traceGenerationApi.handleRequest(
         async () => {
           const job = await createGeneratedLinks({
-            requests: [buildGeneratedMatrix(matrices, method)],
+            requests: [buildGeneratedMatrix(matrices)],
             projectVersion: projectStore.version,
           });
 
@@ -101,32 +98,7 @@ export const useTraceGenerationApi = defineStore(
       );
     }
 
-    async function handleTrain(
-      model: GenerationModelSchema,
-      matrices: MatrixSchema[],
-      callbacks: IOHandlerCallback
-    ): Promise<void> {
-      const matricesName = matrices
-        .map(({ source, target }) => `${source} -> ${target}`)
-        .join(", ");
-
-      await traceGenerationApi.handleRequest(
-        async () => {
-          const job = await createModelTraining(projectStore.projectId, {
-            requests: [buildGeneratedMatrix(matrices, model.baseModel, model)],
-          });
-
-          await jobApiStore.handleCreate(job);
-        },
-        {
-          ...callbacks,
-          success: `Started training model on: ${matricesName}. You'll receive a notification once complete.`,
-          error: `Unable to train model on: ${matricesName}`,
-        }
-      );
-    }
-
-    return { loading, handleReload, handleGenerate, handleTrain };
+    return { loading, handleReload, handleGenerate };
   }
 );
 

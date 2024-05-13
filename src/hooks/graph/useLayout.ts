@@ -34,6 +34,12 @@ export const useLayout = defineStore("layout", {
   }),
   getters: {
     /**
+     * @return Whether the graph is in TIM mode.
+     */
+    isTimMode(): boolean {
+      return this.mode === "tim";
+    },
+    /**
      * @return Whether the graph is in tree mode.
      */
     isTreeMode(): boolean {
@@ -44,6 +50,12 @@ export const useLayout = defineStore("layout", {
      */
     isTableMode(): boolean {
       return this.mode === "table";
+    },
+    /**
+     * @return Whether the graph is in chat mode.
+     */
+    isChatMode(): boolean {
+      return this.mode === "chat";
     },
     /**
      * @return Layout options for the graph.

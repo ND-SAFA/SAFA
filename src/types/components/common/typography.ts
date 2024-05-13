@@ -11,6 +11,7 @@ export type TextType =
   | "small"
   | "caption"
   | "expandable"
+  | "markdown"
   | "code";
 
 /**

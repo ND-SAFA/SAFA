@@ -1,8 +1,9 @@
 <template>
-  <panel-card :title="traceLabel" collapsable>
+  <panel-card :title="traceLabel" collapsable borderless>
     <template #title-actions>
       <text-button
         text
+        small
         label="View Artifacts"
         icon="view-tree"
         @click="handleViewLevel"

@@ -9,7 +9,11 @@
       />
     </template>
 
-    <panel-card v-if="artifactLevel" data-cy="panel-artifact-type-options">
+    <panel-card
+      v-if="artifactLevel"
+      data-cy="panel-artifact-type-options"
+      borderless
+    >
       <flex-box align="center" justify="between">
         <typography
           ellipsis

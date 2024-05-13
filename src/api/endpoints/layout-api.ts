@@ -20,5 +20,5 @@ export async function createLayout(
     GeneratedLayoutsSchema,
     "versionId",
     LayoutRegenerationSchema
-  >("refreshLayout", { versionId }).post(body);
+  >("layout", { versionId }).post(body);
 }

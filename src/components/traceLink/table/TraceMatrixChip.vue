@@ -90,8 +90,8 @@ function handleClick(): void {
 function handleCreateLink(): void {
   traceSaveStore.openPanel({
     type: "both",
-    sourceId: props.source.id,
-    targetId: props.target.id,
+    sourceIds: [props.source.id],
+    targetIds: [props.target.id],
   });
 }
 </script>

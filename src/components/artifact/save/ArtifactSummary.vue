@@ -1,5 +1,5 @@
 <template>
-  <flex-box justify="between" align="center">
+  <flex-box v-if="hasSummary" justify="between" align="center">
     <typography variant="caption" value="Summary" />
     <text-button
       v-if="!generateApproval && displayActions"

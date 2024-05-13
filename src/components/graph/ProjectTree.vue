@@ -103,7 +103,9 @@ const graph = ref(
   })
 );
 
-const isInView = computed(() => !layoutStore.isTableMode);
+const isInView = computed(
+  () => layoutStore.isTreeMode || layoutStore.isTimMode
+);
 const isTreeMode = computed(() => layoutStore.isTreeMode);
 
 const artifacts = computed(() => artifactStore.currentArtifacts);

@@ -4,7 +4,7 @@ import { ClassNameProps, CytoCoreGraph, StyleProps } from "@/types";
 /**
  * Enumerates the modes of the project graph.
  */
-export type GraphMode = "tim" | "tree" | "table" | "delta";
+export type GraphMode = "tim" | "tree" | "table" | "delta" | "chat";
 
 /**
  * Enumerates the modes of the project graph.

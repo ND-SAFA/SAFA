@@ -1,6 +1,6 @@
 <template>
   <div>
-    <panel-card :title="title">
+    <panel-card :title="title" borderless>
       <template #title-actions>
         <attribute-chip v-if="!!score" confidence-score :value="score" />
       </template>

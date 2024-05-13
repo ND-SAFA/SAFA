@@ -2,9 +2,9 @@ import { defineStore } from "pinia";
 
 import { computed } from "vue";
 import {
-  DocumentType,
+  ViewType,
   IOHandlerCallback,
-  DocumentSchema,
+  ViewSchema,
   DocumentApiHook,
 } from "@/types";
 import { buildDocument, preserveObjectKeys } from "@/util";
@@ -17,21 +17,21 @@ import {
   artifactStore,
 } from "@/hooks";
 import {
-  saveDocument,
-  deleteDocument,
-  getDocuments,
-  setCurrentDocument,
-  clearCurrentDocument,
+  saveView,
+  deleteView,
+  getViews,
+  setCurrentView,
+  clearCurrentView,
 } from "@/api";
 import { pinia } from "@/plugins";
 
 /**
- * A hook for managing document API requests.
+ * A hook for managing view API requests.
  */
-const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
-  const documentApi = useApi("documentApi");
+const useViewApi = defineStore("documentApi", (): DocumentApiHook => {
+  const viewApi = useApi("viewApi");
 
-  const loading = computed(() => documentApi.loading);
+  const loading = computed(() => viewApi.loading);
 
   const currentDocument = computed({
     get() {
@@ -44,12 +44,12 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
 
   async function handleCreate(
     name: string,
-    type: DocumentType,
+    type: ViewType,
     artifactIds: string[]
   ): Promise<void> {
-    await documentApi.handleRequest(async () => {
+    await viewApi.handleRequest(async () => {
       const versionId = projectStore.versionIdWithLog;
-      const createdDocument = await saveDocument(
+      const createdDocument = await saveView(
         versionId,
         buildDocument({
           project: preserveObjectKeys(projectStore.project, [
@@ -68,18 +68,18 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
         })
       );
 
-      await setCurrentDocument(createdDocument.documentId);
+      await setCurrentView(createdDocument.documentId);
       await documentStore.addDocument(createdDocument);
     });
   }
 
   async function handleCreatePreset(
-    document: DocumentSchema,
+    document: ViewSchema,
     callbacks: IOHandlerCallback = {}
   ): Promise<void> {
     const { name, type, artifactIds } = document;
 
-    await documentApi.handleRequest(
+    await viewApi.handleRequest(
       async () => {
         await documentStore.removeDocument(document);
         await handleCreate(name, type, artifactIds);
@@ -93,10 +93,10 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
     );
   }
 
-  async function handleUpdate(document: DocumentSchema): Promise<void> {
-    await documentApi.handleRequest(async () => {
+  async function handleUpdate(document: ViewSchema): Promise<void> {
+    await viewApi.handleRequest(async () => {
       const versionId = projectStore.versionIdWithLog;
-      const updatedDocument = await saveDocument(versionId, document);
+      const updatedDocument = await saveView(versionId, document);
 
       await documentStore.updateDocuments([updatedDocument]);
     });
@@ -112,9 +112,9 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
       async (confirmed) => {
         if (!confirmed) return;
 
-        await documentApi.handleRequest(
+        await viewApi.handleRequest(
           async () => {
-            await deleteDocument(document.documentId);
+            await deleteView(document.documentId);
             await documentStore.removeDocument(document);
           },
           {
@@ -132,8 +132,8 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
     versionId = projectStore.versionId,
     artifacts = artifactStore.allArtifacts
   ): Promise<void> {
-    await documentApi.handleRequest(async () => {
-      const documents = await getDocuments(versionId);
+    await viewApi.handleRequest(async () => {
+      const documents = await getViews(versionId);
 
       await documentStore.updateDocuments(documents);
 
@@ -146,7 +146,7 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
     const isUpdate = documentSaveStore.isUpdate;
     const { name, type, artifactIds } = document;
 
-    await documentApi.handleRequest(
+    await viewApi.handleRequest(
       async () =>
         isUpdate
           ? handleUpdate(document)
@@ -164,14 +164,14 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
     );
   }
 
-  async function handleSwitch(document: DocumentSchema): Promise<void> {
-    await documentApi.handleRequest(async () => {
+  async function handleSwitch(document: ViewSchema): Promise<void> {
+    await viewApi.handleRequest(async () => {
       await documentStore.switchDocuments(document);
 
       if (document.documentId) {
-        await setCurrentDocument(document.documentId);
+        await setCurrentView(document.documentId);
       } else {
-        await clearCurrentDocument();
+        await clearCurrentView();
       }
     });
   }
@@ -189,4 +189,4 @@ const useDocumentApi = defineStore("documentApi", (): DocumentApiHook => {
   };
 });
 
-export default useDocumentApi(pinia);
+export default useViewApi(pinia);

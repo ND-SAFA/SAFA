@@ -10,7 +10,7 @@ import { buildRequest } from "@/api";
 export async function getProjectVersions(
   projectId: string
 ): Promise<VersionSchema[]> {
-  return buildRequest<VersionSchema[], "projectId">("getProjectVersions", {
+  return buildRequest<VersionSchema[], "projectId">("versionCollection", {
     projectId,
   }).get();
 }
@@ -24,7 +24,7 @@ export async function getProjectVersions(
 export async function getCurrentVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return buildRequest<VersionSchema, "projectId">("getCurrentVersion", {
+  return buildRequest<VersionSchema, "projectId">("versionCurrent", {
     projectId,
   }).get();
 }
@@ -38,7 +38,7 @@ export async function getCurrentVersion(
 export async function createMajorVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return buildRequest<VersionSchema, "projectId">("createNewMajorVersion", {
+  return buildRequest<VersionSchema, "projectId">("versionMajor", {
     projectId,
   }).post();
 }
@@ -52,7 +52,7 @@ export async function createMajorVersion(
 export async function createMinorVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return buildRequest<VersionSchema, "projectId">("createNewMinorVersion", {
+  return buildRequest<VersionSchema, "projectId">("versionMinor", {
     projectId,
   }).post();
 }
@@ -66,7 +66,7 @@ export async function createMinorVersion(
 export async function createRevisionVersion(
   projectId: string
 ): Promise<VersionSchema> {
-  return buildRequest<VersionSchema, "projectId">("createNewRevisionVersion", {
+  return buildRequest<VersionSchema, "projectId">("versionRevision", {
     projectId,
   }).post();
 }
@@ -77,7 +77,7 @@ export async function createRevisionVersion(
  * @param versionId - The version ID to delete.
  */
 export async function deleteProjectVersion(versionId: string): Promise<void> {
-  return buildRequest<void, "versionId">("projectVersion", {
+  return buildRequest<void, "versionId">("version", {
     versionId,
   }).delete();
 }

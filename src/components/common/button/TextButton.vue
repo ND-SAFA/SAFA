@@ -15,6 +15,7 @@
       v-if="props.icon"
       :variant="props.icon"
       :class="!props.hideLabel ? 'q-mr-sm' : ''"
+      :rotate="props.iconRotate"
     />
     <typography
       v-if="!!props.label && !props.hideLabel"

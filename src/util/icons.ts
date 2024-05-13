@@ -217,6 +217,22 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-credit-card-outline";
     case "admin":
       return "mdi-account-supervisor-circle";
+    case "comment":
+      return "mdi-comment-text-outline";
+    case "comment-resolve":
+      return "mdi-comment-check-outline";
+    case "flag":
+      return "mdi-flag";
+    case "health":
+      return "mdi-heart-pulse";
+    case "health-unknown":
+      return "mdi-help";
+    case "health-concept":
+      return "mdi-file-document";
+    case "health-concept-multiple":
+      return "mdi-file-document-multiple";
+    case "health-conflict":
+      return "mdi-compare-remove";
     default:
       return "";
   }

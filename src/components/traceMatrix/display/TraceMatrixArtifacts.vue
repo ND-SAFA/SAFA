@@ -1,9 +1,10 @@
 <template>
   <div>
-    <panel-card :title="targetArtifactsLabel" collapsable>
+    <panel-card :title="targetArtifactsLabel" collapsable borderless>
       <template #title-actions>
         <text-button
           text
+          small
           label="View Parents"
           icon="view-tree"
           @click="viewsStore.addDocumentOfTypes([targetType])"
@@ -14,6 +15,7 @@
         :artifacts="targetArtifacts"
         data-cy="list-selected-parent-artifacts"
         item-data-cy="list-selected-parent-artifact-item"
+        class="bg-background rounded"
         @click="viewsStore.addDocumentOfNeighborhood($event)"
       />
       <typography
@@ -24,10 +26,11 @@
       />
     </panel-card>
 
-    <panel-card :title="sourceArtifactsLabel" collapsable>
+    <panel-card :title="sourceArtifactsLabel" collapsable borderless>
       <template #title-actions>
         <text-button
           text
+          small
           label="View Children"
           icon="view-tree"
           @click="viewsStore.addDocumentOfTypes([sourceType])"
@@ -38,6 +41,7 @@
         :artifacts="sourceArtifacts"
         data-cy="list-selected-child-artifacts"
         item-data-cy="list-selected-child-artifact-item"
+        class="bg-background rounded"
         @click="viewsStore.addDocumentOfNeighborhood($event)"
       />
       <typography

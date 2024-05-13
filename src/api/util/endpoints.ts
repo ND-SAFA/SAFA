@@ -22,24 +22,24 @@ export enum Endpoint {
 
   session = "accounts/session",
   login = "login",
-  createAccount = "accounts/create",
-  createVerifiedAccount = "accounts/create-verified",
-  verifyAccount = "accounts/verify",
+  accountCreate = "accounts/create",
+  accountCreateVerified = "accounts/create-verified",
+  accountVerify = "accounts/verify",
   logout = "logout",
-  forgotPassword = "accounts/forgot",
-  forgotPasswordAdmin = "accounts/forgot/no-email",
-  resetPassword = "accounts/reset",
-  updatePassword = "accounts/change",
-  deleteAccount = "accounts/delete",
-  getAccount = "accounts/self",
-  editAccountOrg = "accounts/organization",
+  accountForgot = "accounts/forgot",
+  accountForgotAdmin = "accounts/forgot/no-email",
+  accountReset = "accounts/reset",
+  accountChange = "accounts/change",
+  accountDelete = "accounts/delete",
+  accountGet = "accounts/self",
+  accountOrg = "accounts/organization",
 
   // Admin
 
-  setSuperuser = "accounts/superuser",
-  activateSuperuser = "accounts/superuser/activate",
-  deactivateSuperuser = "accounts/superuser/deactivate",
-  onboardingStatistics = "statistics/onboarding",
+  superuser = "accounts/superuser",
+  superuserActivate = "accounts/superuser/activate",
+  superuserDeactivate = "accounts/superuser/deactivate",
+  statisticsOnboarding = "statistics/onboarding",
 
   // Onboarding
 
@@ -47,34 +47,27 @@ export enum Endpoint {
 
   // Jobs
 
-  createProjectJob = "jobs/projects",
-  createProjectThroughFlatFiles = "jobs/projects/upload",
-  updateProjectThroughFlatFiles = "jobs/projects/versions/:versionId",
-  getUserJobs = "jobs/user",
-  getProjectJobs = "jobs/project/:projectId",
-  deleteJobById = "jobs/:jobId",
-  getJobLog = "jobs/:jobId/logs",
-  jobTopic = "/topic/jobs/:jobId",
-  userTopic = "/user/:userId/updates",
-  projectTopic = "/topic/project/:projectId",
-  versionTopic = "/topic/version/:versionId",
+  jobProjects = "jobs/projects",
+  jobProjectsUpload = "jobs/projects/upload",
+  jobProjectsVersion = "jobs/projects/versions/:versionId",
+  jobsUser = "jobs/user",
+  jobsProject = "jobs/project/:projectId",
+  job = "jobs/:jobId",
+  jobLogs = "jobs/:jobId/logs",
+  topicJobs = "/topic/jobs/:jobId",
+  topicProject = "/topic/project/:projectId",
+  topicVersion = "/topic/version/:versionId",
 
   // Projects
 
-  project = "projects",
-  updateProject = "projects/:projectId",
-  transferProject = "projects/:projectId/transfer",
-  getTeamProjects = "projects/team/:teamId",
-
-  // Project Members
-
-  getProjectMembers = "projects/:projectId/members",
-  updateProjectMember = "projects/:projectId/members",
-  deleteProjectMember = "projects/members/:projectMemberId",
+  projectCollection = "projects",
+  project = "projects/:projectId",
+  projectTransfer = "projects/:projectId/transfer",
+  projectTeam = "projects/team/:teamId",
 
   // Integrations
 
-  getInstallations = "projects/installations/by-project/:projectId",
+  projectInstallations = "projects/installations/by-project/:projectId",
 
   jiraCreateCredentials = "accounts/jira/credentials/:accessCode",
   jiraEditCredentials = "accounts/jira/credentials",
@@ -99,85 +92,65 @@ export enum Endpoint {
 
   // Types
 
-  createArtifactType = "projects/:projectId/artifactTypes",
-  editArtifactType = "projects/:projectId/artifactTypes/:artifactTypeName",
-  deleteArtifactType = "projects/:projectId/artifactTypes/:artifactTypeName",
+  artifactTypeCollection = "projects/:projectId/artifactTypes",
+  artifactType = "projects/:projectId/artifactTypes/:artifactTypeName",
 
   // Trace Matrices
 
-  createTraceMatrix = "projects/:versionId/matrices/:sourceType/:targetType",
-  deleteTraceMatrix = "projects/:versionId/matrices/:sourceType/:targetType",
+  traceMatrix = "projects/:versionId/matrices/:sourceType/:targetType",
 
   // Links
 
-  getGeneratedLinks = "projects/versions/:versionId/links/generated",
-  generateLinksJob = "jobs/projects/links/generate",
-  trainModelJob = "jobs/projects/:projectId/models/train",
+  linksGenerated = "projects/versions/:versionId/links/generated",
+  jobLinksGenerate = "jobs/projects/links/generate",
 
   // Entity Retrieval
 
-  projectVersion = "projects/versions/:versionId",
-  getArtifactsInVersion = "projects/versions/:versionId/artifacts",
-  getTracesInVersion = "projects/versions/:versionId/traces",
+  version = "projects/versions/:versionId",
+  artifacts = "projects/versions/:versionId/artifacts",
+  traces = "projects/versions/:versionId/traces",
 
   // Versions
 
-  getProjectVersions = "projects/:projectId/versions",
-  getCurrentVersion = "projects/:projectId/versions/current",
-  createNewMajorVersion = "projects/:projectId/versions/major",
-  createNewMinorVersion = "projects/:projectId/versions/minor",
-  createNewRevisionVersion = "projects/:projectId/versions/revision",
+  versionCollection = "projects/:projectId/versions",
+  versionCurrent = "projects/:projectId/versions/current",
+  versionMajor = "projects/:projectId/versions/major",
+  versionMinor = "projects/:projectId/versions/minor",
+  versionRevision = "projects/:projectId/versions/revision",
 
   // Attributes
 
-  createAttribute = "projects/:projectId/attributes",
-  editAttribute = "projects/:projectId/attributes/:key",
-  createAttributeLayout = "projects/:projectId/attribute-layouts",
-  editAttributeLayout = "projects/:projectId/attribute-layouts/:id",
+  attributeCollection = "projects/:projectId/attributes",
+  attribute = "projects/:projectId/attributes/:key",
+  attributeLayoutCollection = "projects/:projectId/attribute-layouts",
+  attributeLayout = "projects/:projectId/attribute-layouts/:id",
 
   // Layout
 
-  refreshLayout = "projects/versions/:versionId/layout",
+  layout = "projects/versions/:versionId/layout",
 
   // Documents
 
-  createOrUpdateDocument = "projects/versions/:versionId/documents",
-  getProjectDocuments = "projects/versions/:versionId/documents",
-  deleteDocument = "projects/documents/:documentId",
-
-  // Document Artifacts
-
-  addArtifactsToDocument = "projects/versions/:versionId/documents/:documentId/artifacts",
-  removeArtifactFromDocument = "projects/versions/:versionId/documents/:documentId/artifacts/:artifactId",
-  setCurrentDocument = "projects/documents/current/:documentId",
-  clearCurrentDocument = "projects/documents/current",
+  viewCollection = "projects/versions/:versionId/documents",
+  view = "projects/documents/:viewId",
+  viewCurrent = "projects/documents/current/:viewId",
+  viewCurrentClear = "projects/documents/current",
 
   // Delta
 
-  getProjectDelta = "projects/delta/:sourceVersionId/:targetVersionId",
+  delta = "projects/delta/:sourceVersionId/:targetVersionId",
 
   // Parse Entities
 
-  parseArtifactFile = "projects/parse/artifacts/:artifactType",
-  parseTraceFile = "projects/parse/traces",
-
-  // Warnings
-
-  getWarningsInProjectVersion = "projects/versions/:versionId/warnings",
-
-  // Models
-
-  getModels = "projects/:projectId/models",
-  createModel = "projects/:projectId/models",
-  editModel = "projects/:projectId/models/:modelId",
-  deleteModel = "projects/:projectId/models/:modelId",
-  shareModel = "projects/models/share",
+  parseArtifacts = "projects/parse/artifacts/:artifactType",
+  parseTraces = "projects/parse/traces",
 
   // Files
 
-  getProjectFiles = "projects/versions/:versionId/flat-files/:fileType",
+  projectFiles = "projects/versions/:versionId/flat-files/:fileType",
 
   // Search
+
   search = "search/:versionId",
 
   // Generation
@@ -188,30 +161,40 @@ export enum Endpoint {
 
   // Orgs
 
-  getAllOrgs = "organizations",
-  createOrg = "organizations",
-  getPersonalOrg = "organizations/self",
-  getOrg = "organizations/:orgId",
-  editOrg = "organizations/:orgId",
-  deleteOrg = "organizations/:orgId",
+  organizationCollection = "organizations",
+  organizationSelf = "organizations/self",
+  organization = "organizations/:orgId",
 
-  createTeam = "organizations/:orgId/teams",
-  editTeam = "organizations/:orgId/teams/:teamId",
-  deleteTeam = "organizations/:orgId/teams/:teamId",
+  teamCollection = "organizations/:orgId/teams",
+  team = "organizations/:orgId/teams/:teamId",
 
-  getMembers = "members/:entityId",
-  createMember = "members/:entityId",
-  editMember = "members/:entityId/:memberId",
-  deleteMember = "members/:entityId/:memberId",
+  memberCollection = "members/:entityId",
+  member = "members/:entityId/:memberId",
 
   // Billing
 
-  createCostEstimate = "hgen/:versionId/estimate",
-  createCheckoutSession = "billing/checkout",
-  setOrgPaymentTier = "billing/update-payment-tier",
-  deleteCheckoutSession = "stripe/cancel/:sessionId",
-  getAllTransactions = "billing/transactions/:orgId",
-  getMonthlyTransactions = "billing/transactions/:orgId/month",
+  billingEstimate = "hgen/:versionId/estimate",
+  billingCheckout = "billing/checkout",
+  billingCheckoutDelete = "stripe/cancel/:sessionId",
+  billingTier = "billing/update-payment-tier",
+  transactions = "billing/transactions/:orgId",
+  transactionsMonthly = "billing/transactions/:orgId/month",
+
+  // Comments, Flags, Health Checks
+
+  commentCollection = "comments/artifact/:artifactId",
+  comment = "comments/:commentId",
+  commentContent = "comments/:commentId/content",
+  commentResolve = "comments/:commentId/resolve",
+  healthChecks = "health/versions/:versionId",
+
+  // Chat
+
+  chatCollection = "chats",
+  chat = "chats/:chatId",
+  chatProject = "chats/projects/:projectId",
+  chatTitle = "chats/:chatId/title",
+  chatMessages = "chats/:chatId/messages",
 }
 
 /**

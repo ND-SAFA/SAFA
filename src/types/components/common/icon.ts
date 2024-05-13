@@ -100,7 +100,15 @@ export type IconVariant =
   | "changelog"
   | "security"
   | "payment"
-  | "admin";
+  | "admin"
+  | "comment"
+  | "comment-resolve"
+  | "flag"
+  | "health"
+  | "health-unknown"
+  | "health-concept"
+  | "health-concept-multiple"
+  | "health-conflict";
 
 /**
  * Defines props for an icon.

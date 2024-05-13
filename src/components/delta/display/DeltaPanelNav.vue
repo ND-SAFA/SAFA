@@ -1,5 +1,5 @@
 <template>
-  <panel-card>
+  <panel-card borderless title="Version Delta">
     <text-button
       v-if="deltaVersion && !!deltaVersion.versionId"
       block

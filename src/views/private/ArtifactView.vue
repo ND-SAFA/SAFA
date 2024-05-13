@@ -2,6 +2,8 @@
   <private-page full-window graph class="bg-neutral">
     <project-tree />
 
+    <project-chat />
+
     <div
       v-if="isTableMode"
       class="q-pa-sm bg-background"
@@ -42,6 +44,7 @@ import {
   TraceTable,
   ProjectTree,
   ApprovalTable,
+  ProjectChat,
 } from "@/components";
 
 const tabs = tableViewTabOptions();

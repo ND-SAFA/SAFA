@@ -1,4 +1,4 @@
-import { DocumentType, FTANodeType, SafetyCaseType } from "@/types";
+import { ArtifactSchema } from "@/types";
 
 export type PopupType =
   | "errorModal"
@@ -34,22 +34,31 @@ export interface PopupStateMap
 }
 
 /**
- * Represents the open state of the artifact creator.
- */
-export type ArtifactCreatorOpenState =
-  | boolean
-  | SafetyCaseType
-  | FTANodeType
-  | DocumentType;
-
-/**
  * Represents the open state of the trace link creator.
  */
 export type TraceCreatorOpenState =
   | boolean
   | { type: "source"; artifactId: string }
   | { type: "target"; artifactId: string }
-  | { type: "both"; sourceId: string; targetId: string };
+  | { type: "both"; sourceIds: string[]; targetIds: string[] };
+
+/**
+ * Represents the open state of the artifact creator.
+ */
+export interface ArtifactCreatorOpenState {
+  /**
+   * Whether this is a new artifact, or one being edited.
+   */
+  isNewArtifact?: boolean;
+  /**
+   * Additional fields to include in the artifact being saved.
+   */
+  artifact?: Partial<ArtifactSchema>;
+  /**
+   * A parent artifact to optionally link to.
+   */
+  parentId?: string;
+}
 
 /**
  * Represents the type of details panel states.

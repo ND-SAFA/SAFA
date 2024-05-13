@@ -9,7 +9,7 @@
         @click="appStore.openDetailsPanel('displayTrace')"
       />
     </template>
-    <panel-card title="Save Trace Link">
+    <panel-card title="Save Trace Link" borderless>
       <text-input
         v-model="editTraceStore.editedTrace.explanation"
         label="Explanation"

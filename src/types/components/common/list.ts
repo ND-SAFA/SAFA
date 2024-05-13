@@ -51,6 +51,10 @@ export interface ArtifactListProps extends TestableProps {
    * How many action columns to display.
    */
   actionCols?: number;
+  /**
+   * Whether to display at full width.
+   */
+  fullWidth?: boolean;
 }
 
 /**

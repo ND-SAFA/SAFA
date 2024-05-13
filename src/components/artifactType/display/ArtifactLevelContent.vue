@@ -1,5 +1,5 @@
 <template>
-  <panel-card>
+  <panel-card borderless>
     <template #title>
       <typography
         ellipsis

@@ -1,5 +1,8 @@
 <template>
-  <panel-card :title="props.hideTitle ? undefined : name">
+  <panel-card
+    :title="props.hideTitle ? undefined : name"
+    :borderless="props.borderless"
+  >
     <template v-if="!props.hideTitle" #title-actions>
       <typography secondary :value="versionLabel" />
     </template>
@@ -59,7 +62,11 @@ import { versionToString } from "@/util";
 import { projectStore } from "@/hooks";
 import { PanelCard, Typography } from "@/components/common";
 
-const props = defineProps<{ hideTitle?: boolean; hideOverflow?: boolean }>();
+const props = defineProps<{
+  hideTitle?: boolean;
+  hideOverflow?: boolean;
+  borderless?: boolean;
+}>();
 
 // const editMode = computed(() => appStore.popups.editProject);
 // const editedIdentifier = computed(() => identifierSaveStore.editedIdentifier);

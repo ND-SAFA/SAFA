@@ -22,7 +22,7 @@
       v-for="chat in chatStore.chats"
       :key="chat.id"
       :title="chat.title"
-      :clickable="!chatApiStore.loading"
+      clickable
       :focused="chatStore.currentChat?.id === chat.id"
       :action-cols="1"
       @click="chatApiStore.handleLoadProjectChatMessages(chat)"

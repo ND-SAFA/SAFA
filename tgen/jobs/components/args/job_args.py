@@ -4,8 +4,9 @@ from typing import Any, Dict, Type
 from tgen.common.constants.job_constants import SAVE_OUTPUT_DEFAULT
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.dataclass_util import DataclassUtil
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.param_specs import ParamSpecs
+from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.pipeline.pipeline_args import PipelineArgs
@@ -70,7 +71,6 @@ class JobArgs(BaseObject):
         :return: A dictionary mapping param name to value for all job args that are in the pipeline args.
         """
         job_args_dict = DataclassUtil.convert_to_dict(self)
-        constructor_param_names = ParamSpecs.create_from_method(pipeline_args_class.__init__).param_names
-        args4pipeline = {name: val for name, val in job_args_dict.items()
-                         if name in constructor_param_names and name != "dataset_creator"}
+        args4pipeline = ReflectionUtil.get_constructor_params(pipeline_args_class, **job_args_dict)
+        DictUtil.get_kwarg_values(args4pipeline, dataset_creator=None, pop=True)
         return args4pipeline

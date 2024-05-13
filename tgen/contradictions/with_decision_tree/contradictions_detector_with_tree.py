@@ -129,5 +129,5 @@ class ContradictionsDetectorWithTree:
             return []
         trainer = LLMTrainer(LLMTrainerState(prompt_builders=prompt_builders, llm_manager=self.llm_manager))
         res = trainer.perform_prediction()
-        choices = [LLMNode.get_choice_from_response(r) for r in res.predictions]
+        choices = [LLMNode.parse_response(r) for r in res.predictions]
         return choices

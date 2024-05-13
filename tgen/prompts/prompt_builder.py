@@ -131,6 +131,13 @@ class PromptBuilder:
         """
         return {prompt.args.prompt_id: prompt.parse_response(res) for prompt in self.prompts}
 
+    def get_response_prompts(self) -> List[Prompt]:
+        """
+        Gets any prompts that expect a response from the LLM.
+        :return: A list of prompts with response tags.
+        """
+        return [p for p in self.prompts if p.response_manager.response_tag]
+
     def _build_prompts(self, build_all: bool = True, only_use_system_prompts: bool = False, **prompt_kwargs) -> str:
         """
         Builds each prompt and combines them to create one final prompt.

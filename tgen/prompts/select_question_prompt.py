@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Union
 from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.override import overrides
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
@@ -82,8 +83,11 @@ class SelectQuestionPrompt(QuestionPrompt):
         Category) Description
         :return: The formatted prompt
         """
-        categories_format = "\t{}) {}"
-        formatted_categories = NEW_LINE.join(
-            [categories_format.format(category, descr) for category, descr in self.categories.items()])
-        formatted_question = f"{self.value}{NEW_LINE}{formatted_categories}"
+        if not any(self.categories.values()):
+            formatted_categories = PromptUtil.format_options(list(self.categories.keys()))
+        else:
+            categories_format = "\n\t{}) {}"
+            formatted_categories = EMPTY_STRING.join(
+                [categories_format.format(category, descr) for category, descr in self.categories.items()])
+        formatted_question = f"{self.value}{formatted_categories}"
         return formatted_question

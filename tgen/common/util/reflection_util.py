@@ -40,8 +40,8 @@ class ReflectionUtil:
         :param params: The param names to check for.
         :return: All params that would be in the constructor.
         """
-        constructor_param_names = ParamSpecs.create_from_method(class_type.__init__).param_names
-        return {name: val for name, val in params.items() if name in constructor_param_names}
+        param_specs = ParamSpecs.create_from_method(class_type.__init__)
+        return param_specs.extract_params_from_kwargs(**params)
 
     @staticmethod
     def get_target_class_from_type(target_class: Type) -> Type:

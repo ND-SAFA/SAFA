@@ -108,8 +108,8 @@ class TestCommentCrud extends ApplicationBaseTest {
         assertThat(commentCreated.getVersionId()).isEqualTo(projectVersion.getId());
         assertThat(commentCreated.getStatus()).isEqualTo(CommentStatus.ACTIVE);
         assertThat(commentCreated.getType()).isEqualTo(CommentType.CONVERSATION);
-        assertThat(commentCreated.getTimeCreated()).isNotNull();
-        assertThat(commentCreated.getTimeUpdated()).isNotNull();
+        assertThat(commentCreated.getCreatedAt()).isNotNull();
+        assertThat(commentCreated.getUpdatedAt()).isNotNull();
     }
 
     /**

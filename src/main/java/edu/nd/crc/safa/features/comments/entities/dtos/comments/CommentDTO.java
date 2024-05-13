@@ -39,11 +39,11 @@ public class CommentDTO {
     /**
      * Timestamp of when this comment was created.
      */
-    private LocalDateTime timeCreated;
+    private LocalDateTime createdAt;
     /**
      * Timestamp of when this comment was last updated.
      */
-    private LocalDateTime timeUpdated;
+    private LocalDateTime updatedAt;
 
     /**
      * Creates DTO from persistent entity.
@@ -58,8 +58,8 @@ public class CommentDTO {
         dto.setType(comment.getType());
         dto.setStatus(comment.getStatus());
         dto.setVersionId(comment.getVersion().getVersionId());
-        dto.setTimeCreated(comment.getCreatedAt());
-        dto.setTimeUpdated(comment.getUpdatedAt());
+        dto.setCreatedAt(comment.getCreatedAt());
+        dto.setUpdatedAt(comment.getUpdatedAt());
 
         SafaUser author = comment.getAuthor();
         if (author != null) {
@@ -80,7 +80,7 @@ public class CommentDTO {
         other.setVersionId(this.versionId);
         other.setStatus(this.status);
         other.setType(this.type);
-        other.setTimeCreated(this.timeCreated);
-        other.setTimeUpdated(this.timeUpdated);
+        other.setCreatedAt(this.createdAt);
+        other.setUpdatedAt(this.updatedAt);
     }
 }

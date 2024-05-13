@@ -99,7 +99,7 @@ export const useComments = defineStore("useComments", {
               switch (health.type) {
                 case "cited_concept":
                 case "predicted_concept":
-                  return getArtifacts([health.conceptArtifactId]);
+                  return getArtifacts([health.conceptCommentId]);
                 case "contradiction":
                   return getArtifacts(health.artifactIds);
                 case "multi_matched_concept":
@@ -123,7 +123,7 @@ export const useComments = defineStore("useComments", {
                       traceSaveStore.openPanel({
                         type: "both",
                         targetIds: [artifactId],
-                        sourceIds: [health.conceptArtifactId],
+                        sourceIds: [health.conceptCommentId],
                       }),
                   };
                 case "undefined_concept":

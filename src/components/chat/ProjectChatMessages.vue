@@ -47,22 +47,16 @@
             </div>
           </flex-box>
         </list-item>
-      </div>
 
-      <flex-box
-        v-if="chatApiStore.loading || chatApiStore.loadingResponse"
-        justify="center"
-        t="4"
-        class="chat-wrapper chat-loading"
-      >
-        <q-circular-progress color="primary" indeterminate size="md" />
-      </flex-box>
+        <div :id="scrollId" />
+      </div>
 
       <div class="full-width q-px-md chat-wrapper chat-input">
         <q-input
           v-model="currentMessage"
           outlined
-          :disable="chatApiStore.loading"
+          :loading="chatApiStore.loading || chatApiStore.loadingResponse"
+          :disable="chatApiStore.loading || chatApiStore.loadingResponse"
           placeholder="Ask a question"
           class="full-width bg-neutral"
           clearable
@@ -103,6 +97,8 @@ import {
 } from "@/components/common";
 import { ArtifactChip } from "@/components/artifact";
 
+const scrollId = "chat-bottom";
+
 const currentMessage = ref("");
 const editing = ref(false);
 
@@ -118,6 +114,7 @@ function handleSendMessage() {
     chatStore.currentChat,
     currentMessage.value
   );
+
   currentMessage.value = "";
 }
 
@@ -149,12 +146,7 @@ watch(
   () => messages.value,
   () => {
     setTimeout(() => {
-      const chat = document.getElementById(
-        "message-" + (messages.value.length - 1)
-      );
-      if (chat) {
-        chat.scrollIntoView({ behavior: "smooth" });
-      }
+      document.getElementById(scrollId)?.scrollIntoView({ behavior: "smooth" });
     }, 100);
   }
 );

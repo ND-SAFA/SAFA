@@ -32,19 +32,24 @@ export default {
 
 <script setup lang="ts">
 import { computed, watch } from "vue";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { SearchSelectOption } from "@/types";
 import { searchModeOptions } from "@/util";
 import { permissionStore, searchStore } from "@/hooks";
 import { ListItem, Separator } from "@/components/common";
 
-const displayActions = computed(() =>
-  permissionStore.isAllowed("project.edit_data")
-);
+const modeOptions = computed(() => {
+  const allOptions = searchModeOptions();
+  const currentOptions = searchModeOptions().slice(0, 2);
 
-const modeOptions = computed(() =>
-  displayActions.value ? searchModeOptions() : [searchModeOptions()[2]]
-);
+  if (permissionStore.isAllowed("project.edit_data")) {
+    currentOptions.push(allOptions[2]);
+  }
+  if (permissionStore.isAllowed("project.generate")) {
+    currentOptions.push(allOptions[3]);
+  }
+
+  return currentOptions;
+});
 
 /**
  * Clear the search data when the mode changes.

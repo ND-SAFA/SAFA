@@ -56,7 +56,7 @@
           v-model="currentMessage"
           outlined
           :loading="chatApiStore.loading || chatApiStore.loadingResponse"
-          :disable="chatApiStore.loading || chatApiStore.loadingResponse"
+          :disable="chatApiStore.loadingResponse"
           placeholder="Ask a question"
           class="full-width bg-neutral"
           clearable

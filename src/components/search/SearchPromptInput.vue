@@ -16,6 +16,7 @@
     data-cy="input-nav-artifact-search"
     @update:model-value="clearOptions"
     @filter="filterOptions"
+    @keydown.enter="handleChat"
   >
     <template #append>
       <icon variant="search" />
@@ -37,7 +38,10 @@
     <template #option="{ opt, itemProps }">
       <search-option v-bind="itemProps" :option="opt" />
     </template>
-    <template v-if="!searchStore.basicSearchMode" #no-option>
+    <template
+      v-if="!searchStore.basicSearchMode && !searchStore.chatSearchMode"
+      #no-option
+    >
       <search-inputs @submit="searchApiStore.handleSearch" />
     </template>
   </q-select>
@@ -58,6 +62,9 @@ import { ArtifactSchema, ArtifactTypeSchema } from "@/types";
 import { filterArtifacts } from "@/util";
 import {
   artifactStore,
+  chatApiStore,
+  chatStore,
+  layoutStore,
   searchApiStore,
   searchStore,
   selectionStore,
@@ -69,6 +76,7 @@ import SearchInputs from "./SearchInputs.vue";
 
 const searchOptions = ref<ArtifactSchema[] | string[]>([]);
 const hiddenTypes = ref<string[]>([]);
+const currentText = ref("");
 
 /**
  * Returns the display text for how many matches there are.
@@ -94,6 +102,7 @@ function clearOptions(): void {
  */
 function filterOptions(search: string, update: (fn: () => void) => void) {
   searchStore.searchText = search;
+  currentText.value = search;
 
   update(() => {
     if (
@@ -151,6 +160,17 @@ function handleTypeChange(
   searchOptions.value = artifactStore.currentArtifacts.filter(
     (artifact) => !hiddenTypes.value.includes(artifact.type)
   );
+}
+
+/**
+ * Handles a search in chat mode, creating a new chat.
+ */
+function handleChat() {
+  if (!searchStore.chatSearchMode) return;
+
+  chatStore.addChat();
+  chatApiStore.handleSendChatMessage(chatStore.currentChat, currentText.value);
+  layoutStore.mode = "chat";
 }
 
 /**

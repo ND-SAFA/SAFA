@@ -54,6 +54,12 @@ export const useSearch = defineStore("search", {
       return this.mode.id === "search";
     },
     /**
+     * Whether the search mode is chat search.
+     */
+    chatSearchMode(): boolean {
+      return this.mode.id === "chat";
+    },
+    /**
      * The number of search items selected.
      */
     selectionCount(): number {

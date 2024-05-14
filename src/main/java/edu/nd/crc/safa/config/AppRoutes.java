@@ -390,6 +390,7 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Statistics {
         public static final String ROOT = "/statistics";
-        public static final String ONBOARDING_ALL_USERS = ROOT + "/onboarding";
+        public static final String ONBOARDING_ROOT = ROOT + "/onboarding";
+        public static final String ONBOARDING_BY_USER = ONBOARDING_ROOT + "/{userId}";
     }
 }

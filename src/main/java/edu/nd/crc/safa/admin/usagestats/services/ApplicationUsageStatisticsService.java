@@ -3,7 +3,7 @@ package edu.nd.crc.safa.admin.usagestats.services;
 import java.util.List;
 
 import edu.nd.crc.safa.admin.usagestats.ProgressSummaryCalculator;
-import edu.nd.crc.safa.admin.usagestats.entities.app.UserProgressSummaryAppEntity;
+import edu.nd.crc.safa.admin.usagestats.entities.app.OnboardingProgressSummaryDTO;
 import edu.nd.crc.safa.admin.usagestats.entities.db.ApplicationUsageStatistics;
 import edu.nd.crc.safa.admin.usagestats.repositories.ApplicationUsageStatisticsRepository;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
@@ -129,7 +129,7 @@ public class ApplicationUsageStatisticsService {
      *
      * @return Orientation progress summary
      */
-    public UserProgressSummaryAppEntity getOrientationProgressSummary() {
+    public OnboardingProgressSummaryDTO getOrientationProgressSummary() {
         Iterable<ApplicationUsageStatistics> allUsageStats = statsRepo.findAll();
         return ProgressSummaryCalculator.fromUsageStats(allUsageStats);
     }

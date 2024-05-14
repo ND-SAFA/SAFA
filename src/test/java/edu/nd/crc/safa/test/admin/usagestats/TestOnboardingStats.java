@@ -13,9 +13,10 @@ import java.util.UUID;
 import edu.nd.crc.safa.admin.usagestats.entities.app.AccountCreationStatistics;
 import edu.nd.crc.safa.admin.usagestats.entities.app.GenerationStatistics;
 import edu.nd.crc.safa.admin.usagestats.entities.app.GithubIntegrationStatistics;
+import edu.nd.crc.safa.admin.usagestats.entities.app.OnboardingProgressSummaryDTO;
 import edu.nd.crc.safa.admin.usagestats.entities.app.ProjectImportStatistics;
 import edu.nd.crc.safa.admin.usagestats.entities.app.ProjectSummarizationStatistics;
-import edu.nd.crc.safa.admin.usagestats.entities.app.UserProgressSummaryAppEntity;
+import edu.nd.crc.safa.admin.usagestats.entities.app.UserStatisticsDTO;
 import edu.nd.crc.safa.admin.usagestats.entities.db.ApplicationUsageStatistics;
 import edu.nd.crc.safa.admin.usagestats.repositories.ApplicationUsageStatisticsRepository;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -145,7 +146,7 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
         applyToUsers(this::doGeneration, range(8, 10, 2));
 
         rootBuilder.authorize(a -> a.loginDefaultUser(this));
-        UserProgressSummaryAppEntity onboardingState = getOnboardingStats();
+        OnboardingProgressSummaryDTO onboardingState = getOnboardingStats();
 
         AccountCreationStatistics accountStats = onboardingState.getAccounts();
         assertThat(accountStats.getCreated()).isEqualTo(16);
@@ -179,11 +180,24 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
         assertThat(genStats.getFromImportProper().getPercent()).isEqualTo(0.6666, Offset.offset(0.0001));
         assertThat(genStats.getTotalGenerations()).isEqualTo(4);
         assertThat(genStats.getLinesGeneratedOn()).isEqualTo(8096);
+
+        UUID firstUserId = safaUserService.getUserByEmail(users.get(0).getUsername()).getUserId();
+        UserStatisticsDTO firstUserStats = SafaRequest.withRoute(AppRoutes.Statistics.ONBOARDING_BY_USER)
+                .withPathVariable("userId", firstUserId.toString())
+                .getAsType(new TypeReference<>(){});
+        assertThat(firstUserStats.getImportsPerformed()).isEqualTo(1);
+        assertThat(firstUserStats.getSummarizationsPerformed()).isEqualTo(0);
+        assertThat(firstUserStats.getGenerationsPerformed()).isEqualTo(1);
+        assertThat(firstUserStats.getLinesGeneratedOn()).isEqualTo(2024);
+        assertThat(firstUserStats.getAccountCreatedTime()).isNull();
+        assertThat(firstUserStats.getGithubLinkedTime()).isNotNull();
+        assertThat(firstUserStats.getFirstProjectImportedTime()).isNotNull();
+        assertThat(firstUserStats.getFirstGenerationPerformedTime()).isNotNull();
     }
 
-    private UserProgressSummaryAppEntity getOnboardingStats() throws Exception {
+    private OnboardingProgressSummaryDTO getOnboardingStats() throws Exception {
         rootBuilder.authorize(a -> a.loginDefaultUser(this));
-        return SafaRequest.withRoute(AppRoutes.Statistics.ONBOARDING_ALL_USERS)
+        return SafaRequest.withRoute(AppRoutes.Statistics.ONBOARDING_ROOT)
             .getAsType(new TypeReference<>() {
             });
     }

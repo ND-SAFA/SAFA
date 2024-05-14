@@ -25,7 +25,7 @@ DEFAULT_RESPONSE_TAG = "answer"
 @dataclass
 class LLMNode(AbstractNode):
     llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
-    input_variable_converter: Callable = None
+    input_variable_converter: Callable = None  # converts the args, state to format vars for the prompt
     response_manager_params: Dict = field(default_factory=dict)
     response_tag: str = field(init=False, default=DEFAULT_RESPONSE_TAG)
 

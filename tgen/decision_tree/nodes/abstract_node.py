@@ -12,7 +12,7 @@ from tgen.pipeline.state import State
 class AbstractNode(abc.ABC):
     description: str
     branches: Dict[str, "AbstractNode"] | "AbstractNode" = field(default_factory=dict)
-    state_setter: Callable[[str, State], None] | str = None
+    state_setter: Callable[[str, State], None] | str = None  # either a callable to set the state or the name of the state var to set
     node_id: str = field(default_factory=uuid.uuid4)
 
     def __post_init__(self) -> None:

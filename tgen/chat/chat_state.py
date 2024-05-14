@@ -15,13 +15,13 @@ from tgen.prompts.prompt_builder import PromptBuilder
 
 @dataclass
 class ChatState(State):
-    user_chat_history: List[MessageMeta] = required_field(field_name="user_chat_history")
-    context_artifact_types: List[str] = field(default_factory=list)
-    related_artifact_ids: Set[str] = field(default_factory=set)
+    user_chat_history: List[MessageMeta] = required_field(field_name="user_chat_history")  # contains only user + llm messages
+    context_artifact_types: List[str] = field(default_factory=list)  # layer ids to use for context
+    related_artifact_ids: Set[str] = field(default_factory=set)  # all artifact ids used for context
 
-    system_prompt: str = field(init=False, default=None)
-    internal_chat_history: List[MessageMeta] = field(init=False, default_factory=list)
-    user_query: str = field(init=False, default=None)
+    system_prompt: str = field(init=False, default=None)  # contains context for chat
+    internal_chat_history: List[MessageMeta] = field(init=False, default_factory=list)  # contains messages used internally for state
+    user_query: str = field(init=False, default=None)  # most recent user message
 
     def __post_init__(self) -> None:
         """

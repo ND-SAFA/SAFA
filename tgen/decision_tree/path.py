@@ -1,14 +1,18 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Any
 
+from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.decision_tree.nodes.abstract_node import AbstractNode
+from tgen.pipeline.state import State
 
 
 @dataclass
 class Path:
     starting_node: AbstractNode
-    starting_input: Any
+    args: Any
+    state: State
     __choices: List[str] = field(default_factory=list, init=False)
     __path_taken: List[AbstractNode] = field(default_factory=list, init=False)
 
@@ -51,7 +55,15 @@ class Path:
         """
         current_node = self.get_node()
         next_selected_node = current_node.select_branch(choice)
-        self.__path_taken.append(next_selected_node)
+        logger.log_with_title(title="Finished traversing next node",
+                              message=f"Node: {current_node.description}{NEW_LINE}Choice: " + "%.200s" % choice)
+        if current_node.state_setter:
+            if isinstance(current_node.state_setter, str):
+                setattr(self.state, current_node.state_setter, choice)
+            else:
+                current_node.state_setter(choice, self.state)
+        if next_selected_node:
+            self.__path_taken.append(next_selected_node)
         self.__choices.append(choice)
         return next_selected_node
 

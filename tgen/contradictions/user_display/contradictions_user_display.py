@@ -117,7 +117,7 @@ class ContradictionsUserDisplay:
         additional_text = f"{RequirementConstituent.EFFECT.name} {RequirementConstituent.CONDITION.name}"
         nodes = path.get_nodes()
 
-        node_text = [node.get_formatted_question(path.starting_input) if isinstance(node, LLMNode) else node.description for node in
+        node_text = [node.get_formatted_question(path.args) if isinstance(node, LLMNode) else node.description for node in
                      nodes]
         canvas_width = self._calculate_canvas_width(node_text, requirements, max_text_width, x_padding_between_nodes, x_canvas_padding)
 
@@ -145,7 +145,7 @@ class ContradictionsUserDisplay:
         key = [("key = ", self.ACCENT_COLOR)] + [(f"{c.name}|", color) for c, color in self.REQUIREMENT_CONSTITUENT_COLORS.items()]
         key_width = BoundingBox.calculate_width_of_text(EMPTY_STRING.join([k[0] for k in key]))
         self._display_text_segments(key, (center_x - (key_width / 2), text_start_y), canvas, make_scrollable=False)
-        self._draw_decision_tree(canvas, node2bounding_box, edges, path.starting_input)
+        self._draw_decision_tree(canvas, node2bounding_box, edges, path.args)
 
     def _create_requirement_entry(self, req_num: int) -> scrolledtext.ScrolledText:
         """

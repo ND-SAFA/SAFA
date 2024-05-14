@@ -18,21 +18,21 @@ public class AppRoutes {
     public static class Accounts {
         public static final String LOGIN = "/login";
         public static final String LOGOUT = "/logout";
-        protected static final String PREFIX = "/accounts";
-        public static final String CHANGE_PASSWORD = Accounts.PREFIX + "/change";
-        public static final String RESET_PASSWORD = Accounts.PREFIX + "/reset";
-        public static final String FORGOT_PASSWORD = Accounts.PREFIX + "/forgot";
-        public static final String FORGOT_PASSWORD_NO_EMAIL = Accounts.PREFIX + "/forgot/no-email";
-        public static final String CREATE_ACCOUNT = Accounts.PREFIX + "/create";
-        public static final String CREATE_VERIFIED_ACCOUNT = Accounts.PREFIX + "/create-verified";
-        public static final String VERIFY_ACCOUNT = Accounts.PREFIX + "/verify";
-        public static final String DELETE_ACCOUNT = Accounts.PREFIX + "/delete";
-        public static final String SELF = Accounts.PREFIX + "/self";
-        public static final String DEFAULT_ORG = Accounts.PREFIX + "/organization";
+        public static final String ROOT = "/accounts";
+        public static final String CHANGE_PASSWORD = Accounts.ROOT + "/change";
+        public static final String RESET_PASSWORD = Accounts.ROOT + "/reset";
+        public static final String FORGOT_PASSWORD = Accounts.ROOT + "/forgot";
+        public static final String FORGOT_PASSWORD_NO_EMAIL = Accounts.ROOT + "/forgot/no-email";
+        public static final String CREATE_ACCOUNT = Accounts.ROOT + "/create";
+        public static final String CREATE_VERIFIED_ACCOUNT = Accounts.ROOT + "/create-verified";
+        public static final String VERIFY_ACCOUNT = Accounts.ROOT + "/verify";
+        public static final String DELETE_ACCOUNT = Accounts.ROOT + "/delete";
+        public static final String SELF = Accounts.ROOT + "/self";
+        public static final String DEFAULT_ORG = Accounts.ROOT + "/organization";
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class SuperUser {
-            public static final String ROOT = Accounts.PREFIX + "/superuser";
+            public static final String ROOT = Accounts.ROOT + "/superuser";
             public static final String ACTIVATE = ROOT + "/activate";
             public static final String DEACTIVATE = ROOT + "/deactivate";
         }
@@ -240,7 +240,7 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Credentials {
-            public static final String ROOT = Accounts.PREFIX + "/jira/credentials";
+            public static final String ROOT = Accounts.ROOT + "/jira/credentials";
             public static final String REGISTER = Credentials.ROOT + "/{accessCode}";
             public static final String REFRESH = Credentials.ROOT;
             public static final String DELETE = Credentials.ROOT;
@@ -249,7 +249,7 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Installations {
-            public static final String ROOT = Accounts.PREFIX + "/jira/installations";
+            public static final String ROOT = Accounts.ROOT + "/jira/installations";
             public static final String RETRIEVE_AVAILABLE = Installations.ROOT;
         }
 
@@ -268,9 +268,9 @@ public class AppRoutes {
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class Credentials {
-            public static final String REGISTER = Accounts.PREFIX + "/github/credentials/{accessCode}";
-            public static final String DELETE = Accounts.PREFIX + "/github/credentials";
-            public static final String VALID = Accounts.PREFIX + "/github/credentials/check";
+            public static final String REGISTER = Accounts.ROOT + "/github/credentials/{accessCode}";
+            public static final String DELETE = Accounts.ROOT + "/github/credentials";
+            public static final String VALID = Accounts.ROOT + "/github/credentials/check";
         }
 
         @NoArgsConstructor(access = AccessLevel.NONE)

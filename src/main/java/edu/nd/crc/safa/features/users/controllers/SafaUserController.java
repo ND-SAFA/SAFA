@@ -1,6 +1,8 @@
 package edu.nd.crc.safa.features.users.controllers;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.TokenService;
@@ -46,8 +48,8 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Controller containing endpoints for:
  * 1. Creating a new account
- * 2. Resetting user password (TODO)
- * 3. Confirming user account (TODO)
+ * 2. Resetting user password
+ * 3. Confirming user account
  * Note, logging into system is handled by spring boot default configuration at /login.
  */
 @RestController
@@ -267,6 +269,14 @@ public class SafaUserController extends BaseController {
     @GetMapping(AppRoutes.Accounts.SELF)
     public UserAppEntity retrieveCurrentUser() {
         return safaUserService.toAppEntity(safaUserService.getCurrentUser());
+    }
+
+    @GetMapping(AppRoutes.Accounts.ROOT)
+    public List<UserAppEntity> retrieveAllUsers() {
+        permissionService.requireSuperuser(getCurrentUser());
+        List<UserAppEntity> users = new ArrayList<>();
+        safaUserRepository.findAll().forEach(user -> users.add(safaUserService.toAppEntity(user)));
+        return users;
     }
 
     @PutMapping(AppRoutes.Accounts.DEFAULT_ORG)

@@ -1,11 +1,9 @@
 <template>
   <card-page id="login-view">
     <template #form>
-      <text-input
+      <email-input
         v-model="email"
-        label="Email"
-        :error-message="sessionApiStore.loginErrorMessage"
-        data-cy="input-email"
+        :error-message="errorMessage"
         @enter="handleSubmit"
       />
       <password-input v-model="password" @enter="handleSubmit" />
@@ -59,7 +57,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { ENABLED_FEATURES } from "@/util";
 import { sessionApiStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
@@ -68,11 +66,12 @@ import {
   PasswordInput,
   Typography,
   TextButton,
-  TextInput,
+  EmailInput,
 } from "@/components";
 
 const email = ref("");
 const password = ref("");
+const errorMessage = ref<string | false>("");
 
 /**
  * Navigate to the sign-up page.
@@ -97,4 +96,14 @@ async function handleSubmit() {
     password: password.value,
   });
 }
+
+watch(
+  () => sessionApiStore.loginErrorMessage,
+  (message) => (errorMessage.value = message)
+);
+
+watch(
+  () => [email.value, password.value],
+  () => (errorMessage.value = false)
+);
 </script>

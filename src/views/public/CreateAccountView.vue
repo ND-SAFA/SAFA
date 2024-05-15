@@ -13,9 +13,8 @@
           el="p"
           value="There are just a few key pieces of info we need to set up your account."
         />
-        <text-input
+        <email-input
           v-model="email"
-          label="Email"
           :error-message="sessionApiStore.createErrorMessage"
           data-cy="input-new-email"
         />
@@ -78,7 +77,7 @@ import {
   CardPage,
   PasswordInput,
   Typography,
-  TextInput,
+  EmailInput,
   TextButton,
 } from "@/components";
 

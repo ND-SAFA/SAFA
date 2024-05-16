@@ -32,28 +32,31 @@ class ContradictionsDetector:
         """
         self.args = args
 
-    def detect(self, query_id: str) -> ContradictionsResult:
+    def detect(self, query_ids: List[str]) -> List[ContradictionsResult]:
         """
         Determines whether a given artifact has any contradictions
-        :param query_id: The id of the artifact to detect contradictions for.
+        :param query_ids: The id of the artifact to detect contradictions for.
         :return A list of ids that conflict with the artifact (empty list if none conflict) and the explanation for why.
         """
-        assert query_id in self.args.dataset.artifact_df, "Unknown artifact"
+        assert all([q_id in self.args.dataset.artifact_df for q_id in query_ids]), f"Queries contain unknown ids: {query_ids}"
+        results = []
 
-        artifact_df = self.args.dataset.artifact_df
-        id2context, all_relationships = ContextFinder.find_related_artifacts(query_id, self.args.dataset,
-                                                                             max_context=self.args.max_context,
-                                                                             base_export_dir=self.args.export_dir)
-        trace_df = self.args.dataset.trace_dataset.trace_df if self.args.dataset.trace_dataset else TraceDataFrame()
-        result = self._perform_detections(query_id, id2context)
-        if not self.args.dataset.trace_dataset:
-            artifact_type = artifact_df.get_artifact(query_id)[ArtifactKeys.LAYER_ID]
-            all_artifact_types = artifact_df.get_artifact_types()
-            layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [artifact_type for _ in all_artifact_types],
-                                       LayerKeys.TARGET_TYPE: all_artifact_types})
-            self.args.dataset.trace_dataset = TraceDataset(artifact_df, trace_df, layer_df)
-        self.args.dataset.trace_dataset.trace_df = self._add_traces_to_df(all_relationships, trace_df)
-        return result
+        for query_id in query_ids:
+            artifact_df = self.args.dataset.artifact_df
+            id2context, all_relationships = ContextFinder.find_related_artifacts(query_id, self.args.dataset,
+                                                                                 max_context=self.args.max_context,
+                                                                                 base_export_dir=self.args.export_dir)
+            trace_df = self.args.dataset.trace_dataset.trace_df if self.args.dataset.trace_dataset else TraceDataFrame()
+            result = self._perform_detections(query_id, id2context)
+            if not self.args.dataset.trace_dataset:
+                artifact_type = artifact_df.get_artifact(query_ids)[ArtifactKeys.LAYER_ID]
+                all_artifact_types = artifact_df.get_artifact_types()
+                layer_df = LayerDataFrame({LayerKeys.SOURCE_TYPE: [artifact_type for _ in all_artifact_types],
+                                           LayerKeys.TARGET_TYPE: all_artifact_types})
+                self.args.dataset.trace_dataset = TraceDataset(artifact_df, trace_df, layer_df)
+            self.args.dataset.trace_dataset.trace_df = self._add_traces_to_df(all_relationships, trace_df)
+            results.append(result)
+        return results
 
     def _perform_detections(self, query_id: str, id2context: Dict[str, List[EnumDict]]) -> ContradictionsResult:
         """
@@ -62,13 +65,7 @@ class ContradictionsDetector:
         :param id2context: Dictionary mapping query id to its related artifacts.
         :return: A list of ids that conflict with the artifact (empty list if none conflict) and the explanation for why.
         """
-        query_artifact = self.args.dataset.artifact_df.get_artifact(query_id)
-        context_prompt = ContextPrompt(id2context, prompt_start=PromptUtil.as_markdown_header("Related Information"),
-                                       build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN, include_ids=True)
-        query_prompt = ArtifactPrompt(prompt_start=PromptUtil.as_markdown_header("Artifact"))
-        instructions_prompt = Prompt(CONTRADICTIONS_INSTRUCTIONS)
-        task_prompt: QuestionnairePrompt = SupportedPrompts.CONTRADICTIONS_TASK.value
-        prompt_builder = PromptBuilder(prompts=[instructions_prompt, query_prompt, context_prompt, task_prompt])
+        prompt_builder, query_artifact, task_prompt = self.construct_prompt_builder(id2context, query_id)
         save_and_load_path = FileUtil.safely_join_paths(self.args.export_dir, f"{query_id}_contradictions_response.yaml")
         output = LLMTrainer.predict_from_prompts(self.args.llm_manager, prompt_builder,
                                                  save_and_load_path=save_and_load_path,
@@ -78,6 +75,16 @@ class ContradictionsDetector:
         result = ContradictionsResult(**{tag: response[tag][0] if len(response[tag]) else None for tag in tags})
         self._filter_unknown_ids(result, id2context[query_id])
         return result
+
+    def construct_prompt_builder(self, id2context, query_id):
+        query_artifact = self.args.dataset.artifact_df.get_artifact(query_id)
+        context_prompt = ContextPrompt(id2context, prompt_start=PromptUtil.as_markdown_header("Related Information"),
+                                       build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN, include_ids=True)
+        query_prompt = ArtifactPrompt(prompt_start=PromptUtil.as_markdown_header("Artifact"))
+        instructions_prompt = Prompt(CONTRADICTIONS_INSTRUCTIONS)
+        task_prompt: QuestionnairePrompt = SupportedPrompts.CONTRADICTIONS_TASK.value
+        prompt_builder = PromptBuilder(prompts=[instructions_prompt, query_prompt, context_prompt, task_prompt])
+        return prompt_builder, query_artifact, task_prompt
 
     @staticmethod
     def _filter_unknown_ids(result: ContradictionsResult, context_artifacts: List[EnumDict]) -> None:

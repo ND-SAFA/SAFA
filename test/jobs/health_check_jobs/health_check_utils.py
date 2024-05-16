@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from test.concepts.test_entity_extraction import TestEntityExtraction
+from test.concepts.test_entity_extraction import TestPredictEntityStep
 from test.concepts.test_entity_matching import TestEntityMatching
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.enum_util import EnumDict
@@ -83,5 +83,5 @@ def mocks_for_health_checks(ai_manager):
                  for e in QUERY_CONCEPTS]
     test_entity_df = ArtifactDataFrame(artifacts)
     ai_manager.set_responses([PromptUtil.create_xml(contradiction_response_tag, EXPECTED_CONTRADICTION)])
-    TestEntityExtraction.mock_entity_extraction(ai_manager, test_entity_df)
+    TestPredictEntityStep.mock_entity_extraction(ai_manager, test_entity_df)
     TestEntityMatching.mock_entity_matching(ai_manager, QUERY_CONCEPTS[:1])

@@ -1,6 +1,6 @@
 from test.concepts.constants import ConceptData
 from test.concepts.test_create_response import TestCreateResponse
-from test.concepts.test_entity_extraction import TestEntityExtraction
+from test.concepts.test_entity_extraction import TestPredictEntityStep
 from test.concepts.test_entity_matching import TestEntityMatching
 from test.concepts.utils import create_concept_args
 from tgen.concepts.concept_pipeline import ConceptPipeline
@@ -18,9 +18,11 @@ class TestConceptPipeline(BaseTest):
         :return:None
         """
         args = create_concept_args()
-        test_entity_df = ConceptData.get_entity_df()
+        test_entity_data_frames = ConceptData.get_entity_dataframes()
 
-        TestEntityExtraction.mock_entity_extraction(ai_manager, test_entity_df)
+        # Mock
+        for test_entity_df in test_entity_data_frames:
+            TestPredictEntityStep.mock_entity_extraction(ai_manager, test_entity_df)
         TestEntityMatching.mock_entity_matching(ai_manager)
 
         # Execution

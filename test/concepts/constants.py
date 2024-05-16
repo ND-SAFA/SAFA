@@ -5,11 +5,12 @@ from tgen.common.objects.artifact import Artifact
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.testres.paths.paths import TEST_DATA_DIR
 
-CONCEPT_ARTIFACT_ID = "GSFPS-3221"
+CONCEPT_R1 = "GSFPS-3221"
+CONCEPT_R2 = "MRD631"
 CONCEPT_TARGET_LAYER_ID = "Requirement"
 CONCEPT_DATA_PATH = os.path.join(TEST_DATA_DIR, "concepts")
 CONCEPT_DF_PATH = os.path.join(CONCEPT_DATA_PATH, "Concept.csv")
-CONCEPT_ARTIFACT_PATH = os.path.join(CONCEPT_DATA_PATH, "requirement.txt")
+CONCEPT_ARTIFACT_PATH = os.path.join(CONCEPT_DATA_PATH, "requirement.csv")
 CONCEPT_TYPE = "Concept"
 CONCEPT_ENTITY_MATCHED = "GS"
 CONCEPT_ENTITY_UNDEFINED = "IFDS"
@@ -17,9 +18,18 @@ CONCEPT_ENTITY_UNDEFINED = "IFDS"
 
 class ConceptData:
     """
-    # Test Case
+    # Test Case: GOES-R
+    - Requirements: 2
+        - R1 = GSFPS-3221
+        - R2 = MRD631
+    - Concept: 26
 
-    List of concepts scraped from NASA dataset: https://dev.safa.ai/project?version=1314a50e-3b09-4197-9264-61e6ce6d3de5
+    # Matches
+
+    R1 => `GS: Ground Speed`, `Ground Station (GS)`, `Command`, `Telemetry (TLM)`
+    R2 =>
+
+
     Artificially added Concept `GS: Ground Speed` to conflict with concept `Ground Station (GS)`
     There are 4 direct matches present above with those above, `Command` and `Telemetry (TLM)` appear naturally in the target artifact.
 
@@ -46,11 +56,12 @@ class ConceptData:
         - N_PREDICTED_MATCHES: E2 is predicted to match with C5 (mocked, this would have been caught in direct matching if present)
         - N_UNDEFINED: IFDS/E3 is not in concepts and marked as undefined.
         """
+        N_TARGETS = 2
         N_DIRECT_MATCHES = 2
         N_MULTI_MATCHES = 1
         MULTI_MATCH_LOC = 4
         N_PREDICTED_MATCHES = 1
-        N_UNDEFINED = 1
+        N_UNDEFINED = 3
 
     class Entities:
         """
@@ -60,7 +71,9 @@ class ConceptData:
         """
         E1 = "GS"
         E2 = "Data Collection System"
-        E3 = "IFDS"
+        E3 = "IFDS"  # R1 - Undefined
+        E4 = "GLM"  # R2 - Undefined
+        E5 = "SSP"  # R3 - Undefined
         UNDEFINED = E3
 
     class LayerId:
@@ -89,17 +102,21 @@ class ConceptData:
     Predicted = [{"source": Entities.E2, "target": Concepts.C5}]
 
     @staticmethod
-    def get_entity_names() -> List[str]:
+    def get_entity_batches() -> List[List[str]]:
         """
         :return: List of entity names found in artifact.
         """
-        return [ConceptData.Entities.E1, ConceptData.Entities.E2, ConceptData.Entities.E3]
+        return [[ConceptData.Entities.E1, ConceptData.Entities.E2, ConceptData.Entities.E3],
+                [ConceptData.Entities.E4, ConceptData.Entities.E5]]
 
     @staticmethod
-    def get_entity_df() -> ArtifactDataFrame:
+    def get_entity_dataframes() -> List[ArtifactDataFrame]:
         """
         :return: DataFrame with entities as artifacts.
         """
-        artifacts = [Artifact(id=e, content="description", layer_id=ConceptData.LayerId.ENTITY, summary="")
-                     for e in ConceptData.get_entity_names()]
-        return ArtifactDataFrame(artifacts)
+        data_frames = []
+        for layer_entities in ConceptData.get_entity_batches():
+            artifacts = [Artifact(id=e, content="description", layer_id=ConceptData.LayerId.ENTITY, summary="")
+                         for e in layer_entities]
+            data_frames.append(ArtifactDataFrame(artifacts))
+        return data_frames

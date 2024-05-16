@@ -4,7 +4,7 @@ from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.types.concept_match import ConceptMatch
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 
@@ -26,17 +26,16 @@ class CreateResponseStep(AbstractPipelineStep):
                 multi_matches[loc] = matches
 
         # Undefined entities
-        direct_matched_entities = set([m[ArtifactKeys.ID] for m in state.direct_matches])
-        predicted_matched_entities = set([t[TraceKeys.SOURCE] for t in state.predicted_matches])
+        direct_matched_entities = set([m["matched_content"] for m in state.direct_matches])
+        predicted_matched_entities = set([t.entity_id for t in state.predicted_matches])
         matched_entities = direct_matched_entities.union(predicted_matched_entities)
-        undefined_entities = [e for e in state.entity_df.to_artifacts() if e[ArtifactKeys.ID] not in matched_entities]
-
-        unique_predicted_entities = [t for t in state.predicted_matches if t[TraceKeys.SOURCE] not in direct_matched_entities]
+        undefined_entities = [e for entity_df in state.entity_data_frames for e in entity_df.to_artifacts()
+                              if not any(e[ArtifactKeys.ID] in me for me in matched_entities)]
 
         state.response = ConceptPipelineResponse(
             matches=direct_matches,
             multi_matches=multi_matches,
-            predicted_matches=unique_predicted_entities,
+            predicted_matches=state.predicted_matches,
             undefined_entities=undefined_entities
         )
 

@@ -4,7 +4,11 @@
       "jobs": [
         {
           "object_type": "HEALTH_CHECK",
-          "req_id": "RANDOM",
+          "query_ids": [
+            "MRD631",
+            "MRD638"
+          ],
+          "concept_layer_id": "Concept",
           "job_args": {
             "dataset_creator": {
               "object_type": "PROMPT",

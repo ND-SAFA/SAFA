@@ -1,7 +1,7 @@
-from typing import List, Dict
+from typing import Dict, List
 
-from test.jobs.health_check_jobs.health_check_utils import get_dataset_for_health_checks, QUERY_ID, CONCEPT_LAYER_ID, \
-    mocks_for_health_checks, assert_health_check_success
+from test.jobs.health_check_jobs.health_check_utils import CONCEPT_LAYER_ID, QUERY_ID, assert_health_check_success, \
+    get_dataset_for_health_checks, mocks_for_health_checks
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
@@ -28,4 +28,4 @@ class TestHealthCheckJobJob(BaseJobTest):
 
     def _get_job(self, additional_chats: List[Dict] = None) -> AbstractJob:
         dataset = get_dataset_for_health_checks()
-        return HealthCheckJob(JobArgs(dataset=dataset), query_id=QUERY_ID, concept_layer_id=CONCEPT_LAYER_ID)
+        return HealthCheckJob(JobArgs(dataset=dataset), query_ids=QUERY_ID, concept_layer_id=CONCEPT_LAYER_ID)

@@ -265,17 +265,20 @@ class TraceDataFrame(AbstractProjectDataFrame):
                 artifact_ids.add(trace[key])
         return artifact_ids
 
-    def get_relationships(self, artifact_id: str, artifact_key: str = None) -> List[EnumDict]:
+    def get_relationships(self, artifact_ids: Union[str, List[str]], artifact_key: str = None) -> List[EnumDict]:
         """
         Finds traces related to the artifact.
         If an artifact key is provided, will only look for traces with trace[artifact_key] == artifact_id.
-        :param artifact_id: The id to look for.
+        :param artifact_ids: The id to look for.
         :param artifact_key: The key that the artifact will be under (child label means all parents are returned and vice versa).
         :return: List of all traces related to the artifact.
         """
+        if isinstance(artifact_ids, str):
+            artifact_ids = [artifact_ids]
         all_relationships = []
-        for key in [TraceKeys.child_label(), TraceKeys.parent_label()]:
-            if artifact_key == key or not artifact_key:
-                relations = self.filter_for_parents_or_children(artifact_id, key).get_links()
-                all_relationships.extend(relations)
+        for a_id in artifact_ids:
+            for key in [TraceKeys.child_label(), TraceKeys.parent_label()]:
+                if artifact_key == key or not artifact_key:
+                    relations = self.filter_for_parents_or_children(a_id, key).get_links()
+                    all_relationships.extend(relations)
         return all_relationships

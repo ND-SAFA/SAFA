@@ -28,7 +28,7 @@ class ToolParam:
         :return: The value of the param.
         """
         param_message = f"{self.name} - {self.description}"
-        param_value = inquirer_value(param_message, self.annotation, self.default, **kwargs)
+        param_value = inquirer_value(param_message, class_type=self.annotation, default_value=self.default, **kwargs)
         return param_value
 
     @staticmethod

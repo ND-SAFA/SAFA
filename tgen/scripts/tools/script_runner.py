@@ -3,14 +3,14 @@ import sys
 
 from dotenv import load_dotenv
 
+RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
+
+sys.path.append(ROOT_PATH)
+assert os.path.exists(ROOT_PATH), ROOT_PATH
 load_dotenv()
 
 os.environ["DEPLOYMENT"] = "development"
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
-assert os.path.exists(ROOT_PATH), ROOT_PATH
-sys.path.append(ROOT_PATH)
-
-RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
 
 
 def run_script_runner(script_rel_path: str):

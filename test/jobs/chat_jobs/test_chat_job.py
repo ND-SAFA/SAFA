@@ -4,6 +4,7 @@ from test.jobs.health_check_jobs.health_check_utils import EXPECTED_CONTEXT_IDS,
     get_dataset_for_context, get_chat_history
 from tgen.chat.message_meta import MessageMeta
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.status import Status
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.jobs.abstract_job import AbstractJob
@@ -54,6 +55,7 @@ class TestChatJob(BaseJobTest):
         message_meta: MessageMeta = job.result.body
         self.assertEqual(message_meta.message["content"], second_response)
         self.assertSetEqual(set(expected_context_artifacts), message_meta.artifact_ids)
+
 
     def _assert_success(self, job: AbstractJob, job_result: JobResult):
         message_meta: MessageMeta = job.result.body

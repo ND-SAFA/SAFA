@@ -5,10 +5,10 @@
         {
           "object_type": "HUGGING_FACE",
           "task": "PREDICT",
-          "trainer": "ST",
+          "trainer": "[ST_ARCH]",
           "job_args": {
             "random_seed": 812,
-            "output_dir": "[OUTPUT_PATH]/predict-st/[CURRENT_PROJECT]"
+            "output_dir": "[OUTPUT_PATH]/predict-st/[EVAL_PROJECT]"
           },
           "model_manager": {
             "model_path": "[BASE_MODEL]"
@@ -20,7 +20,7 @@
               "object_type": "TRACE",
               "project_reader": {
                 "object_type": "STRUCTURE",
-                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+                "project_path": "[DATA_PATH]/[EVAL_PROJECT]"
               }
             }
           }

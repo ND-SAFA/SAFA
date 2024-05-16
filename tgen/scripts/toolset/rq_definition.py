@@ -2,7 +2,7 @@ import os
 import re
 from typing import Any, Dict, List, Optional
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, NONE
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, NONE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
@@ -95,9 +95,18 @@ class RQDefinition:
                 self.inquirer_variables()
         if not self.has_all_variable():
             self.inquirer_variables()
+
         if not self.confirm():
-            self.clear_variable_values()
-            self.inquirer_variables()
+            if not self.confirm("Edit Specific Variable?", body=EMPTY_STRING):
+                self.clear_variable_values()
+                self.inquirer_variables()
+            else:
+                var_name = input("Variable Name:")
+                variable_query = [v for v in self.variables if v.name == var_name]
+                if len(variable_query) != 1:
+                    logger.warning(f"Expected 1 variable but got {len(variable_query)}")
+                    return self.inquirer_variables()
+                variable_query[0].inquirer_value()
 
     def read_rq_variables(self) -> Dict[str, RQVariable]:
         """
@@ -137,17 +146,19 @@ class RQDefinition:
         save_rq_path = os.path.join(output_dir, "rq_config.yaml")
         return save_rq_path
 
-    def confirm(self, title: str = RQ_INQUIRER_CONFIRM_MESSAGE) -> bool:
+    def confirm(self, title: str = RQ_INQUIRER_CONFIRM_MESSAGE, body=None) -> bool:
         """
         Confirms values of the rq with the user.
         :param title: The title of the message.
         :return: Whether the user confirmed the values.
         """
-        variable_messages = []
-        for variable in self.variables:
-            variable_messages.append(repr(variable))
-        variable_values_message = NEW_LINE.join(variable_messages)
-        return confirm(f"\n{title}\n{variable_values_message}")
+        if body is None:
+            variable_messages = []
+            for variable in self.variables:
+                variable_messages.append(repr(variable))
+            body = NEW_LINE.join(variable_messages)
+            body = f"\n{body}"
+        return confirm(f"\n{title}{body}")
 
     def has_all_variable(self):
         """

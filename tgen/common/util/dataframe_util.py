@@ -63,6 +63,8 @@ class DataFrameUtil:
         for k, v in query.items():
             if v is None:
                 continue
+            if isinstance(v, str) and len(v) == 0:  # e.g. summary is empty in query but df contains NA
+                continue
 
             if k == df.index.name:
                 query_df = df.loc[[v]]

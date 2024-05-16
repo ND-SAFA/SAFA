@@ -1,6 +1,6 @@
 import os
 from abc import ABC, abstractmethod
-from typing import Generic, List, Optional, Set, Tuple, Type, TypeVar
+from typing import Generic, List, Optional, Set, Tuple, Type
 
 from tgen.common.constants import environment_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
@@ -9,9 +9,7 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
-from tgen.pipeline.abstract_pipeline_step import ArgType, StateType, title_format_for_logs
-from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
+from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep, ArgType, StateType, title_format_for_logs
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.pipeline.state import State
 from tgen.scripts.toolset.confirm import confirm

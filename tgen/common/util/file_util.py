@@ -191,6 +191,8 @@ class FileUtil:
                     if k == path:
                         return v
                     if k in path:
+                        if v is None:
+                            raise Exception(f"{k} is not defined.")
                         path = path.replace(k, v)
             path = os.path.expanduser(path)
             if (USER_SYM in path or path.startswith(F_SLASH) or path.startswith(PERIOD)) and use_abs_paths:

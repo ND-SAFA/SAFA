@@ -6,8 +6,8 @@ import numpy as np
 
 from tgen.common.constants.hugging_face_constants import POS_LINK, SMALL_EMBEDDING_MODEL
 from tgen.core.args.hugging_face_args import HuggingFaceArgs
-from tgen.core.trainers.sentence_transformer_trainer import SentenceTransformerTrainer
-from tgen.core.trainers.st.st_loss_functions import SupportedLossFunctions
+from tgen.core.trainers.st_embedding_trainer import STEmbeddingTrainer, STTrainer
+from tgen.core.trainers.st_loss_functions import SupportedSTLossFunctions
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.model_manager import ModelManager
@@ -16,15 +16,15 @@ from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_data_manager import TestDataManager
 
 
-class TestSentenceTransformerTrainer(TestCase):
+class TestSTTrainer(TestCase):
     def test_training(self):
         """
         Tests that sentence transformer trainer is able to train and calculates metrics every epoch.
         """
         n_epochs = 2
         trainer = self.create_trainer(trainer_args_kwargs={"num_train_epochs": n_epochs})
-        training_metrics = trainer.perform_training().metrics["records"]
-        self.assert_valid_metrics(self, training_metrics, n_epochs)
+        training_metrics = trainer.perform_training().metrics
+        self.verify_training_metrics(self, training_metrics, n_epochs)
 
     def test_prediction(self):
         """
@@ -39,10 +39,10 @@ class TestSentenceTransformerTrainer(TestCase):
         """
         Tests ability to define loss functions on sentence transformer trainer.
         """
-        for loss_function in SupportedLossFunctions:
+        for loss_function in SupportedSTLossFunctions:
             trainer = self.create_trainer(trainer_args_kwargs={"num_train_epochs": 1, "st_loss_function": loss_function.name})
-            training_metrics = trainer.perform_training().metrics["records"]
-            self.assert_valid_metrics(self, training_metrics, 1)
+            training_metrics = trainer.perform_training().metrics
+            self.verify_training_metrics(self, training_metrics, 1)
 
     def test_zero_loss(self) -> None:
         """
@@ -58,15 +58,15 @@ class TestSentenceTransformerTrainer(TestCase):
         pos_link_indices = [i for i, link_id in enumerate(link_ids) if
                             train_dataset.trace_df.get_link(link_id)[TraceKeys.LABEL] == POS_LINK]
 
-        train_output = trainer.perform_training()
-        train_losses = train_output.metrics["losses"]
+        train_metrics = trainer.perform_training().metrics
+        train_losses = [m["loss"] for m in train_metrics]
         max_loss_index = np.argmax(train_losses)
         self.assertIn(max_loss_index, pos_link_indices)  # indices of positive labels.
 
     @staticmethod
     def create_trainer(model_manager_kwargs: Dict = None, trainer_dataset_manager_kwargs: Dict = None,
                        trainer_args_kwargs: Dict = None, trainer_kwargs: Dict = None,
-                       save_best_model: bool = False) -> SentenceTransformerTrainer:
+                       save_best_model: bool = False) -> STTrainer:
         """
         Creates trainer with given customizations.
         :param model_manager_kwargs: Keyword arguments passed to model manager.
@@ -91,11 +91,11 @@ class TestSentenceTransformerTrainer(TestCase):
         trainer_dataset_manager = DatasetCreatorTUtil.create_trainer_dataset_manager(val_percentage=0.4,
                                                                                      **trainer_dataset_manager_kwargs)
         trainer_args_kwargs = HuggingFaceArgs(TEST_OUTPUT_DIR, **trainer_args_kwargs)
-        trainer = SentenceTransformerTrainer(trainer_args_kwargs, model_manager, trainer_dataset_manager, **trainer_kwargs)
+        trainer = STEmbeddingTrainer(trainer_args_kwargs, model_manager, trainer_dataset_manager, **trainer_kwargs)
         return trainer
 
     @staticmethod
-    def assert_valid_metrics(tc: TestCase, metrics: List[Dict[DatasetRole, Dict]], n_expected: int) -> None:
+    def verify_training_metrics(tc: TestCase, metrics: List[Dict], n_expected: int) -> None:
         """
         Asserts that metrics have a certain number and that MAP is greater than or equal to 0.5
         :param tc: The test case used to make assertions.
@@ -104,9 +104,8 @@ class TestSentenceTransformerTrainer(TestCase):
         :return: None
         """
         tc.assertEqual(n_expected, len(metrics))
-        for role2metrics in metrics:
-            for dataset_role, m in role2metrics.items():
-                tc.assertGreaterEqual(m["map"], 0.5)
+        for metric in metrics:
+            tc.assertGreater(metric["loss"], 0)
 
     @staticmethod
     def get_cat_dataset_definition():

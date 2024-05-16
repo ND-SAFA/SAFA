@@ -3,10 +3,10 @@ from typing import Dict
 
 import pandas as pd
 
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -101,13 +101,14 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         Reads trace matrix files and aggregates them into single data frame.
         :return: DataFrame containing all trace links read from project.
         """
-        trace_links = TraceDataFrame()
+        trace_df = TraceDataFrame()
         for _, trace_definition_json in self._get_trace_definitions().items():
             trace_reader = EntityReader(self.get_full_project_path(), trace_definition_json,
                                         conversions=self.get_project_conversions())
-            trace_links = pd.concat([trace_links, trace_reader.read_entities()], ignore_index=True)
-        trace_links[StructuredKeys.Trace.LABEL.value] = [1 for link in trace_links.index]
-        return TraceDataFrame(trace_links)
+            reader_trace_df = TraceDataFrame(trace_reader.read_entities())
+            trace_df = TraceDataFrame.concat(trace_df, reader_trace_df)
+        trace_df[StructuredKeys.Trace.LABEL.value] = [1 for link in trace_df.index]
+        return TraceDataFrame(trace_df)
 
     def _read_layer_mapping_df(self) -> pd.DataFrame:
         """

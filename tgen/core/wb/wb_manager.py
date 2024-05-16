@@ -8,7 +8,12 @@ from tgen.common.logging.logger_manager import logger
 from tgen.data.tdatasets.dataset_role import DatasetRole
 
 GROUP_EXCLUDE = ["random_seed"]
-ARGS_PARAMS = ["num_train_epochs", "train_batch_size", "st_loss_function", "metric_for_best_model", "gradient_accumulation_steps",
+ARGS_PARAMS = ["num_train_epochs",
+               "metric_for_best_model",
+               "gradient_accumulation_steps",
+               "st_loss_function",
+               "learning_rate",
+               "freeze_base",
                "use_scores"]
 
 
@@ -77,25 +82,25 @@ class WBManager:
         cls.HAS_INITIALIZED = True
 
     @classmethod
-    def log(cls, role2metrics: Dict[DatasetRole, Dict] = None, metrics: Dict = None, step: int = None) -> None:
+    def log(cls, role2metrics: Dict[DatasetRole, Dict] = None, additional_metrics: Dict = None, step: int = None) -> None:
         """
         Logs the current metrics at given stpe prefixed with dataset role name.
         :param role2metrics: Map of role to metrics.
-        :param metrics: Any other metrics to append to flattened log.
+        :param additional_metrics: Any other metrics to append to flattened log.
         :param step: The current step to log this to.
         :return: None
         """
         if not cls.HAS_INITIALIZED:
             return
-        if metrics is None:
-            metrics = {}
+        if additional_metrics is None:
+            additional_metrics = {}
         if role2metrics is None:
             role2metrics = {}
         global_metrics = {}
-        for dataset_role, metrics in role2metrics.items():
-            named_metrics = {f"{dataset_role.name.lower()}_{k}": v for k, v in metrics.items()}
+        for dataset_role, role_metrics in role2metrics.items():
+            named_metrics = {f"{dataset_role.name.lower()}_{k}": v for k, v in role_metrics.items()}
             global_metrics.update(named_metrics)
-        global_metrics.update(metrics)
+        global_metrics.update(additional_metrics)
         wandb.log(global_metrics, step=step)
 
     @classmethod

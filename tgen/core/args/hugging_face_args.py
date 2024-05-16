@@ -25,6 +25,7 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
     max_seq_length: int = MAX_SEQ_LENGTH_DEFAULT
 
     # Trainer
+    dataloader_prefetch_factor = None
     full_determinism = True
     train_epochs_range: List = None
     num_train_epochs: int = N_EPOCHS_DEFAULT
@@ -74,7 +75,9 @@ class HuggingFaceArgs(TrainingArguments, BaseObject):
 
     # Sentence-BERT
     use_scores: bool = False
-    st_loss_function = "cosine"
+    st_loss_function = None
+    freeze_base: bool = False
+    final_learning_rate = 5e-6
 
     # Misc
     multi_gpu: bool = MULTI_GPU_DEFAULT

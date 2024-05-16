@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Set
 
 from tgen.chat.chat_args import ChatArgs
 from tgen.chat.chat_state import ChatState
@@ -41,3 +41,4 @@ class ChatJob(AbstractJob):
         meta = state.user_chat_history[-1]
         meta.artifact_ids = state.user_chat_history[-2].artifact_ids
         return meta
+

@@ -1,6 +1,5 @@
 from enum import Enum
-
-from typing import Any, Dict, Iterable, List, Set, Tuple, Type, TypeVar, Union
+from typing import Any, Callable, Dict, Iterable, List, Set, Tuple, Type, TypeVar, Union
 
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.list_util import ListUtil
@@ -282,3 +281,17 @@ class DictUtil:
         key = DictUtil.get_key_by_index(dict_, index)
         if key:
             return dict_[key]
+
+    @staticmethod
+    def group_by(objs: List[Dict], key_lambda: Callable[[Dict], str]) -> Dict[str, List[Dict]]:
+        """
+        Groups list of objects using lambda to get key for object.
+        :param objs: The objects to group.
+        :param key_lambda: The lambda defining key for each object.
+        :return: map of group to objects.
+        """
+        grouped_items = {}
+        for obj in objs:
+            obj_key = key_lambda(obj)
+            DictUtil.set_or_append_item(grouped_items, obj_key, obj)
+        return grouped_items

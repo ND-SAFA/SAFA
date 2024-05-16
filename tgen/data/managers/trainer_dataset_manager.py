@@ -195,10 +195,13 @@ class TrainerDatasetManager(BaseObject):
         :param data_augmenter: The augmenter responsible for generating new positive samples.
         :return: None
         """
-        dataset_splits_map = self._create_dataset_splits(train_dataset, self._dataset_creators)
-        self._datasets.update(dataset_splits_map)
-        if isinstance(train_dataset, TraceDataset):
-            train_dataset.prepare_for_training(data_augmenter)
+        if train_dataset:
+            dataset_splits_map = self._create_dataset_splits(train_dataset, self._dataset_creators)
+            self._datasets.update(dataset_splits_map)
+            if DatasetRole.TRAIN in dataset_splits_map:
+                train_dataset = dataset_splits_map[DatasetRole.TRAIN]
+                if isinstance(train_dataset, TraceDataset):
+                    train_dataset.prepare_for_training(data_augmenter)
         return train_dataset
 
     @staticmethod

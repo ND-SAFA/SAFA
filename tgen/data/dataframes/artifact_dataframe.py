@@ -64,7 +64,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         for a in artifacts:
             self.add_artifact(**a)
 
-    def add_artifact(self, a_id: Any, content: str, layer_id: Any = "1",
+    def add_artifact(self, id: Any, content: str, layer_id: Any = "1",
                      summary: str = DEFAULT_FOR_OPTIONAL_COLS[ArtifactKeys.SUMMARY],
                      chunks: List[str] = DEFAULT_FOR_OPTIONAL_COLS[ArtifactKeys.CHUNKS]) -> EnumDict:
         """
@@ -76,7 +76,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         :param chunks: The chunks that the artifact has been split into
         :return: The newly added artifact
         """
-        row_as_dict = {ArtifactKeys.ID: a_id, ArtifactKeys.CONTENT: content, ArtifactKeys.LAYER_ID: layer_id,
+        row_as_dict = {ArtifactKeys.ID: id, ArtifactKeys.CONTENT: content, ArtifactKeys.LAYER_ID: layer_id,
                        ArtifactKeys.SUMMARY: summary, ArtifactKeys.CHUNKS: chunks}
         return self.add_row(row_as_dict)
 

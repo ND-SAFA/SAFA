@@ -1,6 +1,7 @@
 from typing import Dict, Set
 
 from tgen.chat.chat_args import ChatArgs
+from tgen.chat.chat_node_ids import ChatNodeIDs
 from tgen.chat.chat_state import ChatState
 from tgen.common.constants.deliminator_constants import COMMA
 from tgen.common.objects.artifact import Artifact
@@ -18,33 +19,28 @@ from tgen.prompts.supported_prompts.chat_prompts import INCLUDE_MORE_CONTEXT_PRO
 from tgen.tracing.context_finder import ContextFinder
 
 
-class ChatNodeIDs:
-    USER_CHAT = "user_chat_node"
-    RAG = "rag_node"
-    CONTEXT_TYPE = "context_type_node"
-    INCLUDE_CONTEXT = "include_context_node"
-
-
 class ChatTreeDefinition:
     QUERY_ARTIFACT_ID = "query"
 
-    def __init__(self):
+    def __init__(self, root_node_id: str = ChatNodeIDs.INCLUDE_CONTEXT):
         """
         Defines the nodes and tree structure for chat state.
+        :param root_node_id: The id of the root or starting node.
         """
         node_constructor_map = {ChatNodeIDs.INCLUDE_CONTEXT: self.build_include_context_node,
                                 ChatNodeIDs.CONTEXT_TYPE: self.build_context_type_node,
                                 ChatNodeIDs.USER_CHAT: self.build_user_chat_node,
                                 ChatNodeIDs.RAG: self.build_rag_node}
-        self.builder = TreeBuilder(root_node_id=ChatNodeIDs.INCLUDE_CONTEXT, node_constructor_map=node_constructor_map)
+        self.builder = TreeBuilder(root_node_id=root_node_id, node_constructor_map=node_constructor_map)
 
     @staticmethod
-    def get_tree() -> Tree:
+    def get_tree(root_node_id: str = ChatNodeIDs.INCLUDE_CONTEXT) -> Tree:
         """
         Gets the decision tree for chat.
+        :param root_node_id: The id of the root or starting node.
         :return: The decision tree for chat.
         """
-        return ChatTreeDefinition().builder.build_tree()
+        return ChatTreeDefinition(root_node_id).builder.build_tree()
 
     def build_include_context_node(self) -> LLMNode:
         """

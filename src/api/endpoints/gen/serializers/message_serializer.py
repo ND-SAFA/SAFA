@@ -1,4 +1,4 @@
-from typing import Dict, List, TypedDict
+from typing import Dict, List, TypedDict, Set
 
 from rest_framework import serializers
 
@@ -9,7 +9,7 @@ from tgen.models.llm.abstract_llm_manager import Message, PromptRoles
 
 
 class MessageDTO(TypedDict):
-    artifact_ids: List[str]
+    artifact_ids: Set[str]
     role: str
     content: str
 
@@ -36,4 +36,4 @@ class MessageMetaSerializer(AbstractSerializer):
         assert role.upper() in dir(PromptRoles), f"Unknown role: {role}"
         message = Message(content=content, role=role)
 
-        return MessageMeta(message=message, artifact_ids=validated_data.get("artifact_ids", []))
+        return MessageMeta(message=message, artifact_ids=set(validated_data.get("artifact_ids", set())))

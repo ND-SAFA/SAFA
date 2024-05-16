@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Tuple
 
 from tgen.common.objects.artifact import Artifact
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -75,6 +75,14 @@ class ConceptData:
         E4 = "GLM"  # R2 - Undefined
         E5 = "SSP"  # R3 - Undefined
         UNDEFINED = E3
+
+        @staticmethod
+        def get_undefined_entities() -> List[Tuple[str, List[str]]]:
+            """
+            Returns list containing each target artifact and the expected undefined entities.
+            :return:
+            """
+            return [(CONCEPT_R1, [ConceptData.Entities.E3]), (CONCEPT_R2, [ConceptData.Entities.E4, ConceptData.Entities.E5])]
 
     class LayerId:
         """

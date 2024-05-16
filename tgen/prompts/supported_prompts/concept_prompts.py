@@ -35,7 +35,7 @@ def create_entity_extraction_response(name: str, description: str, prefix: str =
 
 ENTITY_EXTRACTION_PROMPT = Prompt("Above is an artifact from a software system. "
                                   "Please extract the acronyms used in the artifact. "
-                                  "Attempt to define each acronym found. ",
+                                  "Give the most probably definition for each acronym found. ",
                                   prompt_args=PromptArgs(title="Instructions\n"),
                                   response_manager=PromptResponseManager(
                                       response_tag={ENTITY_TAG: [ENTITY_NAME_TAG, ENTITY_DESCRIPTION_TAG]},

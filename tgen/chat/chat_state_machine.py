@@ -15,7 +15,7 @@ class ChatStateMachine:
         Runs through each state in the chat.
         :param args: Arguments required for chat.
         """
-        self.tree = ChatTreeDefinition.get_tree()
+        self.tree = ChatTreeDefinition.get_tree(args.root_node_id)
         self.args = args
         self.state = ChatState(user_chat_history=self.args.chat_history)
         self.state.update_related_artifact_ids(additional_artifact_ids={a for meta in self.args.chat_history

@@ -69,7 +69,7 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
                      chunks: List[str] = DEFAULT_FOR_OPTIONAL_COLS[ArtifactKeys.CHUNKS]) -> EnumDict:
         """
         Adds artifact to dataframe
-        :param a_id: The id of the Artifact
+        :param id: The id of the Artifact
         :param content: The body of the artifact
         :param layer_id: The id of the layer that the artifact is part of
         :param summary: The summary of the artifact body

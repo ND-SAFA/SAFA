@@ -71,6 +71,6 @@ class JobArgs(BaseObject):
         :return: A dictionary mapping param name to value for all job args that are in the pipeline args.
         """
         job_args_dict = DataclassUtil.convert_to_dict(self)
-        args4pipeline = ReflectionUtil.get_constructor_params(pipeline_args_class, **job_args_dict)
+        args4pipeline = ReflectionUtil.get_constructor_params(pipeline_args_class, job_args_dict)
         DictUtil.get_kwarg_values(args4pipeline, dataset_creator=None, pop=True)
         return args4pipeline

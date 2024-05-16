@@ -2,7 +2,6 @@ from functools import lru_cache
 from logging import Logger
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.util.prompt_util import PromptUtil
 
 
 class TGenLogger(Logger):
@@ -57,14 +56,14 @@ class TGenLogger(Logger):
         return self.log(level=level, msg=msg, *args, **kwargs)
 
     @staticmethod
-    def __create_title(title: str, prefix: str = ""):
+    def __create_title(title: str, prefix: str = EMPTY_STRING):
         """
         Logs the message as a new title in the logs.
         :param title: The title name.
         :param prefix: Prefix to prepend title with.
         :return: Title formatted as markdown header.
         """
-        title = prefix + f"{PromptUtil.as_markdown_header(title)}".strip()
+        title = prefix + f"# {title}".strip()
         return title
 
     @staticmethod
@@ -74,5 +73,5 @@ class TGenLogger(Logger):
         :param step: The name of the step.
         :return: Step formatted as markdown header.
         """
-        formatted_step = f"{PromptUtil.as_markdown_header(step, 2)}"
+        formatted_step = f"## {step}"
         return formatted_step

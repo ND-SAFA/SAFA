@@ -16,7 +16,7 @@ from tgen.prompts.prompt_builder import PromptBuilder
 @dataclass
 class ChatState(State):
     user_chat_history: List[MessageMeta] = required_field(field_name="user_chat_history")  # contains only user + llm messages
-    context_artifact_types: List[str] = field(default_factory=list)  # layer ids to use for context
+    context_artifact_types: Set[str] = field(default_factory=set)  # layer ids to use for context
     related_artifact_ids: Set[str] = field(default_factory=set)  # all artifact ids used for context
 
     system_prompt: str = field(init=False, default=None)  # contains context for chat

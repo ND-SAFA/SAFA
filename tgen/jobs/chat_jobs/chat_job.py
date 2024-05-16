@@ -4,7 +4,6 @@ from tgen.chat.chat_args import ChatArgs
 from tgen.chat.chat_state import ChatState
 from tgen.chat.chat_state_machine import ChatStateMachine
 from tgen.chat.message_meta import MessageMeta
-from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
@@ -23,7 +22,7 @@ class ChatJob(AbstractJob):
         """
         super().__init__(job_args, require_data=True)
         self.chat_history = chat_history
-        self.llm_manager = get_best_default_llm_manager_long_context() if not llm_manager else llm_manager
+        self.llm_manager = llm_manager
         self.max_context = max_context
 
     def _run(self) -> Any:
@@ -33,9 +32,10 @@ class ChatJob(AbstractJob):
         """
         other_args = self.job_args.get_args_for_pipeline(ChatArgs)
         chat_args = ChatArgs(chat_history=self.chat_history,
-                             llm_manager=self.llm_manager,
                              max_context=self.max_context,
                              **other_args)
+        if self.llm_manager:
+            chat_args.llm_manager = self.llm_manager
         path = ChatStateMachine(chat_args).run()
         state: ChatState = path.state
         meta = state.user_chat_history[-1]

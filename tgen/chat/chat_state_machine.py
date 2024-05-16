@@ -1,11 +1,10 @@
 from tgen.chat.chat_args import ChatArgs
 from tgen.chat.chat_state import ChatState
-from tgen.chat.chat_tree import ChatTree
+from tgen.chat.chat_tree_definition import ChatTreeDefinition
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.decision_tree.path import Path
-from tgen.decision_tree.tree import Tree
 from tgen.models.llm.abstract_llm_manager import PromptRoles
 
 
@@ -16,7 +15,7 @@ class ChatStateMachine:
         Runs through each state in the chat.
         :param args: Arguments required for chat.
         """
-        self.tree = Tree(ChatTree.construct_tree())
+        self.tree = ChatTreeDefinition.get_tree()
         self.args = args
         self.state = ChatState(user_chat_history=self.args.chat_history)
         self.state.update_related_artifact_ids(additional_artifact_ids={a for meta in self.args.chat_history
@@ -36,7 +35,8 @@ class ChatStateMachine:
                 chat_history = self.state.add_internal_chat_message(next_prompt)
                 res = LLMTrainer.perform_chat(node.llm_manager, chat_history,
                                               self.state.system_prompt, prompt_builder,
-                                              save_and_load_path=ChatTree.create_save_and_load_path_for_node(self.args, node.node_id))
+                                              save_and_load_path=ChatTreeDefinition.create_save_and_load_path_for_node(self.args,
+                                                                                                                       node.node_id))
                 self.state.add_internal_chat_message(res.original_response[0], role=PromptRoles.ASSISTANT)
                 choice = node.get_choice_from_response(res.predictions[0])
                 path.add_decision(choice)

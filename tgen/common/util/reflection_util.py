@@ -33,7 +33,7 @@ class ReflectionUtil:
         return param in constructor_param_names
 
     @staticmethod
-    def get_constructor_params(class_type: Type, **params: Dict[str, Any]) -> Dict[str, Any]:
+    def get_constructor_params(class_type: Type, params: Dict[str, Any]) -> Dict[str, Any]:
         """
         Checks whether param of given name is accepted in type constructor.
         :param class_type: The class type whose constructor is checked.

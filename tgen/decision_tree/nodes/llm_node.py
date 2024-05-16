@@ -28,6 +28,7 @@ class LLMNode(AbstractNode):
     input_variable_converter: Callable = None  # converts the args, state to format vars for the prompt
     response_manager_params: Dict = field(default_factory=dict)
     response_tag: str = field(init=False, default=DEFAULT_RESPONSE_TAG)
+    default_response: str = None
 
     def create_prompt_builder(self, args: PipelineArgs, state: State) -> PromptBuilder:
         """
@@ -52,14 +53,16 @@ class LLMNode(AbstractNode):
             prompt = Prompt(self.description, response_manager=PromptResponseManager(response_tag=self.response_tag,
                                                                                      **self.response_manager_params))
         else:
-            params = DictUtil.update_kwarg_values(response_format="Enclose your answer in {}", replace_existing=False,
+            params = DictUtil.update_kwarg_values(response_format="Enclose your answer in {}",
+                                                  default_factory=lambda tag, val: self.default_response,
+                                                  multiple_responses_allowed=True,
+                                                  loose_response_validation=True,
+                                                  replace_existing=False,
                                                   orig_kwargs=self.response_manager_params)
             prompt = SelectQuestionPrompt(categories={choice: EMPTY_STRING for choice in self.branches.keys()},
                                           question=self.description,
                                           instructions="Answer with one of the following responses: ",
                                           response_tag=self.response_tag,
-                                          multiple_responses_allowed=True,
-                                          loose_response_validation=True,
                                           **params)
 
         prompt.args.prompt_id = PROMPT_ID

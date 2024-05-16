@@ -1,14 +1,18 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Any
 
+from tgen.common.constants.deliminator_constants import NEW_LINE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
 from tgen.decision_tree.nodes.abstract_node import AbstractNode
+from tgen.pipeline.state import State
 
 
 @dataclass
 class Path:
     starting_node: AbstractNode
-    starting_input: Any
+    args: Any
+    state: State
     __choices: List[str] = field(default_factory=list, init=False)
     __path_taken: List[AbstractNode] = field(default_factory=list, init=False)
 
@@ -51,9 +55,27 @@ class Path:
         """
         current_node = self.get_node()
         next_selected_node = current_node.select_branch(choice)
-        self.__path_taken.append(next_selected_node)
+        self.log_node(choice, current_node)
+        if current_node.state_setter:
+            if isinstance(current_node.state_setter, str):
+                setattr(self.state, current_node.state_setter, choice)
+            else:
+                current_node.state_setter(choice, self.state)
+        if next_selected_node:
+            self.__path_taken.append(next_selected_node)
         self.__choices.append(choice)
         return next_selected_node
+
+    @staticmethod
+    def log_node(choice: Any, current_node: AbstractNode) -> None:
+        """
+        Logs the node that was just finished being traversed.
+        :param choice: The choice from the node.
+        :param current_node: The current node.
+        :return: None
+        """
+        logger.log_with_title(title="Finished traversing next node",
+                              message=f"Node: {current_node.description}{NEW_LINE}Choice: " + "%.200s" % choice)
 
     def get_final_decision(self) -> Optional[str]:
         """

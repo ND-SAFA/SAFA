@@ -58,6 +58,8 @@ class TestPromptResponseManager(BaseTest):
         prm_multi.loose_response_validation = True
         formatted_response = prm_multi._format_response({"tag1": "onefour", "tag2": "2 "})
         self.assertEqual(formatted_response, {"tag1": ["one"], "tag2": [2]})
+        formatted_response = prm_multi._format_response({"tag1": " One", "tag2": "2 "})
+        self.assertEqual(formatted_response, {"tag1": ["one"], "tag2": [2]})
 
         # Not expected response
         formatted_response_bad = prm_multi._format_response({"tag1": "two", "tag2": "4 "})

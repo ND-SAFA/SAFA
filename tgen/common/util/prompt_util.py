@@ -1,4 +1,7 @@
+from typing import List, Any
+
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, SPACE, TAB
+from tgen.common.util.str_util import StrUtil
 
 
 class PromptUtil:
@@ -120,3 +123,17 @@ class PromptUtil:
         if remove_all_new_lines:
             formatted_string = formatted_string.replace(NEW_LINE, SPACE)
         return formatted_string
+
+    @staticmethod
+    def format_options(options: List[Any], conjunction: str = "or"):
+        """
+        Formats the options so the LLM can understand.
+        :param options: The list of options
+        :param conjunction: Joins the last option e.g. and, or and/or.
+        :return: The options as a readable string.
+        """
+        format_symbol = StrUtil.get_format_symbol()
+        options_format = f"{format_symbol}, " * (len(options) - 1)
+        options_format += f"{conjunction} {format_symbol}"
+        formatted_categories = options_format.format(*options)
+        return formatted_categories

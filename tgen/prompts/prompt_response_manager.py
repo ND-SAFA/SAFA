@@ -256,8 +256,17 @@ class PromptResponseManager:
             elif v in self.expected_responses[tag]:
                 success = True
             if not success:
-                closest_val = [r for r in self.expected_responses[tag] if
-                               hasattr(r, '__contains__') and r in v] if self.loose_response_validation else []
+                closest_val = []
+                if self.loose_response_validation:
+                    try:
+                        expected_response_order = list(self.expected_responses[tag])
+                        lower_cased_expected = [r.lower() for r in expected_response_order if isinstance(r, str)]
+                        lower_case_v = v.strip().lower() if isinstance(v, str) else v
+                        index = lower_cased_expected.index(lower_case_v)
+                        closest_val.append(expected_response_order[index])
+                    except ValueError:
+                        closest_val = [r for r in self.expected_responses[tag] if
+                                       hasattr(r, '__contains__') and r in v] if self.loose_response_validation else []
                 if len(closest_val) == 1:
                     success = True
                     val = closest_val[0]

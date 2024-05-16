@@ -35,6 +35,16 @@ class ParamSpecs:
         return ParamSpecs(name=str(method), param_names=param_names, param_types=param_types,
                           required_params=required_params, has_kwargs=full_specs.varkw is not None)
 
+    def extract_params_from_kwargs(self, **kwargs):
+        """
+        Gets kwargs that match known param names.
+        :return: A dictionary mapping param name to value for all kwargs that are known params.
+        """
+        constructor_param_names = self.param_names
+        params = {name: val for name, val in kwargs.items()
+                  if name in constructor_param_names}
+        return params
+
     def assert_definition(self, definition: Dict) -> None:
         """
         Asserts that there are no missing or unexpected params for the method represented by the given param specs

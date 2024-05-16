@@ -2,7 +2,7 @@ from typing import Optional, List
 
 from tgen.common.constants.deliminator_constants import COMMA
 from tgen.contradictions.common_choices import CommonChoices
-from tgen.contradictions.with_decision_tree.requirement import RequirementConstituent
+from tgen.contradictions.requirement import RequirementConstituent
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt

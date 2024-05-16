@@ -51,8 +51,8 @@ class ChatTreeDefinition:
         Builds the node to determine whether the chat needs additional context.
         :return: The node to determine whether the chat needs additional context.
         """
-        context_type_node = self.builder.get_node(pre_req_node_id=ChatNodeIDs.CONTEXT_TYPE)
-        user_chat_node = self.builder.get_node(pre_req_node_id=ChatNodeIDs.USER_CHAT)
+        context_type_node = self.builder.get_node(node_id=ChatNodeIDs.CONTEXT_TYPE)
+        user_chat_node = self.builder.get_node(node_id=ChatNodeIDs.USER_CHAT)
         include_context_node = LLMNode(description=INCLUDE_MORE_CONTEXT_PROMPT.value,
                                        node_id=ChatNodeIDs.INCLUDE_CONTEXT,
                                        default_response=CommonChoices.NO,
@@ -65,7 +65,7 @@ class ChatTreeDefinition:
         Builds the node to determine the types of artifacts to use for the context.
         :return: The node to determine the types of artifacts to use for the context.
         """
-        rag_node = self.builder.get_node(pre_req_node_id=ChatNodeIDs.RAG)
+        rag_node = self.builder.get_node(node_id=ChatNodeIDs.RAG)
         context_type_node = LLMNode(description=ARTIFACT_TYPE_FOR_CONTEXT_PROMPT.value,
                                     node_id=ChatNodeIDs.CONTEXT_TYPE,
                                     input_variable_converter=ChatTreeDefinition.get_context_type_format_vars,
@@ -80,7 +80,7 @@ class ChatTreeDefinition:
         Builds the node to perform rag for creating chat context.
         :return: The node to perform rag for creating chat contex.
         """
-        chat_node = self.builder.get_node(pre_req_node_id=ChatNodeIDs.USER_CHAT)
+        chat_node = self.builder.get_node(node_id=ChatNodeIDs.USER_CHAT)
         rag_node = ActionNode(description="Run Rag for Chat Context", action_method=ChatTreeDefinition.run_rag,
                               branches=chat_node, node_id=ChatNodeIDs.RAG)
         return rag_node

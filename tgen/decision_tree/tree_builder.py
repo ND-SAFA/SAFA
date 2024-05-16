@@ -9,8 +9,8 @@ class TreeBuilder:
     def __init__(self, root_node_id: str, node_constructor_map: Dict[str, Callable]):
         """
         Responsible for constructing decision trees.
-        :param root_node_id:
-        :param node_constructor_map:
+        :param root_node_id: The id of the root (starting) node.
+        :param node_constructor_map: Dictionary mapping node id to the method used to construct it.
         """
         self.built_nodes = {}
         self.node_constructor_map = node_constructor_map
@@ -23,12 +23,12 @@ class TreeBuilder:
         """
         return Tree(self.get_node(self.root_node_id))
 
-    def get_node(self, pre_req_node_id: str) -> AbstractNode:
+    def get_node(self, node_id: str) -> AbstractNode:
         """
         Gets the pre-requisite node needed to build current node.
-        :param pre_req_node_id: The id of the pre-requisite node.
+        :param node_id: The id of the pre-requisite node.
         :return: The pre-requisite node needed to build current node.
         """
-        if pre_req_node_id not in self.built_nodes:
-            self.built_nodes[pre_req_node_id] = self.node_constructor_map[pre_req_node_id]()
-        return self.built_nodes[pre_req_node_id]
+        if node_id not in self.built_nodes:
+            self.built_nodes[node_id] = self.node_constructor_map[node_id]()
+        return self.built_nodes[node_id]

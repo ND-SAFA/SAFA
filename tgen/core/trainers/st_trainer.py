@@ -132,7 +132,13 @@ class STTrainer(HuggingFaceTrainer, ABC):
 
         return PredictionOutput(host_scores, labels, prediction_metrics)
 
-    def scale_scores(self, input_examples: List[InputExample], scores: List[float]):
+    def scale_scores(self, input_examples: List[InputExample], scores: List[float]) -> List[float]:
+        """
+        Uses min max scaling per parent to adjust the scores.
+        :param input_examples: Contains the parent, child information.
+        :param scores: List of pre-scaled scores.
+        :return: The scaled scores.
+        """
         items = zip(input_examples, scores)
         parent2items = DictUtil.group_by(items, lambda i: i[0].texts[1])
         parent2min = {}
@@ -289,6 +295,7 @@ class STTrainer(HuggingFaceTrainer, ABC):
     @abstractmethod
     def move_training_modules(self, device: torch.device) -> None:
         """
+        :param device: The device to move the training modules to.
         :return: Moves any additional modules to device before training.
         """
         pass

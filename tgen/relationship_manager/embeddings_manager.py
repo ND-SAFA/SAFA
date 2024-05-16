@@ -34,6 +34,7 @@ class EmbeddingsManager(AbstractRelationshipManager):
         :param model: The model to use to embed artifacts.
         :param show_progress_bar: Whether to show progress bar when calculating batches.
         :param create_embeddings_on_init: If True, creates embeddings for all items in the content map.
+        :param as_tensors: Converts embeddings to tensors.
         """
         self._embedding_map = {}
         self.__ordered_ids = []

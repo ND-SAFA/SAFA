@@ -65,6 +65,7 @@ class STEmbeddingTrainer(STTrainer):
     @overrides(STTrainer)
     def move_training_modules(self, device: torch.device) -> None:
         """
+        :param device: The device to move the training modules to.
         :return: Returns list of modules to move to device before training.
         """
         self.loss_function = self.loss_function.to(device)

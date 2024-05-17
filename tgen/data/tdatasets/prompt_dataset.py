@@ -104,7 +104,7 @@ class PromptDataset(iDataset):
             prompt_df = self.get_prompt_dataframe(prompt_builders=prompt_builder, prompt_args=llm_manager.prompt_args)
             export_path, should_delete_path = self.export_prompt_dataframe(prompt_df)
             res = llm_manager.upload_file(file=open(export_path), purpose=TrainerTask.TRAIN.value)
-            self.project_file_id = res.concept_id
+            self.project_file_id = res.id
             if should_delete_path:
                 os.remove(export_path)
         return self.project_file_id

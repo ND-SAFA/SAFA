@@ -117,7 +117,7 @@ class TestExperimentStep(BaseExperimentTest):
 
         job2.result.body = TracePredictionOutput(metrics={"accuracy": 0.8})
         best_job = step._get_best_job([job1, job2])
-        self.assertEqual(best_job.id, job2.concept_id)
+        self.assertEqual(best_job.id, job2.id)
 
     def test_update_job_children_output_paths(self):
         job1, job2 = self.get_test_jobs()
@@ -155,7 +155,7 @@ class TestExperimentStep(BaseExperimentTest):
     def get_job_by_id(step, job_id):
         found_job = None
         for job in step.jobs:
-            if str(job.concept_id) == job_id:
+            if str(job.id) == job_id:
                 found_job = job
                 break
         return found_job

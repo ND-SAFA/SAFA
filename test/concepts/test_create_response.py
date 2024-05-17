@@ -46,14 +46,14 @@ class TestCreateResponse(BaseTest):
         tc.assertEqual(ConceptData.Expected.N_MULTI_MATCHES, len(res["multi_matches"]))  # 'Ground Speed' and 'Ground Station'
         tc.assertTrue(ConceptData.Expected.MULTI_MATCH_LOC in res["multi_matches"])
         tc.assertEqual(ConceptData.Expected.N_PREDICTED_MATCHES, len(res["predicted_matches"]))
-        tc.assertEqual(CONCEPT_R1, res["predicted_matches"][0].artifact_id)
+        tc.assertEqual(CONCEPT_R1, res["predicted_matches"][0]["artifact_id"])
         tc.assertEqual(ConceptData.Expected.N_UNDEFINED, len(res["undefined_entities"]))
 
-        undefined_entity_lookup = {e.concept_id: e for e in res["undefined_entities"]}
+        undefined_entity_lookup = {e["concept_id"]: e for e in res["undefined_entities"]}
         expected_undefined_entities = ConceptData.Entities.get_undefined_entities()
 
         for target_artifact_id, expected_undefined_entities in expected_undefined_entities:
             for e in expected_undefined_entities:
                 tc.assertIn(e, undefined_entity_lookup)
                 undefined_entity = undefined_entity_lookup[e]
-                tc.assertIn(target_artifact_id, undefined_entity.artifact_ids)
+                tc.assertIn(target_artifact_id, undefined_entity["artifact_ids"])

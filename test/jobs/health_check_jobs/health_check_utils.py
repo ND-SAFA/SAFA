@@ -102,7 +102,6 @@ def mocks_for_health_checks(ai_manager):
     artifacts = [Artifact(id=e, content="description", layer_id="entity")
                  for e in QUERY_CONCEPTS]
     test_entity_df = ArtifactDataFrame(artifacts)
-
+    ai_manager.add_responses([create_mock_response(EXPECTED_CONTRADICTION_EXPLANATION, EXPECTED_CONFLICTING_IDS)])
     TestPredictEntityStep.mock_entity_extraction(ai_manager, test_entity_df)
     TestEntityMatching.mock_entity_matching(ai_manager, [QUERY_CONCEPTS[1]] + ["NA"])
-    ai_manager.add_responses([create_mock_response(EXPECTED_CONTRADICTION_EXPLANATION, EXPECTED_CONFLICTING_IDS)])

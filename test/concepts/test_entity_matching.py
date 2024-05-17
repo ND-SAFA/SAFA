@@ -35,9 +35,9 @@ class TestEntityMatching(BaseTest):
         self.assertEqual(TestEntityMatching.N_MATCHES, len(predicted_links))
         for i in range(TestEntityMatching.N_MATCHES):
             link = predicted_links[i]
-            self.assertEqual(CONCEPT_R1, link.artifact_id)  # TODO: only works when single target artifact
-            self.assertEqual(ConceptData.Predicted[i]["source"], link.entity_id)
-            self.assertEqual(ConceptData.Predicted[i]["target"], link.concept_id)
+            self.assertEqual(CONCEPT_R1, link["artifact_id"])  # TODO: only works when single target artifact
+            self.assertEqual(ConceptData.Predicted[i]["source"], link["entity_id"])
+            self.assertEqual(ConceptData.Predicted[i]["target"], link["concept_id"])
 
     @staticmethod
     def mock_entity_matching(ai_manager: TestAIManager, matches: List = None) -> None:

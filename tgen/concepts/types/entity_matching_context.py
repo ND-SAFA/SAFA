@@ -67,6 +67,8 @@ class EntityMatchingContext:
         """
         if self.prompts is None:
             raise Exception("Prompts have not been created in context.")
+        if len(self.prompts) == 0:
+            return []
         output = LLMTrainer.predict_from_prompts(
             self.args.llm_manager,
             message_prompts=self.prompts,

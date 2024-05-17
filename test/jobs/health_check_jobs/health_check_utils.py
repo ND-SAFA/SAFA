@@ -4,12 +4,10 @@ from test.concepts.test_entity_extraction import TestPredictEntityStep
 from test.concepts.test_entity_matching import TestEntityMatching
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.prompts.prompt import Prompt
-from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.prompts.supported_prompts.contradiction_prompts import create_mock_response
 from tgen.testres.base_tests.base_test import BaseTest
 
 ARTIFACT_CONTENT = ["All dogs are really cute.", "Car goes vroom.", "Fire trucks are loud.", "Dogs pee on fire hydrants.",
@@ -17,10 +15,13 @@ ARTIFACT_CONTENT = ["All dogs are really cute.", "Car goes vroom.", "Fire trucks
 ARTIFACT_IDS = [f"a_{i}" for i in range(len(ARTIFACT_CONTENT))]
 QUERY = Artifact(id="query1", content="What pet should I get?", layer_id="queries")
 EXPECTED_CONTEXT_IDS = [ARTIFACT_IDS[0], ARTIFACT_IDS[-1]]
-EXPECTED_CONTRADICTION = ARTIFACT_IDS[0]
+EXPECTED_CONFLICTING_IDS = [ARTIFACT_IDS[0]]
+EXPECTED_CONTRADICTION_EXPLANATION = "this is an explanation"
+
 EXISTING_CONCEPTS = ["dog", "cat", "fire truck", "car", "vroom"]
 CONCEPT_LAYER_ID = "concept"
-QUERY_CONCEPTS = ["pug", "dog"]
+UNDEFINED_CONCEPT = "undefined_concept"
+QUERY_CONCEPTS = ["pug", "dog", UNDEFINED_CONCEPT]
 QUERY_CONTENT = "Pugs aren't cute dogs."
 QUERY_ID = "target"
 EXPECTED_RELATED_ARTIFACTS = EXPECTED_CONTEXT_IDS + EXISTING_CONCEPTS[:2]
@@ -42,16 +43,37 @@ def assert_correct_related_traces(test_case: BaseTest, related_traces: List[Enum
         test_case.assertEqual(trace[TraceKeys.child_label().value], query_artifact)
 
 
-def assert_health_check_success(test_case: BaseTest, result: Dict):
-    test_case.assertListEqual(result["contradictions"]["conflicting_ids"], [EXPECTED_CONTRADICTION])
-    assert_correct_related_traces(test_case, result["context_traces"], EXPECTED_RELATED_ARTIFACTS, QUERY_ID)
-    direct_matches = [a[ArtifactKeys.ID.value] for a in result["concept_matches"]['matches']]
-    undefined_matches = [a[ArtifactKeys.ID.value] for a in result["concept_matches"]['undefined_entities']]
-    for concept in QUERY_CONCEPTS:
-        if concept in EXISTING_CONCEPTS:
-            test_case.assertIn(concept, direct_matches)
-        else:
-            test_case.assertIn(concept, undefined_matches)
+def assert_health_check_success(tc: BaseTest, result: Dict):
+    tc.assertEqual(1, len(result["contradictions"]))
+    contradiction = result["contradictions"][0]
+    tc.assertListEqual(contradiction["conflicting_ids"], EXPECTED_CONFLICTING_IDS + [QUERY_ID])
+    tc.assertEqual(contradiction["explanation"], EXPECTED_CONTRADICTION_EXPLANATION)
+    assert_correct_related_traces(tc, result["context_traces"], EXPECTED_RELATED_ARTIFACTS, QUERY_ID)
+
+    concept_matches = result["concept_matches"]
+
+    # Direct ("dog)
+    direct_concept = EXISTING_CONCEPTS[0]
+    tc.assertEqual(1, len(concept_matches["matches"]))
+    direct_match = concept_matches["matches"][0]
+    tc.assertEqual(direct_concept, direct_match["concept_id"])
+    tc.assertEqual(direct_concept, direct_match["matched_content"])
+    tc.assertEqual(QUERY_ID, direct_match["artifact_id"])
+
+    # Predicted (pug)
+    concept_id = EXISTING_CONCEPTS[0]
+    entity_id = QUERY_CONCEPTS[0]
+    tc.assertEqual(1, len(concept_matches["predicted_matches"]))
+    predicted_match = concept_matches["predicted_matches"][0]
+    tc.assertEqual(QUERY_ID, predicted_match["artifact_id"])
+    tc.assertEqual(concept_id, predicted_match["concept_id"])
+    tc.assertEqual(entity_id, predicted_match["entity_id"])
+
+    # Undefined (undefined_concept)
+    tc.assertEqual(1, len(concept_matches["undefined_entities"]))
+    undefined_entity = concept_matches["undefined_entities"][0]
+    tc.assertEqual([QUERY_ID], undefined_entity["artifact_ids"])
+    tc.assertEqual(UNDEFINED_CONCEPT, undefined_entity["concept_id"])
 
 
 def get_dataset_for_context(include_query: bool = False):
@@ -77,11 +99,10 @@ def get_dataset_for_health_checks():
 
 @staticmethod
 def mocks_for_health_checks(ai_manager):
-    task_prompt: Prompt = SupportedPrompts.CONTRADICTIONS_TASK.value
-    contradiction_response_tag = task_prompt.get_all_response_tags()[0]
     artifacts = [Artifact(id=e, content="description", layer_id="entity")
                  for e in QUERY_CONCEPTS]
     test_entity_df = ArtifactDataFrame(artifacts)
-    ai_manager.set_responses([PromptUtil.create_xml(contradiction_response_tag, EXPECTED_CONTRADICTION)])
+
     TestPredictEntityStep.mock_entity_extraction(ai_manager, test_entity_df)
-    TestEntityMatching.mock_entity_matching(ai_manager, QUERY_CONCEPTS[:1])
+    TestEntityMatching.mock_entity_matching(ai_manager, [QUERY_CONCEPTS[1]] + ["NA"])
+    ai_manager.add_responses([create_mock_response(EXPECTED_CONTRADICTION_EXPLANATION, EXPECTED_CONFLICTING_IDS)])

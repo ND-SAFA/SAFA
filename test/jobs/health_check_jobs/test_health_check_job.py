@@ -12,7 +12,7 @@ from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
-class TestHealthCheckJobJob(BaseJobTest):
+class TestHealthCheckJob(BaseJobTest):
 
     @mock_anthropic
     def test_run_success(self, ai_manager: TestAIManager):
@@ -28,4 +28,4 @@ class TestHealthCheckJobJob(BaseJobTest):
 
     def _get_job(self, additional_chats: List[Dict] = None) -> AbstractJob:
         dataset = get_dataset_for_health_checks()
-        return HealthCheckJob(JobArgs(dataset=dataset), query_ids=QUERY_ID, concept_layer_id=CONCEPT_LAYER_ID)
+        return HealthCheckJob(JobArgs(dataset=dataset), query_ids=[QUERY_ID], concept_layer_id=CONCEPT_LAYER_ID)

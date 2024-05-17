@@ -1,8 +1,7 @@
-from dataclasses import dataclass
+from tgen.common.util.typed_enum_dict import TypedEnumDict
 
 
-@dataclass
-class EntityMatchingPred:
+class EntityMatchingPred(TypedEnumDict):
     """
     :param artifact_id: ID of artifact whose entity was predicted to match against concept.
     :param entity_id: ID of entity matched.

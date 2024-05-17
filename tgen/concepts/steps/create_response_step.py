@@ -30,7 +30,7 @@ class CreateResponseStep(AbstractPipelineStep):
 
         # Undefined entities
         direct_matched_entities = set([m["matched_content"] for m in state.direct_matches])
-        predicted_matched_entities = set([t.entity_id for t in state.predicted_matches])
+        predicted_matched_entities = set([t["entity_id"] for t in state.predicted_matches])
         matched_entities = direct_matched_entities.union(predicted_matched_entities)
         undefined_concepts = self.create_undefined_concepts(args.artifacts, state.entity_data_frames, matched_entities)
 

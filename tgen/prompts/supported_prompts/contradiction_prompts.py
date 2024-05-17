@@ -1,6 +1,7 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from tgen.common.constants.deliminator_constants import COMMA
+from tgen.common.util.prompt_util import PromptUtil
 from tgen.contradictions.common_choices import CommonChoices
 from tgen.contradictions.with_decision_tree.requirement import RequirementConstituent
 from tgen.prompts.prompt import Prompt
@@ -96,14 +97,31 @@ def format_response(tag: str, value: str) -> Optional[List[str]]:
     return conflicting_ids
 
 
+def create_mock_response(explanation: str, artifact_ids: List[str]) -> str:
+    """
+    Creates expected LLM response format for a contradiction.
+    :param explanation: Explanation of contradiction.
+    :param artifact_ids: Conflicting artifact ids.
+    :return: String representing format.
+    """
+    explanation_content = PromptUtil.create_xml(EXPLANATION_TAG, explanation)
+    ids_content = PromptUtil.create_xml(CONFLICTING_IDS_TAG, COMMA.join(artifact_ids))
+    tag_content = f'{explanation_content}{ids_content}'
+    return PromptUtil.create_xml(CONTRADICTION_TAG, tag_content)
+
+
+CONTRADICTION_TAG = "contradiction"
+EXPLANATION_TAG = "explanation"
+CONFLICTING_IDS_TAG = "conflicting_ids"
 CONTRADICTIONS_INSTRUCTIONS = "Consider whether the following software artifact is inconsistent or contradictory with any of the " \
                               "related pieces of information. "
 CONTRADICTIONS_TASK_PROMPT = QuestionnairePrompt(
     question_prompts=[Prompt("Output the ids of any contradictory or inconsistent information in a comma-deliminated list."
-                             "If all the information entails or is neutral to the artifact, simply respond with no.",
-                             response_manager=PromptResponseManager(response_tag="conflicting_ids",
-                                                                    value_formatter=format_response)),
-                      Prompt("If you identify contradictory information, explain why in 1-2 sentences.",
-                             response_manager=PromptResponseManager(response_tag="explanation")
-                             )],
+                             "If all the information entails or is neutral to the artifact, simply respond with no. "
+                             "Otherwise, provide the conflicting ids and explanation for each contradiction found.",
+                             response_manager=PromptResponseManager(response_tag={"contradiction": ["conflicting_ids", "explanation"]},
+                                                                    value_formatter=format_response,
+                                                                    response_instructions_format=create_mock_response("EXPLANATION",
+                                                                                                                      ["ID1", "ID2"])))
+                      ],
     use_multi_step_task_instructions=True)

@@ -1,10 +1,9 @@
-from dataclasses import dataclass
-
 from typing import List
 
+from tgen.common.util.typed_enum_dict import TypedEnumDict
 
-@dataclass
-class UndefinedConcept:
+
+class UndefinedConcept(TypedEnumDict):
     """
     :param artifact_ids: IDs of artifact containing undefined concept.
     :param concept_id: ID of concept being referenced.

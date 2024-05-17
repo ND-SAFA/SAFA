@@ -37,12 +37,13 @@ class HealthCheckJob(AbstractJob):
         :return: Results from each health check.
         """
         dataset: PromptDataset = self.job_args.dataset
-        concept_matches = self._run_concept_matching(dataset.artifact_df)
         contradictions_result = self._run_contradictions_detector()
+        concept_matches = self._run_concept_matching(dataset.artifact_df)
         related_traces = dataset.trace_dataset.trace_df.get_relationships(artifact_ids=self.query_ids,
                                                                           artifact_key=TraceKeys.child_label())
         context_traces = [trace for trace in related_traces if trace[TraceKeys.RELATIONSHIP_TYPE] == TraceRelationshipType.CONTEXT]
-        results = HealthCheckResults(context_traces=context_traces, concept_matches=concept_matches,
+        results = HealthCheckResults(context_traces=context_traces,
+                                     concept_matches=concept_matches,
                                      contradictions=contradictions_result)
         return results
 
@@ -53,19 +54,19 @@ class HealthCheckJob(AbstractJob):
         :return: The response from the concept pipeline.
         """
         pipeline_params = self.job_args.get_args_for_pipeline(ConceptArgs)
-        query_artifact = artifact_df.filter_by_index(self.query_ids).to_artifacts()
-        args = ConceptArgs(concept_layer_id=self.concept_layer_id, artifacts=query_artifact, **pipeline_params)
+        query_artifacts = artifact_df.filter_by_index(self.query_ids).to_artifacts()
+        args = ConceptArgs(concept_layer_id=self.concept_layer_id, artifacts=query_artifacts, **pipeline_params)
         pipeline = ConceptPipeline(args)
         pipeline.run()
         return pipeline.state.response
 
-    def _run_contradictions_detector(self) -> ContradictionsResult:
+    def _run_contradictions_detector(self, **kwargs) -> List[ContradictionsResult]:
         """
         Runs contradictions detector to identify any conflicting artifacts with the query artifact.
         :return: Any ids of conflicting artifacts and an explanation as to why if some were found.
         """
         pipeline_params = self.job_args.get_args_for_pipeline(ContradictionsArgs)
-        args = ContradictionsArgs(**pipeline_params)
+        args = ContradictionsArgs(**pipeline_params, **kwargs)
         detector = ContradictionsDetector(args)
         contradictions_result = detector.detect(self.query_ids)
         return contradictions_result

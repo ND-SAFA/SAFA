@@ -23,7 +23,7 @@ class ClusteringRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         :param skip_summarization: Whether to skip summarization of artifacts.
         """
         super().__init__(args, ClusteringRankingPipeline.steps, skip_summarization=skip_summarization, no_project_summary=True)
-        self.state.relationship_manager = args.relationship_manager
+        self.state.relationship_manager = args.embeddings_manager
         self.args.link_threshold = CLUSTERING_LINK_THRESHOLD
 
     def state_class(self) -> RankingState:

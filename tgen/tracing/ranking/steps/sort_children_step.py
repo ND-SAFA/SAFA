@@ -1,5 +1,4 @@
 from copy import deepcopy
-
 from typing import Dict, List
 
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
@@ -24,7 +23,7 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the current pipeline.
         :return: NOne
         """
-        state.relationship_manager = args.relationship_manager if args.relationship_manager else state.relationship_manager
+        state.relationship_manager = args.embeddings_manager if args.embeddings_manager else state.relationship_manager
 
         children_ids = deepcopy(args.children_ids)
         if args.use_chunks:

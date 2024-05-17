@@ -23,6 +23,7 @@ from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.contradiction_prompts import CONFLICTING_IDS_TAG, CONTRADICTIONS_INSTRUCTIONS, CONTRADICTION_TAG, \
     EXPLANATION_TAG
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.relationship_manager.cross_encoder_manager import CrossEncoderManager
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.context_finder import ContextFinder
 
@@ -45,12 +46,16 @@ class ContradictionsDetector:
         assert all([q_id in self.args.dataset.artifact_df for q_id in query_ids]), f"Queries contain unknown ids: {query_ids}"
         context_traces = []
         id2context = {}
-        relationship_manager = EmbeddingsManager()
+        content_map = self.args.dataset.artifact_df.to_map()
+        embeddings_manager = EmbeddingsManager(content_map=content_map)
+        cross_encoder_manager = CrossEncoderManager(content_map=content_map)
+
         for query_id in query_ids:
             id2context_local, all_relationships = ContextFinder.find_related_artifacts(query_id, self.args.dataset,
                                                                                        max_context=self.args.max_context,
                                                                                        base_export_dir=self.args.export_dir,
-                                                                                       relationship_manager=relationship_manager)
+                                                                                       embeddings_manager=embeddings_manager,
+                                                                                       cross_encoder_manager=cross_encoder_manager)
             id2context.update(id2context_local)
             context_traces.extend(all_relationships)
 

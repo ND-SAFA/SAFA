@@ -18,8 +18,7 @@
                   "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
                 }
               }
-            },
-            "export_dir": "[OUTPUT_PATH]/health-check/[CURRENT_PROJECT]"
+            }
           }
         }
       ]

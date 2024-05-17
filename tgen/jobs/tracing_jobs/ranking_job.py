@@ -111,7 +111,7 @@ class RankingJob(AbstractJob):
                                     children_ids=children_ids,
                                     export_dir=export_dir,
                                     types_to_trace=types_to_trace,
-                                    relationship_manager=self.relationship_manager,
+                                    embeddings_manager=self.relationship_manager,
                                     re_rank_children=True,
                                     **self.ranking_kwargs)
         logger.info(f"Starting to trace: {pipeline_args.run_name}")

@@ -16,7 +16,7 @@ class ReRankStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :return: NOne
         """
         if args.re_rank_children:
-            relationship_manager = state.relationship_manager if isinstance(state.relationship_manager, CrossEncoderManager) \
+            relationship_manager = args.cross_encoder_manager if args.cross_encoder_manager \
                 else CrossEncoderManager(state.artifact_map, model_name=args.ranking_model_name)
             id_pairs = [(trace[TraceKeys.SOURCE], trace[TraceKeys.TARGET]) for trace in state.selected_entries]
             scores = relationship_manager.calculate_scores(id_pairs=id_pairs)

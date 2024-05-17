@@ -190,6 +190,9 @@ class JsonUtil:
         """
 
         def add_child_fields():
+            """
+            Adds the children fields to the central list.
+            """
             child_ordered_fields = JsonUtil.get_all_fields(v)
             ordered_fields.extend([c for c in child_ordered_fields if c not in fields])
             fields.update(set(child_ordered_fields))

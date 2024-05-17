@@ -3,9 +3,9 @@ from tgen.common.constants.project_summary_constants import PS_DATA_FLOW_TAG, PS
     PS_OVERVIEW_TAG, PS_SUBSYSTEM_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 
 PROJECT_SUMMARY_CONTEXT_PROMPT_ARTIFACTS = Prompt((
     "# Goal\n"
@@ -27,22 +27,22 @@ PROJECT_SUMMARY_CONTEXT_PROMPT_VERSIONS = Prompt((
 OVERVIEW_SECTION_PROMPT = QuestionnairePrompt(
     question_prompts=[
         QuestionPrompt("Write a set of bullet points indicating what is important in the system.",
-                       response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
+                       response_manager=XMLResponseManager(response_tag=PS_NOTES_TAG)),
         QuestionPrompt("Using your notes, write a polished description of the high-level functionality of the software system. "
                        "Write in the activate voice and use 2-3 paragraphs to group your description. "
                        "Assume your reader is someone unfamiliar with the system.",
-                       response_manager=PromptResponseManager(response_tag=PS_OVERVIEW_TAG))
+                       response_manager=XMLResponseManager(response_tag=PS_OVERVIEW_TAG))
     ])
 
 FEATURE_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
     QuestionPrompt("Make a list of all the different features present in the system.",
-                   response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
+                   response_manager=XMLResponseManager(response_tag=PS_NOTES_TAG)),
     QuestionPrompt("Using your notes, output the features of the system as formal system requirements. "
                    "Be as thorough as you possibly can.",
-                   response_manager=PromptResponseManager(response_tag=PS_FEATURE_TAG,
-                                                          response_instructions_format="Enclose each feature "
-                                                                                       "inside of a set of {}",
-                                                          value_formatter=lambda t, v: PromptUtil.as_bullet_point(v)))
+                   response_manager=XMLResponseManager(response_tag=PS_FEATURE_TAG,
+                                                       response_instructions_format="Enclose each feature "
+                                                                                    "inside of a set of {}",
+                                                       value_formatter=lambda t, v: PromptUtil.as_bullet_point(v)))
 ])
 
 
@@ -64,14 +64,14 @@ def entities_formatter(t, v):
 ENTITIES_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
     QuestionPrompt("Think about what domain entities and vocabulary that are needed to understand the project. "
                    "Write a short PARAGRAPH describing each one.",
-                   response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
+                   response_manager=XMLResponseManager(response_tag=PS_NOTES_TAG)),
     QuestionPrompt("Using your notes, create a comprehensive list of all domain entities and key vocabularly used in the system "
                    "and use xml format to output them. ",
-                   response_manager=PromptResponseManager(response_tag={PS_ENTITIES_TAG: ["name", "descr"]},
-                                                          response_instructions_format="Enclose each entity in {} "
-                                                                                       "with the name of the entity inside of "
-                                                                                       "{} and the description inside of {}.",
-                                                          entry_formatter=entities_formatter))
+                   response_manager=XMLResponseManager(response_tag={PS_ENTITIES_TAG: ["name", "descr"]},
+                                                       response_instructions_format="Enclose each entity in {} "
+                                                                                    "with the name of the entity inside of "
+                                                                                    "{} and the description inside of {}.",
+                                                       entry_formatter=entities_formatter))
 ])
 
 
@@ -100,14 +100,14 @@ SUBSYSTEM_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
                                           QuestionPrompt("The software artifacts that work to implement the functionality "
                                                          "of the sub-system"),
                                           QuestionPrompt("The differences to other similar sub-system in the system.")],
-                        response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
+                        response_manager=XMLResponseManager(response_tag=PS_NOTES_TAG)),
     QuestionPrompt("Using your notes, create a comprehensive description of each of the system's sub-systems "
                    "and output them in xml format.",
-                   response_manager=PromptResponseManager(response_tag={PS_SUBSYSTEM_TAG: ["name", "descr"]},
-                                                          response_instructions_format="Enclose each sub-system in {} "
-                                                                                       "with the name of the subsystem inside of "
-                                                                                       "{} and the description inside of {}.",
-                                                          entry_formatter=subsection_formatter))
+                   response_manager=XMLResponseManager(response_tag={PS_SUBSYSTEM_TAG: ["name", "descr"]},
+                                                       response_instructions_format="Enclose each sub-system in {} "
+                                                                                    "with the name of the subsystem inside of "
+                                                                                    "{} and the description inside of {}.",
+                                                       entry_formatter=subsection_formatter))
 ])
 
 DATA_FLOW_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
@@ -116,10 +116,10 @@ DATA_FLOW_SECTION_PROMPT = QuestionnairePrompt(question_prompts=[
                         question_prompts=[QuestionPrompt("What input data does it need?"),
                                           QuestionPrompt("What output data does it produce?"),
                                           QuestionPrompt("What features does it depend on?")],
-                        response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
+                        response_manager=XMLResponseManager(response_tag=PS_NOTES_TAG)),
     QuestionPrompt(
         "Using your notes, create a polished description of how data flows "
         "throughout the system to accomplish all of its features. "
         "Use an activate voice and group your thoughts into 2-3 paragraphs.",
-        response_manager=PromptResponseManager(response_tag=PS_DATA_FLOW_TAG))
+        response_manager=XMLResponseManager(response_tag=PS_DATA_FLOW_TAG))
 ])

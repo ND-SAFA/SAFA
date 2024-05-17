@@ -5,8 +5,8 @@ from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt_args import PromptArgs
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 
 
 class SelectQuestionPrompt(QuestionPrompt):
@@ -65,12 +65,12 @@ class SelectQuestionPrompt(QuestionPrompt):
         response_manager_args = DictUtil.update_kwarg_values(response_manager_args,
                                                              value_formatter=None if not multiple_responses_allowed
                                                              else lambda t, v: v.split(COMMA), replace_existing=False)
-        response_manager = PromptResponseManager(response_tag=self.response_tag,
-                                                 response_instructions_format=self.response_format,
-                                                 expected_responses=category_names
-                                                 if expected_responses is None else expected_responses,
-                                                 expected_response_type=type(category_names[0]),
-                                                 **response_manager_args)
+        response_manager = XMLResponseManager(response_tag=self.response_tag,
+                                              response_instructions_format=self.response_format,
+                                              expected_responses=category_names
+                                              if expected_responses is None else expected_responses,
+                                              expected_response_type=type(category_names[0]),
+                                              **response_manager_args)
         super().__init__(f"{question}{self.instructions}", prompt_args=prompt_args,
                          response_manager=response_manager)
 

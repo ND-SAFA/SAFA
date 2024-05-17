@@ -4,13 +4,13 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.prompts.multi_prompt import MultiPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.response_managers.abstract_response_manager import AbstractResponseManager
 
 
 class ConditionalPrompt(MultiPrompt):
 
     def __init__(self, candidate_prompts: List[Prompt], prompt_selector: Callable,
-                 prompt_args: PromptArgs = None, response_manager: PromptResponseManager = None):
+                 prompt_args: PromptArgs = None, response_manager: AbstractResponseManager = None):
         """
         Selects a prompt based on some condition.
         :param candidate_prompts: List of all candidate prompts that can be chosen

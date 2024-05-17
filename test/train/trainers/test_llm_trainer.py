@@ -28,8 +28,8 @@ from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_openai import mock_openai
@@ -116,9 +116,9 @@ class TestLLMTrainer(BaseTest):
 
         artifact_prompt = ArtifactPrompt("Tell me about this artifact: ")
         response_prompt1 = Prompt("First response:",
-                                  response_manager=PromptResponseManager(response_tag="response1"))
+                                  response_manager=XMLResponseManager(response_tag="response1"))
         response_prompt2 = Prompt("Second response:",
-                                  response_manager=PromptResponseManager(response_tag="response2"))
+                                  response_manager=XMLResponseManager(response_tag="response2"))
         prompt_ids = [response_prompt1.args.prompt_id, response_prompt2.args.prompt_id]
         prompt_builder1 = PromptBuilder([artifact_prompt, response_prompt1])
         prompt_builder2 = PromptBuilder([artifact_prompt, response_prompt2])
@@ -157,9 +157,9 @@ class TestLLMTrainer(BaseTest):
         artifact_prompt1 = ArtifactPrompt("Context artifacts: ",
                                           prompt_args=PromptArgs(system_prompt=True))
         response_prompt1 = Prompt(f"{system_prompt_identifier} response:",
-                                  response_manager=PromptResponseManager(response_tag=tag))
+                                  response_manager=XMLResponseManager(response_tag=tag))
         response_prompt2 = Prompt("Second response:",
-                                  response_manager=PromptResponseManager(response_tag=tag))
+                                  response_manager=XMLResponseManager(response_tag=tag))
 
         artifact_prompt2 = ArtifactPrompt("Message artifact: ",
                                           prompt_args=PromptArgs(system_prompt=False))

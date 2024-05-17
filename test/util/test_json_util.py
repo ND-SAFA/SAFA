@@ -82,3 +82,56 @@ class TestJsonUtil(BaseTest):
         self.assertListEqual(["stage", "iteration", "metrics"], list(stage_eval_json.keys()))
         metric_json = stage_eval_json["metrics"]
         self.assertEqual(metrics["map"], metric_json["map"])
+
+    def test_get_all_fields(self):
+        json_dict = {
+            "user": {
+                "name": "John Doe",
+                "contact": {
+                    "email": "john.doe@example.com",
+                    "phones": ["+123456789", "+987654321"]
+                },
+                "address": {
+                    "primary": {
+                        "street": "123 Main St",
+                        "coordinates": {
+                            "latitude": 40.7128,
+                            "longitude": -74.0060
+                        }
+                    }
+                },
+                "orders": [
+                    {
+                        "date": "2023-05-16T08:30:00Z",
+                        "items": [
+                            {
+                                "productId": "A1B2C3",
+                                "quantity": 2,
+                                "price": 19.99
+                            },
+                            {
+                                "productId": "D4E5F6",
+                                "quantity": 1,
+                                "price": 49.99
+                            }
+                        ],
+                        "total": 89.97,
+                    },
+                    {
+                        "orderId": 456,
+                        "items": [
+                            {
+                                "productId": "G7H8I9",
+                                "quantity": 3,
+                                "price": 9.99
+                            }
+                        ],
+                        "total": 29.97,
+                    }
+                ]
+            }}
+        expected_fields = {"user", "name", "contact", "email", "phones", "address", "primary", "street", "coordinates", "latitude",
+                           "longitude", "orders", "date", "items", "productId", "quantity", "price", "total", "orderId"}
+
+        fields = JsonUtil.get_all_fields(obj=json_dict)
+        self.assertSetEqual(expected_fields, set(fields))

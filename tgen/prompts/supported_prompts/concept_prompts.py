@@ -2,7 +2,7 @@ from tgen.common.constants.concept_pipeline_constants import ENTITY_DESCRIPTION_
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 
 """
 Entity Extraction
@@ -37,7 +37,7 @@ ENTITY_EXTRACTION_PROMPT = Prompt("Above is an artifact from a software system. 
                                   "Please extract the acronyms used in the artifact. "
                                   "Attempt to define each acronym found. ",
                                   prompt_args=PromptArgs(title="Instructions\n"),
-                                  response_manager=PromptResponseManager(
+                                  response_manager=XMLResponseManager(
                                       response_tag={ENTITY_TAG: [ENTITY_NAME_TAG, ENTITY_DESCRIPTION_TAG]},
                                       response_instructions_format=get_response_format()))
 

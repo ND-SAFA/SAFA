@@ -1,9 +1,9 @@
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.testres.base_tests.base_test import BaseTest
 
 
@@ -11,7 +11,7 @@ class TestQuestionnairePrompt(BaseTest):
     PROMPT = "Answer all of the following"
     STEPS = {
         1: QuestionPrompt("Think about your favorite {blank}"),
-        2: QuestionPrompt("Then do this", response_manager=PromptResponseManager(response_tag="question2")),
+        2: QuestionPrompt("Then do this", response_manager=XMLResponseManager(response_tag="question2")),
         3: BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Do you like running?"),
         4: QuestionnairePrompt(instructions="Then answer these {blank2}",
                                question_prompts=[QuestionPrompt("This is another question!")], enumeration_chars=["-"])

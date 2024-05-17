@@ -6,9 +6,9 @@ from tgen.common.constants.ranking_constants import CHANGE_IMPACT_TAG, DERIVATIO
     SUB_SYSTEMS_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.prompts.supported_prompts.tracing_prompts import SCORE_INSTRUCTIONS
 
 EXPLANATION_GOAL = Prompt(
@@ -43,18 +43,18 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts
                                                          QuestionPrompt("What sub-systems and components do the artifacts belong to, "
                                                                         "impact or reference? Are any of the sub-systems/components "
                                                                         "shared between the two artifacts?",
-                                                                        response_manager=PromptResponseManager(
+                                                                        response_manager=XMLResponseManager(
                                                                             response_tag=SUB_SYSTEMS_TAG)),
                                                          QuestionPrompt("What inputs, outputs, entities or technical details "
                                                                         "are specified in each artifact? Do the artifacts "
                                                                         "reference any of the same ones?",
-                                                                        response_manager=PromptResponseManager(
+                                                                        response_manager=XMLResponseManager(
                                                                             response_tag=ENTITIES_TAG)),
                                                          QuestionPrompt("What are the primary functions or purposes "
                                                                         "of each artifact? Could the functionality of one "
                                                                         "artifact impact the other? Does one artifact reference "
                                                                         "functionality that is fulfilled in the other?",
-                                                                        response_manager=PromptResponseManager(
+                                                                        response_manager=XMLResponseManager(
                                                                             response_tag=FUNCTIONALITY_TAG)),
                                                          QuestionPrompt("Could one artifact be derived from, "
                                                                         "decomposed from, or be an implementation of the other? "
@@ -62,13 +62,13 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts
                                                                         "breaking down, or implementing a portion of the "
                                                                         "other artifact, generally resulting in "
                                                                         "a smaller, more detailed component at a lower-level. ",
-                                                                        response_manager=PromptResponseManager(
+                                                                        response_manager=XMLResponseManager(
                                                                             response_tag=DERIVATION_TAG)),
                                                          QuestionPrompt("If one artifact changed, "
                                                                         "would it impact or necessitate changes in the other? "
                                                                         "Could a change in one create a misalignment with the "
                                                                         "capabilities/functionality described in the other?",
-                                                                        response_manager=PromptResponseManager(
+                                                                        response_manager=XMLResponseManager(
                                                                             response_tag=CHANGE_IMPACT_TAG)),
                                                          SCORE_INSTRUCTIONS,
                                                          QuestionPrompt("Using your previous responses and both scores given, "
@@ -77,6 +77,6 @@ EXPLANATION_TASK_QUESTIONNAIRE = QuestionnairePrompt(instructions="Two artifacts
                                                                         "believe they are mostly likely traced or un-traced. "
                                                                         "Importantly, do NOT reference the specific score "
                                                                         "in the justification. ",
-                                                                        response_manager=PromptResponseManager(
+                                                                        response_manager=XMLResponseManager(
                                                                             response_tag=JUSTIFICATION_TAG))
                                                      ])

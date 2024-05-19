@@ -1,8 +1,8 @@
 from test.jobs.health_check_jobs.health_check_utils import get_dataset_for_context, get_chat_history, QUERY, EXPECTED_CONTEXT_IDS
 from tgen.chat.chat_args import ChatArgs
+from tgen.chat.chat_node_ids import ChatNodeIDs
 from tgen.chat.chat_state import ChatState
 from tgen.chat.chat_tree_definition import ChatTreeDefinition
-from tgen.chat.chat_node_ids import ChatNodeIDs
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import ArtifactKeys

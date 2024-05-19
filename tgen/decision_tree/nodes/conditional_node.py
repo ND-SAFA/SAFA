@@ -11,7 +11,7 @@ from tgen.pipeline.state import State
 class ConditionalNode(AbstractNode):
     conditional_statement: Callable[[PipelineArgs, State], Any] = required_field(field_name="conditional_statement")
 
-    def make_choice(self, args: PipelineArgs, state: State) -> Any:
+    def _make_choice(self, args: PipelineArgs, state: State) -> Any:
         """
         Decides which path to take from the current node.
         :param args: The arguments to the node.

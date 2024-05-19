@@ -22,25 +22,25 @@ from tgen.tracing.context_finder import ContextFinder
 class ChatTreeDefinition:
     QUERY_ARTIFACT_ID = "query"
 
-    def __init__(self, root_node_id: str = ChatNodeIDs.INCLUDE_CONTEXT):
+    def __init__(self, root_node_id: str = ChatNodeIDs.INCLUDE_CONTEXT, nodes2skip: Set[str] = None):
         """
         Defines the nodes and tree structure for chat state.
         :param root_node_id: The id of the root or starting node.
+        :param nodes2skip: Set of node ids that should be skipped.
         """
         node_constructor_map = {ChatNodeIDs.INCLUDE_CONTEXT: self.build_include_context_node,
                                 ChatNodeIDs.CONTEXT_TYPE: self.build_context_type_node,
                                 ChatNodeIDs.USER_CHAT: self.build_user_chat_node,
                                 ChatNodeIDs.RAG: self.build_rag_node}
-        self.builder = TreeBuilder(root_node_id=root_node_id, node_constructor_map=node_constructor_map)
+        self.builder = TreeBuilder(root_node_id=root_node_id, node_constructor_map=node_constructor_map,
+                                   nodes2skip=nodes2skip)
 
-    @staticmethod
-    def get_tree(root_node_id: str = ChatNodeIDs.INCLUDE_CONTEXT) -> Tree:
+    def get_tree(self) -> Tree:
         """
         Gets the decision tree for chat.
-        :param root_node_id: The id of the root or starting node.
         :return: The decision tree for chat.
         """
-        return ChatTreeDefinition(root_node_id).builder.build_tree()
+        return self.builder.build_tree()
 
     def build_include_context_node(self) -> LLMNode:
         """

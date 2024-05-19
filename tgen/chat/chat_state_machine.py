@@ -1,3 +1,5 @@
+from collections.abc import Set
+
 from tgen.chat.chat_args import ChatArgs
 from tgen.chat.chat_state import ChatState
 from tgen.chat.chat_tree_definition import ChatTreeDefinition
@@ -10,12 +12,13 @@ from tgen.models.llm.abstract_llm_manager import PromptRoles
 
 class ChatStateMachine:
 
-    def __init__(self, args: ChatArgs):
+    def __init__(self, args: ChatArgs, nodes2skip: Set[str] = None):
         """
         Runs through each state in the chat.
         :param args: Arguments required for chat.
+        :param nodes2skip: Set of node ids that should be skipped.
         """
-        self.tree = ChatTreeDefinition.get_tree(args.root_node_id)
+        self.tree = ChatTreeDefinition(root_node_id=args.root_node_id, nodes2skip=nodes2skip).get_tree()
         self.args = args
         self.state = ChatState(user_chat_history=self.args.chat_history)
         self.state.update_related_artifact_ids(additional_artifact_ids={a for meta in self.args.chat_history

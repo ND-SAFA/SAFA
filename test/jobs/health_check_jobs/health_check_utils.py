@@ -7,7 +7,7 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.prompts.supported_prompts.contradiction_prompts import create_mock_response
+from tgen.prompts.supported_prompts.contradiction_prompts import create_contradiction_response
 from tgen.testres.base_tests.base_test import BaseTest
 
 ARTIFACT_CONTENT = ["All dogs are really cute.", "Car goes vroom.", "Fire trucks are loud.", "Dogs pee on fire hydrants.",
@@ -102,6 +102,6 @@ def mocks_for_health_checks(ai_manager):
     artifacts = [Artifact(id=e, content="description", layer_id="entity")
                  for e in QUERY_CONCEPTS]
     test_entity_df = ArtifactDataFrame(artifacts)
-    ai_manager.add_responses([create_mock_response(EXPECTED_CONTRADICTION_EXPLANATION, EXPECTED_CONFLICTING_IDS)])
+    ai_manager.add_responses([create_contradiction_response(EXPECTED_CONTRADICTION_EXPLANATION, EXPECTED_CONFLICTING_IDS)])
     TestPredictEntityStep.mock_entity_extraction(ai_manager, test_entity_df)
     TestEntityMatching.mock_entity_matching(ai_manager, [QUERY_CONCEPTS[1]] + ["NA"])

@@ -96,7 +96,8 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
         :return: String with each word lemmatize.
         """
         if concept.isupper():
-            return concept.lower()
+            # If is ancronym, then match start of new word + acronym (lower case is used to match later)
+            return SPACE + concept.lower()
         concept_words = concept.lower().split(SPACE)
         lemmatized_words = [self.lemmatizer.lemmatize(w) for w in concept_words]
         return SPACE.join(lemmatized_words)

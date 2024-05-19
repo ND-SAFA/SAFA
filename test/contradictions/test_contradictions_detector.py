@@ -4,7 +4,7 @@ from test.contradictions.data_test_requirements import EXPECTED_CONTRADICTIONS, 
 from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.contradictions.contradictions_detector import ContradictionsDetector
 from tgen.data.keys.structure_keys import TraceKeys, TraceRelationshipType
-from tgen.prompts.supported_prompts.contradiction_prompts import create_mock_response
+from tgen.prompts.supported_prompts.contradiction_prompts import create_contradiction_response
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
@@ -21,7 +21,7 @@ class TestContradictionsDetector(BaseTest):
         args = ContradictionsArgs(dataset=get_contradictions_dataset())
         detector = ContradictionsDetector(args)
 
-        test_ai_manager.add_responses([create_mock_response(explanation, contradicting_ids)])
+        test_ai_manager.add_responses([create_contradiction_response(explanation, contradicting_ids)])
         conflicting_ids: List[str] = EXPECTED_CONTRADICTIONS[contradicting_id] + [contradicting_id]
         self.verify_contradictions(detector, [contradicting_id], [(explanation, conflicting_ids)])
 

@@ -1,6 +1,7 @@
 from typing import Dict, List, Tuple
 
 from tgen.common.objects.trace import Trace
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
@@ -128,8 +129,7 @@ class ContradictionsDetector:
         result_group_table = {}
         for r in results:
             contradicting_id_hash = "*".join(sorted(set(r["conflicting_ids"])))  # TODO: Use better delimiter, curr is just unlikely
-            if contradicting_id_hash not in result_group_table:
-                result_group_table[contradicting_id_hash] = []
+            DictUtil.initialize_value_if_not_in_dict(result_group_table, contradicting_id_hash, [])
             result_group_table[contradicting_id_hash].append(r)
 
         final_results = [results[0] for a_ids, results in result_group_table.items()]  # TODO : use LLM to consolidate messages.

@@ -1,6 +1,7 @@
 from typing import Dict, List, Set
 
 from tgen.common.objects.artifact import Artifact
+from tgen.common.util.dict_util import DictUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.types.concept_match import ConceptMatch
@@ -19,14 +20,7 @@ class CreateResponseStep(AbstractPipelineStep):
         :param state: Used to retrieve intermediate and store final result.
         :return: None
         """
-        loc2match: Dict[int, List[ConceptMatch]] = self.create_loc2match_map(state.direct_matches)
-        direct_matches: List[ConceptMatch] = []
-        multi_matches = {}
-        for loc, matches in loc2match.items():
-            if len(matches) == 1:
-                direct_matches.append(matches[0])
-            else:
-                multi_matches[loc] = matches
+        direct_matches, multi_matches = self.analyze_matches(state.direct_matches)
 
         # Undefined entities
         direct_matched_entities = set([m["matched_content"] for m in state.direct_matches])
@@ -42,6 +36,23 @@ class CreateResponseStep(AbstractPipelineStep):
         )
 
     @staticmethod
+    def analyze_matches(direct_matches: List[ConceptMatch]):
+        """
+        Reads direct matches and identifies those that are multi-matches.
+        :param direct_matches: The direct matches to separate from multi-matches.
+        :return: List of purely direct matches and then list of multi-matches.
+        """
+        loc2match: Dict[int, List[ConceptMatch]] = CreateResponseStep.create_loc2match_map(direct_matches)
+        direct_matches: List[ConceptMatch] = []
+        multi_matches = {}
+        for loc, matches in loc2match.items():
+            if len(matches) == 1:
+                direct_matches.append(matches[0])
+            else:
+                multi_matches[loc] = matches
+        return direct_matches, multi_matches
+
+    @staticmethod
     def create_undefined_concepts(target_artifacts: List[Artifact], entity_data_frames: List[ArtifactDataFrame],
                                   matched_entities: Set[str]):
         """
@@ -54,12 +65,11 @@ class CreateResponseStep(AbstractPipelineStep):
         undefined2artifact = {}
         undefined_concept_lookup = {}
         for artifact, entity_df in zip(target_artifacts, entity_data_frames):
-            undefined_entities = [e for e in entity_df.to_artifacts() if not any(e[ArtifactKeys.ID] in me for me in matched_entities)]
+            undefined_entities = [e for e in entity_df.to_artifacts() if e[ArtifactKeys.ID] not in matched_entities]
 
             for e in undefined_entities:
                 undefined_concept_id = e[ArtifactKeys.ID]
-                if undefined_concept_id not in undefined2artifact:
-                    undefined2artifact[undefined_concept_id] = []
+                DictUtil.initialize_value_if_not_in_dict(undefined2artifact, undefined_concept_id, [])
                 undefined2artifact[undefined_concept_id].append(artifact[ArtifactKeys.ID])  # can override matching undefined concepts
                 undefined_concept_lookup[undefined_concept_id] = e
 

@@ -97,7 +97,7 @@ def format_response(tag: str, value: str) -> Optional[List[str]]:
     return conflicting_ids
 
 
-def create_mock_response(explanation: str, artifact_ids: List[str]) -> str:
+def create_contradiction_response(explanation: str, artifact_ids: List[str]) -> str:
     """
     Creates expected LLM response format for a contradiction.
     :param explanation: Explanation of contradiction.
@@ -121,7 +121,8 @@ CONTRADICTIONS_TASK_PROMPT = QuestionnairePrompt(
                              "Otherwise, provide the conflicting ids and explanation for each contradiction found.",
                              response_manager=PromptResponseManager(response_tag={"contradiction": ["conflicting_ids", "explanation"]},
                                                                     value_formatter=format_response,
-                                                                    response_instructions_format=create_mock_response("EXPLANATION",
-                                                                                                                      ["ID1", "ID2"])))
+                                                                    response_instructions_format=create_contradiction_response(
+                                                                        "EXPLANATION",
+                                                                        ["ID1", "ID2"])))
                       ],
     use_multi_step_task_instructions=True)

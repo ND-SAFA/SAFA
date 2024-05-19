@@ -84,8 +84,11 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
             args.embeddings_manager.update_or_add_contents(state.artifact_map)
         else:
             args.embeddings_manager = EmbeddingsManager(content_map=state.artifact_map, model_name=args.embedding_model_name)
+
+        # TODO: use enum to differentiate?
+        relationship_manager = args.embeddings_manager if args.embeddings_manager else args.cross_encoder_manager
         parent2rankings = sorter.sort(args.parent_ids, children_ids, artifact_map=state.artifact_map,
-                                      relationship_manager=args.embeddings_manager, return_scores=True)
+                                      relationship_manager=relationship_manager, return_scores=True)
         parent_map = RankingUtil.convert_parent2rankings_to_prediction_entries(parent2rankings)
         if args.max_context_artifacts:
             parent_map = {p: c[:args.max_context_artifacts] for p, c in parent_map.items()}

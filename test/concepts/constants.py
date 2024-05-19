@@ -26,10 +26,6 @@ class ConceptData:
 
     # Matches
 
-    R1 => `GS: Ground Speed`, `Ground Station (GS)`, `Command`, `Telemetry (TLM)`
-    R2 =>
-
-
     Artificially added Concept `GS: Ground Speed` to conflict with concept `Ground Station (GS)`
     There are 4 direct matches present above with those above, `Command` and `Telemetry (TLM)` appear naturally in the target artifact.
 

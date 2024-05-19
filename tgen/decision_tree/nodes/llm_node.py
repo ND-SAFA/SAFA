@@ -15,7 +15,7 @@ from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.pipeline.state import State
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.prompts.select_question_prompt import SelectQuestionPrompt
 
 PROMPT_ID = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(0)))
@@ -50,8 +50,8 @@ class LLMNode(AbstractNode):
         """
         self.response_tag = DictUtil.get_kwarg_values(self.response_manager_params, response_tag=self.response_tag, pop=True)
         if len(self.branches) == 1:
-            prompt = Prompt(self.description, response_manager=PromptResponseManager(response_tag=self.response_tag,
-                                                                                     **self.response_manager_params))
+            prompt = Prompt(self.description, response_manager=XMLResponseManager(response_tag=self.response_tag,
+                                                                                  **self.response_manager_params))
         else:
             params = DictUtil.update_kwarg_values(response_format="Enclose your answer in {}",
                                                   default_factory=lambda tag, val: self.default_response,

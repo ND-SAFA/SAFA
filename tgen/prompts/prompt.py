@@ -5,7 +5,8 @@ from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.prompts.prompt_args import PromptArgs
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.response_managers.abstract_response_manager import AbstractResponseManager
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 
 
 class Prompt:
@@ -15,7 +16,7 @@ class Prompt:
     SEED = 1
 
     def __init__(self, value: str = EMPTY_STRING, prompt_args: PromptArgs = None,
-                 response_manager: PromptResponseManager = None):
+                 response_manager: AbstractResponseManager = None):
         """
         Initialize with the value of the prompt
         :param value: The content of the prompt.
@@ -25,7 +26,7 @@ class Prompt:
         self.value = value
         self.args = prompt_args if prompt_args else PromptArgs()
         self.args.set_id(Prompt.SEED)
-        self.response_manager = response_manager if response_manager else PromptResponseManager(include_response_instructions=False)
+        self.response_manager = response_manager if response_manager else XMLResponseManager(include_response_instructions=False)
         Prompt.SEED += 1
 
     def build(self, **kwargs) -> str:

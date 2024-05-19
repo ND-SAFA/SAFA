@@ -1,6 +1,6 @@
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.prompts.select_question_prompt import SelectQuestionPrompt
 
 SOURCE_COMPONENT_LABEL = "subsystem_one"
@@ -37,21 +37,21 @@ CATEGORIES = list(CLASSIFICATION_CATEGORIES.keys())
 
 CLASSIFICATION_STEPS = {
     1: QuestionPrompt("In 10 words, describe the function of the sub-system containing (1).",
-                      response_manager=PromptResponseManager(response_tag=SOURCE_COMPONENT_LABEL)),
+                      response_manager=XMLResponseManager(response_tag=SOURCE_COMPONENT_LABEL)),
 
     2: QuestionPrompt("In 10 words, describe the function of the sub-system containing (2).",
-                      response_manager=PromptResponseManager(response_tag=TARGET_COMPONENT_LABEL)),
+                      response_manager=XMLResponseManager(response_tag=TARGET_COMPONENT_LABEL)),
 
     3: QuestionPrompt("Describe all the ways that (1) and (2) are dependent on each other.",
-                      response_manager=PromptResponseManager(response_tag=RELATED_LABEL)),
+                      response_manager=XMLResponseManager(response_tag=RELATED_LABEL)),
 
     4: QuestionPrompt("Describe all the ways that (1) and (2) are independent on each other.",
-                      response_manager=PromptResponseManager(response_tag=UNRELATED_LABEL)),
+                      response_manager=XMLResponseManager(response_tag=UNRELATED_LABEL)),
 
     5: SelectQuestionPrompt(CLASSIFICATION_CATEGORIES, question="Classify (1) and (2) into one of the following:"),
 
     6: QuestionPrompt("Provide a detailed reasoning of the classification using your answers as references.",
-                      response_manager=PromptResponseManager(response_tag=JUSTIFICATION))
+                      response_manager=XMLResponseManager(response_tag=JUSTIFICATION))
 }
 
 STRENGTH = "Rate the strength of the relatedness between the artifacts with a floating point number between 0 and 1. " \

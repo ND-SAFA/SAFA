@@ -1,7 +1,7 @@
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 
 CODE_SECTION_ID = "# Code to Summarize"
 CODE_SECTION_HEADER = f"{CODE_SECTION_ID}\n"
@@ -18,7 +18,7 @@ CODE_SUMMARY = [ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION_HEADE
                        "while interweaving the details of how it provides such behavior."
                        "Write in an active voice and assume your audience is familiar with software system this code belongs to. "
                        "Do not make conclusions about the code and only provide information.",
-                       response_manager=PromptResponseManager(response_tag="summary"))
+                       response_manager=XMLResponseManager(response_tag="summary"))
                 ]
 
 CODE_SUMMARY_AS_NL = [ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION_HEADER),
@@ -33,7 +33,7 @@ CODE_SUMMARY_AS_NL = [ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION
                              "\n\nThen, using your notes, create a {target_type} artifact for this code that describes the behavior "
                              "provided to the user. You should use the following format when creating the {target_type}\n"
                              "{format} ",
-                             response_manager=PromptResponseManager(response_tag="summary"))
+                             response_manager=XMLResponseManager(response_tag="summary"))
                       ]
 
 NL_SUMMARY = [
@@ -46,7 +46,7 @@ NL_SUMMARY = [
            "Follow the format TITLE - KEYWORDS. "
            "Write in an active voice and assume your audience is familiar with software system this artifact belongs to."
            "\n\n",
-           response_manager=PromptResponseManager(response_tag="descrip")),
+           response_manager=XMLResponseManager(response_tag="descrip")),
     ArtifactPrompt(include_id=False, prompt_start="\n", build_method=ArtifactPrompt.BuildMethod.XML)]
 
 CODE_SUMMARY_WITH_PROJECT_SUMMARY_PREFIX = QuestionPrompt("Use the information below to understand the project.")

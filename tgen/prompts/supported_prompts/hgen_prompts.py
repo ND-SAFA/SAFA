@@ -5,9 +5,10 @@ from tgen.prompts.conditional_prompt import ConditionalPrompt
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
-from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.response_managers.abstract_response_manager import USE_ALL_TAGS
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 
 INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} from a system and you must reverse engineer "
                                      "{target_type} from the {source_type}. "
@@ -16,31 +17,31 @@ INSTRUCTION_CREATION_PROMPT = Prompt("Imagine you are given only {source_type} f
                                      "the {source_type} that by answering would provide the most important information "
                                      "to create the {target_type}. Output the minimal set of questions in a new-line "
                                      "delimited list containing at most 10 items. ",
-                                     response_manager=PromptResponseManager(response_tag="questions",
-                                                                            required_tag_ids=USE_ALL_TAGS,
-                                                                            ))
+                                     response_manager=XMLResponseManager(response_tag="questions",
+                                                                         required_tag_ids=USE_ALL_TAGS,
+                                                                         ))
 
 DEFINITION_PROMPT = QuestionPrompt(
     "First, write a brief description of what a {target_type} is in a software development project. "
     "Focus on what differentiates this artifact from other similar software artifacts. ",
-    response_manager=PromptResponseManager(response_tag="description",
-                                           required_tag_ids=USE_ALL_TAGS,
-                                           value_formatter=lambda tag, val:
-                                           PromptUtil.strip_new_lines_and_extra_space(val)))
+    response_manager=XMLResponseManager(response_tag="description",
+                                        required_tag_ids=USE_ALL_TAGS,
+                                        value_formatter=lambda tag, val:
+                                        PromptUtil.strip_new_lines_and_extra_space(val)))
 EXAMPLE_PROMPT = QuestionPrompt(
     "Then provide an example {target_type} for a software development project. The {target_type} should focus "
     "on a single feature or functionality. ",
-    response_manager=PromptResponseManager(response_tag="example")
+    response_manager=XMLResponseManager(response_tag="example")
 )
 
 FORMAT_PROMPT = QuestionPrompt(
     "Finally, use your example to create a template for the typical format for an effective software development {target_type}. "
     "The template should be generalizable so it can apply to any software project and should exclude any numbering system. "
     "Include only the format. ",
-    response_manager=PromptResponseManager(response_tag="format",
-                                           required_tag_ids=USE_ALL_TAGS,
-                                           value_formatter=lambda tag, val:
-                                           PromptUtil.strip_new_lines_and_extra_space(val)))
+    response_manager=XMLResponseManager(response_tag="format",
+                                        required_tag_ids=USE_ALL_TAGS,
+                                        value_formatter=lambda tag, val:
+                                        PromptUtil.strip_new_lines_and_extra_space(val)))
 
 FORMAT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[DEFINITION_PROMPT, EXAMPLE_PROMPT, FORMAT_PROMPT],
                                            enumeration_chars=["-"])
@@ -86,7 +87,7 @@ CLUSTERING_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
                    "You answer should be given in 1-2 cohesive, well-written paragraphs.")
         ],
         enumeration_chars=["\t"],
-        response_manager=PromptResponseManager(response_tag="core-goals")),
+        response_manager=XMLResponseManager(response_tag="core-goals")),
     QuestionnairePrompt(
         instructions="Then use the actions you identified to create {n_targets} {target_type}s "
                      "When creating the {target_type} ensure that they are:",
@@ -152,16 +153,16 @@ SUMMARY_QUESTIONNAIRE = QuestionnairePrompt(
     question_prompts=[
         QuestionPrompt(
             "Write a set of bullet points that extracts the information that would be important for creating {target_type}s.",
-            response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
+            response_manager=XMLResponseManager(response_tag=PS_NOTES_TAG)),
         QuestionPrompt(
             "Come up with title for the section that would encapsulate the information contained in your notes. ",
-            response_manager=PromptResponseManager(response_tag="title")),
+            response_manager=XMLResponseManager(response_tag="title")),
         QuestionPrompt("Using your notes, write a polished description for the section "
                        "that is specifically focused on detailing the "
                        "information necessary for the {target_type}s. "
                        "The section will not create the {target_type}s themselves "
                        "but it will be useful to the other engineers who make them.",
-                       response_manager=PromptResponseManager(response_tag="new-section-body"))])
+                       response_manager=XMLResponseManager(response_tag="new-section-body"))])
 REFINE_OVERVIEW_PROMPT = Prompt("You are an engineer working on a software system and your goal is to summarize "
                                 "a set of {target_type}s from a software project.")
 DUP_SUMMARY_TASKS = QuestionnairePrompt([
@@ -173,7 +174,7 @@ DUP_SUMMARY_TASKS = QuestionnairePrompt([
            "who does NOT have access to the {target_type}, so do NOT reference specific requirement numbers. "
            "Importantly, do not make an information up or make assumptions. "
            "Only use information directly from the {target_type}. ")],
-    response_manager=PromptResponseManager(response_tag="answer"))
+    response_manager=XMLResponseManager(response_tag="answer"))
 
 REFINEMENT_QUESTIONNAIRE = QuestionnairePrompt(question_prompts=[
     ConditionalPrompt(candidate_prompts=[CLUSTERING_QUESTIONNAIRE.child_prompts[0],
@@ -195,5 +196,5 @@ TITLE_PROMPT = Prompt("Create a title for the {target_type} "
                       "Try to use as much language directly from the {target_type} as possible "
                       "and keep the number of words to 5 or less PRINCIPAL words. "
                       "\nExample: Category Filtering for Product Discovery \n",
-                      response_manager=PromptResponseManager(response_tag="title", required_tag_ids=USE_ALL_TAGS)
+                      response_manager=XMLResponseManager(response_tag="title", required_tag_ids=USE_ALL_TAGS)
                       )

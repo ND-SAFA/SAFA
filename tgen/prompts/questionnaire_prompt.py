@@ -9,7 +9,7 @@ from tgen.common.util.str_util import StrUtil
 from tgen.prompts.multi_prompt import MultiPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.response_managers.abstract_response_manager import AbstractResponseManager
 
 TASK_HEADER = 'TASKS:'
 
@@ -20,7 +20,7 @@ class QuestionnairePrompt(MultiPrompt):
     """
 
     def __init__(self, question_prompts: Union[List[Prompt], Dict[int, Prompt]], instructions: str = EMPTY_STRING,
-                 response_manager: PromptResponseManager = None, enumeration_chars: List[str] = ascii_uppercase,
+                 response_manager: AbstractResponseManager = None, enumeration_chars: List[str] = ascii_uppercase,
                  use_multi_step_task_instructions: bool = False, prompt_args: PromptArgs = None):
         """
         Initializes the questionnaire with the instructions and the questions that will make up the prompt

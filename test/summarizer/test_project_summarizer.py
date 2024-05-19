@@ -6,9 +6,9 @@ from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.models.llm.anthropic_manager import AnthropicManager
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.summarizer.project.supported_project_summary_sections import PROJECT_SUMMARY_MAP
 from tgen.summarizer.summarizer_args import SummarizerArgs
@@ -25,9 +25,9 @@ class TestProjectSummarizer(BaseTest):
     NEW_TITLE = "new_title"
     NEW_SECTION_TITLE = "NEW_SECTION"
     NEW_SECTIONS = {NEW_SECTION_TITLE: QuestionnairePrompt(question_prompts=[
-        QuestionPrompt("Notes", response_manager=PromptResponseManager(response_tag=PS_NOTES_TAG)),
-        QuestionPrompt("Title", response_manager=PromptResponseManager(response_tag=CUSTOM_TITLE_TAG)),
-        QuestionPrompt("A Prompt", response_manager=PromptResponseManager(response_tag="new")),
+        QuestionPrompt("Notes", response_manager=XMLResponseManager(response_tag=PS_NOTES_TAG)),
+        QuestionPrompt("Title", response_manager=XMLResponseManager(response_tag=CUSTOM_TITLE_TAG)),
+        QuestionPrompt("A Prompt", response_manager=XMLResponseManager(response_tag="new")),
     ])}
     SECTION_ORDER = [PS_OVERVIEW_TITLE, NEW_SECTION_TITLE]
     ARGS = SummarizerArgs(project_summary_sections=PROJECT_SUMMARY_SECTIONS,

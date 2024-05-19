@@ -7,7 +7,7 @@ from tgen.common.util.override import overrides
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.response_managers.abstract_response_manager import AbstractResponseManager
 
 TASK_HEADER = 'TASKS:'
 
@@ -18,7 +18,7 @@ class MultiPrompt(Prompt):
     """
 
     def __init__(self, child_prompts: Union[List[Prompt], Dict[int, Prompt]], main_prompt_value: str = EMPTY_STRING,
-                 prompt_args: PromptArgs = None, response_manager: PromptResponseManager = None):
+                 prompt_args: PromptArgs = None, response_manager: AbstractResponseManager = None):
         """
         Selects a prompt based on some condition.
         :param child_prompts: List of all candidate prompts that can be used.
@@ -118,7 +118,7 @@ class MultiPrompt(Prompt):
             parsed.update(parsed_res)
         return parsed
 
-    def _update_response_manager_for_questions(self, response_manager: PromptResponseManager) -> PromptResponseManager:
+    def _update_response_manager_for_questions(self, response_manager: AbstractResponseManager) -> AbstractResponseManager:
         """
         Updates the response manager to be able to parse each child question.
         :param response_manager: The original response manager for questionnaire.
@@ -129,9 +129,9 @@ class MultiPrompt(Prompt):
             if len(all_tags) > 0 and response_manager.response_tag != all_tags:
                 required_tag_ids = {req_tag for prompt in self.child_prompts for req_tag in prompt.response_manager.required_tag_ids}
                 optional_tag_ids = {opt_tag for prompt in self.child_prompts for opt_tag in prompt.response_manager.optional_tag_ids}
-                params = DataclassUtil.convert_to_dict(PromptResponseManager, response_tag={response_manager.response_tag: all_tags}
+                params = DataclassUtil.convert_to_dict(AbstractResponseManager, response_tag={response_manager.response_tag: all_tags}
                 if response_manager.response_tag else all_tags, required_tag_ids=required_tag_ids, optional_tag_ids=optional_tag_ids)
-                response_manager = PromptResponseManager(**params)
+                response_manager = response_manager.__class__(**params)
         return response_manager
 
     def __repr__(self) -> str:

@@ -11,6 +11,7 @@ from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.jobs.model_jobs.create_model_job import CreateModelJob
 from tgen.jobs.model_jobs.delete_model_job import DeleteModelJob
+from tgen.jobs.rag.eval_rag_job import EvalRagJob
 from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
 from tgen.jobs.tracing_jobs.code_trace_job import TraceCodeJob
 from tgen.jobs.tracing_jobs.ranking_chunk_job import RankingChunkJob
@@ -42,3 +43,4 @@ class SupportedJobType(SupportedEnum):
     CLUSTERING = ClusteringJob
     HEALTH_CHECK = HealthCheckJob
     CHAT = ChatJob
+    EVAL_RAG = EvalRagJob

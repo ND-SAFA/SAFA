@@ -79,7 +79,7 @@ class VSMTrainer(AbstractTrainer):
     @overrides(AbstractTrainer)
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,
                            dataset: iDataset = None,
-                           threshold: float = VSM_THRESHOLD_DEFAULT) -> TracePredictionOutput:
+                           threshold: float = VSM_THRESHOLD_DEFAULT, **kwargs) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
@@ -89,7 +89,7 @@ class VSMTrainer(AbstractTrainer):
         """
         eval_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         try:
-            output = self.predict(eval_dataset, threshold)
+            output = self.predict(eval_dataset, threshold, **kwargs)
         except exceptions.NotFittedError:
             raise exceptions.NotFittedError("Model must be trained before calling predict")
         return output
@@ -123,11 +123,12 @@ class VSMTrainer(AbstractTrainer):
         """
         return [self.artifact_map[a_id] for a_id in artifact_ids]
 
-    def predict(self, eval_dataset: TraceDataset, threshold: float) -> TracePredictionOutput:
+    def predict(self, eval_dataset: TraceDataset, threshold: float, evaluate: bool = True) -> TracePredictionOutput:
         """
         Uses the trained model to predict on the raw source and target tokens
         :param eval_dataset: The dataset to use for predicting
         :param threshold: All similarity scores above this threshold will be considered traced, otherwise they are untraced
+        :param evaluate: Whether to perform evaluation on predictions.
         :return: The output from the prediction
         """
         tracing_requests = RankingUtil.extract_tracing_requests(eval_dataset.artifact_df,
@@ -150,15 +151,15 @@ class VSMTrainer(AbstractTrainer):
                 link_id = eval_dataset.trace_df.generate_link_id(child_id, parent_id)
                 link = eval_dataset.trace_df.get_link(link_id)
                 label = link[TraceKeys.LABEL] if link else 0
-                prediction_entry = Trace(source=child_id, target=parent_id, score=similarity_score, label=label)
+                prediction_entry = Trace(link_id=link_id, source=child_id, target=parent_id, score=similarity_score, label=label)
                 prediction_entries.append(prediction_entry)
 
         if self.select_predictions:
             self.convert_to_percentiles(prediction_entries)
             prediction_entries = RankingUtil.select_predictions_by_thresholds(prediction_entries, *VSM_SELECTION_THRESHOLDS)
-        metrics = RankingUtil.evaluate_trace_predictions(eval_dataset.trace_df, prediction_entries)
-        trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,
-                                                        metrics=metrics)
+
+        metrics = RankingUtil.evaluate_trace_predictions(eval_dataset.trace_df, prediction_entries) if evaluate else {}
+        trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries, metrics=metrics)
         return trace_prediction_output
 
     def create_term_frequency_matrices(self, raw_sources: Iterable[str], raw_targets: Iterable[str]) -> \

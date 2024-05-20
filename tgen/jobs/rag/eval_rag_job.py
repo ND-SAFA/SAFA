@@ -8,11 +8,14 @@ import pandas as pd
 from tgen.common.constants.ranking_constants import DEFAULT_CROSS_ENCODER_MODEL
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
+from tgen.core.trainers.vsm_trainer import VSMTrainer
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
+from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
@@ -26,6 +29,8 @@ from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.steps.re_rank_step import ReRankStep
+
+METRICS = SupportedTraceMetric.get_keys()
 
 
 class EvalRagJob(AbstractJob):
@@ -69,13 +74,23 @@ class EvalRagJob(AbstractJob):
     @staticmethod
     def evaluate_dataset(dataset):
         artifact_df: ArtifactDataFrame = dataset.artifact_df
+
+        def vsm():
+            trainer_dataset_manager = TrainerDatasetManager.create_from_datasets(
+                {DatasetRole.EVAL: dataset, DatasetRole.TRAIN: dataset})
+            trainer = VSMTrainer(trainer_dataset_manager=trainer_dataset_manager, metrics=METRICS)
+            trainer.perform_training(DatasetRole.EVAL)
+            prediction_output = trainer.perform_prediction(evaluate=False)
+            return prediction_output.prediction_entries
+
+        vsm_metrics = EvalRagJob.eval_method(vsm, dataset, method="vsm")
+
         content_map = artifact_df.to_map()
         embeddings_manager = EmbeddingsManager(content_map=content_map)
-        metrics = {}
-        embeddings_manager.create_embeddings()
         embedding_predictions = []
 
         def embeddings():
+            embeddings_manager.create_embeddings()
             for child_type, parent_type in dataset.layer_df.as_list():
                 child_artifact_ids = artifact_df.get_artifacts_by_type(child_type).index
                 parent_artifact_ids = artifact_df.get_artifacts_by_type(parent_type).index
@@ -114,7 +129,7 @@ class EvalRagJob(AbstractJob):
             return state.selected_entries
 
         re_ranking_metrics = EvalRagJob.eval_method(re_ranking, dataset, method="re_ranking")
-        return [embedding_metrics, re_ranking_metrics]
+        return [vsm_metrics, embedding_metrics, re_ranking_metrics]
 
     @staticmethod
     def eval_method(exec_lambda: Callable[[], List[Trace]], dataset: TraceDataset, **kwargs):

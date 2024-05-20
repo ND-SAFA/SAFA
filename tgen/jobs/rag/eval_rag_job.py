@@ -88,6 +88,7 @@ class EvalRagJob(AbstractJob):
                                            types_to_trace=(parent_type, child_type),
                                            generate_explanations=False,
                                            use_rag_defaults=False,
+                                           interactive_mode=False,
                                            relationship_manager=embeddings_manager)
 
                 pipeline = EmbeddingRankingPipeline(ranking_args)

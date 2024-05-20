@@ -36,6 +36,8 @@ export enum Endpoint {
 
   // Admin
 
+  accountCollection = "accounts",
+
   superuser = "accounts/superuser",
   superuserActivate = "accounts/superuser/activate",
   superuserDeactivate = "accounts/superuser/deactivate",

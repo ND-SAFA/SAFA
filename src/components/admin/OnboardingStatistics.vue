@@ -1,10 +1,13 @@
 <template>
   <panel-card v-if="!!stats" title="Onboarding Statistics">
     <flex-box>
-      <email-input
-        v-model="userEmail"
+      <select-input
+        v-model="userId"
+        :options="users"
+        option-to-value
+        option-label="email"
+        option-value="id"
         label="User Email"
-        @enter="handleLoadUser"
       />
       <text-button text l="1" t="2" label="Load User" @click="handleLoadUser" />
     </flex-box>
@@ -137,7 +140,7 @@
       </flex-box>
     </div>
     <div v-else>
-      <typography :value="'Account: ' + userEmail" variant="subtitle" el="h3" />
+      <typography value="Account Statistics" variant="subtitle" el="h3" />
       <flex-box full-width>
         <flex-item parts="4">
           <typography value="Imports" secondary el="p" />
@@ -190,25 +193,28 @@ import { onMounted, ref } from "vue";
 import {
   SingleUserProgressSummarySchema,
   UserProgressSummarySchema,
+  UserSchema,
 } from "@/types";
 import { displayDuration, timestampToDisplay } from "@/util";
-import { getOnboardingStatistics, getUserStatistics } from "@/api";
+import { getOnboardingStatistics, getUsers, getUserStatistics } from "@/api";
 import {
   FlexItem,
   FlexBox,
   Typography,
   PanelCard,
   TextButton,
-  EmailInput,
+  SelectInput,
 } from "@/components/common";
 
 const stats = ref<UserProgressSummarySchema>();
-const userEmail = ref("");
+const userId = ref("");
 const userLoading = ref(false);
 const userStats = ref<SingleUserProgressSummarySchema>();
+const users = ref<UserSchema[]>([]);
 
 onMounted(async () => {
   stats.value = await getOnboardingStatistics();
+  users.value = await getUsers();
 });
 
 /**
@@ -234,9 +240,9 @@ function convertPercent(percent: number) {
  * Loads the statistics for the given user.
  */
 async function handleLoadUser() {
-  if (userEmail.value) {
+  if (userId.value) {
     userLoading.value = true;
-    userStats.value = await getUserStatistics(userEmail.value).finally(() => {
+    userStats.value = await getUserStatistics(userId.value).finally(() => {
       userLoading.value = false;
     });
   } else {

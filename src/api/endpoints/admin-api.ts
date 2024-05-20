@@ -1,6 +1,7 @@
 import {
   SingleUserProgressSummarySchema,
   UserProgressSummarySchema,
+  UserSchema,
 } from "@/types";
 import { buildRequest } from "@/api";
 
@@ -26,6 +27,13 @@ export async function activateSuperuser(): Promise<void> {
  */
 export async function deactivateSuperuser(): Promise<void> {
   await buildRequest<void>("superuserDeactivate").put();
+}
+
+/**
+ * Retrieves all users in the system.
+ */
+export async function getUsers(): Promise<UserSchema[]> {
+  return buildRequest<UserSchema[]>("accountCollection").get();
 }
 
 /**

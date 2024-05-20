@@ -1,41 +1,72 @@
+import os
 import time
 from trace import Trace
 from typing import Any, Callable, List
 
+import pandas as pd
+
+from tgen.common.constants.ranking_constants import DEFAULT_CROSS_ENCODER_MODEL
+from tgen.common.util.enum_util import EnumDict
+from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
+from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
+from tgen.relationship_manager.cross_encoder_manager import CrossEncoderManager
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
+from tgen.scripts.constants import DATA_PATH
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
+from tgen.tracing.ranking.common.ranking_state import RankingState
+from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 from tgen.tracing.ranking.steps.re_rank_step import ReRankStep
 
 
 class EvalRagJob(AbstractJob):
 
-    def __init__(self, job_args: JobArgs):
+    def __init__(self, job_args: JobArgs, dataset_names: List[str]):
         """
         Creates new job evaluating RAG pipeline on dataset.
         :param job_args:
         """
         super().__init__(job_args)
+        self.dataset_names = dataset_names
 
     def _run(self) -> Any:
-        dataset = self.job_args.dataset_creator.create()
+
+        entries_global = []
+        for dataset_name in self.dataset_names:
+            dataset_path = os.path.join(DATA_PATH, dataset_name)
+            project_reader = StructuredProjectReader(dataset_path)
+            trace_dataset_creator = TraceDatasetCreator(project_reader=project_reader)
+            prompt_dataset_creator = PromptDatasetCreator(trace_dataset_creator=trace_dataset_creator)
+            dataset = prompt_dataset_creator.create()
+
+            entries = self.evaluate_dataset(dataset)
+            for e in entries:
+                e["dataset"] = dataset_name
+            entries_global.extend(entries)
+
+        metrics_df = pd.DataFrame(entries_global)
+        summary_metrics = ["dataset", "method", "map", "f1", "f2", "time"]
+        summary_df = metrics_df[summary_metrics]
+        print("hi")
+
+    @staticmethod
+    def evaluate_dataset(dataset):
         artifact_df: ArtifactDataFrame = dataset.artifact_df
         content_map = artifact_df.to_map()
         embeddings_manager = EmbeddingsManager(content_map=content_map)
-
         metrics = {}
-
         embeddings_manager.create_embeddings()
+        embedding_predictions = []
 
         def embeddings():
-            embedding_predictions = []
             for child_type, parent_type in dataset.layer_df.as_list():
                 child_artifact_ids = artifact_df.get_artifacts_by_type(child_type).index
                 parent_artifact_ids = artifact_df.get_artifacts_by_type(parent_type).index
@@ -47,20 +78,36 @@ class EvalRagJob(AbstractJob):
                                            re_rank_children=False,
                                            types_to_trace=(parent_type, child_type),
                                            generate_explanations=False,
-                                           use_rag_defaults=True, relationship_manager=embeddings_manager)
+                                           use_rag_defaults=False,
+                                           relationship_manager=embeddings_manager)
 
                 pipeline = EmbeddingRankingPipeline(ranking_args)
                 pipeline.run()
                 selected_entries = pipeline.state.get_current_entries()
                 embedding_predictions.extend(selected_entries)
+
+            child2traces = RankingUtil.group_trace_predictions(embedding_predictions, TraceKeys.child_label())
+            RankingUtil.normalized_scores_by_individual_artifacts(child2traces, min_score=0)
             return embedding_predictions
+
+        embedding_metrics = EvalRagJob.eval_method(embeddings, dataset, method="embeddings")
+        args = RankingArgs(dataset=dataset,
+                           parent_ids=[], children_ids=[], types_to_trace=dataset.layer_df.as_list(),
+                           re_rank_children=True)
+        state = RankingState()
+        state.selected_entries = [EnumDict(**d) for d in embedding_predictions]
+        state.relationship_manager = CrossEncoderManager(content_map, model_name=DEFAULT_CROSS_ENCODER_MODEL)
 
         def re_ranking():
             step = ReRankStep()
+            step.run(args, state)
+            return state.selected_entries
 
-        embedding_metrics = self.eval_method(embeddings, dataset)
+        re_ranking_metrics = EvalRagJob.eval_method(re_ranking, dataset, method="re_ranking")
+        return [embedding_metrics, re_ranking_metrics]
 
-    def eval_method(self, exec_lambda: Callable[[], List[Trace]], dataset: TraceDataset):
+    @staticmethod
+    def eval_method(exec_lambda: Callable[[], List[Trace]], dataset: TraceDataset, **kwargs):
         start_time = time.time()
         predictions = exec_lambda()
         end_time = time.time()
@@ -77,6 +124,8 @@ class EvalRagJob(AbstractJob):
         # Evaluate
         metrics_manager = MetricsManager(dataset.trace_df, trace_predictions=scores)
         metrics = metrics_manager.eval(SupportedTraceMetric.get_keys())
-        metrics["time"] = end_time - start_time
 
-        return metrics
+        output = {"time": end_time - start_time}
+        output.update(kwargs)
+        output.update(metrics)
+        return output

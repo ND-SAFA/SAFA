@@ -4,11 +4,7 @@
       "jobs": [
         {
           "object_type": "EVAL_RAG",
-          "dataset_names": [
-            "papers/hgen/manual/dronology/summarized",
-            "papers/hgen/manual/safa/summarized",
-            "papers/hgen/manual/joc/summarized"
-          ],
+          "dataset_names": "[DATASET_NAME_LIST]",
           "job_args": {
             "export_path": "[CUSTOM_EXPORT_PATH]"
           }

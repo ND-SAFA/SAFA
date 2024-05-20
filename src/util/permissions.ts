@@ -8,6 +8,7 @@ export const roleMap: Record<
   Record<MemberRole, PermissionType[]>
 > = {
   PROJECT: {
+    PENDING: [],
     NONE: [],
     VIEWER: ["project.view"],
     EDITOR: ["project.view", "project.edit", "project.edit_data"],
@@ -40,6 +41,7 @@ export const roleMap: Record<
     BILLING_MANAGER: [],
   },
   TEAM: {
+    PENDING: [],
     NONE: [],
     VIEWER: ["project.view", "team.view", "team.view_projects"],
     EDITOR: [
@@ -84,6 +86,7 @@ export const roleMap: Record<
     BILLING_MANAGER: [],
   },
   ORGANIZATION: {
+    PENDING: [],
     NONE: [],
     VIEWER: ["org.view", "org.view_teams"],
     EDITOR: [],

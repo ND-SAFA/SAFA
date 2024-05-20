@@ -3,6 +3,8 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 import {
   IdentifierSchema,
+  InviteMembershipSchema,
+  InviteTokenSchema,
   IOHandlerCallback,
   MemberApiHook,
   MemberEntitySchema,
@@ -10,6 +12,7 @@ import {
   OrganizationSchema,
   TeamSchema,
 } from "@/types";
+import { buildMember } from "@/util";
 import {
   getProjectApiStore,
   logStore,
@@ -43,24 +46,33 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
   }
 
   async function handleInvite(
-    member: MembershipSchema,
-    callbacks: IOHandlerCallback
+    member: InviteMembershipSchema,
+    entity: MemberEntitySchema,
+    callbacks: IOHandlerCallback<InviteTokenSchema> = {}
   ): Promise<void> {
     await memberApi.handleRequest(
       async () => {
-        const entityId = member.entityId || projectStore.projectId;
+        const inviteToken = await createMember(entity.entityId, member);
 
-        const invitedMember = await createMember({
-          ...member,
-          entityId,
-        });
+        membersStore.updateMembers(
+          [buildMember({ ...member, ...entity })],
+          entity
+        );
 
-        membersStore.updateMembers([invitedMember], member);
+        if (!member.email) {
+          await navigator.clipboard.writeText(inviteToken.url);
+        }
+
+        return inviteToken;
       },
       {
         ...callbacks,
-        success: `Member has been added: ${member.email}`,
-        error: `Unable save member: ${member.email}`,
+        success: member.email
+          ? `An invite has been sent to ${member.email}`
+          : `Invite link copied to clipboard`,
+        error: member.email
+          ? `Unable to invite member: ${member.email}`
+          : "Unable to create invite link",
       }
     );
   }

@@ -1,9 +1,4 @@
-import {
-  MemberEntitySchema,
-  MembershipSchema,
-  OrganizationSchema,
-  TeamSchema,
-} from "@/types";
+import { OrganizationSchema, TeamSchema } from "@/types";
 import { buildRequest } from "@/api";
 
 /**
@@ -129,69 +124,5 @@ export async function deleteTeam(
   await buildRequest<TeamSchema, "orgId" | "teamId">("team", {
     orgId,
     teamId: team.id,
-  }).delete();
-}
-
-/**
- * Get the members of a project, team, or organization.
- *
- * @param entity - The entity to get the members of.
- * @return The members of the entity.
- */
-export async function getMembers(
-  entity: MemberEntitySchema
-): Promise<MembershipSchema[]> {
-  return buildRequest<MembershipSchema[], "entityId">("memberCollection", {
-    entityId: entity.entityId || "",
-  }).get();
-}
-
-/**
- * Shares a project, team, or organization with a user.
- *
- * @param member - The member to add.
- * @return The created member.
- */
-export async function createMember(
-  member: Omit<MembershipSchema, "id">
-): Promise<MembershipSchema> {
-  return buildRequest<
-    MembershipSchema,
-    "entityId",
-    Pick<MembershipSchema, "email" | "role">
-  >("memberCollection", { entityId: member.entityId || "" }).post({
-    email: member.email,
-    role: member.role,
-  });
-}
-
-/**
- * Edits a member of a project, team, or organization.
- *
- * @param member - The member to edit.
- * @return The edited member.
- */
-export async function editMember(
-  member: MembershipSchema
-): Promise<MembershipSchema> {
-  return buildRequest<
-    MembershipSchema,
-    "entityId" | "memberId",
-    MembershipSchema
-  >("member", { entityId: member.entityId || "", memberId: member.id }).put(
-    member
-  );
-}
-
-/**
- * Deletes a member of a project, team, or organization.
- *
- * @param member - The member to delete.
- * @return The delete member.
- */
-export async function deleteMember(member: MembershipSchema): Promise<void> {
-  await buildRequest<MembershipSchema, "entityId" | "memberId">("member", {
-    entityId: member.entityId || "",
-    memberId: member.id,
   }).delete();
 }

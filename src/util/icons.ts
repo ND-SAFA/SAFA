@@ -233,6 +233,8 @@ export function getIcon(variant?: IconVariant): string {
       return "mdi-file-document-multiple";
     case "health-conflict":
       return "mdi-compare-remove";
+    case "link":
+      return "mdi-link";
     default:
       return "";
   }

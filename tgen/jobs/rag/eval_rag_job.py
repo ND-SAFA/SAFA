@@ -6,6 +6,7 @@ from typing import Any, Callable, List
 import pandas as pd
 
 from tgen.common.constants.ranking_constants import DEFAULT_CROSS_ENCODER_MODEL
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -29,7 +30,7 @@ from tgen.tracing.ranking.steps.re_rank_step import ReRankStep
 
 class EvalRagJob(AbstractJob):
 
-    def __init__(self, job_args: JobArgs, dataset_names: List[str], custom_export_path: str):
+    def __init__(self, job_args: JobArgs, dataset_names: List[str], custom_export_path: str = None):
         """
         Creates new job evaluating RAG pipeline on dataset.
         :param job_args:
@@ -57,8 +58,13 @@ class EvalRagJob(AbstractJob):
         summary_metrics = ["dataset", "method", "map", "f1", "f2", "time"]
         summary_df = metrics_df[summary_metrics]
 
-        metrics_df.to_csv(os.path.join(self.custom_export_path, "metrics.csv"), index=False)
-        summary_df.to_csv(os.path.join(self.custom_export_path, "summary.csv"), index=False)
+        if self.custom_export_path:
+            os.makedirs(self.custom_export_path, exist_ok=True)
+            metrics_df.to_csv(os.path.join(self.custom_export_path, "metrics.csv"), index=False)
+            summary_df.to_csv(os.path.join(self.custom_export_path, "summary.csv"), index=False)
+            logger.info(f"Saved files to {self.custom_export_path}")
+
+        print(summary_df)
 
     @staticmethod
     def evaluate_dataset(dataset):

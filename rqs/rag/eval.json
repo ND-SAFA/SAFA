@@ -5,9 +5,8 @@
         {
           "object_type": "EVAL_RAG",
           "dataset_names": "[DATASET_NAME_LIST]",
-          "job_args": {
-            "export_path": "[CUSTOM_EXPORT_PATH]"
-          }
+          "custom_export_path": "[CUSTOM_EXPORT_PATH]",
+          "job_args": {}
         }
       ]
     }

@@ -1,7 +1,7 @@
-from copy import copy
+from copy import copy, deepcopy
 from dataclasses import dataclass
 from inspect import getfullargspec
-from typing import Callable, Dict, Set, Type, Union, get_type_hints
+from typing import Callable, Dict, Set, Type, Union, get_type_hints, List, Any, Tuple
 
 
 @dataclass
@@ -11,6 +11,7 @@ class ParamSpecs:
     has_kwargs: bool
     required_params: Set[str]
     name: str
+    args_order: List
 
     @staticmethod
     def create_from_method(method: Callable) -> "ParamSpecs":
@@ -20,9 +21,10 @@ class ParamSpecs:
         :return: the param specs
         """
         full_specs = getfullargspec(method)
-        expected_param_names = full_specs.args
+        expected_param_names = deepcopy(full_specs.args)
         optional_param_names = full_specs.kwonlyargs
-        expected_param_names.remove("self")
+        if "self" in expected_param_names:
+            expected_param_names.remove("self")
 
         param_names = set(copy(expected_param_names + optional_param_names))
         type_hints = get_type_hints(method)
@@ -33,7 +35,8 @@ class ParamSpecs:
                            if not full_specs.defaults or i >= len(full_specs.defaults)}
 
         return ParamSpecs(name=str(method), param_names=param_names, param_types=param_types,
-                          required_params=required_params, has_kwargs=full_specs.varkw is not None)
+                          required_params=required_params, has_kwargs=full_specs.varkw is not None,
+                          args_order=full_specs.args)
 
     def extract_params_from_kwargs(self, **kwargs):
         """
@@ -81,3 +84,16 @@ class ParamSpecs:
         :return: a set of any additional parameters
         """
         return set(param_dict.keys()).difference(self.param_names)
+
+    def convert_args_to_kwargs(self, arg_values: Tuple) -> Dict[str, Any]:
+        """
+        Converts args to the equivalent kwargs.
+        :param arg_values: List of arg values.
+        :return: A dictionary mapping arg name to value for kwargs.
+        """
+        kwargs = {}
+        for i, val in enumerate(arg_values):
+            assert len(self.args_order) > i, "Unknown arg"
+            arg_name = self.args_order[i]
+            kwargs[arg_name] = val
+        return kwargs

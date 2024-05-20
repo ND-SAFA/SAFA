@@ -95,7 +95,8 @@ const userRole = ref<MemberRole>();
 
 const subtitle = computed(
   () =>
-    `Invite new members to this ${props.entity.entityType?.toLowerCase()}. Members must already have an account with SAFA.`
+    `Invite new members to this ${props.entity.entityType?.toLowerCase()}.
+    Members will receive an email to accept the invite.`
 );
 
 const submitLabel = computed(

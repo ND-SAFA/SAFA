@@ -10,6 +10,7 @@
             "papers/hgen/manual/joc/summarized"
           ],
           "job_args": {
+            "export_path": "[CUSTOM_EXPORT_PATH]"
           }
         }
       ]

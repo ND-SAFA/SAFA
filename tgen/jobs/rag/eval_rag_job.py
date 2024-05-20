@@ -29,13 +29,14 @@ from tgen.tracing.ranking.steps.re_rank_step import ReRankStep
 
 class EvalRagJob(AbstractJob):
 
-    def __init__(self, job_args: JobArgs, dataset_names: List[str]):
+    def __init__(self, job_args: JobArgs, dataset_names: List[str], custom_export_path: str):
         """
         Creates new job evaluating RAG pipeline on dataset.
         :param job_args:
         """
         super().__init__(job_args)
         self.dataset_names = dataset_names
+        self.custom_export_path = custom_export_path
 
     def _run(self) -> Any:
 
@@ -55,7 +56,9 @@ class EvalRagJob(AbstractJob):
         metrics_df = pd.DataFrame(entries_global)
         summary_metrics = ["dataset", "method", "map", "f1", "f2", "time"]
         summary_df = metrics_df[summary_metrics]
-        print("hi")
+
+        metrics_df.to_csv(os.path.join(self.custom_export_path, "metrics.csv"), index=False)
+        summary_df.to_csv(os.path.join(self.custom_export_path, "summary.csv"), index=False)
 
     @staticmethod
     def evaluate_dataset(dataset):

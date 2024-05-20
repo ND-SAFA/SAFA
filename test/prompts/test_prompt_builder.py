@@ -6,9 +6,9 @@ from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.prompts.select_question_prompt import SelectQuestionPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 
@@ -86,7 +86,7 @@ class TestPromptBuilder(BaseTest):
                                        question_prompts={
                                            1: QuestionPrompt("Think about your favorite {blank}"),
                                            2: QuestionPrompt("Then do this",
-                                                             response_manager=PromptResponseManager(response_tag="question2")),
+                                                             response_manager=XMLResponseManager(response_tag="question2")),
                                            3: BinaryChoiceQuestionPrompt(choices=["yes", "no"], question="Do you like running?")
 
                                        }),

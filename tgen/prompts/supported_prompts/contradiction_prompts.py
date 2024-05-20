@@ -3,10 +3,11 @@ from typing import List, Optional
 from tgen.common.constants.deliminator_constants import COMMA
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.contradictions.common_choices import CommonChoices
-from tgen.contradictions.with_decision_tree.requirement import RequirementConstituent
+from tgen.contradictions.requirement import RequirementConstituent
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_response_manager import PromptResponseManager, USE_ALL_TAGS
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.response_managers.abstract_response_manager import USE_ALL_TAGS
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 
 CONSTITUENT2TAG = {RequirementConstituent.CONDITION: RequirementConstituent.CONDITION.value,
                    RequirementConstituent.EFFECT: RequirementConstituent.EFFECT.value,
@@ -27,7 +28,7 @@ CONDITIONS_PROMPT = Prompt("Conditions are sub-statements that are crucial for t
                            "For example, for the requirement 'If the threshold is reached, then the speed must be decreased',"
                            "the condition would be *'If the threshold is reached'. "
                            "Identify if the requirement above has a condition. ",
-                           response_manager=PromptResponseManager(
+                           response_manager=XMLResponseManager(
                                response_tag=CONSTITUENT2TAG[RequirementConstituent.CONDITION],
                                optional_tag_ids=USE_ALL_TAGS,
                                response_instructions_format="If it has a condition, output the condition enclosed in {}. "
@@ -39,7 +40,7 @@ EFFECT_PROMPT = Prompt("Effects are the results of a condition being met. "
                        "even when a condition is not explicitly included in the requirement. "
                        "For example, 'The speed must be decreased' would still be an effect even if there was no condition provided. "
                        "Identify if the requirement above has a effect.",
-                       response_manager=PromptResponseManager(
+                       response_manager=XMLResponseManager(
                            response_tag=CONSTITUENT2TAG[RequirementConstituent.EFFECT],
                            optional_tag_ids=USE_ALL_TAGS,
                            response_instructions_format="If it has a effect, output the effect enclosed in {}. "
@@ -53,7 +54,7 @@ VARIABLE_PROMPT = Prompt("Variables are the *subjects* of the condition and effe
                          "There is generally exactly ONE variable in the condition (if it exists) "
                          "and exactly ONE in the effect (if it exists)."
                          "Identify the condition and effect variables in the requirement. ",
-                         response_manager=PromptResponseManager(
+                         response_manager=XMLResponseManager(
                              response_tag=[CONSTITUENT2TAG[RequirementConstituent.VARIABLE][RequirementConstituent.CONDITION],
                                            CONSTITUENT2TAG[RequirementConstituent.VARIABLE][RequirementConstituent.EFFECT]],
                              optional_tag_ids=USE_ALL_TAGS,
@@ -68,7 +69,7 @@ ACTION_PROMPT = Prompt("Actions are what happens to the variables.  "
                        "where as 'display' WOULD BE the primary action occurring to the dashboard. "
                        "There is generally exactly ONE action in the condition (if it exists) "
                        "and exactly ONE in the effect (if it exists).",
-                       response_manager=PromptResponseManager(
+                       response_manager=XMLResponseManager(
                            response_tag=[CONSTITUENT2TAG[RequirementConstituent.ACTION][RequirementConstituent.CONDITION],
                                          CONSTITUENT2TAG[RequirementConstituent.ACTION][RequirementConstituent.EFFECT]],
                            optional_tag_ids=USE_ALL_TAGS,

@@ -146,10 +146,11 @@ class RQDefinition:
         save_rq_path = os.path.join(output_dir, "rq_config.yaml")
         return save_rq_path
 
-    def confirm(self, title: str = RQ_INQUIRER_CONFIRM_MESSAGE, body=None) -> bool:
+    def confirm(self, title: str = RQ_INQUIRER_CONFIRM_MESSAGE, body: str = None) -> bool:
         """
         Confirms values of the rq with the user.
         :param title: The title of the message.
+        :param body: Body of the confirm message.
         :return: Whether the user confirmed the values.
         """
         if body is None:

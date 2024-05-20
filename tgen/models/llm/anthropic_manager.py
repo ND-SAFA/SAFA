@@ -91,6 +91,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         assert AnthropicParams.PROMPT in params, f"Expected {params} to include `prompt`"
         prompts = params.pop(AnthropicParams.PROMPT)
         system_prompts = DictUtil.get_kwarg_values(params, pop=True, system=[None] * len(prompts))
+        if not isinstance(system_prompts, list):
+            system_prompts = [system_prompts]
         logger.info(f"Starting Anthropic batch ({len(prompts)}): {params['model']}")
         prompts = self._format_prompts(prompts)
 

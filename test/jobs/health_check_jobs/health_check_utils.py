@@ -2,15 +2,19 @@ from typing import Dict, List
 
 from test.concepts.test_entity_extraction import TestPredictEntityStep
 from test.concepts.test_entity_matching import TestEntityMatching
+from tgen.chat.message_meta import MessageMeta
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.prompts.supported_prompts.contradiction_prompts import create_contradiction_response
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.prompts.prompt import Prompt
+from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 
-ARTIFACT_CONTENT = ["All dogs are really cute.", "Car goes vroom.", "Fire trucks are loud.", "Dogs pee on fire hydrants.",
+ARTIFACT_CONTENT = ["All dogs are really cute.", "Cars make vroom vroom sound.", "Fire trucks are loud.", "Dogs pee on fire hydrants.",
                     "Cats are better than Dogs"]
 ARTIFACT_IDS = [f"a_{i}" for i in range(len(ARTIFACT_CONTENT))]
 QUERY = Artifact(id="query1", content="What pet should I get?", layer_id="queries")
@@ -83,6 +87,12 @@ def get_dataset_for_context(include_query: bool = False):
     if include_query:
         artifact_df.add_row(QUERY)
     return PromptDataset(artifact_df=artifact_df)
+
+
+def get_chat_history(artifact_ids: List = None):
+    artifact_ids = [] if not artifact_ids else artifact_ids
+    return [MessageMeta(message=AbstractLLMManager.convert_prompt_to_message(prompt=QUERY[ArtifactKeys.CONTENT]),
+                        artifact_ids=artifact_ids)]
 
 
 def get_dataset_for_health_checks():

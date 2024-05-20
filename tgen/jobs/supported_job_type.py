@@ -6,7 +6,6 @@ from tgen.jobs.data_jobs.create_source_splits_job import CreateSourceSplitsJob
 from tgen.jobs.data_jobs.download_repository_job import DownloadRepositoryJob
 from tgen.jobs.data_jobs.export_artifacts_job import ExportArtifactsJob
 from tgen.jobs.delta_jobs.delta_summarizer_job import DeltaSummarizerJob
-from tgen.jobs.health_check_jobs.contradiction_job import ContradictionJob
 from tgen.jobs.health_check_jobs.health_check_job import HealthCheckJob
 from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
@@ -41,6 +40,5 @@ class SupportedJobType(SupportedEnum):
     DOWNLOAD_REPO = DownloadRepositoryJob
     CREATE_SOURCE_SPLITS = CreateSourceSplitsJob
     CLUSTERING = ClusteringJob
-    CONTRADICTIONS = ContradictionJob
     HEALTH_CHECK = HealthCheckJob
     CHAT = ChatJob

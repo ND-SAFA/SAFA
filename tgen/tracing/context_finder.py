@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Set
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
@@ -13,21 +13,23 @@ from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipe
 class ContextFinder:
 
     @staticmethod
-    def find_related_artifacts(artifact_id: str, dataset: PromptDataset, max_context: int = None,
+    def find_related_artifacts(artifact_id: str, dataset: PromptDataset, layer_ids: Set[str] = None, max_context: int = None,
                                base_export_dir: str = None, **ranking_params) -> Tuple[Dict[str, List[EnumDict]], List[Trace]]:
         """
         Identifies related artifacts to the given artifact.
         :param artifact_id: The id of the artifact to find related artifacts for.
         :param dataset: Contains all artifacts in the dataset.
+        :param layer_ids: Will only select context artifacts that are in the given layer ids. None if should use all.
         :param base_export_dir: The directory to save output to.
         :param max_context: The maximum number of artifacts allowed in the context.
         :return: A mapping of artifact id to related artifacts and a list of traces containing the related artifacts.
         """
         artifact_df = dataset.artifact_df
+        layer_ids = artifact_df.get_artifact_types() if not layer_ids else layer_ids
         requirement = artifact_df.get_artifact(artifact_id)
         children_ids = [artifact_id]
         all_relationships = []
-        for layer in artifact_df.get_artifact_types():
+        for layer in layer_ids:
             layer_artifacts = artifact_df.get_artifacts_by_type(layer)
             parent_ids = [a_id for a_id in layer_artifacts.index if a_id != artifact_id]
             if not parent_ids:

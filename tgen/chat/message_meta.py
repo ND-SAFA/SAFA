@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Set
 
 from tgen.common.util.base_object import BaseObject
 from tgen.models.llm.abstract_llm_manager import Message
@@ -11,7 +11,7 @@ class MessageMeta(BaseObject):
     Contains message and artifact ids in its context.
     """
     message: Message
-    artifact_ids: List[str] = field(default_factory=list)
+    artifact_ids: Set[str] = field(default_factory=set)
 
     @staticmethod
     def to_llm_messages(metas: list["MessageMeta"]) -> List[Message]:

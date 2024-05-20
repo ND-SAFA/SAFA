@@ -1,6 +1,6 @@
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.util.prompt_util import PromptUtil
-from tgen.contradictions.with_decision_tree.requirement import Requirement, RequirementConstituent
+from tgen.contradictions.requirement import Requirement, RequirementConstituent
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame

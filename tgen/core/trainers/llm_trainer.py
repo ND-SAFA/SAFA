@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from openai.api_resources.fine_tune import FineTune
 
+from tgen.chat.message_meta import MessageMeta
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -21,7 +22,7 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.metrics.metrics_manager import MetricsManager
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, Message, CONTENT_KEY
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.prompt import Prompt
@@ -82,26 +83,11 @@ class LLMTrainer(AbstractTrainer):
         :param raise_exception: If True, raises an exception if a response fails
         :return: THe prediction response
         """
-        assert not save_and_load_path or save_and_load_path.endswith(FileUtil.YAML_EXT), "Response must be saved to yaml file."
-
         datasets = self._get_dataset(dataset_role, datasets)
         prompt_df, message_prompts, system_prompts = self._get_prompts_for_predictions(datasets, message_prompts, system_prompts)
 
-        reloaded = LLMResponseUtil.reload_responses(save_and_load_path)
-        missing_generations = isinstance(reloaded, List) or reloaded is None
-
-        if missing_generations:
-            res = self.llm_manager.make_completion_request(
-                completion_type=self.completion_type,
-                prompt=message_prompts,
-                system=system_prompts,
-                original_responses=reloaded,
-                raise_exception=raise_exception and not save_and_load_path)
-            LLMResponseUtil.save_responses(res, save_and_load_path)
-        else:
-            res = reloaded
-
-        LLMResponseUtil.get_failed_responses(res, raise_exception=raise_exception)
+        res = self._make_generation_request(self.state.llm_manager, message_prompts, system_prompts,
+                                            self.state.completion_type, raise_exception, save_and_load_path)
 
         batch_responses = LLMResponseUtil.get_batch_responses(res)
         debugging = [p + NEW_LINE + str(r) for p, r in zip(message_prompts, batch_responses)]
@@ -116,6 +102,36 @@ class LLMTrainer(AbstractTrainer):
             output = self._create_generation_output(res.batch_responses, prompt_builder_map, prompt_builder_ids)
         else:
             raise NotImplementedError(f"Unable to translate response to task: {type(res)}")
+        return output
+
+    @staticmethod
+    def perform_chat(llm_manager: AbstractLLMManager,
+                     chat_history: List[MessageMeta | Message],
+                     system_prompts: str = None,
+                     prompt_builder: PromptBuilder = None,
+                     save_and_load_path: str = EMPTY_STRING,
+                     raise_exception: bool = True) -> TracePredictionOutput:
+        """
+        Gets the next response in the chat.
+        :param llm_manager: The llm manager to use for the chat.
+        :param chat_history: The list of message sent between user and LLM.
+        :param system_prompts: The system prompts for chat if applicable.
+        :param prompt_builder: Used to parse response.
+        :param save_and_load_path: The path to load or save response
+        :param raise_exception: If True, raises an exception if a response fails
+        :return: THe prediction response
+        """
+        if isinstance(chat_history[0], MessageMeta):
+            chat_history = MessageMeta.to_llm_messages(chat_history)
+
+        res = LLMTrainer._make_generation_request(llm_manager, chat_history, system_prompts, raise_exception=raise_exception,
+                                                  save_and_load_path=save_and_load_path)
+        if prompt_builder:
+            output = LLMTrainer._create_generation_output(res.batch_responses, {prompt_builder.id: prompt_builder},
+                                                          [prompt_builder.id])
+        else:
+            output = TracePredictionOutput(predictions=res.batch_responses, original_response=res.batch_responses)
+
         return output
 
     @staticmethod
@@ -171,6 +187,56 @@ class LLMTrainer(AbstractTrainer):
         :return: None
         """
         pass
+
+    @staticmethod
+    def _make_generation_request(llm_manager: AbstractLLMManager,
+                                 message_prompts: Union[str, List], system_prompts: Union[str, List] = None,
+                                 completion_type: LLMCompletionType = LLMCompletionType.GENERATION,
+                                 raise_exception: bool = False,
+                                 save_and_load_path: str = None) -> Union[ClassificationResponse, GenerationResponse]:
+        """
+        Makes a request to the llm manager to generate a response.
+        :param llm_manager: The llm manager to use.
+        :param message_prompts: List of prompts to provide to the LLM.
+        :param system_prompts: The system prompt to provide context in Anthropic convos.
+        :param completion_type: The type of completion (generation or classification).
+        :param raise_exception: If True, raises an exception if the request fails.
+        :param save_and_load_path: Path to load or save responses to.
+        :return: The response(s) from the model.
+        """
+        assert not save_and_load_path or save_and_load_path.endswith(FileUtil.YAML_EXT), "Response must be saved to yaml file."
+
+        reloaded = LLMResponseUtil.reload_responses(save_and_load_path)
+        missing_generations = isinstance(reloaded, List) or reloaded is None
+        first_prompt = LLMTrainer._get_first_prompt(message_prompts)  # debugging
+
+        if missing_generations:
+            res = llm_manager.make_completion_request(
+                completion_type=completion_type,
+                prompt=message_prompts,
+                system=system_prompts,
+                original_responses=reloaded,
+                raise_exception=raise_exception and not save_and_load_path)
+            LLMResponseUtil.save_responses(res, save_and_load_path)
+        else:
+            res = reloaded
+        LLMResponseUtil.get_failed_responses(res, raise_exception=raise_exception)
+        return res
+
+    @staticmethod
+    def _get_first_prompt(message_prompts: List | str) -> str:
+        """
+        Gets the first prompt for debugging.
+        :param message_prompts: A list of prompts or messages or a single string.
+        :return: The first prompt.
+        """
+        if isinstance(message_prompts, str):
+            return message_prompts
+        if isinstance(message_prompts, list):
+            if isinstance(message_prompts[0], Dict):
+                return message_prompts[0][CONTENT_KEY]
+            else:
+                return message_prompts[0]
 
     @staticmethod
     def _create_generation_output(responses: List[str], prompt_builder_map: Dict[str, PromptBuilder],

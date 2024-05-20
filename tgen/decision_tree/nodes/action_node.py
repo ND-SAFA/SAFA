@@ -1,27 +1,21 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable
 
+from tgen.common.util.dataclass_util import required_field
 from tgen.decision_tree.nodes.abstract_node import AbstractNode
 from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.pipeline.state import State
 
 
 @dataclass
-class LeafNode(AbstractNode):
-
-    def __post_init__(self):
-        """
-        Checks that this is indeed a leaf node.
-        :return: None
-        """
-        if not self.is_leaf():
-            raise Exception("Leaf node cannot have branches.")
+class ActionNode(AbstractNode):
+    action_method: Callable[[PipelineArgs, State], Any] = required_field(field_name="action_method")
 
     def make_choice(self, args: PipelineArgs, state: State) -> Any:
         """
-        Here for node api, should not be used for leaf.
+        Decides which path to take from the current node.
         :param args: The arguments to the node.
         :param state: The current state.
         :return: The choice of the next branch or the input for the next node.
         """
-        raise Exception("Can't choose a branch from a leaf node")
+        return self.action_method(args, state)

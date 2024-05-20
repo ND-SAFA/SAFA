@@ -43,11 +43,14 @@ class BaseJobTest(BaseTraceTest, ABC):
             return JobResult.from_dict(json.load(out_file))
 
     def assert_output_on_success(self, job: AbstractJob, job_result: JobResult, **kwargs):
+        self.assert_job_succeeded(job_result)
+        self._assert_success(job, job_result, **kwargs)
+
+    def assert_job_succeeded(self, job_result):
         if job_result.status == Status.FAILURE:
             failure_msg = job_result.body
             self.fail(failure_msg)
         self.assertEqual(job_result.status, Status.SUCCESS)
-        self._assert_success(job, job_result, **kwargs)
 
     def assert_output_on_failure(self, job_output: JobResult):
         self.assertEqual(job_output.status, Status.FAILURE)

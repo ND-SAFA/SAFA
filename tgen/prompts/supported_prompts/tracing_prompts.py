@@ -7,9 +7,9 @@ from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, RANK
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.prompts.select_question_prompt import SelectQuestionPrompt
 
 RANKING_GOAL = Prompt(
@@ -36,7 +36,7 @@ QUESTION1 = QuestionnairePrompt(
                           f"that is related to the parent artifact's functionality. "
                           f"Use the information in `{PROJECT_SUMMARY_HEADER}` "
                           f"to understand the system the parent artifact is operating in.")
-                      ], response_manager=PromptResponseManager(response_tag=RANKING_PARENT_SUMMARY_TAG))
+                      ], response_manager=XMLResponseManager(response_tag=RANKING_PARENT_SUMMARY_TAG))
 RANKING_CATEGORIES = ["Artifacts have closely-tied functionality "
                       "or a direct design/inheritance relationship (definite trace-link) ",
                       "Artifacts support key functions of the other "
@@ -76,13 +76,13 @@ QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps 
                                              "answer the following questions for each artifact. "
                                              f"Each set of answers for a single artifact should be enclosed in "
                                              f"inside of {PromptUtil.create_xml(RANKING_ARTIFACT_TAG)}",
-                                response_manager=PromptResponseManager(response_tag=RANKING_ARTIFACT_TAG,
-                                                                       response_instructions_format="Enclose the set of answers "
-                                                                                                    "for EACH artifact inside of {}"),
+                                response_manager=XMLResponseManager(response_tag=RANKING_ARTIFACT_TAG,
+                                                                    response_instructions_format="Enclose the set of answers "
+                                                                                                 "for EACH artifact inside of {}"),
                                 use_multi_step_task_instructions=True,
                                 question_prompts=[QuestionPrompt("Provide the ID of the artifact being processed ",
-                                                                 response_manager=PromptResponseManager(response_tag=RANKING_ID_TAG,
-                                                                                                        expected_response_type=int)),
+                                                                 response_manager=XMLResponseManager(response_tag=RANKING_ID_TAG,
+                                                                                                     expected_response_type=int)),
                                                   QuestionnairePrompt(instructions=f"Within "
                                                                                    f"{PromptUtil.create_xml(RANKING_EXPLANATION_TAG)} "
                                                                                    f"provide three complete sentences "
@@ -99,7 +99,7 @@ QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps 
                                                                                          "affect the primary goal "
                                                                                          "of the parent artifact?")],
                                                                       enumeration_chars=["i", "ii", "iii", "iv", "v"],
-                                                                      response_manager=PromptResponseManager(
+                                                                      response_manager=XMLResponseManager(
                                                                           response_tag=RANKING_EXPLANATION_TAG)),
                                                   SCORE_INSTRUCTIONS,
                                                   Prompt(f"Make sure to enclose each set of answers "

@@ -19,8 +19,8 @@ from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.prompt_response_manager import PromptResponseManager
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 
@@ -206,7 +206,7 @@ class ContentGenerator:
                                            "{target}. " + additional_response_instructions
             sources = {a[ArtifactKeys.ID] for artifacts in cluster2artifacts.values() for a in artifacts} \
                 if cluster2artifacts else set(self.state.source_dataset.artifact_df.index)
-            task_prompt.response_manager = PromptResponseManager(
+            task_prompt.response_manager = XMLResponseManager(
                 response_instructions_format=response_instructions_format,
                 optional_tag_ids={self.SOURCE_TAG_ID},
                 expected_responses={self.SOURCE_TAG_ID: sources},

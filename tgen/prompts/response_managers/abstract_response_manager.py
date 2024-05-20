@@ -1,5 +1,6 @@
 import logging
 import uuid
+from abc import abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
 
@@ -7,8 +8,6 @@ import bs4
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
 
 RESPONSE_FORMAT = "Enclose your answer inside of {}"
@@ -16,7 +15,7 @@ USE_ALL_TAGS = str(uuid.uuid4())
 
 
 @dataclass
-class PromptResponseManager:
+class AbstractResponseManager:
     """
     :param response_tag: The tag that the model uses to enclose its answer
     """
@@ -89,6 +88,35 @@ class PromptResponseManager:
         self.required_tag_ids = self._post_process_tag_id_sets(self.required_tag_ids)
         self.optional_tag_ids = self._post_process_tag_id_sets(self.optional_tag_ids)
 
+    def get_all_tag_ids(self) -> List[str]:
+        """
+        Gets all the response tag ids in the order they are provided .
+        If parent, children, they are returned in the order:
+        p1, c1.1, .. c1.n, p2, c2.1, .. c2.n,... pn, cn.1, .. cn.n
+        :return: All the response tag ids in the order they are provided
+        """
+        return self._all_tag_ids
+
+    def format_response_instructions(self) -> str:
+        """
+        Formats the response instructions with the appropriate tags
+        :return: The formatted response instructions
+        """
+        if not self.include_response_instructions:
+            return EMPTY_STRING
+        args, kwargs = self._get_response_instructions_format_params()
+        return StrUtil.format_selective(self.response_instructions_format, *args, **kwargs)
+
+    def parse_response(self, response: str) -> Dict[str, Any]:
+        """
+        Parses the response from the model in the expected format for the prompt
+        :param response: The model response
+        :return: The formatted response
+        """
+        if not self.response_tag:
+            return {}
+        return self._parse_response(response)
+
     def _post_process_tag_id_sets(self, tag_ids: Union[Set, str]) -> Set[str]:
         """
         Performs necessary post-processing on required and optional tag ids set to ensure they are in correct format.
@@ -116,68 +144,13 @@ class PromptResponseManager:
         Initializes tag2id and all_tag_ids from the provided response tag and id2tag
         :return: None
         """
-        all_tags = []
-        if isinstance(self.response_tag, str):
-            all_tags.append(self.response_tag)
-        elif isinstance(self.response_tag, list):
-            all_tags.extend(self.response_tag)
-        else:
-            for tag, children in self.response_tag.items():
-                all_tags.append(tag)
-                all_tags.extend(children)
+        all_tags = self._collect_all_tags()
         ids = set(self.id2tag.values())
         for tag in all_tags:
             if tag not in ids:
                 self.id2tag[tag] = tag
         self._tag2id = {tag: id_ for id_, tag in self.id2tag.items()}
         self._all_tag_ids = [self._tag2id.get(tag, tag) for tag in all_tags]
-
-    def get_all_tag_ids(self) -> List[str]:
-        """
-        Gets all the response tag ids in the order they are provided .
-        If parent, children, they are returned in the order:
-        p1, c1.1, .. c1.n, p2, c2.1, .. c2.n,... pn, cn.1, .. cn.n
-        :return: All the response tag ids in the order they are provided
-        """
-        return self._all_tag_ids
-
-    def format_response_instructions(self) -> str:
-        """
-        Formats the response instructions with the appropriate tags
-        :return: The formatted response instructions
-        """
-        if not self.include_response_instructions:
-            return EMPTY_STRING
-        args = [PromptUtil.create_xml(tag_name=tag) for tag in self.get_all_tag_ids()]
-        kwargs = {id_: PromptUtil.create_xml(tag_name=tag) for id_, tag in self.id2tag.items()}
-        return StrUtil.format_selective(self.response_instructions_format, *args, **kwargs)
-
-    def parse_response(self, response: str) -> Dict[str, Any]:
-        """
-        Parses the response from the model in the expected format for the prompt
-        :param response: The model response
-        :return: The formatted response
-        """
-        if not self.response_tag:
-            return {}
-        output = {}
-        if isinstance(self.response_tag, dict):
-            for parent, child_tags in self.response_tag.items():
-                values = LLMResponseUtil.parse(response, parent, is_nested=True, raise_exception=parent in self.required_tag_ids,
-                                               is_optional=parent in self.optional_tag_ids)
-                tags = child_tags + [parent]
-                values = [{self._tag2id[c_tag]: val.get(c_tag, None) for c_tag in tags if c_tag in val or c_tag != parent}
-                          for val in values]
-                output[self._tag2id[parent]] = values
-        else:
-            tags, _ = self._convert2list(self.response_tag)
-            for tag in tags:
-                tag_id = self._tag2id[tag]
-                parsed = LLMResponseUtil.parse(response, tag, is_nested=False, raise_exception=tag in self.required_tag_ids,
-                                               is_optional=tag in self.optional_tag_ids)
-                output[tag_id] = parsed if len(parsed) > 0 else [None]
-        formatted_output = self._format_response(output)
-        return formatted_output
 
     def _format_response(self, output: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -256,8 +229,17 @@ class PromptResponseManager:
             elif v in self.expected_responses[tag]:
                 success = True
             if not success:
-                closest_val = [r for r in self.expected_responses[tag] if
-                               hasattr(r, '__contains__') and r in v] if self.loose_response_validation else []
+                closest_val = []
+                if self.loose_response_validation:
+                    try:
+                        expected_response_order = list(self.expected_responses[tag])
+                        lower_cased_expected = [r.lower() for r in expected_response_order if isinstance(r, str)]
+                        lower_case_v = v.strip().lower() if isinstance(v, str) else v
+                        index = lower_cased_expected.index(lower_case_v)
+                        closest_val.append(expected_response_order[index])
+                    except ValueError:
+                        closest_val = [r for r in self.expected_responses[tag] if
+                                       hasattr(r, '__contains__') and r in v] if self.loose_response_validation else []
                 if len(closest_val) == 1:
                     success = True
                     val = closest_val[0]
@@ -313,3 +295,25 @@ class PromptResponseManager:
         """
         is_list = isinstance(orig_val, list)
         return [orig_val] if not is_list else orig_val, is_list
+
+    @abstractmethod
+    def _parse_response(self, response: str) -> Dict[str, Any]:
+        """
+        Parses the response from the model in the expected format for the prompt
+        :param response: The model response
+        :return: The formatted response
+        """
+
+    @abstractmethod
+    def _get_response_instructions_format_params(self) -> Tuple[List, Dict]:
+        """
+        Gets the args and kwargs needed to format the response instructions.
+        :return: The args and kwargs needed for the response instructions format.
+        """
+
+    @abstractmethod
+    def _collect_all_tags(self) -> List[str]:
+        """
+        Collects all response tags used.
+        :return: a list of all response tags that are used.
+        """

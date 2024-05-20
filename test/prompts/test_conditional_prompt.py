@@ -1,7 +1,7 @@
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.prompts.conditional_prompt import ConditionalPrompt
 from tgen.prompts.prompt import Prompt
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.testres.base_tests.base_test import BaseTest
 
 
@@ -41,10 +41,10 @@ class TestConditionalPrompt(BaseTest):
         prompt2txt = "prompt2{var}"
         prompt2tag = "two"
         conditional_prompt = ConditionalPrompt(candidate_prompts=[Prompt(prompt1txt,
-                                                                         response_manager=PromptResponseManager(
+                                                                         response_manager=XMLResponseManager(
                                                                              response_tag=prompt1tag)),
                                                                   Prompt(prompt2txt,
-                                                                         response_manager=PromptResponseManager(
+                                                                         response_manager=XMLResponseManager(
                                                                              response_tag=prompt2tag))
                                                                   ],
                                                prompt_selector=lambda kwargs: kwargs.get("indicator"))

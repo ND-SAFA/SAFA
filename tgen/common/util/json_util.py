@@ -180,3 +180,32 @@ class JsonUtil:
         """
         obj_str = json.dumps(obj, cls=NpEncoder)
         return json.loads(obj_str)
+
+    @staticmethod
+    def get_all_fields(obj: Any) -> List:
+        """
+        Gets the name of all fields (keys) in the obj.
+        :param obj: Python representation of the json.
+        :return: A list of all attribute in the obj.
+        """
+
+        def add_child_fields():
+            """
+            Adds the children fields to the central list.
+            """
+            child_ordered_fields = JsonUtil.get_all_fields(v)
+            ordered_fields.extend([c for c in child_ordered_fields if c not in fields])
+            fields.update(set(child_ordered_fields))
+
+        ordered_fields = []
+        fields = set()
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                if k not in fields:
+                    fields.add(k)
+                    ordered_fields.append(k)
+                add_child_fields()
+        elif isinstance(obj, list):
+            for v in obj:
+                add_child_fields()
+        return ordered_fields

@@ -3,6 +3,7 @@ import { PaymentStatus } from "@/types";
 import {
   billingApiStore,
   getVersionApiStore,
+  memberApiStore,
   sessionApiStore,
 } from "@/hooks/api";
 import { appStore, sessionStore } from "@/hooks/core";
@@ -84,6 +85,13 @@ export const routerBeforeChecks: RouteChecks = {
     }
 
     return { path: Routes.HOME };
+  },
+  async acceptInvite(to) {
+    if (to.path !== Routes.INVITE) return;
+
+    const token = String(to.query[QueryParams.INVITE_TOKEN]);
+
+    await memberApiStore.handleAcceptInvite(token);
   },
   async checkSuperuserStatus(to) {
     const requiresSuperuser = to.matched.some(

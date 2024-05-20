@@ -170,6 +170,8 @@ export enum Endpoint {
 
   memberCollection = "members/:entityId",
   member = "members/:entityId/:memberId",
+  memberInviteAccept = "members/accept-invite",
+  memberInviteDecline = "members/decline-invite",
 
   // Billing
 

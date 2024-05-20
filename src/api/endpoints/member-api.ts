@@ -23,7 +23,7 @@ export async function getMembers(
 /**
  * Shares a project, team, or organization with a user.
  * If an email is provided, an invite email will be sent.
- * Otherwise, a general share link will be created.
+ * Otherwise, a general share link will be copied to the clipboard.
  *
  * @param entityId - The id of the entity to add the member to.
  * @param member - The member to add.
@@ -68,4 +68,26 @@ export async function deleteMember(member: MembershipSchema): Promise<void> {
     entityId: member.entityId || "",
     memberId: member.id,
   }).delete();
+}
+
+/**
+ * Accepts an invite to join a project, team, or organization.
+ * @param token - The invite token.
+ * @return The accepted membership.
+ */
+export function acceptInvite(token: string): Promise<MembershipSchema> {
+  return buildRequest<MembershipSchema, string, { token: string }>(
+    "memberInviteAccept",
+    { token }
+  ).put({ token });
+}
+
+/**
+ * Declines an invite to join a project, team, or organization.
+ * @param token - The invite token.
+ */
+export function declineInvite(token: string): Promise<void> {
+  return buildRequest<void, string, { token: string }>("memberInviteAccept", {
+    token,
+  }).put({ token });
 }

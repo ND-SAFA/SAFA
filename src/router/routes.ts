@@ -38,6 +38,7 @@ export enum Routes {
   TEAM = "/team",
   SEARCH = "/search",
   PAYMENT = "/payment",
+  INVITE = "/accept-invite",
 
   ADMIN = "/admin",
 
@@ -50,6 +51,7 @@ export enum Routes {
 export enum QueryParams {
   LOGIN_PATH = "to",
   ACCOUNT_TOKEN = "token",
+  INVITE_TOKEN = "token",
   TAB = "tab",
   VERSION = "version",
   VIEW = "view",
@@ -155,6 +157,11 @@ export const routes: Array<RouteRecordRaw> = [
     path: Routes.UPLOAD_STATUS,
     name: "Upload Status",
     component: UploadStatusView,
+  },
+  {
+    path: Routes.INVITE,
+    name: "Accept Invite",
+    component: HomeView,
   },
   // Project Specific
   {

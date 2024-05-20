@@ -40,6 +40,12 @@ export interface MemberApiHook {
   ): Promise<void>;
 
   /**
+   * Accepts an invite to a project, team, or organization.
+   * After accepting, navigates to view the project, team, or organization.
+   */
+  handleAcceptInvite(token: string): Promise<void>;
+
+  /**
    * Updates the role of a member.
    *
    * @param member - The member to update the role of.

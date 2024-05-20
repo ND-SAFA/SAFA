@@ -39,7 +39,9 @@ export enum Endpoint {
   superuser = "accounts/superuser",
   superuserActivate = "accounts/superuser/activate",
   superuserDeactivate = "accounts/superuser/deactivate",
+
   statisticsOnboarding = "statistics/onboarding",
+  statisticsUser = "statistics/onboarding/:userId",
 
   // Onboarding
 

@@ -60,7 +60,7 @@ class EvalRagJob(AbstractJob):
             entries_global.extend(entries)
 
         metrics_df = pd.DataFrame(entries_global)
-        summary_metrics = ["dataset", "method", "map", "f1", "f2", "time"]
+        summary_metrics = ["dataset", "method", "map", "precision", "recall", "tp", "fp", "tn", "fn"]
         summary_df = metrics_df[summary_metrics]
 
         if self.custom_export_path:
@@ -78,9 +78,11 @@ class EvalRagJob(AbstractJob):
         def vsm():
             trainer_dataset_manager = TrainerDatasetManager.create_from_datasets(
                 {DatasetRole.EVAL: dataset, DatasetRole.TRAIN: dataset})
-            trainer = VSMTrainer(trainer_dataset_manager=trainer_dataset_manager, metrics=METRICS)
+            trainer = VSMTrainer(trainer_dataset_manager=trainer_dataset_manager, metrics=METRICS, select_predictions=False)
             trainer.perform_training(DatasetRole.EVAL)
             prediction_output = trainer.perform_prediction(evaluate=False)
+            child2traces = RankingUtil.group_trace_predictions(prediction_output.prediction_entries, TraceKeys.child_label())
+            RankingUtil.normalized_scores_by_individual_artifacts(child2traces, min_score=0)
             return prediction_output.prediction_entries
 
         vsm_metrics = EvalRagJob.eval_method(vsm, dataset, method="vsm")
@@ -108,7 +110,7 @@ class EvalRagJob(AbstractJob):
 
                 pipeline = EmbeddingRankingPipeline(ranking_args)
                 pipeline.run()
-                selected_entries = pipeline.state.get_current_entries()
+                selected_entries = pipeline.state.candidate_entries
                 embedding_predictions.extend(selected_entries)
 
             child2traces = RankingUtil.group_trace_predictions(embedding_predictions, TraceKeys.child_label())

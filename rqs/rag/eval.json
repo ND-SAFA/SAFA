@@ -6,7 +6,9 @@
           "object_type": "EVAL_RAG",
           "dataset_names": "[DATASET_NAME_LIST]",
           "custom_export_path": "[CUSTOM_EXPORT_PATH]",
-          "job_args": {}
+          "job_args": {
+            "export_dir": "[OUTPUT_PATH]/eval-rag/[CURRENT_PROJECT]"
+          }
         }
       ]
     }

@@ -87,7 +87,7 @@ export const routerBeforeChecks: RouteChecks = {
     return { path: Routes.HOME };
   },
   async acceptInvite(to) {
-    if (to.path !== Routes.INVITE) return;
+    if (to.path !== Routes.INVITE || permissionStore.isDemo) return;
 
     const token = String(to.query[QueryParams.INVITE_TOKEN]);
 

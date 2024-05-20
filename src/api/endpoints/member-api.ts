@@ -87,7 +87,7 @@ export function acceptInvite(token: string): Promise<MembershipSchema> {
  * @param token - The invite token.
  */
 export function declineInvite(token: string): Promise<void> {
-  return buildRequest<void, string, { token: string }>("memberInviteAccept", {
+  return buildRequest<void, string, { token: string }>("memberInviteDecline", {
     token,
   }).put({ token });
 }

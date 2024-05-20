@@ -3,10 +3,9 @@
     <typography variant="subtitle" value="Invite Members" />
     <separator b="2" />
     <typography secondary :value="subtitle" el="p" b="4" />
-    <text-input
+    <email-input
       v-model="userEmail"
-      label="Email"
-      :error-message="emailErrorMessage"
+      v-model:error-message="emailErrorMessage"
       data-cy="input-member-email"
     />
     <select-input
@@ -72,7 +71,7 @@ import { memberRoleOptions } from "@/util";
 import { memberApiStore, teamStore } from "@/hooks";
 import {
   ProjectInput,
-  TextInput,
+  EmailInput,
   SelectInput,
   TextButton,
   FlexBox,
@@ -92,6 +91,7 @@ const roles = memberRoleOptions();
 const entityIds = ref<string[]>([]);
 const userEmail = ref("");
 const userRole = ref<MemberRole>();
+const emailErrorMessage = ref<string | false>(false);
 
 const subtitle = computed(
   () =>
@@ -102,17 +102,6 @@ const subtitle = computed(
 const submitLabel = computed(
   () => `Invite to ${props.entity.entityType?.toLowerCase() || ""}`
 );
-
-const emailErrorMessage = computed(() => {
-  if (
-    userEmail.value &&
-    !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(userEmail.value)
-  ) {
-    return "E-mail must be valid";
-  } else {
-    return false;
-  }
-});
 
 const isValidCopy = computed(
   () => entityIds.value.length === 1 && !!userRole.value

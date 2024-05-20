@@ -31,7 +31,11 @@ const emit = defineEmits<{
   /**
    * Called when the email is updated.
    */
-  (e: "update:modelValue", value: string | number | null): void;
+  (e: "update:modelValue", value: string | null): void;
+  /**
+   * Called when the error message is updated.
+   */
+  (e: "update:errorMessage", value: string | false): void;
   /**
    * Called when the enter button is pressed.
    */
@@ -41,16 +45,16 @@ const emit = defineEmits<{
 const model = useVModel(props, "modelValue");
 
 const errorMessage = computed(() => {
-  const domain = model.value.split("@")[1];
-
-  if (!model.value) {
-    return false;
+  if (
+    model.value &&
+    !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(model.value)
+  ) {
+    const error = "E-mail must contain a valid domain.";
+    emit("update:errorMessage", error);
+    return error;
+  } else {
+    emit("update:errorMessage", false);
+    return props.errorMessage;
   }
-
-  if (!domain) {
-    return "Email must contain an @ symbol and domain.";
-  }
-
-  return props.errorMessage;
 });
 </script>

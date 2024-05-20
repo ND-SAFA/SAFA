@@ -7,7 +7,7 @@
       </template>
     </q-toggle>
     <expansion-item label="Create Account">
-      <text-input v-model="adminCreateEmail" label="Email" />
+      <email-input v-model="adminCreateEmail" />
       <text-input v-model="adminCreatePassword" label="Password" />
       <text-button
         block
@@ -19,7 +19,7 @@
       />
     </expansion-item>
     <expansion-item label="Enable Superuser">
-      <text-input v-model="adminSuperuserEmail" label="Email" />
+      <email-input v-model="adminSuperuserEmail" />
       <text-button
         block
         outlined
@@ -48,7 +48,7 @@
       />
     </expansion-item>
     <expansion-item label="Reset Password">
-      <text-input v-model="adminResetEmail" label="Email" />
+      <email-input v-model="adminResetEmail" />
       <text-button
         block
         outlined
@@ -86,6 +86,7 @@ import {
   ExpansionItem,
   TextInput,
   SelectInput,
+  EmailInput,
 } from "@/components/common";
 
 const adminCreateEmail = ref("");

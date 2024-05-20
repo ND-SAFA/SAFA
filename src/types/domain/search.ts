@@ -18,7 +18,11 @@ export type SearchMode =
    * Font-end only.
    * Search within the current view for artifacts.
    */
-  | "search";
+  | "search"
+  /**
+   * Use the search query as the start of a new chat.
+   */
+  | "chat";
 
 /**
  * Represents a request to search for matching artifacts within a project.

@@ -71,7 +71,7 @@ export default {
 </script>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import {
   IdentifierSchema,
@@ -197,4 +197,8 @@ watch(
     handleReload();
   }
 );
+
+onMounted(() => {
+  handleReload();
+});
 </script>

@@ -125,7 +125,8 @@ export const useChatApi = defineStore("chatApi", (): ChatApiHook => {
         ],
       });
 
-      if (chat.messages.length == 2) {
+      if (priorMessages.length == 0) {
+        // If this is a new chat that just had its first message sent, generate the chat title.
         const { title } = await generateChatTitle(id);
 
         chatStore.updateChat({ id, title });

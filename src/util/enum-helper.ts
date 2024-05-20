@@ -127,6 +127,12 @@ export function attributeTypeOptions(): SelectOption<AttributeType>[] {
 export function searchModeOptions(): SearchSelectOption[] {
   return [
     {
+      id: "chat",
+      name: "Chat",
+      description: "Create a new project chat based on your search",
+      placeholder: "Ask a question...",
+    },
+    {
       id: "prompt",
       name: "Prompt",
       description: "Find artifacts that match a search prompt",

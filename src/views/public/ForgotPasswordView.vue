@@ -15,9 +15,8 @@
           value=" Please enter your email to reset your password."
         />
 
-        <text-input
+        <email-input
           v-model="email"
-          label="Email"
           :error-message="sessionApiStore.passwordErrorMessage"
         />
       </div>
@@ -66,7 +65,7 @@ export default {
 import { ref } from "vue";
 import { sessionApiStore } from "@/hooks";
 import { navigateTo, Routes } from "@/router";
-import { CardPage, Typography, TextButton, TextInput } from "@/components";
+import { CardPage, Typography, TextButton, EmailInput } from "@/components";
 
 const email = ref("");
 

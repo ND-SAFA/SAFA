@@ -71,8 +71,7 @@ interface MatchedConceptHealthCheckSchema extends CommentSchema {
   /**
    * The artifact id of the related concept
    */
-  conceptCommentId: string;
-  // conceptArtifactId: string;
+  conceptArtifactId: string;
 }
 
 /**

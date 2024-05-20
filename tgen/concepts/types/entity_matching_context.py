@@ -15,7 +15,7 @@ from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
-from tgen.prompts.prompt_response_manager import PromptResponseManager
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.prompts.supported_prompts.concept_prompts import ENTITY_MATCHING_INSTRUCTIONS, ENTITY_MATCHING_RESPONSE_FORMAT
 
 
@@ -110,8 +110,8 @@ class EntityMatchingContext:
             artifact_prompt = ArtifactPrompt(prompt_start=ENTITY_MATCHING_INSTRUCTIONS + NEW_LINE)
             response_format = ENTITY_MATCHING_RESPONSE_FORMAT.format(EntityMatchingContext.create_example_xml("ARTIFACT_ID"))
             instructions_prompt = Prompt(value=NEW_LINE, prompt_args=PromptArgs(prompt_id=EntityMatchingContext.PROMPT_ID),
-                                         response_manager=PromptResponseManager(response_tag=EntityMatchingContext.MATCH_TAG,
-                                                                                response_instructions_format=response_format))
+                                         response_manager=XMLResponseManager(response_tag=EntityMatchingContext.MATCH_TAG,
+                                                                             response_instructions_format=response_format))
             prompt_builder = PromptBuilder(prompts=[concept_prompt, artifact_prompt, instructions_prompt])
             prompt = prompt_builder.build(prompt_args, artifacts=concepts, artifact=entity)[PromptKeys.PROMPT]
             prompts.append(prompt)

@@ -120,10 +120,10 @@ CONTRADICTIONS_TASK_PROMPT = QuestionnairePrompt(
     question_prompts=[Prompt("Output the ids of any contradictory or inconsistent information in a comma-deliminated list."
                              "If all the information entails or is neutral to the artifact, simply respond with no. "
                              "Otherwise, provide the conflicting ids and explanation for each contradiction found.",
-                             response_manager=PromptResponseManager(response_tag={"contradiction": ["conflicting_ids", "explanation"]},
-                                                                    value_formatter=format_response,
-                                                                    response_instructions_format=create_contradiction_response(
-                                                                        "EXPLANATION",
-                                                                        ["ID1", "ID2"])))
+                             response_manager=XMLResponseManager(response_tag={"contradiction": ["conflicting_ids", "explanation"]},
+                                                                 value_formatter=format_response,
+                                                                 response_instructions_format=create_contradiction_response(
+                                                                     "EXPLANATION",
+                                                                     ["ID1", "ID2"])))
                       ],
     use_multi_step_task_instructions=True)

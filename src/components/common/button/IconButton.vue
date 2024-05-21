@@ -9,12 +9,7 @@
     :round="!props.fab"
     @click="emit('click')"
   >
-    <icon
-      :id="props.iconId"
-      :variant="props.icon"
-      :rotate="props.rotate"
-      :color="props.color"
-    />
+    <icon :id="props.iconId" :variant="props.icon" :rotate="props.rotate" />
     <q-tooltip :delay="props.tooltipDelay || 200">
       {{ tooltip }}
     </q-tooltip>

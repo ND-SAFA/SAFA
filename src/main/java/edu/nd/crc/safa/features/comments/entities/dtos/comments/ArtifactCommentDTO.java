@@ -13,7 +13,7 @@ public class ArtifactCommentDTO extends CommentDTO {
     /**
      * The name of the concept being referenced.
      */
-    private UUID conceptCommentId;
+    private UUID conceptArtifactId;
 
     /**
      * Constructs DTO from CommentConcept.
@@ -24,7 +24,7 @@ public class ArtifactCommentDTO extends CommentDTO {
     public static ArtifactCommentDTO fromComment(CommentArtifact commentArtifact) {
         ArtifactCommentDTO dto = new ArtifactCommentDTO();
         CommentDTO.fromComment(commentArtifact.getComment()).copyTo(dto);
-        dto.setConceptCommentId(commentArtifact.getArtifactReferenced().getArtifactId());
+        dto.setConceptArtifactId(commentArtifact.getArtifactReferenced().getArtifactId());
         return dto;
     }
 }

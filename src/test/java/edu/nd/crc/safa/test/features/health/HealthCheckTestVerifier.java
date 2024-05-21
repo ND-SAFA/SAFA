@@ -36,7 +36,7 @@ public class HealthCheckTestVerifier {
         List<CommentDTO> healthChecks = healthResponseDTO.getHealthChecks();
         verifyCommentDTOS(healthChecks);
     }
-    
+
     public void verifyArtifactComments(ArtifactCommentResponseDTO artifactComments) {
         assertThat(artifactComments.getComments().size()).isEqualTo(0);
         assertThat(artifactComments.getFlags().size()).isEqualTo(0);
@@ -95,12 +95,12 @@ public class HealthCheckTestVerifier {
         assertThat(comment.getUserId()).isNull();
         assertThat(comment.getVersionId()).isEqualTo(versionId);
         assertThat(comment.getStatus()).isEqualTo(CommentStatus.ACTIVE);
-        assertThat(comment.getTimeCreated()).isNotNull();
-        assertThat(comment.getTimeUpdated()).isNotNull();
+        assertThat(comment.getCreatedAt()).isNotNull();
+        assertThat(comment.getUpdatedAt()).isNotNull();
     }
 
     private void assertConceptReference(ArtifactCommentDTO comment, Map<UUID, Artifact> artifactLookup) {
-        UUID conceptId = comment.getConceptCommentId();
+        UUID conceptId = comment.getConceptArtifactId();
         assertThat(artifactLookup.containsKey(conceptId)).isTrue();
         Artifact artifact = artifactLookup.get(conceptId);
         assertThat(artifact.getType().getName()).isEqualTo(HealthConstants.CONCEPT_TYPE);

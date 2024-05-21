@@ -36,7 +36,8 @@ class RankingJob(AbstractJob):
     """
 
     def __init__(self, job_args: JobArgs,
-                 ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM, layer_ids: Tuple[str, str] = None,
+                 ranking_pipeline: SupportedRankingPipelines = SupportedRankingPipelines.LLM,
+                 layer_ids: List[str] | Tuple[str, str] = None,
                  select_top_predictions: bool = DEFAULT_SELECT_TOP_PREDICTIONS,
                  relationship_manager: AbstractRelationshipManager = None,
                  relationship_manager_type: SupportedRelationshipManager = SupportedRelationshipManager.EMBEDDING,

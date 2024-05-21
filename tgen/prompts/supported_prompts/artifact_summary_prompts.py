@@ -37,15 +37,10 @@ CODE_SUMMARY_AS_NL = [ArtifactPrompt(include_id=False, prompt_start=CODE_SECTION
                       ]
 
 NL_SUMMARY = [
-    Prompt("# Task\n"
-           "1. Provide a list of answers to the following questions about the software artifact:"
-           "\n- What functionality is described by the artifact?"
-           "\n- What are the keywords that capture the functionality of the artifact?"
-           "\nEnclose your answer in <notes></notes>"
-           "\n\n2. Then, write a short title describing the artifact's functionality followed by its important keywords. "
-           "Follow the format TITLE - KEYWORDS. "
-           "Write in an active voice and assume your audience is familiar with software system this artifact belongs to."
-           "\n\n",
+    Prompt(f"Condense the information in the artifact below into free form text that captures only the key entities and actions. "
+           f"For example, 'The system shall provide a secure login and authentication mechanism "
+           f"for users to access their accounts.' could be condensed to "
+           f"'secure login and authentication for user accounts'. ",
            response_manager=XMLResponseManager(response_tag="descrip")),
     ArtifactPrompt(include_id=False, prompt_start="\n", build_method=ArtifactPrompt.BuildMethod.XML)]
 

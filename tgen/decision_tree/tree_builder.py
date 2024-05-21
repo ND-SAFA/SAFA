@@ -32,6 +32,7 @@ class TreeBuilder:
         :return: The pre-requisite node needed to build current node.
         """
         if node_id not in self.built_nodes:
+            assert node_id in self.node_constructor_map, f"Please register {node_id} in constructor map to build tree."
             node: AbstractNode = self.node_constructor_map[node_id]()
             if node_id in self.nodes2skip:
                 node.skip_node()

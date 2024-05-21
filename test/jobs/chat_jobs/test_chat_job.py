@@ -28,6 +28,7 @@ class TestChatJob(BaseJobTest):
         """
         ai_manager.set_responses(
             [PromptUtil.create_xml(LLMNode.response_tag, "yes"), PromptUtil.create_xml(LLMNode.response_tag, "all"),
+             PromptUtil.create_xml(LLMNode.response_tag, "Best pet to get"),
              self.response])
         self._test_run_success()
 
@@ -64,7 +65,7 @@ class TestChatJob(BaseJobTest):
 
         ai_manager.set_responses([PromptUtil.create_xml(LLMNode.response_tag, "yes"),
                                   self.response])
-        job = self._get_job(nodes2skip={ChatNodeIDs.CONTEXT_TYPE})
+        job = self._get_job(nodes2skip={ChatNodeIDs.CONTEXT_TYPE, ChatNodeIDs.REWRITE_QUERY})
         job.run()
         self.assert_job_succeeded(job.result)
         self._assert_success(job, job.result)

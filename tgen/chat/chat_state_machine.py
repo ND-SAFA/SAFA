@@ -7,7 +7,6 @@ from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.decision_tree.path import Path
-from tgen.models.llm.abstract_llm_manager import PromptRoles
 
 
 class ChatStateMachine:
@@ -35,12 +34,11 @@ class ChatStateMachine:
             node = path.get_node()
             if isinstance(node, LLMNode):
                 next_prompt = prompt_builder.build(node.llm_manager.prompt_args)[PromptKeys.PROMPT]
-                chat_history = self.state.add_internal_chat_message(next_prompt)
+                chat_history = self.state.add_internal_chat_message(next_prompt, replace_last=True)
                 res = LLMTrainer.perform_chat(node.llm_manager, chat_history,
                                               self.state.system_prompt, prompt_builder,
                                               save_and_load_path=ChatTreeDefinition.create_save_and_load_path_for_node(self.args,
                                                                                                                        node.node_id))
-                self.state.add_internal_chat_message(res.original_response[0], role=PromptRoles.ASSISTANT)
                 choice = node.get_choice_from_response(res.predictions[0])
                 path.add_decision(choice)
             prompt_builder, path = self.tree.next_step(self.args, self.state, path)

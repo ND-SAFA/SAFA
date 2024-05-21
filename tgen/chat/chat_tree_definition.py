@@ -3,10 +3,12 @@ from typing import Dict, Set
 from tgen.chat.chat_args import ChatArgs
 from tgen.chat.chat_node_ids import ChatNodeIDs
 from tgen.chat.chat_state import ChatState
+from tgen.chat.message_meta import MessageMeta
 from tgen.common.constants.deliminator_constants import COMMA
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.prompt_util import PromptUtil
+from tgen.common.util.pythonisms_util import default_mutable
 from tgen.contradictions.common_choices import CommonChoices
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -15,14 +17,17 @@ from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.decision_tree.tree import Tree
 from tgen.decision_tree.tree_builder import TreeBuilder
 from tgen.models.llm.abstract_llm_manager import PromptRoles
-from tgen.prompts.supported_prompts.chat_prompts import INCLUDE_MORE_CONTEXT_PROMPT, ARTIFACT_TYPE_FOR_CONTEXT_PROMPT, TYPES_FORMAT_VAR
+from tgen.prompts.supported_prompts.chat_prompts import INCLUDE_MORE_CONTEXT_PROMPT, ARTIFACT_TYPE_FOR_CONTEXT_PROMPT, \
+    TYPES_FORMAT_VAR, REWRITE_QUERY_PROMPT
 from tgen.tracing.context_finder import ContextFinder
 
 
 class ChatTreeDefinition:
     QUERY_ARTIFACT_ID = "query"
 
-    def __init__(self, root_node_id: str = ChatNodeIDs.INCLUDE_CONTEXT, nodes2skip: Set[str] = None):
+    @default_mutable()
+    def __init__(self, root_node_id: str = ChatNodeIDs.INCLUDE_CONTEXT,
+                 nodes2skip: Set[str] = None):
         """
         Defines the nodes and tree structure for chat state.
         :param root_node_id: The id of the root or starting node.
@@ -31,7 +36,10 @@ class ChatTreeDefinition:
         node_constructor_map = {ChatNodeIDs.INCLUDE_CONTEXT: self.build_include_context_node,
                                 ChatNodeIDs.CONTEXT_TYPE: self.build_context_type_node,
                                 ChatNodeIDs.USER_CHAT: self.build_user_chat_node,
-                                ChatNodeIDs.RAG: self.build_rag_node}
+                                ChatNodeIDs.RAG: self.build_rag_node,
+                                ChatNodeIDs.REWRITE_QUERY: self.build_rewrite_queries_node
+                                }
+
         self.builder = TreeBuilder(root_node_id=root_node_id, node_constructor_map=node_constructor_map,
                                    nodes2skip=nodes2skip)
 
@@ -61,15 +69,27 @@ class ChatTreeDefinition:
         Builds the node to determine the types of artifacts to use for the context.
         :return: The node to determine the types of artifacts to use for the context.
         """
-        rag_node = self.builder.get_node(node_id=ChatNodeIDs.RAG)
+        rewrite_query_node = self.builder.get_node(node_id=ChatNodeIDs.REWRITE_QUERY)
         context_type_node = LLMNode(description=ARTIFACT_TYPE_FOR_CONTEXT_PROMPT.value,
                                     node_id=ChatNodeIDs.CONTEXT_TYPE,
                                     input_variable_converter=ChatTreeDefinition.get_context_type_format_vars,
                                     response_manager_params={
                                         "value_formatter": lambda tag, value: {v.strip() for v in value.split(COMMA)}},
                                     state_setter="context_artifact_types",
-                                    branches=rag_node)
+                                    branches=rewrite_query_node)
         return context_type_node
+
+    def build_rewrite_queries_node(self) -> LLMNode:
+        """
+        Builds the node to determine the types of artifacts to use for the context.
+        :return: The node to determine the types of artifacts to use for the context.
+        """
+        rag_node = self.builder.get_node(node_id=ChatNodeIDs.RAG)
+        rewrite_query_node = LLMNode(description=REWRITE_QUERY_PROMPT.value,
+                                     node_id=ChatNodeIDs.REWRITE_QUERY,
+                                     state_setter="rewritten_query",
+                                     branches=rag_node)
+        return rewrite_query_node
 
     def build_rag_node(self) -> ActionNode:
         """
@@ -117,7 +137,8 @@ class ChatTreeDefinition:
         """
         related_artifact_ids = ChatTreeDefinition.get_related_context(args, state)
         state.update_related_artifact_ids(related_artifact_ids, args.dataset.artifact_df, args.llm_manager)
-        state.user_chat_history[-1].artifact_ids = related_artifact_ids
+        user_message_index = MessageMeta.index_of_last_response_from_role(state.user_chat_history, PromptRoles.USER)
+        state.user_chat_history[user_message_index].artifact_ids = related_artifact_ids
         return related_artifact_ids
 
     @staticmethod
@@ -128,7 +149,10 @@ class ChatTreeDefinition:
         :param state: The current state of the chat.
         :return: The related artifact_ids to the user query.
         """
-        query_artifact = Artifact(id=ChatTreeDefinition.QUERY_ARTIFACT_ID, content=state.user_query, layer_id="query")
+        query_id, query_content = ChatTreeDefinition.QUERY_ARTIFACT_ID, state.user_query
+        if state.rewritten_query is not None:
+            query_content = state.rewritten_query
+        query_artifact = Artifact(id=query_id, content=query_content, layer_id="query")
         args.dataset.artifact_df.add_row(query_artifact)
         layer_ids = ChatTreeDefinition.validate_artifact_types_to_use(args, state, {query_artifact[ArtifactKeys.LAYER_ID]})
         id2context, _ = ContextFinder.find_related_artifacts(query_artifact[ArtifactKeys.ID],

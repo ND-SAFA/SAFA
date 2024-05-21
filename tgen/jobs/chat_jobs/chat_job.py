@@ -6,6 +6,7 @@ from tgen.chat.chat_state_machine import ChatStateMachine
 from tgen.chat.message_meta import MessageMeta
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
+from tgen.models.llm.abstract_llm_manager import PromptRoles
 
 
 class ChatJob(AbstractJob):
@@ -35,6 +36,7 @@ class ChatJob(AbstractJob):
                              **other_args)
         path = ChatStateMachine(chat_args, nodes2skip=self.nodes2skip).run()
         state: ChatState = path.state
-        meta = state.user_chat_history[-1]
-        meta.artifact_ids = state.user_chat_history[-2].artifact_ids
-        return meta
+        message = MessageMeta.get_most_recent_message(state.user_chat_history, PromptRoles.ASSISTANT)
+        user_message_index = MessageMeta.index_of_last_response_from_role(state.user_chat_history, PromptRoles.USER)
+        artifact_ids = state.user_chat_history[user_message_index].artifact_ids
+        return MessageMeta(artifact_ids=artifact_ids, message=message)

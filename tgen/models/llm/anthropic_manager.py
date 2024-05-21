@@ -11,7 +11,7 @@ from tgen.common.util.attr_dict import AttrDict
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.core.args.anthropic_args import AnthropicArgs, AnthropicParams
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, ConversationType
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, Message
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
@@ -217,7 +217,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             log_probs = {k: 0.5 for k in log_probs.keys()}
         return log_probs
 
-    def _format_prompts(self, prompts: Union[List, str, Dict]) -> List[ConversationType]:
+    def _format_prompts(self, prompts: Union[List, str, Dict]) -> List[Message]:
         """
         Formats the prompt for the anthropic api.
         :param prompts: Either a single prompt, a list of prompts, or a list of messages.

@@ -3,3 +3,4 @@ class ChatNodeIDs:
     RAG = "rag_node"
     CONTEXT_TYPE = "context_type_node"
     INCLUDE_CONTEXT = "include_context_node"
+    REWRITE_QUERY = "rewrite_query_node"

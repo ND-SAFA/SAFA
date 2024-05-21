@@ -4,9 +4,10 @@ from typing import List, Set
 
 from tgen.chat.message_meta import MessageMeta
 from tgen.common.util.dataclass_util import required_field
+from tgen.common.util.pythonisms_util import default_mutable
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, PromptRoles, Message, ROLE_KEY, CONTENT_KEY
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, PromptRoles, Message, CONTENT_KEY
 from tgen.pipeline.state import State
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_args import PromptArgs
@@ -22,15 +23,18 @@ class ChatState(State):
     system_prompt: str = field(init=False, default=None)  # contains context for chat
     internal_chat_history: List[MessageMeta] = field(init=False, default_factory=list)  # contains messages used internally for state
     user_query: str = field(init=False, default=None)  # most recent user message
+    rewritten_query: str = None
 
     def __post_init__(self) -> None:
         """
         Performs post initialize operations.
         :return: None
         """
-        if len(self.user_chat_history) > 1:
-            self.internal_chat_history = deepcopy(self.user_chat_history[:-1])
-        self.user_query = self.user_chat_history[-1].message[CONTENT_KEY]
+        index_of_user_message = MessageMeta.index_of_last_response_from_role(self.user_chat_history, role=PromptRoles.USER)
+        assert index_of_user_message >= 0, "Chat history most include at least one message from the user."
+        self.user_query = self.user_chat_history[index_of_user_message].message[CONTENT_KEY]
+        if index_of_user_message > 0:
+            self.internal_chat_history = deepcopy(self.user_chat_history[:index_of_user_message])
 
     def update_related_artifact_ids(self, additional_artifact_ids: Set[str], artifact_df: ArtifactDataFrame,
                                     llm_manager: AbstractLLMManager) -> Set[str]:
@@ -68,35 +72,49 @@ class ChatState(State):
             self.system_prompt = prompt[PromptKeys.PROMPT]
         return self.system_prompt
 
-    def add_internal_chat_message(self, message_content: str, role: str = PromptRoles.USER) -> List[MessageMeta]:
+    def add_internal_chat_message(self, message_content: str, role: str = PromptRoles.USER,
+                                  replace_last: bool = False) -> List[MessageMeta]:
         """
         Add new chat message to the internal chat history.
         :param message_content: Content of new message.
         :param role: Role of speaker of the message.
+        :param replace_last: If True, replaces the last message instead of just appending.
         :return: Current internal chat history.
         """
-        return self._add_chat_message(self.internal_chat_history, message_content, role)
+        return self.add_chat_message(message_content, self.internal_chat_history, role, replace_last=replace_last)
 
-    def add_user_chat_message(self, message_content: str, role: str = PromptRoles.USER) -> List[MessageMeta]:
+    def add_user_chat_message(self, message_content: str, role: str = PromptRoles.USER,
+                              replace_last: bool = False) -> List[MessageMeta]:
         """
         Add new chat message to the internal chat history.
         :param message_content: Content of new message.
         :param role: Role of speaker of the message.
+        :param replace_last: If True, replaces the last message instead of just appending.
         :return: Current internal chat history.
         """
-        return self._add_chat_message(self.user_chat_history, message_content, role)
+        return self.add_chat_message(message_content, self.user_chat_history, role, replace_last=replace_last)
 
     @staticmethod
-    def _add_chat_message(chat_history: List[MessageMeta], message_content: str, role: str = PromptRoles.USER) -> List[MessageMeta]:
+    @default_mutable()
+    def add_chat_message(message_content: str, chat_history: List[MessageMeta] = None, role: str = PromptRoles.USER,
+                         replace_last: bool = False) -> List[MessageMeta]:
         """
         Add new chat message to the chat history.
-        :param chat_history: The chaat history to add a new message to.
+        :param chat_history: The chat history to add a new message to.
         :param message_content: Content of new message.
         :param role: Role of speaker of the message.
+        :param replace_last: If True, replaces the last message instead of just appending.
         :return: Current chat history.
         """
-        if len(chat_history) > 0:
-            assert role != chat_history[-1].message[ROLE_KEY], "New message cannot be the same role as the last one"
+        if chat_history:
+            if MessageMeta.is_message_from_role(chat_history, role):
+                assert replace_last, "New message cannot be the same role as the last one"
+            else:
+                replace_last = False  # Do not need to replace last because it was not from the same role
+
+            if replace_last:
+                chat_history.pop()
+
         meta = MessageMeta(message=Message(content=message_content, role=role))
         chat_history.append(meta)
         return chat_history

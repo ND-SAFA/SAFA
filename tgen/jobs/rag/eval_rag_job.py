@@ -3,11 +3,11 @@ import time
 from trace import Trace
 from typing import Any, Callable, List
 
+import numpy as np
 import pandas as pd
+from sklearn.metrics import average_precision_score
 
-from tgen.common.constants.ranking_constants import DEFAULT_CROSS_ENCODER_MODEL
 from tgen.common.logging.logger_manager import logger
-from tgen.common.util.enum_util import EnumDict
 from tgen.core.trainers.vsm_trainer import VSMTrainer
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -21,14 +21,11 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
-from tgen.relationship_manager.cross_encoder_manager import CrossEncoderManager
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.scripts.constants import DATA_PATH
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
-from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
-from tgen.tracing.ranking.steps.re_rank_step import ReRankStep
 
 METRICS = SupportedTraceMetric.get_keys()
 
@@ -60,7 +57,7 @@ class EvalRagJob(AbstractJob):
             entries_global.extend(entries)
 
         metrics_df = pd.DataFrame(entries_global)
-        summary_metrics = ["dataset", "method", "map", "precision", "recall", "tp", "fp", "tn", "fn"]
+        summary_metrics = ["method", "map", "precision_at_recall"]
         summary_df = metrics_df[summary_metrics]
 
         if self.custom_export_path:
@@ -74,6 +71,7 @@ class EvalRagJob(AbstractJob):
     @staticmethod
     def evaluate_dataset(dataset):
         artifact_df: ArtifactDataFrame = dataset.artifact_df
+        vsm_predictions = []
 
         def vsm():
             trainer_dataset_manager = TrainerDatasetManager.create_from_datasets(
@@ -83,6 +81,7 @@ class EvalRagJob(AbstractJob):
             prediction_output = trainer.perform_prediction(evaluate=False)
             child2traces = RankingUtil.group_trace_predictions(prediction_output.prediction_entries, TraceKeys.child_label())
             RankingUtil.normalized_scores_by_individual_artifacts(child2traces, min_score=0)
+            vsm_predictions.extend(prediction_output.prediction_entries)
             return prediction_output.prediction_entries
 
         vsm_metrics = EvalRagJob.eval_method(vsm, dataset, method="vsm")
@@ -118,20 +117,107 @@ class EvalRagJob(AbstractJob):
             return embedding_predictions
 
         embedding_metrics = EvalRagJob.eval_method(embeddings, dataset, method="embeddings")
-        args = RankingArgs(dataset=dataset,
-                           parent_ids=[], children_ids=[], types_to_trace=dataset.layer_df.as_list(),
-                           re_rank_children=True)
-        state = RankingState()
-        state.selected_entries = [EnumDict(**d) for d in embedding_predictions]
-        state.relationship_manager = CrossEncoderManager(content_map, model_name=DEFAULT_CROSS_ENCODER_MODEL)
 
-        def re_ranking():
-            step = ReRankStep()
-            step.run(args, state)
-            return state.selected_entries
+        EvalRagJob.compare(dataset, embedding_predictions, vsm_predictions, "embeddings", "vsm")
+        return [vsm_metrics, embedding_metrics]
 
-        re_ranking_metrics = EvalRagJob.eval_method(re_ranking, dataset, method="re_ranking")
-        return [vsm_metrics, embedding_metrics, re_ranking_metrics]
+    @staticmethod
+    def compare(dataset, a_preds, b_preds, a_name, b_name):
+        a_pred_map = {}
+        for entry in a_preds:
+            a_pred_map[entry[TraceKeys.LINK_ID]] = entry
+
+        b_pred_map = {}
+        for entry in b_preds:
+            b_pred_map[entry[TraceKeys.LINK_ID]] = entry
+
+        pred_ids = a_pred_map.keys()
+
+        common = []  # both a and b got right
+        a_entries = []  # only a got right
+        b_entries = []  # only b got right
+        nobody = []
+        all_entries = []
+
+        artifact_map = dataset.artifact_df.to_map()
+        trace_map = {}
+        for pred_id in pred_ids:
+            a_pred = a_pred_map[pred_id]
+            b_pred = b_pred_map[pred_id]
+            trace = dataset.trace_df.loc[pred_id]
+            pred_label = trace[TraceKeys.LABEL.value]
+            a_pred_label = 1 if a_pred[TraceKeys.SCORE] >= 0.5 else 0
+            b_pred_label = 1 if b_pred[TraceKeys.SCORE] >= 0.5 else 0
+
+            a_right = a_pred_label == pred_label
+            b_right = b_pred_label == pred_label
+
+            source_id = trace[TraceKeys.SOURCE.value]
+            target_id = trace[TraceKeys.TARGET.value]
+
+            entry = {
+                "label": pred_label,
+                a_name: a_pred[TraceKeys.SCORE],
+                b_name: b_pred[TraceKeys.SCORE],
+                "source": source_id,
+                "target": target_id,
+                "intersection": EvalRagJob.calc_intersection(artifact_map[source_id], artifact_map[target_id])
+            }
+
+            if a_right and b_right:
+                common.append(entry)
+            elif a_right and not b_right:
+                a_entries.append(entry)
+            elif b_right and not a_right:
+                b_entries.append(entry)
+            else:
+                nobody.append(entry)
+
+            all_entries.append(entry)
+            if target_id not in trace_map:
+                trace_map[target_id] = []
+
+            trace_map[target_id].append(entry)
+
+        experiment_path = os.path.expanduser("~/desktop/experiment")
+
+        scores = []
+        for t_id in dataset.trace_df.index:
+            a_pred = a_pred_map[t_id]
+            b_pred = b_pred_map[t_id]
+            score = max(b_pred[TraceKeys.SCORE], a_pred[TraceKeys.SCORE])
+            scores.append(score)
+
+        metrics_manager = MetricsManager(dataset.trace_df, trace_predictions=scores)
+        metrics = metrics_manager.eval(SupportedTraceMetric.get_keys())
+        trace_map = {t: sorted(v, key=lambda t: t[b_name], reverse=True) for t, v in trace_map.items()}
+
+        ap_entries = {}
+        for a_id, entries in trace_map.items():
+            labels = [e["label"] for e in entries]
+            a_scores = [e[a_name] for e in entries]
+            b_scores = [e[b_name] for e in entries]
+            pos_entries = [e['intersection'] for e in entries if e["label"] == 1]
+            ap_entries[a_id] = {
+                a_name: average_precision_score(labels, a_scores),
+                b_name: average_precision_score(labels, b_scores),
+                "intersection": np.nan if len(pos_entries) == 0 else sum(pos_entries) / len(pos_entries)
+            }
+
+        vsm_best = [k for k, v in ap_entries.items() if v["embeddings"] < v["vsm"]]
+        embeddings_best = [k for k, v in ap_entries.items() if v["embeddings"] > v["vsm"]]
+
+        vsm_best_lengths = [len(artifact_map[k]) for k in vsm_best]
+        embeddings_best_lengths = [len(artifact_map[k]) for k in embeddings_best]
+
+        print("Combined metrics:", metrics)
+        print("Done.")
+
+    @staticmethod
+    def calc_intersection(a: str, b: str):
+        a_words = a.split(" ")
+        words_contained = [a_word for a_word in a_words if a_word in b]
+        return len(words_contained) / len(a_words)
 
     @staticmethod
     def eval_method(exec_lambda: Callable[[], List[Trace]], dataset: TraceDataset, **kwargs):

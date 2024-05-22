@@ -26,7 +26,7 @@ _CITATION = """
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class PrecisionAtRecallMetric(AbstractTraceMetric):
-    name = "precision_at_recall_95"
+    name = "precision_at_recall"
 
     # TODO
     def _compute(self, predictions, references, k=THRESHOLD_DEFAULT, **kwargs) -> Dict:
@@ -53,7 +53,7 @@ class PrecisionAtRecallMetric(AbstractTraceMetric):
 
         if threshold is None:
             logger.warning(f"Could not find threshold under {UPPER_RECALL_THRESHOLD} recall.")
-        return {"precision_at_recall_95": max_precision, "best_threshold": threshold}
+        return {"precision_at_recall": max_precision, "best_threshold": threshold}
 
     def _info(self) -> datasets.MetricInfo:
         """

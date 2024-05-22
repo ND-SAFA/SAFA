@@ -1,11 +1,11 @@
 import re
 import string
 import uuid
-from typing import List, Union, Set, Dict, Tuple
+from typing import Dict, List, Set, Tuple, Union
 
 from nltk.corpus import stopwords
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, UNDERSCORE, PERIOD, SPACE, DASH
+from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, PERIOD, SPACE, UNDERSCORE
 from tgen.common.logging.logger_manager import logger
 
 
@@ -256,3 +256,11 @@ class StrUtil:
         if start_index > -1:
             end_index += len(string2find)
         return start_index, end_index
+
+    @staticmethod
+    def get_stop_words_replacement() -> Dict:
+        """
+        Creates replacement dictionary for stop words.
+        :return: Dictionary of word to empty to string to replace them with.
+        """
+        return {w: "" for w in StrUtil.STOP_WORDS}

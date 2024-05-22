@@ -58,7 +58,7 @@ class FindHomesForOrphansStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                     types_to_trace=(args.source_type, args.target_type),
                                     generate_explanations=False,
                                     selection_method=None,
-                                    relationship_manager=state.embedding_manager)
+                                    embeddings_manager=state.embedding_manager)
         pipeline = EmbeddingRankingPipeline(pipeline_args,
                                             skip_summarization=True)
         pipeline.run()

@@ -4,8 +4,8 @@ import sys
 from dotenv import load_dotenv
 
 load_dotenv()
-
 RQ_PATH = os.path.expanduser(os.environ["RQ_PATH"])
+ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 sys.path.append(ROOT_PATH)

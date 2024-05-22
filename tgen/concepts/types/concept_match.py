@@ -3,9 +3,13 @@ from tgen.common.util.typed_enum_dict import TypedEnumDict
 
 class ConceptMatch(TypedEnumDict):
     """
-    Artifact ID of concept matched.
+    ID of artifact being matched.
     """
-    id: str
+    artifact_id: str
+    """
+    ID of concept matched with.
+    """
+    concept_id: str
     """
     Index in target artifact where match started
     """
@@ -14,3 +18,7 @@ class ConceptMatch(TypedEnumDict):
     Index in target artifact where match ended
     """
     end_loc: int
+    """
+    String of match content
+    """
+    matched_content: str

@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import List
 
 from tgen.common.constants.model_constants import get_best_default_llm_manager_short_context
 from tgen.common.objects.artifact import Artifact
@@ -16,7 +17,7 @@ class ConceptArgs(PipelineArgs):
     """
     Artifact to match concepts against.
     """
-    artifact: Artifact = required_field(field_name="artifact")
+    artifacts: List[Artifact] = required_field(field_name="artifacts")
     """"
     LLM Manager used to complete prompts
     """

@@ -172,7 +172,7 @@ class GenerateTraceLinksStep(AbstractPipelineStep[HGenArgs, HGenState]):
                                    types_to_trace=(args.source_type, args.target_type),
                                    export_dir=export_dir,
                                    generate_explanations=False,
-                                   relationship_manager=state.embedding_manager,
+                                   embeddings_manager=state.embedding_manager,
                                    **pipeline_args)
         ranking_state = RankingState()
         sort_children_step = SortChildrenStep()

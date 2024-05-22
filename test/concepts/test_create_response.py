@@ -1,13 +1,12 @@
 from unittest import TestCase
 
-from test.concepts.constants import ConceptData
+from test.concepts.constants import CONCEPT_R1, ConceptData
 from test.concepts.test_entity_matching import TestEntityMatching
 from test.concepts.utils import create_concept_args, create_concept_state
 from tgen.concepts.steps.create_response_step import CreateResponseStep
 from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from tgen.concepts.steps.entity_matching_step import EntityMatchingStep
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
-from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
@@ -26,7 +25,7 @@ class TestCreateResponse(BaseTest):
 
         # Mock pipeline execution assumptions
         DirectConceptMatchingStep().run(args, state)
-        state.entity_df = ConceptData.get_entity_df()
+        state.entity_data_frames = ConceptData.get_entity_dataframes()
         TestEntityMatching.mock_entity_matching(ai_manager)
         EntityMatchingStep().run(args, state)
         CreateResponseStep().run(args, state)
@@ -47,7 +46,14 @@ class TestCreateResponse(BaseTest):
         tc.assertEqual(ConceptData.Expected.N_MULTI_MATCHES, len(res["multi_matches"]))  # 'Ground Speed' and 'Ground Station'
         tc.assertTrue(ConceptData.Expected.MULTI_MATCH_LOC in res["multi_matches"])
         tc.assertEqual(ConceptData.Expected.N_PREDICTED_MATCHES, len(res["predicted_matches"]))
-        tc.assertEqual(ConceptData.Predicted[0]["target"], res["predicted_matches"][0]["target"])
+        tc.assertEqual(CONCEPT_R1, res["predicted_matches"][0]["artifact_id"])
         tc.assertEqual(ConceptData.Expected.N_UNDEFINED, len(res["undefined_entities"]))
-        undefined_entity_artifact = res["undefined_entities"][0]
-        tc.assertEqual(ConceptData.Entities.UNDEFINED, undefined_entity_artifact[ArtifactKeys.ID])
+
+        undefined_entity_lookup = {e["concept_id"]: e for e in res["undefined_entities"]}
+        expected_undefined_entities = ConceptData.Entities.get_undefined_entities()
+
+        for target_artifact_id, expected_undefined_entities in expected_undefined_entities:
+            for e in expected_undefined_entities:
+                tc.assertIn(e, undefined_entity_lookup)
+                undefined_entity = undefined_entity_lookup[e]
+                tc.assertIn(target_artifact_id, undefined_entity["artifact_ids"])

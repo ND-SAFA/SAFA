@@ -113,7 +113,7 @@ class CustomLoader(SafeLoader):
             self.flatten_mapping(node)
         if not isinstance(node, MappingNode):
             raise ConstructorError(None, None,
-                                   "expected a mapping node, but found %s" % node.id,
+                                   "expected a mapping node, but found %s" % node.concept_id,
                                    node.start_mark)
         mapping = {}
         for key_node, value_node in tqdm(node.value, desc="Loading objects from yaml"):

@@ -47,17 +47,25 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
         :return: None
         """
         concept_artifact_ids = state.concept_df.index.to_list()
-        target_artifact_content = args.artifact[ArtifactKeys.CONTENT]
-
-        concept_alternate_names = extract_alternate_names(concept_artifact_ids)  # [(c0_name, c0_name_alt_name1, ...) ,...]
-
         matches = []
-        for concept_index, (main_name, *alternate_names) in enumerate(concept_alternate_names):
-            start_loc, end_loc = self._find_match(target_artifact_content, main_name, alternate_names)
-            if start_loc == -1:
-                continue
-            concept_match = ConceptMatch(id=concept_artifact_ids[concept_index], start_loc=start_loc, end_loc=end_loc)
-            matches.append(concept_match)
+
+        for artifact in args.artifacts:
+            target_artifact_content = artifact[ArtifactKeys.CONTENT]
+            artifact_id = artifact[ArtifactKeys.ID]
+            concept_alternate_names = extract_alternate_names(concept_artifact_ids)  # [(c0_name, c0_name_alt_name1, ...) ,...]
+
+            for concept_index, (main_name, *alternate_names) in enumerate(concept_alternate_names):
+                start_loc, end_loc = self._find_match(target_artifact_content, main_name, alternate_names)
+                if start_loc == -1:
+                    continue
+                concept_match = ConceptMatch(
+                    artifact_id=artifact_id,
+                    concept_id=concept_artifact_ids[concept_index],
+                    start_loc=start_loc,
+                    end_loc=end_loc,
+                    matched_content=target_artifact_content[start_loc: end_loc]
+                )
+                matches.append(concept_match)
 
         state.direct_matches = matches
 
@@ -74,7 +82,7 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
             return main_start, main_end
         lemmatized = self.lemmatize(main_name)
         for m_str in [lemmatized] + alternate_names:
-            str_start, str_end = StrUtil.find_start_and_end_loc(artifact_content, m_str, ignore_case=True)
+            str_start, str_end = StrUtil.find_start_and_end_loc(artifact_content, m_str, ignore_case=False)
             if str_start == -1:
                 continue
 
@@ -87,6 +95,9 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
         :param concept: The word to sanitize.
         :return: String with each word lemmatize.
         """
+        if concept.isupper():
+            # If is ancronym, then match start of new word + acronym (lower case is used to match later)
+            return SPACE + concept.lower()
         concept_words = concept.lower().split(SPACE)
         lemmatized_words = [self.lemmatizer.lemmatize(w) for w in concept_words]
         return SPACE.join(lemmatized_words)

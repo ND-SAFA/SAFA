@@ -1,8 +1,10 @@
+from typing import List
+
 from test.concepts.constants import ConceptData
 from test.concepts.utils import create_concept_args
 from tgen.common.objects.artifact import Artifact
 from tgen.concepts.concept_state import ConceptState
-from tgen.concepts.steps.entity_extraction_step import EntityExtractionStep
+from tgen.concepts.steps.predict_entity_step import PredictEntityStep
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.prompts.supported_prompts.concept_prompts import create_entity_extraction_response
@@ -11,26 +13,39 @@ from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
-class TestEntityExtraction(BaseTest):
+class TestPredictEntityStep(BaseTest):
     @mock_anthropic
     def test_entity_extraction(self, ai_manager: TestAIManager) -> None:
         """
         Verifies that entities are extracted correctly and saved to state.
         """
-        test_entity_df = ConceptData.get_entity_df()
-
+        entity_dataframes = ConceptData.get_entity_dataframes()
         args = create_concept_args()
-        self.mock_entity_extraction(ai_manager, test_entity_df)
 
-        step = EntityExtractionStep()
+        for entity_df in entity_dataframes:
+            self.mock_entity_extraction(ai_manager, entity_df)
+
+        step = PredictEntityStep()
 
         state = ConceptState()
         step.run(args, state)
 
-        entity_df = state.entity_df
-        self.assertEqual(len(test_entity_df), len(entity_df))
-        for i in range(len(test_entity_df)):
-            self.assertEqual(test_entity_df.iloc[i].to_dict(), entity_df.iloc[i].to_dict())
+        entity_batches = ConceptData.get_entity_batches()
+        self.assertEqual(len(entity_batches), len(state.entity_data_frames))
+        for entity_batch, entity_df in zip(entity_batches, state.entity_data_frames):
+            self.verify_entity_df(entity_batch, entity_df)
+
+    def verify_entity_df(self, expected_entities: List[str], entity_df: ArtifactDataFrame) -> None:
+        """
+        Verifies that entity data frame contains exactly the expected entities.
+        :param expected_entities: Entities expected to be be contained in data frame.
+        :param entity_df: Data frame containing entities resulting from entity extraction test.
+        :return: None
+        """
+        self.assertEqual(len(expected_entities), len(entity_df))
+        resulting_entities = set(entity_df.index)
+        expected_entities = set(expected_entities)
+        self.assertEqual(expected_entities, resulting_entities)
 
     @staticmethod
     def mock_entity_extraction(ai_manager: TestAIManager, entity_df: ArtifactDataFrame) -> None:
@@ -40,7 +55,7 @@ class TestEntityExtraction(BaseTest):
         :param entity_df: Contains entity artifacts.
         :return: None
         """
-        response = "".join([TestEntityExtraction.format_entity(e) for e in entity_df.to_artifacts()])
+        response = "".join([TestPredictEntityStep.format_entity(e) for e in entity_df.to_artifacts()])
         ai_manager.add_responses([response])
 
     @staticmethod

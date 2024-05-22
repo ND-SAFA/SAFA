@@ -1,8 +1,7 @@
-from test.concepts.constants import ConceptData
+from test.concepts.constants import CONCEPT_R1, ConceptData
 from test.concepts.utils import create_concept_args, create_concept_state
 from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from tgen.concepts.util.extract_alt_names import extract_alternate_names
-from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.base_tests.base_test import BaseTest
 
 
@@ -18,11 +17,11 @@ class TestDirectConceptMatching(BaseTest):
         state = create_concept_state(args)
         step.run(args, state)
 
-        direct_matches = ConceptData.DirectMatches
-        self.assertEqual(len(direct_matches), len(state.direct_matches))
+        self.assertEqual(len(ConceptData.DirectMatches), len(state.direct_matches))
 
-        for expected, result in zip(direct_matches, state.direct_matches):
-            self.assertEqual(expected, result[ArtifactKeys.ID])
+        for expected, result in zip(ConceptData.DirectMatches, state.direct_matches):
+            self.assertEqual(CONCEPT_R1, result["artifact_id"])
+            self.assertEqual(expected, result["concept_id"])
 
     def test_alt_name_extraction(self):
         """

@@ -46,7 +46,7 @@ class BaseTest(TestCase):
     def setUpClass(cls):
         super(BaseTest, cls).setUpClass()
         environment_constants.IS_TEST = True
-
+        anthropic_constants.ANTHROPIC_MAX_RPM = None
         anthropic_constants.ANTHROPIC_MAX_THREADS = 1
         anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS = 1
         open_ai_constants.OPENAI_MAX_THREADS = 1

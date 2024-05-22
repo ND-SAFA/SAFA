@@ -1,5 +1,4 @@
 from copy import deepcopy
-
 from typing import Dict, List
 
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
@@ -24,8 +23,6 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         :param state: The state of the current pipeline.
         :return: NOne
         """
-        state.relationship_manager = args.relationship_manager if args.relationship_manager else state.relationship_manager
-
         children_ids = deepcopy(args.children_ids)
         if args.use_chunks:
             args.dataset.artifact_df.chunk()
@@ -83,12 +80,15 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         """
         children_ids = args.children_ids if not children_ids else children_ids
         sorter: iSorter = SupportedSorter.get_value(args.sorter.upper()) if isinstance(args.sorter, str) else args.sorter.value
-        if state.relationship_manager:
-            state.relationship_manager.update_or_add_contents(state.artifact_map)
+        if args.embeddings_manager:
+            args.embeddings_manager.update_or_add_contents(state.artifact_map)
         else:
-            state.relationship_manager = EmbeddingsManager(content_map=state.artifact_map, model_name=args.embedding_model_name)
+            args.embeddings_manager = EmbeddingsManager(content_map=state.artifact_map, model_name=args.embedding_model_name)
+
+        # TODO: use enum to differentiate?
+        relationship_manager = args.embeddings_manager if args.embeddings_manager else args.cross_encoder_manager
         parent2rankings = sorter.sort(args.parent_ids, children_ids, artifact_map=state.artifact_map,
-                                      relationship_manager=state.relationship_manager, return_scores=True)
+                                      relationship_manager=relationship_manager, return_scores=True)
         parent_map = RankingUtil.convert_parent2rankings_to_prediction_entries(parent2rankings)
         if args.max_context_artifacts:
             parent_map = {p: c[:args.max_context_artifacts] for p, c in parent_map.items()}

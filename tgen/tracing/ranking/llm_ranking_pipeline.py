@@ -24,7 +24,7 @@ class LLMRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
         Ranks children artifacts from most to least related to source.
         :param args: Args to ranking pipeline.
         """
-        super().__init__(args, LLMRankingPipeline.steps)
+        super().__init__(args, LLMRankingPipeline.steps, no_project_summary=True)
 
     def state_class(self) -> Type:
         """

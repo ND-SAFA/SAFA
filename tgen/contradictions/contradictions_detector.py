@@ -1,5 +1,6 @@
 from typing import Dict, List, Tuple
 
+from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
@@ -108,7 +109,15 @@ class ContradictionsDetector:
 
         return results
 
-    def _construct_prompt_builder(self, id2context, query_id: str, prompt_args: LLMPromptBuildArgs) -> Tuple[Prompt, PromptBuilder]:
+    def _construct_prompt_builder(self, id2context: Dict[str, List[Artifact]], query_id: str,
+                                  prompt_args: LLMPromptBuildArgs) -> Tuple[Prompt, PromptBuilder]:
+        """
+        Creates the prompt builder used for detecting the contradictions.
+        :param id2context: Maps artifact id to a list of related artifacts.
+        :param query_id: ID of the artifact under investigation.
+        :param prompt_args: The arguments to the prompt builder.
+        :return: The constructed prompt and associated builder.
+        """
         query_artifact = self.args.dataset.artifact_df.get_artifact(query_id)
         context_prompt = ContextPrompt(id2context, prompt_start=PromptUtil.as_markdown_header("Related Information"),
                                        build_method=MultiArtifactPrompt.BuildMethod.MARKDOWN, include_ids=True)

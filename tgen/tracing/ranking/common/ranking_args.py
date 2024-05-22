@@ -198,7 +198,6 @@ class RankingArgs(PipelineArgs):
         super().__post_init__()
         self.embedding_model_name = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else self.embedding_model_name
         if self.use_rag_defaults:
-            self.re_rank_children = True
             self.selection_method = SupportedSelectionMethod.SELECT_BY_THRESHOLD_SCALED
             self.link_threshold = DEFAULT_SCALED_THRESHOLD
             logger.warning(f"Selected a threshold of {DEFAULT_SCALED_THRESHOLD} for RAG.")

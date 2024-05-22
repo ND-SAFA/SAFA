@@ -8,10 +8,8 @@ from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.prompts.supported_prompts.contradiction_prompts import create_contradiction_response
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.prompts.prompt import Prompt
-from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
+from tgen.prompts.supported_prompts.contradiction_prompts import create_contradiction_response
 from tgen.testres.base_tests.base_test import BaseTest
 
 ARTIFACT_CONTENT = ["All dogs are really cute.", "Cars make vroom vroom sound.", "Fire trucks are loud.", "Dogs pee on fire hydrants.",
@@ -28,7 +26,7 @@ UNDEFINED_CONCEPT = "undefined_concept"
 QUERY_CONCEPTS = ["pug", "dog", UNDEFINED_CONCEPT]
 QUERY_CONTENT = "Pugs aren't cute dogs."
 QUERY_ID = "target"
-EXPECTED_RELATED_ARTIFACTS = EXPECTED_CONTEXT_IDS + EXISTING_CONCEPTS[:2]
+EXPECTED_RELATED_ARTIFACTS = EXPECTED_CONTEXT_IDS + EXISTING_CONCEPTS[:1]
 
 
 def assert_correct_related_artifacts(test_case: BaseTest, related_ids: List[str]):

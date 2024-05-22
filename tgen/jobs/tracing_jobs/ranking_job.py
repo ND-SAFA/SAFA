@@ -20,6 +20,8 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
+from tgen.relationship_manager.cross_encoder_manager import CrossEncoderManager
+from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.relationship_manager.supported_relationship_managers import SupportedRelationshipManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
@@ -89,52 +91,19 @@ class RankingJob(AbstractJob):
         :return: List of selected traces and dict mapping trace id to the score obtained for the link.
         """
         full_dataset = self.job_args.dataset
-        selected_artifacts = layer_dataset.artifact_df.get_artifacts_by_type(types_to_trace)
-        parent_type, child_type = types_to_trace
-        parent_ids = list(layer_dataset.artifact_df.get_artifacts_by_type(parent_type).index)
-        children_ids = list(layer_dataset.artifact_df.get_artifacts_by_type(child_type).index)
-        assert parent_ids and children_ids, f"Found {len(parent_ids)} parents and {len(children_ids)} children. " \
-                                            f"Expected at least one parent and child."
-
-        if not self.select_top_predictions:
-            DictUtil.update_kwarg_values(self.ranking_kwargs, selection_method=None)
-        export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
-        if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
-            export_dir = FileUtil.safely_join_paths(export_dir, RankingJob._get_run_dir(child_type, parent_type))
-        layer_dataset = PromptDataset(artifact_df=selected_artifacts, trace_dataset=full_dataset.trace_dataset,
-                                      project_summary=full_dataset.project_summary)
-        if not self.relationship_manager and self.relationship_manager_type:
-            model_name = DictUtil.get_kwarg_values(self.ranking_kwargs, embedding_model_name=None)
-            kwargs = DictUtil.update_kwarg_values({}, model_name=model_name) if model_name else {}
-            self.relationship_manager = self.relationship_manager_type.value(**kwargs)
-        pipeline_args = RankingArgs(dataset=layer_dataset,
-                                    parent_ids=parent_ids,
-                                    children_ids=children_ids,
-                                    export_dir=export_dir,
-                                    types_to_trace=types_to_trace,
-                                    embeddings_manager=self.relationship_manager,
-                                    **self.ranking_kwargs)
-        logger.info(f"Starting to trace: {pipeline_args.run_name}")
-
+        pipeline_args = self._create_ranking_args(layer_dataset, types_to_trace, full_dataset)
         pipeline: AbstractPipeline[RankingArgs, RankingState] = self.ranking_pipeline.value(pipeline_args)
         pipeline.run()
-        self.relationship_manager = pipeline.state.relationship_manager
+        self.relationship_manager = pipeline_args.cross_encoder_manager \
+            if isinstance(self.relationship_manager,
+                          SupportedRelationshipManager.CROSS_ENCODER.value) else pipeline_args.embeddings_manager
         selected_entries = pipeline.state.get_current_entries()
         scores = {TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET]): entry[TraceKeys.SCORE]
                   for entry in pipeline.state.candidate_entries}
-        has_positive_links = full_dataset.trace_dataset and len(full_dataset.trace_df.get_links_with_label(1)) > 1
-        if has_positive_links:
-            for entry in pipeline.state.get_current_entries():
-                trace_id = self.get_trace_id_from_entry(entry)
-                trace_entry = full_dataset.trace_df.loc[trace_id]
-                label = trace_entry[TraceKeys.LABEL.value]
-                entry[TraceKeys.LABEL] = label
-                full_dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
-                if TraceKeys.EXPLANATION in entry:
-                    full_dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
+        self._add_true_labels_if_known(pipeline.state.get_current_entries(), full_dataset)
 
-        if export_dir:
-            PromptDatasetExporter(export_path=os.path.join(export_dir, "final_dataset"),
+        if pipeline_args.export_dir:
+            PromptDatasetExporter(export_path=os.path.join(pipeline_args.export_dir, "final_dataset"),
                                   dataset=full_dataset, trace_dataset_exporter_type=SafaExporter).export()
         return selected_entries, scores
 
@@ -168,6 +137,74 @@ class RankingJob(AbstractJob):
                                                               row[TraceKeys.parent_label().value] in parent_type_ids)
         metrics = RankingUtil.evaluate_trace_predictions(trace_df, predictions, all_scores, log_results=log_results)
         return metrics
+
+    def _create_ranking_args(self, layer_dataset: PromptDataset, types_to_trace: Tuple[str, str],
+                             full_dataset: PromptDataset) -> RankingArgs:
+        """
+        Creates the args for tracing the between the child-parent artifact types.
+        :param layer_dataset: The dataset containing artifacts to trace.
+        :param types_to_trace: The child-parent layers being traced.
+        :param full_dataset: Contains all links and artifacts.
+        :return: The args for the ranking pipeline.
+        """
+        selected_artifacts = layer_dataset.artifact_df.get_artifacts_by_type(types_to_trace)
+        parent_type, child_type = types_to_trace
+        parent_ids = list(layer_dataset.artifact_df.get_artifacts_by_type(parent_type).index)
+        children_ids = list(layer_dataset.artifact_df.get_artifacts_by_type(child_type).index)
+        assert parent_ids and children_ids, f"Found {len(parent_ids)} parents and {len(children_ids)} children. " \
+                                            f"Expected at least one parent and child."
+        if not self.select_top_predictions:
+            DictUtil.update_kwarg_values(self.ranking_kwargs, selection_method=None)
+        export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
+        if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
+            export_dir = FileUtil.safely_join_paths(export_dir, RankingJob._get_run_dir(child_type, parent_type))
+        layer_dataset = PromptDataset(artifact_df=selected_artifacts, trace_dataset=full_dataset.trace_dataset,
+                                      project_summary=full_dataset.project_summary)
+        embeddings_manager, cross_encoder_manager = self._get_embeddings_or_cross_encoder_manager()
+        pipeline_args = RankingArgs(dataset=layer_dataset,
+                                    parent_ids=parent_ids,
+                                    children_ids=children_ids,
+                                    export_dir=export_dir,
+                                    types_to_trace=types_to_trace,
+                                    embeddings_manager=embeddings_manager,
+                                    cross_encoder_manager=cross_encoder_manager,
+                                    **self.ranking_kwargs)
+        logger.info(f"Starting to trace: {pipeline_args.run_name}")
+        return pipeline_args
+
+    def _add_true_labels_if_known(self, trace_entries: List[EnumDict], full_dataset: PromptDataset) -> None:
+        """
+        Adds the true labels to the entries if they are known.
+        :param trace_entries: The trace entries from the pipeline.
+        :param full_dataset: The dataset containing the links and true labels.
+        :return: None (updates directly).
+        """
+        has_positive_links = full_dataset.trace_dataset and len(full_dataset.trace_df.get_links_with_label(1)) > 1
+        if has_positive_links:
+            for entry in trace_entries:
+                trace_id = self.get_trace_id_from_entry(entry)
+                trace_entry = full_dataset.trace_df.loc[trace_id]
+                label = trace_entry[TraceKeys.LABEL.value]
+                entry[TraceKeys.LABEL] = label
+                full_dataset.trace_df.update_value(TraceKeys.SCORE, trace_id, entry[TraceKeys.SCORE])
+                if TraceKeys.EXPLANATION in entry:
+                    full_dataset.trace_df.update_value(TraceKeys.EXPLANATION, trace_id, entry[TraceKeys.EXPLANATION])
+
+    def _get_embeddings_or_cross_encoder_manager(self) -> Tuple[EmbeddingsManager, CrossEncoderManager]:
+        """
+        Gets the embedding or cross encoder manager.
+        :return: The embedding manager if there is one and the cross encoder manager if there is one
+        """
+        if not self.relationship_manager and self.relationship_manager_type:
+            model_name = DictUtil.get_kwarg_values(self.ranking_kwargs, embedding_model_name=None)
+            kwargs = DictUtil.update_kwarg_values({}, model_name=model_name) if model_name else {}
+            self.relationship_manager = self.relationship_manager_type.value(**kwargs)
+        embeddings_manager, cross_encoder_manager = None, None
+        if isinstance(self.relationship_manager, SupportedRelationshipManager.EMBEDDING.value):
+            embeddings_manager = self.relationship_manager
+        elif isinstance(self.relationship_manager, SupportedRelationshipManager.CROSS_ENCODER.value):
+            cross_encoder_manager = self.relationship_manager
+        return embeddings_manager, cross_encoder_manager
 
     @staticmethod
     def _get_run_dir(child_type: str, parent_type: str) -> str:

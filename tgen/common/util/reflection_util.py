@@ -191,6 +191,8 @@ class ReflectionUtil:
         if origin is typing.Union:
             return "union", *type_args
         elif origin is list:
+            if not type_args:
+                type_args = [None]
             assert len(type_args) == 1, f"Found multiple typed for list: {type_args}"
             return "list", type_args[0]
         elif isinstance(origin, typing.Callable):
@@ -328,9 +330,12 @@ class ReflectionUtil:
                     expected_type = child_classes[0]
                 elif parent_class == "list":
                     child_type = child_classes[0]
-                    invalid_runs = [v for v in val if not ReflectionUtil.is_type(v, child_type, param_name, print_on_error=False)]
-                    if len(invalid_runs) > 0:
-                        raise TypeError(f"List elements {invalid_runs} was not of type {child_type}.")
+                    if not isinstance(val, list):
+                        return False
+                    if child_type is not None:
+                        invalid_runs = [v for v in val if not ReflectionUtil.is_type(v, child_type, param_name, print_on_error=False)]
+                        if len(invalid_runs) > 0:
+                            raise TypeError(f"List elements {invalid_runs} was not of type {child_type}.")
                     return True
                 elif parent_class == "union" or parent_class == "optional":
                     queries = [c for c in child_classes if ReflectionUtil.is_type(val, c, param_name, print_on_error=False)]

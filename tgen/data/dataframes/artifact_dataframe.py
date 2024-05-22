@@ -168,17 +168,26 @@ class ArtifactDataFrame(AbstractProjectDataFrame):
         """
         self.loc[artifact_id][ArtifactKeys.CONTENT.value] = new_body
 
-    def summarize_content(self, summarizer: ArtifactsSummarizer, re_summarize: bool = False) -> List[str]:
+    def summarize_content(self, summarizer: ArtifactsSummarizer, re_summarize: bool = False,
+                          summarize_from_existing: bool = False) -> List[str]:
         """
         Summarizes the content in the artifact df
         :param summarizer: The summarizer to use
         :param re_summarize: True if old summaries should be replaced
+        :param summarize_from_existing: If True, uses the existing summary as the content shown to the LLM.
         :return: The summaries
         """
+        re_summarize = True if summarize_from_existing else re_summarize
+
         if re_summarize or not self.is_summarized(code_or_above_limit_only=summarizer.code_or_above_limit_only):
             missing_all = self[ArtifactKeys.SUMMARY].isna().all() or re_summarize
             if missing_all:
-                summaries = summarizer.summarize_dataframe(self, ArtifactKeys.CONTENT.value, ArtifactKeys.ID.value)
+                col2summarize = ArtifactKeys.CONTENT.value
+                if summarize_from_existing:
+                    self[ArtifactKeys.SUMMARY] = [Artifact.get_summary_or_content(a, use_summary_for_code_only=True)
+                                                  for _, a in self.itertuples()]
+                    col2summarize = ArtifactKeys.SUMMARY.value
+                summaries = summarizer.summarize_dataframe(self, col2summarize, ArtifactKeys.ID.value)
                 self[ArtifactKeys.SUMMARY] = summaries
             else:
                 ids, content = self._find_missing_summaries()

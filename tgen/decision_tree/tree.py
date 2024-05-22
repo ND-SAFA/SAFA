@@ -43,7 +43,7 @@ class Tree(abc.ABC):
         current_path_taken = Path(self.starting_node, args, current_state) if not current_path_taken else current_path_taken
         current_node = current_path_taken.get_node(-1)
         prompt_builder, path = None, current_path_taken
-        if isinstance(current_node, LLMNode):
+        if isinstance(current_node, LLMNode) and not current_node.skip:
             prompt_builder = current_node.create_prompt_builder(args, current_state)
         elif not isinstance(current_node, LeafNode):
             self._take_step(args, current_state, current_node, current_path_taken)
@@ -62,6 +62,6 @@ class Tree(abc.ABC):
         :return: The next node to take.
         """
         choice = current_node.make_choice(args, current_state)
-        if choice:
+        if choice is not None:
             current_node = path_taken.add_decision(choice)
         return current_node

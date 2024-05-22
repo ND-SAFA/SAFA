@@ -208,7 +208,7 @@ class LLMTrainer(AbstractTrainer):
 
         reloaded = LLMResponseUtil.reload_responses(save_and_load_path)
         missing_generations = isinstance(reloaded, List) or reloaded is None
-        first_prompt = LLMTrainer._get_first_prompt(message_prompts)  # debugging
+        recent_prompt = LLMTrainer._get_most_recent_prompt(message_prompts)  # debugging
 
         if missing_generations:
             res = llm_manager.make_completion_request(
@@ -224,7 +224,7 @@ class LLMTrainer(AbstractTrainer):
         return res
 
     @staticmethod
-    def _get_first_prompt(message_prompts: List | str) -> str:
+    def _get_most_recent_prompt(message_prompts: List | str) -> str:
         """
         Gets the first prompt for debugging.
         :param message_prompts: A list of prompts or messages or a single string.
@@ -233,10 +233,10 @@ class LLMTrainer(AbstractTrainer):
         if isinstance(message_prompts, str):
             return message_prompts
         if isinstance(message_prompts, list):
-            if isinstance(message_prompts[0], Dict):
-                return message_prompts[0][CONTENT_KEY]
+            if isinstance(message_prompts[-1], Dict):
+                return message_prompts[-1][CONTENT_KEY]
             else:
-                return message_prompts[0]
+                return message_prompts[-1]
 
     @staticmethod
     def _create_generation_output(responses: List[str], prompt_builder_map: Dict[str, PromptBuilder],

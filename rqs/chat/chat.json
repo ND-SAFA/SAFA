@@ -6,6 +6,7 @@
           "object_type": "CHAT",
           "max_context": 10,
           "chat_history": [{"message": {"role":  "user", "content":  "[QUESTION]"}}],
+          "nodes2skip":  "[NODES2SKIP_LIST_OPTIONAL]",
           "job_args": {
             "dataset_creator": {
               "object_type": "PROMPT",

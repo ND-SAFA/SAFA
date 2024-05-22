@@ -4,7 +4,7 @@ from typing import List, Optional, Any
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.list_util import ListUtil
-from tgen.decision_tree.nodes.abstract_node import AbstractNode
+from tgen.decision_tree.nodes.abstract_node import AbstractNode, DEFAULT_BRANCH
 from tgen.pipeline.state import State
 
 
@@ -56,15 +56,25 @@ class Path:
         current_node = self.get_node()
         next_selected_node = current_node.select_branch(choice)
         self.log_node(choice, current_node)
+        if choice != DEFAULT_BRANCH:
+            self.update_state_with_choice(choice, current_node)
+        if next_selected_node:
+            self.__path_taken.append(next_selected_node)
+        self.__choices.append(choice)
+        return next_selected_node
+
+    def update_state_with_choice(self, choice: str, current_node: AbstractNode) -> None:
+        """
+        Updates the state based on the choice (if a state setter is provided in the node).
+        :param choice: The reason that branch was chosen.
+        :param current_node: The current node for which the choice was made.
+        :return: None.
+        """
         if current_node.state_setter:
             if isinstance(current_node.state_setter, str):
                 setattr(self.state, current_node.state_setter, choice)
             else:
                 current_node.state_setter(choice, self.state)
-        if next_selected_node:
-            self.__path_taken.append(next_selected_node)
-        self.__choices.append(choice)
-        return next_selected_node
 
     @staticmethod
     def log_node(choice: Any, current_node: AbstractNode) -> None:

@@ -105,3 +105,8 @@ QUESTION2 = QuestionnairePrompt(instructions="Below is a set of reasoning steps 
                                                   Prompt(f"Make sure to enclose each set of answers "
                                                          f"for EACH individual artifact inside of {RANKING_ARTIFACT_TAG}")
                                                   ])
+REWRITE_ARTIFACT_PROMPT = Prompt(f"Re-write the artifact below to highlight only key entities and actions and "
+                                 f"removing any type-specific format. "
+                                 f"For example, 'The system shall provide a secure login and authentication mechanism "
+                                 f"for users to access their accounts.' could be re-writen to "
+                                 f"'Secure login and authentication for user accounts'")

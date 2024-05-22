@@ -20,3 +20,9 @@ ARTIFACT_TYPE_FOR_CONTEXT_PROMPT = Prompt(USER_INPUT_STARTER +
                                           "If one or more artifacts would be useful, answer in a comma-deliminated list. "
                                           f"If all artifact types would be useful, respond with '{ALL_TYPES_RESPONSE}'. ",
                                           )
+
+REWRITE_QUERY_PROMPT = Prompt(USER_INPUT_STARTER +
+                              f"Re-write the query so that it will be easier to identify only the necessary "
+                              f"context required to answer. For example, if a user asked 'How does the code "
+                              f"ensure that user account access is secure when logging in?' the query might be "
+                              f"rewritten to 'Secure account access on login'")

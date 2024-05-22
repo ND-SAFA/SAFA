@@ -9,6 +9,7 @@ from tgen.tracing.ranking.steps.calculate_composite_scores_step import Calculate
 from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 from tgen.tracing.ranking.steps.filter_scores_step import FilterScoresStep
 from tgen.tracing.ranking.steps.re_rank_step import ReRankStep
+from tgen.tracing.ranking.steps.rewrite_artifacts_step import RewriteArtifactsStep
 from tgen.tracing.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
 
@@ -17,8 +18,8 @@ class EmbeddingRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):
     """
     Ranks a set of artifacts by using their embeddings to their parents.
     """
-    steps = [SortChildrenStep, FilterScoresStep, CalculateCompositeScoreStep, SelectCandidateLinksStep, ReRankStep,
-             CreateExplanationsStep]
+    steps = [RewriteArtifactsStep, SortChildrenStep, FilterScoresStep, CalculateCompositeScoreStep, SelectCandidateLinksStep,
+             ReRankStep, CreateExplanationsStep]
 
     def __init__(self, args: RankingArgs, skip_summarization: bool = False):
         """

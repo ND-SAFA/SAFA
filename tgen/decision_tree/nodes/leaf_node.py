@@ -17,7 +17,7 @@ class LeafNode(AbstractNode):
         if not self.is_leaf():
             raise Exception("Leaf node cannot have branches.")
 
-    def make_choice(self, args: PipelineArgs, state: State) -> Any:
+    def _make_choice(self, args: PipelineArgs, state: State) -> Any:
         """
         Here for node api, should not be used for leaf.
         :param args: The arguments to the node.

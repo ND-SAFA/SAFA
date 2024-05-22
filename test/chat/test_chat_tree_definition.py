@@ -1,8 +1,9 @@
 from test.jobs.health_check_jobs.health_check_utils import get_dataset_for_context, get_chat_history, QUERY, EXPECTED_CONTEXT_IDS
 from tgen.chat.chat_args import ChatArgs
+from tgen.chat.chat_node_ids import ChatNodeIDs
 from tgen.chat.chat_state import ChatState
 from tgen.chat.chat_tree_definition import ChatTreeDefinition
-from tgen.chat.chat_node_ids import ChatNodeIDs
+from tgen.chat.message_meta import MessageMeta
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.prompt_keys import PromptKeys
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -54,6 +55,24 @@ class TestChatTreeDefinition(BaseTest):
         self.assertEqual(state.context_artifact_types, choice)
 
         next_selected_node = context_type_node.select_branch(choice)
+        self.assertEqual(next_selected_node.node_id, ChatNodeIDs.REWRITE_QUERY)
+
+    def test_re_write_query_node(self):
+        builder = ChatTreeDefinition().builder
+        rewrite_query_node: LLMNode = builder.get_node(ChatNodeIDs.REWRITE_QUERY)
+        args, state = self.get_args_and_state()
+        prompt_builder = rewrite_query_node.create_prompt_builder(args, state)
+        prompt = prompt_builder.build(args.llm_manager.prompt_args)[PromptKeys.PROMPT]
+        self.assertIn(QUERY["content"], prompt)
+
+        rewritten_query = "rewritten query"
+        response = prompt_builder.parse_responses(PromptUtil.create_xml(rewrite_query_node.response_tag, rewritten_query))
+        choice = rewrite_query_node.get_choice_from_response(response)
+        Path(rewrite_query_node, args, state).add_decision(choice)
+        self.assertEqual(rewritten_query, choice)
+        self.assertEqual(state.rewritten_query, choice)
+
+        next_selected_node = rewrite_query_node.select_branch(choice)
         self.assertEqual(next_selected_node.node_id, ChatNodeIDs.RAG)
 
     def test_rag_node(self):
@@ -84,7 +103,7 @@ class TestChatTreeDefinition(BaseTest):
         self.assertEqual(choice, response)
 
         Path(chat_node, args, state).add_decision(choice)
-        self.assertEqual(state.user_chat_history[-1].message["content"], response)
+        self.assertEqual(MessageMeta.get_most_recent_message(state.user_chat_history)["content"], response)
 
     def response(self, prompt, response, artifact_df):
         user_prompt, system_prompt = prompt

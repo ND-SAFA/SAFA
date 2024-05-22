@@ -68,7 +68,7 @@ class LLMNode(AbstractNode):
         prompt.args.prompt_id = PROMPT_ID
         return prompt
 
-    def make_choice(self, args: PipelineArgs, state: State) -> Any:
+    def _make_choice(self, args: PipelineArgs, state: State) -> Any:
         """
         Decides which path to take from the current node.
         :param args: The arguments to the node.

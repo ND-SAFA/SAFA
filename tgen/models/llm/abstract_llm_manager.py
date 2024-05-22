@@ -31,10 +31,6 @@ class Message(TypedDict):
     role: str
 
 
-MessageType = Dict[str, str]
-ConversationType = List[Message]
-
-
 class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
     """
     Interface for all AI utility classes.
@@ -92,7 +88,7 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         return translated_response
 
     @staticmethod
-    def convert_prompt_to_message(prompt: str, role: str = PromptRoles.USER) -> MessageType:
+    def convert_prompt_to_message(prompt: str, role: str = PromptRoles.USER) -> Message:
         """
         Converts a prompt to the expected format for messages between the user and assistant.
         :param prompt: The prompt/content of the message.

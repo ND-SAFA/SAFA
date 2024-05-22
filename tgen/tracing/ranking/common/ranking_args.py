@@ -63,6 +63,10 @@ class RankingArgs(PipelineArgs):
     """
     ranking_llm_model_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
     """
+    - rewrite_artifacts: If True, rewrites the artifacts to be in the same format before tracing.
+    """
+    rewrite_artifacts: bool = False
+    """
     - explanation_llm_model: The model used to create explanations
     """
     explanation_llm_model: AbstractLLMManager = field(default_factory=get_efficient_default_llm_manager)

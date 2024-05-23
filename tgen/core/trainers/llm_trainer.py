@@ -97,7 +97,7 @@ class LLMTrainer(AbstractTrainer):
                                                                  else [self.prompt_builders])})
         prompt_builder_ids = prompt_df[PromptKeys.PROMPT_BUILDER_ID]
         if isinstance(res, ClassificationResponse):
-            output = self._create_classification_output(res, datasets, prompt_builder_map)
+            output = self._create_classification_output(res, datasets)
         elif isinstance(res, GenerationResponse):
             output = self._create_generation_output(res.batch_responses, prompt_builder_map, prompt_builder_ids)
         else:
@@ -257,8 +257,7 @@ class LLMTrainer(AbstractTrainer):
         return TracePredictionOutput(predictions=predictions,
                                      original_response=responses)  #
 
-    def _create_classification_output(self, res: ClassificationResponse, datasets: List[PromptDataset],
-                                      prompt_builder_map: Dict[str, PromptBuilder]):
+    def _create_classification_output(self, res: ClassificationResponse, datasets: List[PromptDataset]):
         """
         Creates the output for a classification
         :param res: The response from the completion

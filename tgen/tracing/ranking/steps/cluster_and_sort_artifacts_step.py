@@ -33,7 +33,7 @@ class ClusterAndSortArtifactsStep(AbstractPipelineStep[RankingArgs, RankingState
         state.artifact_map = args.dataset.artifact_df.to_map()
         sorter = ClusterChildrenSorter
         parent2rankings = sorter.sort(args.parent_ids, args.children_ids,
-                                      embedding_manager=state.relationship_manager,
+                                      embedding_manager=args.embeddings_manager,
                                       final_clusters=final_clusters,
                                       return_scores=True)
         state.sorted_parent2children = {p: [RankingUtil.create_entry(p, rankings[0][i], score=rankings[1][i])
@@ -86,7 +86,7 @@ class ClusterAndSortArtifactsStep(AbstractPipelineStep[RankingArgs, RankingState
                         [trace[TraceKeys.child_label()] for trace in parent2traces.get(artifact[ArtifactKeys.ID], [])]
                     for i, artifact in generated_artifacts.itertuples()}
         final_clusters = {p_id: Cluster.from_artifacts(a_ids,
-                                                       state.relationship_manager)
+                                                       args.embeddings_manager)
                           for p_id, a_ids in clusters.items() if len(a_ids) > 0}
         return final_clusters
 
@@ -104,4 +104,4 @@ class ClusterAndSortArtifactsStep(AbstractPipelineStep[RankingArgs, RankingState
             embedding_manager = external_pipeline_state.embedding_manager
             embedding_manager.update_or_add_contents(parent_artifact_map)
             embedding_manager.create_embedding_map()
-            ranking_state.relationship_manager = embedding_manager
+            ranking_args.embeddings_manager = embedding_manager

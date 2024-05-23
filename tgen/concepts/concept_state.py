@@ -1,9 +1,9 @@
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 from typing import List
 
-from tgen.common.objects.trace import Trace
 from tgen.concepts.types.concept_match import ConceptMatch
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
+from tgen.concepts.types.entity_matching_pred import EntityMatchingPred
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.pipeline.state import State
 
@@ -21,11 +21,11 @@ class ConceptState(State):
     """
     List of entities extracted from artifact.
     """
-    entity_df: ArtifactDataFrame = None
+    entity_data_frames: List[ArtifactDataFrame] = None
     """"
     List of predicted links between entities and concepts.
     """
-    predicted_matches: List[Trace] = field(default_factory=lambda: [])
+    predicted_matches: List[EntityMatchingPred] = field(default_factory=lambda: [])
     """
     Final response of pipeline.
     """

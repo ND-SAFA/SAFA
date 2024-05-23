@@ -5,6 +5,8 @@
         {
           "object_type": "RANKING",
           "ranking_pipeline": "LLM",
+          "interactive_mode": false,
+          "sorter": "[SORTER]",
           "job_args": {
             "export_dir": "[OUTPUT_PATH]/ranking-llm/[CURRENT_PROJECT]",
             "dataset_creator": {

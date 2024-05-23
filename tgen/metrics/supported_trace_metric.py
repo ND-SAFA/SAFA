@@ -1,7 +1,7 @@
 import inspect
+from typing import List, Set, Type
 
 from datasets import Metric, list_metrics
-from typing import List, Type, Set
 
 from tgen.common.util.supported_enum import SupportedEnum
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
@@ -23,12 +23,12 @@ class SupportedTraceMetric(SupportedEnum):
     """
     Enumerates trace metrics.
     """
-    LAG = LagMetric
     MAP = MapMetric
-    CLASSIFICATION = ClassificationMetrics
-    PRECISION_AT_K = PrecisionAtKMetric
     PRECISION_AT_RECALL = PrecisionAtRecallMetric
     CONFUSION_MATRIX = ConfusionMatrixAtThresholdMetric
+    LAG = LagMetric
+    CLASSIFICATION = ClassificationMetrics
+    PRECISION_AT_K = PrecisionAtKMetric
     AVERAGE_TRUE_LINKS = AverageTrueLinksMetric
     SPECIFICITY = SpecificityMetric
 

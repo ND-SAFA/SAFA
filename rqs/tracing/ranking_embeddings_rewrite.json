@@ -5,8 +5,9 @@
         {
           "object_type": "RANKING",
           "ranking_pipeline": "EMBEDDING",
-          "rewrite_artifacts": false,
-          "generate_explanations": false,
+           "layer_ids": ["[TARGET_TYPE]","[SOURCE_LAYER_IDS]"],
+          "rewrite_artifacts": "[REWRITE_ARTIFACTS_BOOL_OPTIONAL]",
+          "generate_explanations": "[GENERATE_EXPLANATIONS_OPTIONAL]",
           "job_args": {
             "export_dir": "[OUTPUT_PATH]/embedding/[CURRENT_PROJECT]",
             "dataset_creator": {

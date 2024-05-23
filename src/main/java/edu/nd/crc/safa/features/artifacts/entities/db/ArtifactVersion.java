@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.artifacts.entities.db;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -45,6 +47,7 @@ import org.hibernate.type.SqlTypes;
 )
 @Data
 public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactAppEntity> {
+    @Setter
     @Id
     @GeneratedValue
     @JdbcTypeCode(SqlTypes.VARCHAR)
@@ -81,6 +84,9 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     @Transient
     private Map<String, JsonNode> customAttributeValues;
 
+    @Transient
+    private List<UUID> documentIds;
+
     public ArtifactVersion() {
         this.summary = "";
         this.content = "";
@@ -116,10 +122,6 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         this.setEntityVersionId(versionEntityId);
     }
 
-    public void setEntityVersionId(UUID artifactBodyId) {
-        this.entityVersionId = artifactBodyId;
-    }
-
     @Override
     public UUID getBaseEntityId() {
         return this.artifact.getBaseEntityId();
@@ -151,8 +153,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     }
 
     public boolean hasSameContent(IVersionEntity entityVersion) {
-        if (entityVersion instanceof ArtifactVersion) {
-            ArtifactVersion artifactVersion = (ArtifactVersion) entityVersion;
+        if (entityVersion instanceof ArtifactVersion artifactVersion) {
             return hasSameContent(artifactVersion.getName(),
                 artifactVersion.getSummary(),
                 artifactVersion.getContent(),

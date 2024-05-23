@@ -34,7 +34,7 @@ class TestFlatFileJiraProjectImportCommonRequests extends JiraBaseFlatFileTest {
 
         // Step - Read test json file
         List<JiraIssueDTO> issues = readJiraIssues(ProjectPaths.Resources.Tests.Jira.DRONE_ISSUES);
-        /**
+        /*
          * Now counts inward + outward issues not accounted for
          * Note, this includes an extra one because it is referenced there.
          * This artifact definitely exists but was just under the cutoff for
@@ -67,11 +67,11 @@ class TestFlatFileJiraProjectImportCommonRequests extends JiraBaseFlatFileTest {
             .executeJob(serviceProvider, job);
 
         // VP - Verify that project completed
-        JobDbEntity completedJob = verifyJIRAJobWasCompleted(jobDbEntity.getId());
+        verifyJIRAJobWasCompleted(jobDbEntity.getId());
 
         // VP - Verify that artifacts were created
         verifyNumberOfItems("artifacts",
-            () -> this.artifactRepository.findByProject(project),
+            () -> this.artifactRepository.findByProjectId(project.getId()),
             nArtifacts + initialArtifactCount);
     }
 
@@ -91,8 +91,7 @@ class TestFlatFileJiraProjectImportCommonRequests extends JiraBaseFlatFileTest {
             .newVersion(projectName)
             .newType(projectName, artifactTypeName);
 
-        IntStream.range(0, initialArtifactCount).mapToObj(String::valueOf).forEach(name -> {
-            dbEntityBuilder.newArtifact(projectName, artifactTypeName, name);
-        });
+        IntStream.range(0, initialArtifactCount).mapToObj(String::valueOf)
+                .forEach(name -> dbEntityBuilder.newArtifact(projectName, artifactTypeName, name));
     }
 }

@@ -28,7 +28,7 @@ class TestHealthCheckClear extends GenerationalTest {
 
         List<Artifact> projectArtifacts = getServiceProvider()
             .getArtifactRepository()
-            .getProjectArtifacts(projectVersion.getProject());
+            .getProjectArtifacts(projectVersion.getProject().getId());
         HealthCheckTestVerifier testVerifier = new HealthCheckTestVerifier(projectVersion, projectArtifacts);
 
         // Step - Trigger health

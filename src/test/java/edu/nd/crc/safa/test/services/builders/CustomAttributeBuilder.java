@@ -6,8 +6,8 @@ import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import lombok.Getter;
 
+@Getter
 public class CustomAttributeBuilder {
-    @Getter
     private final CustomAttribute customAttribute;
 
     public CustomAttributeBuilder() {
@@ -30,7 +30,7 @@ public class CustomAttributeBuilder {
     }
 
     public CustomAttributeBuilder withProject(Project project) {
-        this.customAttribute.setProject(project);
+        this.customAttribute.setProjectId(project.getId());
         return this;
     }
 }

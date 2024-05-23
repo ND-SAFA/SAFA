@@ -17,7 +17,7 @@ class TestHealthChecks extends GenerationalTest {
 
 
     @Test
-    void testHealthChecks() throws Exception {
+    void testHealthChecks() {
         ProjectVersion projectVersion = rootBuilder.actions(a -> a.createProjectWithVersion(getCurrentUser())).get();
         HealthCheckTestData testData = new HealthCheckTestData();
 
@@ -26,7 +26,7 @@ class TestHealthChecks extends GenerationalTest {
         targetArtifact.setId(artifactId);
 
         List<Artifact> projectArtifacts =
-            getServiceProvider().getArtifactRepository().getProjectArtifacts(projectVersion.getProject());
+            getServiceProvider().getArtifactRepository().getProjectArtifacts(projectVersion.getProject().getId());
 
         mockHealthResponse(testData.createMockGenHealthResponse());
 

@@ -47,8 +47,8 @@ public class ArtifactPositionService {
 
         // Step - 1 Retrieve artifact
         String artifactName = artifactAppEntity.getName();
-        Optional<Artifact> artifactOptional = this.artifactRepository.findByProjectAndName(projectVersion.getProject(),
-            artifactName);
+        Optional<Artifact> artifactOptional = this.artifactRepository
+             .findByProjectIdAndName(projectVersion.getProject().getId(), artifactName);
         if (artifactOptional.isEmpty()) {
             throw new IllegalArgumentException("Could not find artifact with name:" + artifactName);
         }
@@ -57,12 +57,12 @@ public class ArtifactPositionService {
         // Step 2 - Check if position has already been created or set properties
         UUID documentId = document == null ? null : document.getDocumentId();
         Optional<ArtifactPosition> artifactPositionOptional =
-            artifactPositionRepository.findByProjectVersionAndArtifactAndDocumentDocumentId(
-                projectVersion, artifact, documentId);
+            artifactPositionRepository.findByProjectVersionAndArtifactIdAndDocumentDocumentId(
+                projectVersion, artifact.getArtifactId(), documentId);
         artifactPositionOptional.ifPresent(position -> artifactPosition.setId(position.getId()));
 
         // Step 3 - Set position
-        artifactPosition.setArtifact(artifact);
+        artifactPosition.setArtifactId(artifact.getArtifactId());
         artifactPosition.setProjectVersion(projectVersion);
         artifactPosition.setDocument(document);
         artifactPosition.setX(layoutPosition.getX());
@@ -77,7 +77,7 @@ public class ArtifactPositionService {
             .getByProjectAndDocumentId(projectVersion.getProject(), documentId);
         Map<UUID, List<ArtifactPosition>> id2pos = ProjectDataStructures.createGroupLookup(
             artifactPositionsAcrossVersions,
-            ap -> ap.getArtifact().getArtifactId());
+                ArtifactPosition::getArtifactId);
         for (Map.Entry<UUID, List<ArtifactPosition>> entry : id2pos.entrySet()) {
             List<ArtifactPosition> artifactPositions = entry.getValue();
             ArtifactPosition artifactPosition = versionCalculator.getEntityAtVersion(
@@ -88,7 +88,7 @@ public class ArtifactPositionService {
                 artifactPosition = artifactPositions.get(0);
             }
             LayoutPosition layoutPosition = new LayoutPosition(artifactPosition.getX(), artifactPosition.getY());
-            UUID artifactId = artifactPosition.getArtifact().getArtifactId();
+            UUID artifactId = artifactPosition.getArtifactId();
             layout.put(artifactId, layoutPosition);
         }
 

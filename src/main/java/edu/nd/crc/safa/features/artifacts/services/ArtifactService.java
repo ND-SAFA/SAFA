@@ -1,7 +1,9 @@
 package edu.nd.crc.safa.features.artifacts.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,6 +14,8 @@ import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.IVersionRepository;
 import edu.nd.crc.safa.features.common.IAppEntityService;
+import edu.nd.crc.safa.features.documents.entities.db.DocumentArtifact;
+import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -26,6 +30,7 @@ import org.springframework.stereotype.Service;
 public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
     private final ArtifactRepository artifactRepository;
     private IVersionRepository<ArtifactVersion, ArtifactAppEntity> artifactVersionRepository;
+    private final DocumentArtifactRepository documentArtifactRepository;
 
     /**
      * Returns all artifacts present in the given version.
@@ -47,7 +52,8 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
     @Override
     public List<ArtifactAppEntity> getAppEntities(ProjectVersion projectVersion, SafaUser user) {
         List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
-            .retrieveVersionEntitiesByProjectVersion(projectVersion);
+                .retrieveVersionEntitiesByProjectVersion(projectVersion);
+        attactDocumentsToVersions(artifactVersions);
         return versionToAppEntity(artifactVersions);
     }
 
@@ -59,8 +65,24 @@ public class ArtifactService implements IAppEntityService<ArtifactAppEntity> {
      */
     public List<ArtifactAppEntity> getAppEntities(Project project) {
         List<ArtifactVersion> artifactVersions = this.artifactVersionRepository
-            .retrieveVersionEntitiesByProject(project);
+                .retrieveVersionEntitiesByProject(project);
         return versionToAppEntity(artifactVersions);
+    }
+
+    private void attactDocumentsToVersions(List<ArtifactVersion> artifactVersions) {
+        List<Artifact> artifacts = artifactVersions.stream().map(ArtifactVersion::getArtifact).toList();
+
+        Map<UUID, ArtifactVersion> artifactIdMap = new HashMap<>();
+        for (ArtifactVersion artifactVersion : artifactVersions) {
+            artifactIdMap.put(artifactVersion.getArtifact().getArtifactId(), artifactVersion);
+            artifactVersion.setDocumentIds(new ArrayList<>());
+        }
+
+        List<DocumentArtifact> documentArtifacts = documentArtifactRepository.findByArtifactIn(artifacts);
+        documentArtifacts.forEach(da -> {
+            ArtifactVersion version = artifactIdMap.get(da.getArtifact().getArtifactId());
+            version.getDocumentIds().add(da.getDocument().getDocumentId());
+        });
     }
 
     @Override

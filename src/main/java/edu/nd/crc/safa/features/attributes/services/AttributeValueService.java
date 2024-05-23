@@ -48,6 +48,10 @@ public class AttributeValueService {
      * @param artifactVersion The artifact version we're looking at.
      */
     public void attachCustomAttributesToArtifact(ArtifactVersion artifactVersion) {
+        if (!artifactVersion.getCustomAttributeValues().isEmpty()) {
+            return;
+        }
+
         attachCustomAttributesToArtifacts(List.of(artifactVersion));
     }
 
@@ -60,8 +64,11 @@ public class AttributeValueService {
         Map<UUID, ArtifactVersion> artifactVersionMap = new HashMap<>();
         artifactVersions.forEach(a -> artifactVersionMap.put(a.getVersionEntityId(), a));
 
+        List<ArtifactVersion> versionsWithoutAttributes = artifactVersions.stream()
+                .filter(a -> a.getCustomAttributeValues().isEmpty()).toList();
+
         List<ArtifactAttributeVersion> attributeVersions =
-            serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersionIn(artifactVersions);
+            serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersionIn(versionsWithoutAttributes);
 
         for (ArtifactAttributeVersion attributeVersion : attributeVersions) {
             JsonNode jsonValue = getJsonValue(attributeVersion);
@@ -114,7 +121,7 @@ public class AttributeValueService {
 
             Optional<CustomAttribute> attribute =
                 serviceProvider.getCustomAttributeRepository()
-                    .findByProjectAndKeyname(artifactVersion.getArtifact().getProject(), key);
+                    .findByProjectIdAndKeyname(artifactVersion.getArtifact().getProjectId(), key);
 
             if (attribute.isPresent()) {
                 saveAttributeValue(attribute.get(), artifactVersion, value);

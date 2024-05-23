@@ -10,9 +10,11 @@ from sklearn.metrics import pairwise_distances
 
 from tgen.common.constants.other_constants import VSM_SELECTION_THRESHOLDS, VSM_THRESHOLD_DEFAULT
 from tgen.common.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
+from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.util.list_util import ListUtil
 from tgen.common.util.override import overrides
+from tgen.common.util.str_util import StrUtil
 from tgen.core.trace_output.stage_eval import Metrics
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
@@ -23,6 +25,7 @@ from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from tgen.data.processing.cleaning.data_cleaner import DataCleaner
 from tgen.data.processing.cleaning.lemmatize_words_step import LemmatizeWordStep
+from tgen.data.processing.cleaning.manual_replace_words_step import ManualReplaceWordsStep
 from tgen.data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
 from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
 from tgen.data.tdatasets.dataset_role import DatasetRole
@@ -53,11 +56,16 @@ class VSMTrainer(AbstractTrainer):
         :param select_predictions: Whether to select the predictions of the algorithm.
         """
         if steps is None:
-            steps = [RemoveNonAlphaCharsStep(), SeparateCamelCaseStep(), LemmatizeWordStep()]
+            steps = [
+                ManualReplaceWordsStep(StrUtil.get_stop_words_replacement()),
+                RemoveNonAlphaCharsStep(),
+                SeparateCamelCaseStep(),
+                LemmatizeWordStep()
+            ]
         if metrics is None:
             metrics = SupportedTraceMetric.get_keys()
         self.trainer_dataset_manager = trainer_dataset_manager
-        self.model = vectorizer(strip_accents="ascii")
+        self.model = vectorizer(strip_accents="ascii", max_df=0.7)
         self.metrics = metrics
         self.artifact_map = VSMTrainer.create_clean_artifact_map(self.trainer_dataset_manager, steps)
         self.select_predictions = select_predictions
@@ -79,7 +87,7 @@ class VSMTrainer(AbstractTrainer):
     @overrides(AbstractTrainer)
     def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,
                            dataset: iDataset = None,
-                           threshold: float = VSM_THRESHOLD_DEFAULT) -> TracePredictionOutput:
+                           threshold: float = VSM_THRESHOLD_DEFAULT, **kwargs) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
@@ -89,7 +97,7 @@ class VSMTrainer(AbstractTrainer):
         """
         eval_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         try:
-            output = self.predict(eval_dataset, threshold)
+            output = self.predict(eval_dataset, threshold, **kwargs)
         except exceptions.NotFittedError:
             raise exceptions.NotFittedError("Model must be trained before calling predict")
         return output
@@ -123,11 +131,12 @@ class VSMTrainer(AbstractTrainer):
         """
         return [self.artifact_map[a_id] for a_id in artifact_ids]
 
-    def predict(self, eval_dataset: TraceDataset, threshold: float) -> TracePredictionOutput:
+    def predict(self, eval_dataset: TraceDataset, threshold: float, evaluate: bool = True) -> TracePredictionOutput:
         """
         Uses the trained model to predict on the raw source and target tokens
         :param eval_dataset: The dataset to use for predicting
         :param threshold: All similarity scores above this threshold will be considered traced, otherwise they are untraced
+        :param evaluate: Whether to perform evaluation on predictions.
         :return: The output from the prediction
         """
         tracing_requests = RankingUtil.extract_tracing_requests(eval_dataset.artifact_df,
@@ -146,20 +155,41 @@ class VSMTrainer(AbstractTrainer):
             for i, (child_id, parent_id) in enumerate(child_parent_pairs):
                 row, col = divmod(i, len(child_artifacts))
                 similarity_score = similarity_matrix[row][col]
-
+                if child_id == 'Create empty projects' and parent_id == 'Bulk Project Creation':
+                    self.compare(child_tf_matrix[col], child_artifacts[col], parent_tf_matrix[row], parent_artifacts[row])
                 link_id = eval_dataset.trace_df.generate_link_id(child_id, parent_id)
                 link = eval_dataset.trace_df.get_link(link_id)
                 label = link[TraceKeys.LABEL] if link else 0
-                prediction_entry = Trace(source=child_id, target=parent_id, score=similarity_score, label=label)
+                prediction_entry = Trace(link_id=link_id, source=child_id, target=parent_id, score=similarity_score, label=label)
                 prediction_entries.append(prediction_entry)
 
         if self.select_predictions:
             self.convert_to_percentiles(prediction_entries)
             prediction_entries = RankingUtil.select_predictions_by_thresholds(prediction_entries, *VSM_SELECTION_THRESHOLDS)
-        metrics = RankingUtil.evaluate_trace_predictions(eval_dataset.trace_df, prediction_entries)
-        trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries,
-                                                        metrics=metrics)
+
+        metrics = RankingUtil.evaluate_trace_predictions(eval_dataset.trace_df, prediction_entries) if evaluate else {}
+        trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries, metrics=metrics)
         return trace_prediction_output
+
+    def compare(self, a_embedding, a_artifact, b_embedding, b_artifact):
+        index2word = {v: k for k, v in self.model.vocabulary_.items()}
+        _, n_cols = a_embedding.shape
+        words = []
+        for i in range(n_cols):
+            a_value = a_embedding[0, i]
+            b_value = b_embedding[0, i]
+
+            if a_value > 0 or b_value > 0:
+                word = index2word[i]
+                words.append({
+                    "word": word,
+                    'a': a_value,
+                    'b': b_value,
+                    "min": min(a_value, b_value)
+                })
+        a_best = sorted(words, key=lambda w: w['a'], reverse=True)
+        b_best = sorted(words, key=lambda w: w['b'], reverse=True)
+        print("hi")
 
     def create_term_frequency_matrices(self, raw_sources: Iterable[str], raw_targets: Iterable[str]) -> \
             Tuple[csr_matrix, csr_matrix]:
@@ -195,7 +225,8 @@ class VSMTrainer(AbstractTrainer):
                 if artifact_id not in artifacts_seen:
                     artifacts_seen.add(artifact_id)
                     artifact_ids.append(artifact_id)
-                    artifact_bodies.append(artifact_row[ArtifactKeys.CONTENT])
+                    artifact_body = Artifact.get_summary_or_content(artifact_row)
+                    artifact_bodies.append(artifact_body)
 
         artifact_bodies = data_cleaner.run(list(artifact_bodies))
         return {a_id: a_body for a_id, a_body in zip(artifact_ids, artifact_bodies)}

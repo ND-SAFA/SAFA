@@ -5,7 +5,6 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
 from tgen.common.threading.threading_state import MultiThreadState
 from tgen.common.util.base_object import BaseObject
-from tgen.common.util.dict_util import DictUtil
 from tgen.core.args.abstract_llm_args import AbstractLLMArgs
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.models.llm.llm_responses import SupportedLLMResponses
@@ -63,19 +62,20 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
         """
         completion_params = self.llm_args.to_params(TrainerTask.PREDICT, completion_type)
         completion_params.update(params)
-        input_content = EMPTY_STRING.join(DictUtil.get_kwarg_values(params, prompt=[]))
+        prompts = self.format_prompts(prompt)
+        input_content = EMPTY_STRING.join([message["content"] for convo in prompts for message in convo])
         if input_content:
             self.state.total_input_cost += ModelTokenCost.calculate_cost_for_content(content=input_content,
                                                                                      model_name=self.llm_args.model,
                                                                                      input_or_output=INPUT_TOKENS,
                                                                                      raise_exception=False)
 
-        retries = self._get_indices_to_retry(original_responses, n_expected=len(prompt))
+        retries = self._get_indices_to_retry(original_responses, n_expected=len(prompts))
 
         global_state: MultiThreadState = self.make_completion_request_impl(raise_exception=raise_exception,
                                                                            original_responses=original_responses,
                                                                            retries=retries,
-                                                                           prompt=prompt,
+                                                                           prompt=prompts,
                                                                            **completion_params)
         llm_response = global_state.results
 
@@ -86,6 +86,23 @@ class AbstractLLMManager(BaseObject, ABC, Generic[AIObject]):
                                                                                   raise_exception=False)
         translated_response = self.translate_to_response(completion_type, llm_response, **params)
         return translated_response
+
+    def format_prompts(self, prompts: Union[List, str, Dict]) -> List[List[Message]]:
+        """
+        Formats the prompt for the anthropic api.
+        :param prompts: Either a single prompt, a list of prompts, or a list of messages.
+        :return: A list of conversations for the anthropic api.
+        """
+        if not isinstance(prompts, list) or isinstance(prompts[0], dict):
+            prompts = [prompts]
+        prompts_formatted = []
+        for convo in prompts:
+            if not isinstance(convo, list):
+                if isinstance(convo, str):
+                    convo = self.convert_prompt_to_message(convo)
+                convo = [convo]
+            prompts_formatted.append(convo)
+        return prompts_formatted
 
     @staticmethod
     def convert_prompt_to_message(prompt: str, role: str = PromptRoles.USER) -> Message:

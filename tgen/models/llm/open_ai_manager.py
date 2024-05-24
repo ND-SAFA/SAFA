@@ -66,8 +66,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
         :return: The response from open  ai
         """
         params.pop(OpenAIParams.LOG_PROBS)
-        prompt = params.pop(OpenAIParams.PROMPT)
-        prompts = prompt if isinstance(prompt, list) else [prompt]
+        prompts = params.pop(OpenAIParams.PROMPT)
         logger.info(f"Starting OpenAI batch: {params['model']}")
 
         def complete_prompt(p: str) -> str:
@@ -76,7 +75,7 @@ class OpenAIManager(AbstractLLMManager[OpenAIObject]):
             :param p: The prompt to complete.
             :return: The response as a string.
             """
-            params[OpenAIParams.MESSAGES] = [self.convert_prompt_to_message(p)]
+            params[OpenAIParams.MESSAGES] = p
             res = self._make_request(**params)
             return res.choices[0]
 

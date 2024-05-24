@@ -4,7 +4,7 @@ from typing import Any, Type, Tuple
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.logging.logger_manager import logger
 from tgen.scripts.constants import SUPPORTED_TYPES_RQ
-from tgen.scripts.toolset.selector import inquirer_value
+from tgen.scripts.toolset.inquirer_selector import inquirer_value
 
 OPTIONAL_KEY = "_OPTIONAL"
 

@@ -1,12 +1,12 @@
 import os
 from collections import OrderedDict
+from typing import Dict, List, Optional, Union
 
 import pandas as pd
 from datasets import disable_caching
-from typing import Dict, List, Optional, Union
 
 from tgen.common.util.base_object import BaseObject
-from tgen.common.util.enum_util import EnumUtil, EnumDict
+from tgen.common.util.enum_util import EnumDict, EnumUtil
 from tgen.common.util.override import overrides
 from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
@@ -297,7 +297,7 @@ class TrainerDatasetManager(BaseObject):
         :param dataset_role: The role to check a data for.
         :return: Boolean representing whether data exist for role
         """
-        return self._dataset_creators.get(dataset_role, None) or self._datasets.get(dataset_role, None)
+        return self._dataset_creators.get(dataset_role, None) is not None or self._datasets.get(dataset_role, None) is not None
 
     def __repr__(self) -> str:
         """

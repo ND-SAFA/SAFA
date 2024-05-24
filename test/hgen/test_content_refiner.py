@@ -1,7 +1,7 @@
 from test.hgen.hgen_test_utils import HGenTestConstants, get_test_hgen_args
 from tgen.clustering.base.cluster import Cluster
 from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
-from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
+from tgen.common.constants.ranking_constants import DEFAULT_TEST_EMBEDDING_MODEL
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -64,7 +64,7 @@ class TestContentRefiner(BaseTest):
 
     def test_calculate_n_targets_for_duplicate_cluster(self):
         artifact_ids = {str(i) for i in range(4)}
-        embeddings_manager = EmbeddingsManager({}, model_name=DEFAULT_SEARCH_EMBEDDING_MODEL)
+        embeddings_manager = EmbeddingsManager({}, model_name=DEFAULT_TEST_EMBEDDING_MODEL)
         intra_cluster = Cluster(embeddings_manager, DuplicateType.INTRA_CLUSTER.name)
         intra_cluster.artifact_id_set = artifact_ids
         inter_cluster = Cluster(embeddings_manager, DuplicateType.INTER_CLUSTER.name)
@@ -82,7 +82,7 @@ class TestContentRefiner(BaseTest):
         source_artifacts = list(hgen_args.dataset.artifact_df.index)
         state = HGenState(source_dataset=hgen_args.dataset,
                           embedding_manager=EmbeddingsManager(content_map=hgen_args.dataset.artifact_df.to_map(),
-                                                              model_name=DEFAULT_SEARCH_EMBEDDING_MODEL),
+                                                              model_name=DEFAULT_TEST_EMBEDDING_MODEL),
                           cluster2generations={str(i): [us] for i, us in enumerate(HGenTestConstants.user_stories)},
                           generations2sources={us: set() for us in HGenTestConstants.user_stories},
                           cluster2artifacts={str(i): [source_artifacts[i * 3 + j] for j in range(3)]

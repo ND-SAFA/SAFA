@@ -1,5 +1,7 @@
 import os
 
+from tgen.common.constants.environment_constants import IS_TEST
+
 DEFAULT_PARENT_PRIMARY_THRESHOLD = 0.80  # The minimum percentile to consider a candidate as true
 DEFAULT_PARENT_SECONDARY_THRESHOLD = 0.60
 DEFAULT_PARENT_MIN_THRESHOLD = 0.4  # The minimum percentile allowed for a top parent prediction.
@@ -11,7 +13,7 @@ VERSION_HEADER = "Section Versions"
 BODY_ARTIFACT_TITLE = f"# {ARTIFACT_HEADER}\nBelow are the artifact of the software system."
 BODY_VERSION_TITLE = f"# {VERSION_HEADER}\nBelow are the section versions for the software system."
 DEFAULT_COMPLETION_TOKENS = 4096
-GENERATE_EXPLANATIONS_DEFAULT = True
+GENERATE_EXPLANATIONS_DEFAULT = False
 PROJECT_SUMMARY_HEADER = "Software Specification"
 DEFAULT_LINKS_TAG = "links"
 DEFAULT_RANKING_MODEL = "claude-2.0"
@@ -47,6 +49,9 @@ FUNCTIONALITY_TAG = "functionality"
 RANKING_ID_TAG = "id"
 RANKING_EXPLANATION_TAG = "explanation"
 RANKING_SCORE_TAG = "score"
-DEFAULT_EMBEDDING_MODEL = os.environ.get("DEFAULT_EMBEDDING_MODEL", "sentence-transformers/all-roberta-large-v1")
+
+DEFAULT_TEST_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+DEFAULT_DEPLOYMENT_EMBEDDING_MODEL = "sentence-transformers/all-roberta-large-v1"
+SELECTED_DEFAULT_EMBEDDING_MODEL = DEFAULT_TEST_EMBEDDING_MODEL if IS_TEST else DEFAULT_DEPLOYMENT_EMBEDDING_MODEL
+DEFAULT_EMBEDDING_MODEL = os.environ.get("DEFAULT_EMBEDDING_MODEL", SELECTED_DEFAULT_EMBEDDING_MODEL)
 DEFAULT_CROSS_ENCODER_MODEL = os.environ.get("DEFAULT_CROSS_ENCODER_MODEL", "mixedbread-ai/mxbai-rerank-large-v1")
-DEFAULT_SEARCH_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"

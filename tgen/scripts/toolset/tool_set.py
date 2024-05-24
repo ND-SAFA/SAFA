@@ -1,6 +1,6 @@
 from typing import Callable, Dict, List, Optional
 
-from tgen.scripts.toolset.selector import inquirer_selection
+from tgen.scripts.toolset.inquirer_selector import inquirer_selection
 from tgen.scripts.toolset.tool import Tool
 
 

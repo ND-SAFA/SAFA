@@ -1,12 +1,12 @@
+from typing import Dict, List, Union
 from unittest import TestCase
 
 from sklearn.metrics.pairwise import cosine_similarity
-from typing import Dict, List, Union
 
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.common.constants.clustering_constants import DEFAULT_TESTING_CLUSTERING_METHODS
-from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
+from tgen.common.constants.ranking_constants import DEFAULT_TEST_EMBEDDING_MODEL
 from tgen.common.objects.artifact import Artifact
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -31,7 +31,7 @@ class ClusteringTestUtil:
 
     @staticmethod
     def create_embeddings_manager(content_map: Dict[str, str] = None,
-                                  model: str = DEFAULT_SEARCH_EMBEDDING_MODEL) -> EmbeddingsManager:
+                                  model: str = DEFAULT_TEST_EMBEDDING_MODEL) -> EmbeddingsManager:
         """
         Create embedding manager for content in map.
         :param content_map: Maps artifact id to content.
@@ -55,7 +55,7 @@ class ClusteringTestUtil:
 
     @staticmethod
     def create_clustering_args(artifact_bodies: List[str], artifact_type: str = DEFAULT_ARTIFACT_TYPE,
-                               embedding_model=DEFAULT_SEARCH_EMBEDDING_MODEL, **kwargs) -> ClusteringArgs:
+                               embedding_model=DEFAULT_TEST_EMBEDDING_MODEL, **kwargs) -> ClusteringArgs:
         """
         Creates a prompt dataset containing artifacts with bodies given.
         :param artifact_bodies: The bodies of the artifacts.
@@ -75,7 +75,7 @@ class ClusteringTestUtil:
         return args
 
     @staticmethod
-    def assert_embeddings_equals(artifact_text: str, embedding: EmbeddingType, model_name: str = DEFAULT_SEARCH_EMBEDDING_MODEL,
+    def assert_embeddings_equals(artifact_text: str, embedding: EmbeddingType, model_name: str = DEFAULT_TEST_EMBEDDING_MODEL,
                                  threshold=0.95):
         """
         Asserts that embedding is sufficiently similar to the embeddings resulting from the model.

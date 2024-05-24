@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 
 from tgen.common.constants.deliminator_constants import DASH, UNDERSCORE
@@ -18,6 +19,9 @@ class ModelTokenCost(Enum):
     GPT_4_1106_VISION_PREVIEW = (0.01, 0.03)
     CLAUDE_INSTANT_1 = (0.00163, 0.00551)
     CLAUDE_2 = (0.01102, 0.03268)
+    CLAUDE_3_HAIKU = (0.00025, 0.00125)
+    CLAUDE_3_SONNET = (0.003, 0.015)
+    CLAUDE_3_OPUS = (0.0015, 0.075)
 
     @classmethod
     def calculate_cost_for_content(cls, content: str, model_name: str, input_or_output: int = INPUT_TOKENS,
@@ -63,6 +67,9 @@ class ModelTokenCost(Enum):
         # get main model version (e.g. claude-instant-1.2 -> claude-instant-1)
         processed_model_name = StrUtil.remove_decimal_points_from_floats(model_name)
         processed_model_name = processed_model_name.replace(DASH, UNDERSCORE)
+        split_name = processed_model_name.split(UNDERSCORE)
+        if split_name[-1].startswith(str(datetime.today().year)):
+            processed_model_name = UNDERSCORE.join(split_name[:-1])
         try:
             return cls[processed_model_name.upper()].value
         except KeyError:

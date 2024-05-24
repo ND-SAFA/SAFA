@@ -1,12 +1,9 @@
 from typing import List
 
 from tgen.common.objects.trace import Trace
-from tgen.common.util.np_util import NpUtil
-from tgen.data.keys.structure_keys import TraceKeys
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.tracing.ranking.selectors.i_selection_method import iSelector
-from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
-import numpy as np
+from tgen.tracing.ranking.trace_selectors.i_selection_method import iSelector
+from tgen.tracing.ranking.trace_selectors.select_by_threshold import SelectByThreshold
 
 
 class SelectByThresholdScaledAcrossAll(iSelector):

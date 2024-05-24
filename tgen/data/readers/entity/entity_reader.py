@@ -3,9 +3,9 @@ from typing import Dict, Generic, Optional, Tuple, TypeVar
 
 import pandas as pd
 
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
 from tgen.common.util.json_util import JsonUtil
-from tgen.common.logging.logger_manager import logger
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.data.readers.entity.supported_entity_formats import SupportedEntityFormats
@@ -61,6 +61,13 @@ class EntityReader(Generic[EntityType]):
         """
         if StructuredKeys.COLS in self.definition:
             conversion_id = JsonUtil.get_property(self.definition, StructuredKeys.COLS)
-            assert self.conversions is not None, f"Could not find conversion {conversion_id} because none defined."
+            if not isinstance(conversion_id, str):
+                raise Exception("`cols` property should be string referencing name of conversion defined in `conversions`.")
+            if self.conversions is None or len(self.conversions) == 0:
+                raise Exception(
+                    "Column conversion referenced but not defined.\n\nMake sure `conversions` is defined in project file.")
+            valid_conversions = list(self.conversions.keys())
+            if conversion_id not in self.conversions:
+                raise Exception(f"Could not find conversion {conversion_id}. Did you mean {valid_conversions}?")
             return self.conversions[conversion_id]
         return None

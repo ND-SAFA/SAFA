@@ -11,7 +11,7 @@ from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.safa_keys import SafaKeys
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from tgen.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
 from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
@@ -92,6 +92,7 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
             artifact_type_df[StructuredKeys.Artifact.LAYER_ID.value] = artifact_type
             artifact_df = pd.concat([artifact_df, artifact_type_df], ignore_index=True)
         final_df = ArtifactDataFrame(artifact_df)
+        final_df.index = final_df.index.astype(str)
         if self.summarizer:
             final_df.summarize_content(self.summarizer)
         return final_df
@@ -106,8 +107,11 @@ class StructuredProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
             trace_reader = EntityReader(self.get_full_project_path(), trace_definition_json,
                                         conversions=self.get_project_conversions())
             reader_trace_df = TraceDataFrame(trace_reader.read_entities())
+
             trace_df = TraceDataFrame.concat(trace_df, reader_trace_df)
-        trace_df[StructuredKeys.Trace.LABEL.value] = [1 for link in trace_df.index]
+        trace_df[StructuredKeys.Trace.LABEL] = [1 for link in trace_df.index]
+        trace_df[TraceKeys.SOURCE] = trace_df[TraceKeys.SOURCE].astype(str)
+        trace_df[TraceKeys.TARGET] = trace_df[TraceKeys.TARGET].astype(str)
         return TraceDataFrame(trace_df)
 
     def _read_layer_mapping_df(self) -> pd.DataFrame:

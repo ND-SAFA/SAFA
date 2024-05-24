@@ -3,12 +3,11 @@ from typing import List, Optional
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.file_util import FileUtil
-from tgen.common.util.yaml_util import YamlUtil
 from tgen.scripts.constants import FOLDER_NAV_MESSAGE, PARENT_FOLDER, RQ_PATH_PARAM
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner
+from tgen.scripts.toolset.inquirer_selector import inquirer_selection
 from tgen.scripts.toolset.rq_definition import RQDefinition
-from tgen.scripts.toolset.selector import inquirer_selection
 from tgen.testres.object_creator import ObjectCreator
 
 

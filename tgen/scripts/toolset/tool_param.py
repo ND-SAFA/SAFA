@@ -3,7 +3,7 @@ from typing import Any
 
 from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.scripts.constants import MISSING_PARAM_ERROR, PARAM_DOCSTRING_QUERY
-from tgen.scripts.toolset.selector import inquirer_value
+from tgen.scripts.toolset.inquirer_selector import inquirer_value
 
 
 class ToolParam:

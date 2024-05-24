@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from tgen.common.util.uncased_dict import UncasedDict
 from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 
@@ -16,7 +17,7 @@ class ManualReplaceWordsStep(AbstractDataProcessingStep):
         :param word_replace_mappings
         """
         super().__init__(self.ORDER)
-        self.word_replace_mappings = word_replace_mappings
+        self.word_replace_mappings = UncasedDict(word_replace_mappings)
 
     def run(self, word_list: List[str], **kwargs) -> List[str]:
         """

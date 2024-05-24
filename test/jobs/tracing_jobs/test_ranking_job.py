@@ -2,8 +2,7 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
-from tgen.common.util.enum_util import EnumDict
+from tgen.common.constants.ranking_constants import DEFAULT_TEST_EMBEDDING_MODEL
 from tgen.common.util.status import Status
 from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
@@ -12,7 +11,6 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
-from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
@@ -47,8 +45,6 @@ class TestRankingJob(BaseTest):
     @mock.patch.object(ProjectSummarizer, "summarize")
     @mock_anthropic
     def test_non_default_ranking_pipeline(self, anthropic_ai_manager: TestAIManager, project_summarizer_mock: MagicMock):
-        project_summarizer_mock.return_value = Summary(overview=EnumDict({"chunks": ["summary of project"],
-                                                                          "title": "overview"}))
         anthropic_ai_manager.mock_summarization()
         anthropic_ai_manager.set_responses([RankingPipelineTest.get_response()
                                             for _ in range(TestDataManager.get_n_candidates())])
@@ -60,7 +56,8 @@ class TestRankingJob(BaseTest):
 
     def create_job_using_embeddings(self, **kwargs):
         job = self.create_job(ranking_pipeline=SupportedRankingPipelines.EMBEDDING,
-                              embedding_model_name=DEFAULT_SEARCH_EMBEDDING_MODEL, **kwargs)
+                              embedding_model_name=DEFAULT_TEST_EMBEDDING_MODEL,
+                              generate_explanations=True, **kwargs)
         return job
 
     @staticmethod

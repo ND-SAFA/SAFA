@@ -15,7 +15,7 @@
         "precision@3": 0.053,
         "avg_true_links": 1.2,
         "lag": 5,
-        "precision_at_recall_95": 0.25
+        "precision_at_recall": 0.25
       }
     },
     "prediction_output": {
@@ -29,7 +29,7 @@
         "precision@3": 0.035,
         "avg_true_links": 1.1,
         "lag": 6,
-        "precision_at_recall_95": 0.20
+        "precision_at_recall": 0.20
       }
     }
   },

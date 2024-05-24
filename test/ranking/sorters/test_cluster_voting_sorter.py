@@ -1,5 +1,5 @@
 from tgen.clustering.base.cluster import Cluster
-from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
+from tgen.common.constants.ranking_constants import DEFAULT_TEST_EMBEDDING_MODEL
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.tracing.ranking.sorters.cluster_voting_sorter import ClusterVotingSorter
@@ -16,7 +16,7 @@ class TestClusterChildrenSorter(BaseTest):
         "P2": "That house is on fire.",
         "P3": "Zebras are at the zoo."
     }
-    EMBEDDING_MANAGER = EmbeddingsManager(ARTIFACT_MAP, DEFAULT_SEARCH_EMBEDDING_MODEL)
+    EMBEDDING_MANAGER = EmbeddingsManager(ARTIFACT_MAP, DEFAULT_TEST_EMBEDDING_MODEL)
     INITIAL_CLUSTERS = {'0': Cluster.from_artifacts(['A2', 'A3', 'P2'], EMBEDDING_MANAGER),
                         '1': Cluster.from_artifacts(['A4', 'P2'], EMBEDDING_MANAGER),
                         '2': Cluster.from_artifacts(['A2', 'A5'], EMBEDDING_MANAGER),

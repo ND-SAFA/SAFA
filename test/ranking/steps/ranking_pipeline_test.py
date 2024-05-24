@@ -11,7 +11,7 @@ from tgen.summarizer.summary import Summary
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
-from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
+from tgen.tracing.ranking.trace_selectors.selection_methods import SupportedSelectionMethod
 
 DEFAULT_PARENT_IDS = ["s4", "s5"]
 DEFAULT_CHILDREN_IDS = ["t1", "t6"]

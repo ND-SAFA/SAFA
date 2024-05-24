@@ -8,9 +8,9 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.tracing.ranking.selectors.selection_by_threshold_scaled_by_artifact import SelectByThresholdScaledByArtifacts
-from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 from tgen.tracing.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
+from tgen.tracing.ranking.trace_selectors.selection_by_threshold_scaled_by_artifact import SelectByThresholdScaledByArtifacts
+from tgen.tracing.ranking.trace_selectors.selection_methods import SupportedSelectionMethod
 
 
 class TestSelectCandidateLinksStep(TestCase):

@@ -1,7 +1,6 @@
 import os
 from typing import Dict, List, Tuple, Union
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
@@ -155,7 +154,7 @@ class RankingJob(AbstractJob):
                                             f"Expected at least one parent and child."
         if not self.select_top_predictions:
             DictUtil.update_kwarg_values(self.ranking_kwargs, selection_method=None)
-        export_dir = DictUtil.get_kwarg_values(self.ranking_kwargs, pop=True, export_dir=EMPTY_STRING)
+        export_dir = self.job_args.export_dir
         if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
             export_dir = FileUtil.safely_join_paths(export_dir, RankingJob._get_run_dir(child_type, parent_type))
         layer_dataset = PromptDataset(artifact_df=selected_artifacts, trace_dataset=full_dataset.trace_dataset,

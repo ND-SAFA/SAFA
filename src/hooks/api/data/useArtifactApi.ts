@@ -70,7 +70,8 @@ export const useArtifactApi = defineStore(
     async function handleSave(
       artifact: ArtifactSchema,
       isUpdate: boolean,
-      parentArtifact: ArtifactSchema | undefined,
+      parentArtifacts: ArtifactSchema[] = [],
+      childArtifacts: ArtifactSchema[] = [],
       callbacks: IOHandlerCallback = {}
     ): Promise<void> {
       await artifactSaveApi.handleRequest(
@@ -88,11 +89,17 @@ export const useArtifactApi = defineStore(
             artifactStore.addCreatedArtifact(createdArtifacts[0]);
             selectionStore.selectArtifact(createdArtifacts[0].id);
 
-            if (parentArtifact) {
-              for (const createdArtifact of createdArtifacts) {
+            for (const createdArtifact of createdArtifacts) {
+              for (const parentArtifact of parentArtifacts) {
                 await traceApiStore.handleCreate(
                   createdArtifact,
                   parentArtifact
+                );
+              }
+              for (const childArtifact of childArtifacts) {
+                await traceApiStore.handleCreate(
+                  childArtifact,
+                  createdArtifact
                 );
               }
             }

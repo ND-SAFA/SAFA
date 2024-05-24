@@ -263,4 +263,4 @@ class StrUtil:
         Creates replacement dictionary for stop words.
         :return: Dictionary of word to empty to string to replace them with.
         """
-        return {w: "" for w in StrUtil.STOP_WORDS}
+        return {w: EMPTY_STRING for w in StrUtil.STOP_WORDS}

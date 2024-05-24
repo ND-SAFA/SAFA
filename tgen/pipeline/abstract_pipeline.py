@@ -13,7 +13,7 @@ from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep, ArgType, 
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
 from tgen.pipeline.state import State
 from tgen.scripts.toolset.confirm import confirm
-from tgen.scripts.toolset.selector import inquirer_selection, inquirer_value
+from tgen.scripts.toolset.inquirer_selector import inquirer_selection, inquirer_value
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
 

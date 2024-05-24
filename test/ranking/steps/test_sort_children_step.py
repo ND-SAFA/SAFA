@@ -1,5 +1,5 @@
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
+from tgen.common.constants.ranking_constants import DEFAULT_TEST_EMBEDDING_MODEL
 from tgen.data.keys.structure_keys import TraceKeys
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
@@ -34,7 +34,7 @@ class TestSortChildrenStep(BaseTest):
         args, state = RankingPipelineTest.create_ranking_structures(parent_ids=[parent_id],
                                                                     children_ids=before,
                                                                     sorter="transformer",
-                                                                    embedding_model_name=DEFAULT_SEARCH_EMBEDDING_MODEL)
+                                                                    embedding_model_name=DEFAULT_TEST_EMBEDDING_MODEL)
         step = SortChildrenStep()
         step.run(args, state)
         self.assertEqual([entry[TraceKeys.SOURCE] for entry in state.sorted_parent2children[parent_id]], after)

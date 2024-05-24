@@ -2,7 +2,7 @@ from trace import Trace
 from typing import List, Tuple
 
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.tracing.ranking.selectors.i_selection_method import iSelector
+from tgen.tracing.ranking.trace_selectors.i_selection_method import iSelector
 
 
 class SelectByTopParents(iSelector):

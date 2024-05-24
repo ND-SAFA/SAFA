@@ -57,6 +57,7 @@ class TestCreateExplanationsStep(TestCase):
     @staticmethod
     def get_args_and_state(children_ids, parent_ids):
         args, state = RankingPipelineTest.create_ranking_structures(
+            generate_explanations=True,
             children_ids=[entry['source'] for entry in TestCreateExplanationsStep.SELECTED_ENTRIES],
             parent_ids=[entry['target'] for entry in TestCreateExplanationsStep.SELECTED_ENTRIES])
         state.sorted_parent2children = {p_id: [RankingUtil.create_entry(p_id, c_id) for c_id in children_ids]

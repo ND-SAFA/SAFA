@@ -1,5 +1,4 @@
 from collections import Counter
-
 from typing import Dict, List, Set, Tuple
 
 from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
@@ -15,8 +14,8 @@ from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
-from tgen.tracing.ranking.selectors.select_by_threshold import SelectByThreshold
 from tgen.tracing.ranking.sorters.transformer_sorter import TransformerSorter
+from tgen.tracing.ranking.trace_selectors.select_by_threshold import SelectByThreshold
 
 
 class DetectDuplicateArtifactsStep(AbstractPipelineStep[HGenArgs, HGenState]):

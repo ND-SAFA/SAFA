@@ -1,9 +1,8 @@
 from math import floor
 
 from tgen.common.constants.deliminator_constants import L_CARROT, R_CARROT
-from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
-    RANKING_ID_TAG, RANKING_MAX_SCORE, RANKING_PARENT_SUMMARY_TAG, \
-    RANKING_SCORE_TAG, RANKING_MIN_SCORE, ARTIFACT_HEADER, RANKING_EXPLANATION_TAG, DEFAULT_SCORE
+from tgen.common.constants.ranking_constants import ARTIFACT_HEADER, DEFAULT_SCORE, PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
+    RANKING_EXPLANATION_TAG, RANKING_ID_TAG, RANKING_MAX_SCORE, RANKING_MIN_SCORE, RANKING_PARENT_SUMMARY_TAG, RANKING_SCORE_TAG
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.common.util.str_util import StrUtil
 from tgen.prompts.prompt import Prompt
@@ -15,7 +14,6 @@ from tgen.prompts.select_question_prompt import SelectQuestionPrompt
 RANKING_GOAL = Prompt(
     f"\n{PromptUtil.as_markdown_header('Goal')}\n"
     "You are an expert on the software project below. "
-    f"This software project is described under `{PromptUtil.as_markdown_header(PROJECT_SUMMARY_HEADER)}`. "
     f"You are tasked with performing software traceability for a parent artifact "
     f"(enclosed in {PromptUtil.create_xml(RANKING_ARTIFACT_TAG)}) "
     f"against a list of candidate children artifacts under `{PromptUtil.as_markdown_header(ARTIFACT_HEADER)}`. "

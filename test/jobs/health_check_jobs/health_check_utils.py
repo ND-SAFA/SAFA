@@ -26,7 +26,7 @@ UNDEFINED_CONCEPT = "undefined_concept"
 QUERY_CONCEPTS = ["pug", "dog", UNDEFINED_CONCEPT]
 QUERY_CONTENT = "Pugs aren't cute dogs."
 QUERY_ID = "target"
-EXPECTED_RELATED_ARTIFACTS = EXPECTED_CONTEXT_IDS + EXISTING_CONCEPTS[:1]
+EXPECTED_RELATED_ARTIFACTS = EXPECTED_CONTEXT_IDS + EXISTING_CONCEPTS[:2]
 
 
 def assert_correct_related_artifacts(test_case: BaseTest, related_ids: List[str]):

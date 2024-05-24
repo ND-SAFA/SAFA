@@ -9,7 +9,7 @@ from test.hgen.hgen_test_utils import HGEN_PROJECT_SUMMARY, HGenTestConstants, g
 from test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.clustering.base.cluster import Cluster
 from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE
-from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL
+from tgen.common.constants.ranking_constants import DEFAULT_TEST_EMBEDDING_MODEL
 from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.enum_util import EnumDict
 from tgen.common.util.prompt_util import PromptUtil
@@ -212,7 +212,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         clusters = []
         for i, artifact_set in enumerate(selected_artifacts):
             c = Cluster(embeddings_manager=EmbeddingsManager(artifacts,
-                                                             model_name=DEFAULT_SEARCH_EMBEDDING_MODEL))
+                                                             model_name=DEFAULT_TEST_EMBEDDING_MODEL))
             c.add_artifacts(list(artifact_set))
             clusters.append(c)
         art_df = ArtifactDataFrame({ArtifactKeys.ID: list(artifacts.keys()), ArtifactKeys.CONTENT: list(artifacts.values()),

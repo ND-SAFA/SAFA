@@ -1,6 +1,5 @@
 import json
 from copy import deepcopy
-
 from typing import Dict, Tuple, Union
 
 from tgen.common.logging.logger_manager import logger
@@ -14,8 +13,8 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.tracing.ranking.filters.supported_filters import SupportedFilter
-from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
+from tgen.tracing.ranking.trace_selectors.selection_methods import SupportedSelectionMethod
 
 
 class RankingChunkJob(AbstractJob):

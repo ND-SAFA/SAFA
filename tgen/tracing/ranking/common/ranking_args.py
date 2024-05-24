@@ -7,7 +7,7 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager
 from tgen.common.constants.ranking_constants import DEFAULT_CROSS_ENCODER_MODEL, DEFAULT_EMBEDDINGS_SCORE_WEIGHT, \
     DEFAULT_EMBEDDING_MODEL, DEFAULT_EXPLANATION_SCORE_WEIGHT, DEFAULT_LINK_THRESHOLD, DEFAULT_MAX_CONTEXT_ARTIFACTS, \
-    DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SCALED_THRESHOLD, DEFAULT_SEARCH_EMBEDDING_MODEL, \
+    DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SCALED_THRESHOLD, DEFAULT_TEST_EMBEDDING_MODEL, \
     DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import required_field
@@ -17,8 +17,8 @@ from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.relationship_manager.cross_encoder_manager import CrossEncoderManager
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.filters.supported_filters import SupportedFilter
-from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
 from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
+from tgen.tracing.ranking.trace_selectors.selection_methods import SupportedSelectionMethod
 
 
 @dataclass
@@ -196,7 +196,7 @@ class RankingArgs(PipelineArgs):
         if not self.run_name:
             self.run_name = self.get_run_name(self.child_type(), self.children_ids, self.parent_type(), self.parent_ids)
         super().__post_init__()
-        self.embedding_model_name = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else self.embedding_model_name
+        self.embedding_model_name = DEFAULT_TEST_EMBEDDING_MODEL if environment_constants.IS_TEST else self.embedding_model_name
         if self.use_rag_defaults:
             self.selection_method = SupportedSelectionMethod.SELECT_BY_THRESHOLD_SCALED
             self.link_threshold = DEFAULT_SCALED_THRESHOLD

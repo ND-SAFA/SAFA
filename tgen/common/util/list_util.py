@@ -1,9 +1,9 @@
 from typing import Any, Iterable, List, Optional, Tuple, Union
+
 import numpy as np
 import pandas as pd
 from scipy.stats import percentileofscore
 from tqdm import tqdm
-from typing import Iterable, List, Tuple, Union, Any
 
 
 class ListUtil:
@@ -153,6 +153,19 @@ class ListUtil:
             return ListUtil.unzip(zipped_list, 0), ListUtil.unzip(zipped_list, 1)
 
     @staticmethod
+    def zip_sort_unzip(*args, list_to_sort_on: int = None, **kwargs):
+        """
+        Sorts lists by zipping them then unzipping them.
+        :param args: Lists to sort.
+        :param list_to_sort_on: Index of list to sort on.
+        :param kwargs: Additional arguments to zip_sort.
+        :return: Unzip lists in sorted order.
+        """
+        if list_to_sort_on is None:
+            list_to_sort_on = len(args)
+        return ListUtil.unzip(ListUtil.zip_sort(*args, list_to_sort_on=list_to_sort_on, **kwargs))
+
+    @staticmethod
     def safely_get_item(item_index: int, list_: List, default: Any = None) -> Any:
         """
         Safely gets an item from a list by checking that the list contains an item at the index, returns the default if not.
@@ -184,7 +197,7 @@ class ListUtil:
         :return: The index of the max value in the list.
         """
         return max(enumerate(list_), key=lambda item: item[1])
-      
+
     def append_if_exists(base_items: List[Any], new_possible_item: Optional[Any], as_new_list: bool = False) -> List[Any]:
         """
         Appends new item to list if it exists.

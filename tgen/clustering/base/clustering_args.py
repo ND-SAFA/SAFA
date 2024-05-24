@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-
 from typing import Dict, List
 
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
@@ -9,7 +8,7 @@ from tgen.common.constants.clustering_constants import CLUSTER_ARTIFACT_TYPE, DE
     DEFAULT_CLUSTERING_METHODS, DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, \
     DEFAULT_MAX_CLUSTER_SIZE, \
     DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_MIN_ORPHAN_SIMILARITY, DEFAULT_SEED_CLUSTERING_METHOD, DEFAULT_SORT_METRIC
-from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL, DEFAULT_SEARCH_EMBEDDING_MODEL
+from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL, DEFAULT_TEST_EMBEDDING_MODEL
 from tgen.pipeline.pipeline_args import PipelineArgs
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
@@ -58,7 +57,7 @@ class ClusteringArgs(PipelineArgs):
         """
         super().__post_init__()
         if self.embedding_model is None:
-            self.embedding_model = DEFAULT_SEARCH_EMBEDDING_MODEL if environment_constants.IS_TEST else DEFAULT_EMBEDDING_MODEL
+            self.embedding_model = DEFAULT_TEST_EMBEDDING_MODEL if environment_constants.IS_TEST else DEFAULT_EMBEDDING_MODEL
         if self.artifact_types is None:
             self.artifact_types = self.dataset.artifact_df.get_artifact_types()
 

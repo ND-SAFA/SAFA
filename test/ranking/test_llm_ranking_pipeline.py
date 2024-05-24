@@ -7,11 +7,10 @@ from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_responses import MockResponses
 from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
-from tgen.tracing.ranking.selectors.selection_methods import SupportedSelectionMethod
+from tgen.tracing.ranking.trace_selectors.selection_methods import SupportedSelectionMethod
 
 
 class TestLLMRankingPipeline(BaseTest):
@@ -25,8 +24,7 @@ class TestLLMRankingPipeline(BaseTest):
         Tests that pipeline correctly constructs the ranked predictions.
         """
         ai_manager.mock_summarization()
-        ai_manager.set_responses(MockResponses.project_summary_responses +
-                                 [RankingPipelineTest.get_response()] +
+        ai_manager.set_responses([RankingPipelineTest.get_response()] +
                                  [RankingPipelineTest.get_response(task_prompt=SupportedPrompts.EXPLANATION_TASK.value)])
         args = self.create_args()
         pipeline = LLMRankingPipeline(args)
@@ -56,5 +54,10 @@ class TestLLMRankingPipeline(BaseTest):
         args = RankingArgs(run_name=f"{child_type}2{parent_type}", dataset=PromptDataset(artifact_df=artifact_df),
                            parent_ids=parent_ids,
                            children_ids=children_ids, weight_of_embedding_scores=0, weight_of_explanation_scores=0,
+                           generate_explanations=True,
                            types_to_trace=("target", "source"), selection_method=SupportedSelectionMethod.SELECT_BY_THRESHOLD)
         return args
+
+
+if __name__ == "__main__":
+    TestLLMRankingPipeline.test_prediction_construction(None)

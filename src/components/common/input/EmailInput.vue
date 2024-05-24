@@ -44,7 +44,7 @@ const errorMessage = computed(() => {
   const domain = model.value.split("@")[1];
 
   if (!model.value) {
-    return false;
+    return props.errorMessage;
   }
 
   if (!domain) {

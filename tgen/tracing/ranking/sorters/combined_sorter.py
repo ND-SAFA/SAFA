@@ -9,6 +9,12 @@ from tgen.tracing.ranking.sorters.vsm_sorter import VSMSorter
 class CombinedSorter(iSorter):
     @staticmethod
     def sort(*args, **kwargs) -> Dict[str, List]:
+        """
+        Sorter aggregating scores for VSM and embeddings using max.
+        :param args: Args to sorters.
+        :param kwargs: Kwargs to sorters.
+        :return: Combined sorter output.
+        """
         vsm_sorter = VSMSorter()
         vsm_output = vsm_sorter.sort(*args, **kwargs)
 
@@ -33,7 +39,7 @@ class CombinedSorter(iSorter):
                 query_output_ids.append(child_id)
                 query_output_scores.append(max(vsm_score, embedding_score))
 
-            query_output_ids, query_output_scores = ListUtil.sort_by(query_output_ids, query_output_scores, reverse=True)
+            query_output_ids, query_output_scores = ListUtil.zip_sort_unzip(query_output_ids, query_output_scores, reverse=True)
             sorter_map[query_id] = (query_output_ids, query_output_scores)
 
         return sorter_map

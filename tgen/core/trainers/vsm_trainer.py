@@ -155,8 +155,6 @@ class VSMTrainer(AbstractTrainer):
             for i, (child_id, parent_id) in enumerate(child_parent_pairs):
                 row, col = divmod(i, len(child_artifacts))
                 similarity_score = similarity_matrix[row][col]
-                if child_id == 'Create empty projects' and parent_id == 'Bulk Project Creation':
-                    self.compare(child_tf_matrix[col], child_artifacts[col], parent_tf_matrix[row], parent_artifacts[row])
                 link_id = eval_dataset.trace_df.generate_link_id(child_id, parent_id)
                 link = eval_dataset.trace_df.get_link(link_id)
                 label = link[TraceKeys.LABEL] if link else 0
@@ -170,26 +168,6 @@ class VSMTrainer(AbstractTrainer):
         metrics = RankingUtil.evaluate_trace_predictions(eval_dataset.trace_df, prediction_entries) if evaluate else {}
         trace_prediction_output = TracePredictionOutput(prediction_entries=prediction_entries, metrics=metrics)
         return trace_prediction_output
-
-    def compare(self, a_embedding, a_artifact, b_embedding, b_artifact):
-        index2word = {v: k for k, v in self.model.vocabulary_.items()}
-        _, n_cols = a_embedding.shape
-        words = []
-        for i in range(n_cols):
-            a_value = a_embedding[0, i]
-            b_value = b_embedding[0, i]
-
-            if a_value > 0 or b_value > 0:
-                word = index2word[i]
-                words.append({
-                    "word": word,
-                    'a': a_value,
-                    'b': b_value,
-                    "min": min(a_value, b_value)
-                })
-        a_best = sorted(words, key=lambda w: w['a'], reverse=True)
-        b_best = sorted(words, key=lambda w: w['b'], reverse=True)
-        print("hi")
 
     def create_term_frequency_matrices(self, raw_sources: Iterable[str], raw_targets: Iterable[str]) -> \
             Tuple[csr_matrix, csr_matrix]:

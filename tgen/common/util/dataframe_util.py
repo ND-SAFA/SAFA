@@ -21,10 +21,7 @@ class DataFrameUtil:
         :return: DataFrame with columns converted and na's dropped (when specified)
         """
         if column_translation is None or len(column_translation) == 0:
-            column_translation = {}
-
-        # Columns not referenced in translation but existing in df are mapped to themselves. (Identity property)
-        column_translation = {col: column_translation[col] if col in column_translation else col for col in df.columns}
+            column_translation = {col: col for col in df.columns}
 
         column_translation = {k: v for k, v in column_translation.items() if k in df.columns}
         df = df[column_translation.keys()]

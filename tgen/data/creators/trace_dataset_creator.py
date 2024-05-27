@@ -5,7 +5,7 @@ import pandas as pd
 
 from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, \
     ALLOWED_ORPHANS_DEFAULT, \
-    GENERATE_NEGATIVE_LINKS_DEFAULT, NO_CHECK, REMOVE_ORPHANS_DEFAULT
+    NO_CHECK, REMOVE_ORPHANS_DEFAULT
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -53,13 +53,13 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         self.linked_artifact_ids = None
         self.orphan_artifact_ids = None
 
-    def create(self, **kwargs) -> TraceDataset:
+    def create(self) -> TraceDataset:
         """
         Creates TraceDataset with links.
         :param kwargs: Arguments to data processing method.
         :return: TraceDataset.
         """
-        self.process_data(**kwargs)
+        self.process_data()
         trace_dataset = self._create_trace_dataset()
         TraceDatasetCreator._log_trace_dataset(trace_dataset)
         return trace_dataset
@@ -72,10 +72,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
         raise NotImplementedError("export_as_safa not implemented for trace_dataset_creator.")
 
-    def process_data(self, generate_negative_links: bool = GENERATE_NEGATIVE_LINKS_DEFAULT):
+    def process_data(self):
         """
         Creates the necessary tables and performs validation checks on the data.
-        :param generate_negative_links: Whether to generate negative links in trace data frame.
         :return:  None
         """
         self.artifact_df, self.trace_df, self.layer_mapping_df = self.project_reader.read_project()
@@ -86,8 +85,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             self._remove_orphans()
         self._filter_null_references()
         self._clean_artifact_tokens()
-        if generate_negative_links:
-            self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
+        self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
 
     def get_name(self) -> str:
         """
@@ -202,7 +200,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
 
             for type_name in (source_type, target_type):
                 type_artifacts = artifact_df.get_artifacts_by_type(type_name).index
-                type2artifacts[source_type] = type_artifacts
+                type2artifacts[type_name] = type_artifacts
                 assert len(type_artifacts) > 0, f"Expected at least one source artifact of type {source_type}"
 
             trace_layers.append((source_type, target_type))

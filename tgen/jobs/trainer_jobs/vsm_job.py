@@ -38,7 +38,6 @@ class VSMJob(AbstractTrainerJob):
         Performs predictions and (optionally) evaluation of model
         :return: results of the prediction including prediction values and associated ids
         """
-        self.trainer_dataset_manager.creator_args = {"generate_negative_links": True}
         trainer: VSMTrainer = self.get_trainer()
         train_dataset_role = DatasetRole.TRAIN if DatasetRole.TRAIN in self.trainer_dataset_manager else DatasetRole.EVAL
         training_output = trainer.perform_training(train_dataset_role)

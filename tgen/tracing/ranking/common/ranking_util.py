@@ -187,6 +187,7 @@ class RankingUtil:
 
             if sorted_entries[0][TraceKeys.SCORE] >= min_threshold:
                 predictions.append(sorted_entries[0])
+                continue
 
         return predictions
 

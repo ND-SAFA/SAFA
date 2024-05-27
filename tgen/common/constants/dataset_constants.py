@@ -13,4 +13,3 @@ TRACE_THRESHOLD = 0.5
 EXCLUDED_FILES = ["__init__.py", ".DS_Store"]
 ARTIFACT_FILE_NAME = "artifact_df.csv"
 PROJECT_SUMMARY_FILENAME = "project_summary"
-GENERATE_NEGATIVE_LINKS_DEFAULT = True

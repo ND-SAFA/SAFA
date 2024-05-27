@@ -102,7 +102,7 @@ class TestTraceDataset(BaseTraceTest):
 
         true_source_id, true_target_id = "source_id1", "target_id1"
 
-        trace_dataset.trace_df.add_links(source=true_source_id, target=true_target_id, )
+        trace_dataset.trace_df.add_link(source=true_source_id, target=true_target_id, )
         trace_dataset.create_and_add_link(true_source_id, true_target_id, source_tokens, target_tokens, is_true_link=True)
         true_link_id = TraceDataFrame.generate_link_id(true_source_id, true_target_id)
         self.assertIn(true_link_id, trace_dataset.trace_df.index)

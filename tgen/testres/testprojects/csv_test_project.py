@@ -47,7 +47,7 @@ class CsvTestProject(AbstractTestProject):
         """
         :return Number of links after removing t3 and s6 which contain no positive links.
         """
-        return 36
+        return 18
 
     @classmethod
     def get_n_positive_links(cls) -> int:

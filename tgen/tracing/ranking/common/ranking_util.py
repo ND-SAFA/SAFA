@@ -53,7 +53,13 @@ class RankingUtil:
         return metrics
 
     @staticmethod
-    def log_classification_results(trace_df: TraceDataFrame, predicted_entries: List[Trace]):
+    def log_classification_results(trace_df: TraceDataFrame, predicted_entries: List[Trace]) -> None:
+        """
+        Logs the false negatives and positives in predictions.
+        :param trace_df: Trace data frame containing links for traces.
+        :param predicted_entries: Entries representing trace link predictions.
+        :return: None
+        """
         if trace_df is None:
             logger.info("Skipping evaluation, trace data frame is none.")
             return

@@ -161,7 +161,7 @@ class VSMTrainer(AbstractTrainer):
                 row, col = divmod(i, len(child_artifacts))
                 similarity_score = similarity_matrix[row][col]
                 link_id = eval_dataset.trace_df.generate_link_id(child_id, parent_id)
-                link = trace_map.get(link_id)
+                link = trace_map[link_id]
                 label = link[TraceKeys.LABEL] if link else 0
                 prediction_entry = Trace(link_id=link_id, source=child_id, target=parent_id, score=similarity_score, label=label)
                 prediction_entries.append(prediction_entry)

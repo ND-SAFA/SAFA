@@ -85,7 +85,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             self._remove_orphans()
         self._filter_null_references()
         self._clean_artifact_tokens()
-        self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
 
     def get_name(self) -> str:
         """
@@ -133,6 +132,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Creates trace links from trace DataFrame using artifacts for references.
         :return: Mapping of trace link ids to the link.
         """
+        if self.trace_df.get_label_count(0) < 1:
+            self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
         self._log_artifact_types(self.artifact_df)
         trace_dataset = TraceDataset(artifact_df=self.artifact_df, trace_df=self.trace_df, layer_df=self.layer_mapping_df)
         return trace_dataset

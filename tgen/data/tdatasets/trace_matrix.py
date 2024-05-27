@@ -37,6 +37,10 @@ class TraceMatrix:
         logger.info("Trace matrix created.")
 
     def get_prediction_payload(self):
+        """
+        Returns set of scores and labels in trace matrix.
+        :return: List of scores and labels.
+        """
         scores = []
         labels = []
         for source, query in self.query_matrix.items():

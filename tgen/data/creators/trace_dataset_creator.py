@@ -217,9 +217,9 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         negative_link_ids = set(trace_map.keys()).difference(set(trace_df.index))
         for link_id in negative_link_ids:
             s_id, t_id = trace_map[link_id]
-            negative_links[link_id] = trace_df.link_as_dict(source_id=s_id, target_id=t_id, label=0)
+            negative_links[link_id] = trace_df.link_as_dict(link_id=link_id, source_id=s_id, target_id=t_id, label=0)
 
-        all_links = trace_df.to_dict(orient="index")
+        all_links = trace_df.to_map()
         all_links.update(negative_links)
         logger.info("Adding negative links to trace data frame...")
         trace_df = TraceDataFrame.from_dict(all_links, orient="index")

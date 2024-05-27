@@ -28,7 +28,7 @@ class TestSelectCandidateLinksStep(TestCase):
         self.assertEqual(len(state.selected_entries), len(expected_links_by_threshold))
         self.assert_links(expected_links_by_threshold, state)
 
-        expected_links_by_parent = [2, 4]
+        expected_links_by_parent = [2, 3, 4]
         state = self.get_state(children_ids, parent_ids)
         args.selection_method = SupportedSelectionMethod.SELECT_TOP_PARENTS
         SelectCandidateLinksStep().run(args, state)
@@ -40,7 +40,7 @@ class TestSelectCandidateLinksStep(TestCase):
         selection_method: SelectByThresholdScaledByArtifacts = args.selection_method.value
         state.selected_entries = selection_method.select(state.get_current_entries(),
                                                          threshold=args.link_threshold,
-                                                         parent_thresholds=(0.7, 0.4, 0.4),
+                                                         parent_thresholds=args.parent_thresholds,
                                                          artifact_type=
                                                          TraceKeys.parent_label(),
                                                          )

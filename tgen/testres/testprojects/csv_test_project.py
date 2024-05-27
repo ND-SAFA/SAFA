@@ -1,11 +1,11 @@
 from typing import Dict, List, Tuple
 
+from tgen.common.objects.trace_layer import TraceLayer
 from tgen.data.keys.csv_keys import CSVKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.csv_project_reader import CsvProjectReader
 from tgen.testres.paths.project_paths import CSV_PROJECT_PATH
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
-from tgen.common.objects.trace_layer import TraceLayer
 
 
 class CsvTestProject(AbstractTestProject):
@@ -47,7 +47,7 @@ class CsvTestProject(AbstractTestProject):
         """
         :return Number of links after removing t3 and s6 which contain no positive links.
         """
-        return 18
+        return 36
 
     @classmethod
     def get_n_positive_links(cls) -> int:

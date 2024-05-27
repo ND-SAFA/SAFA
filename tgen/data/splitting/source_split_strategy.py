@@ -48,7 +48,7 @@ class SourceSplitStrategy(AbstractTraceSplitStrategy):
         n_links_per_source = math.inf if n_links_per_source is None else n_links_per_source
         agg_links = []
         for source_name in source_names[:n_sources]:
-            source_links = trace_matrix.query_matrix[source_name].links
+            source_links = trace_matrix.query_matrix[source_name].links  # TODO: Randomize source links
             links_per_query = min(len(source_links), n_links_per_source)
             query_links = source_links[:links_per_query]
             agg_links.extend(query_links)

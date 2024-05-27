@@ -35,7 +35,8 @@ class TrainerDatasetManager(BaseObject):
                  train_dataset_creator: AbstractDatasetCreator = None,
                  val_dataset_creator: AbstractDatasetCreator = None,
                  eval_dataset_creator: AbstractDatasetCreator = None,
-                 augmenter: DataAugmenter = None
+                 augmenter: DataAugmenter = None,
+                 **creator_args
                  ):
         """
         Container to hold all the data used in the TraceTrainer
@@ -53,6 +54,7 @@ class TrainerDatasetManager(BaseObject):
         self._datasets = {}
         self._hf_datasets = None
         self.augmenter = augmenter
+        self.creator_args = creator_args
 
     def get_creator(self, dataset_role: DatasetRole) -> AbstractDatasetCreator:
         """
@@ -139,7 +141,7 @@ class TrainerDatasetManager(BaseObject):
         :return: the dictionary of datasets
         """
         if not self._datasets:
-            self._datasets = self._create_datasets_from_creators(self._dataset_creators)
+            self._datasets = self._create_datasets_from_creators(self._dataset_creators, **self.creator_args)
             if DatasetRole.TRAIN in self._datasets:
                 self._datasets[DatasetRole.TRAIN] = self._prepare_datasets(self._datasets[DatasetRole.TRAIN], self.augmenter)
         return self._datasets
@@ -230,24 +232,27 @@ class TrainerDatasetManager(BaseObject):
         return splitter.split_dataset()
 
     @staticmethod
-    def _create_datasets_from_creators(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator]) \
+    def _create_datasets_from_creators(dataset_creators_map: Dict[DatasetRole, AbstractDatasetCreator], **creator_args) \
             -> Dict[DatasetRole, DATASET_TYPE]:
         """
         Creates the data from their corresponding creators
         :param dataset_creators_map: Map of dataset role to dataset creator.
+        :param creator_args: Arguments to create method of dataset.
         :return: a dictionary mapping dataset role to the corresponding dataset
         """
-        return {dataset_role: TrainerDatasetManager.__optional_create(dataset_creator)
+        return {dataset_role: TrainerDatasetManager.__optional_create(dataset_creator, **creator_args)
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 
     @staticmethod
-    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[Union[TraceDataset, PreTrainDataset]]:
+    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator], **creator_args) -> Optional[
+        Union[TraceDataset, PreTrainDataset]]:
         """
         Creates dataset set if not None, otherwise None is returned.
         :param dataset_creator: The optional dataset creator to use.
+        :param creator_args: Arguments passed to create method.
         :return: None or Dataset
         """
-        return dataset_creator.create() if dataset_creator else None
+        return dataset_creator.create(**creator_args) if dataset_creator else None
 
     @staticmethod
     def __assert_index(index_value):

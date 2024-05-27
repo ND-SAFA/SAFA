@@ -1,12 +1,11 @@
-from collections import Counter
-from trace import Trace
+from collections import Counter, defaultdict
 from typing import Any, Dict, List, Optional, Set
 
 import pandas as pd
 
 from tgen.common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, \
     ALLOWED_ORPHANS_DEFAULT, \
-    NO_CHECK, REMOVE_ORPHANS_DEFAULT
+    GENERATE_NEGATIVE_LINKS_DEFAULT, NO_CHECK, REMOVE_ORPHANS_DEFAULT
 from tgen.common.constants.deliminator_constants import COMMA, NEW_LINE
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataframe_util import DataFrameUtil
@@ -54,12 +53,13 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         self.linked_artifact_ids = None
         self.orphan_artifact_ids = None
 
-    def create(self) -> TraceDataset:
+    def create(self, **kwargs) -> TraceDataset:
         """
         Creates TraceDataset with links.
+        :param kwargs: Arguments to data processing method.
         :return: TraceDataset.
         """
-        self.process_data()
+        self.process_data(**kwargs)
         trace_dataset = self._create_trace_dataset()
         TraceDatasetCreator._log_trace_dataset(trace_dataset)
         return trace_dataset
@@ -72,9 +72,10 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         """
         raise NotImplementedError("export_as_safa not implemented for trace_dataset_creator.")
 
-    def process_data(self):
+    def process_data(self, generate_negative_links: bool = GENERATE_NEGATIVE_LINKS_DEFAULT):
         """
         Creates the necessary tables and performs validation checks on the data.
+        :param generate_negative_links: Whether to generate negative links in trace data frame.
         :return:  None
         """
         self.artifact_df, self.trace_df, self.layer_mapping_df = self.project_reader.read_project()
@@ -85,6 +86,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             self._remove_orphans()
         self._filter_null_references()
         self._clean_artifact_tokens()
+        if generate_negative_links:
+            self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
 
     def get_name(self) -> str:
         """
@@ -132,8 +135,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Creates trace links from trace DataFrame using artifacts for references.
         :return: Mapping of trace link ids to the link.
         """
-        if self.trace_df.get_label_count(0) < 1:
-            self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
         self._log_artifact_types(self.artifact_df)
         trace_dataset = TraceDataset(artifact_df=self.artifact_df, trace_df=self.trace_df, layer_df=self.layer_mapping_df)
         return trace_dataset
@@ -179,27 +180,6 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         return self.linked_artifact_ids
 
     @staticmethod
-    def create_trace_df_from_predictions(predictions: List[Trace],
-                                         artifact_df: ArtifactDataFrame,
-                                         layer_df: LayerDataFrame) -> TraceDataFrame:
-        """
-        Creates a dataframe of traces including the new trace links between the original lower-level artifacts
-        and the newly generated upper-level artifacts
-        :param predictions: The predictions to include in the trace data frame.
-        :param artifact_df: The dataframe containing artifacts referenced.
-        :param layer_df: The dataframe containing the layer mapping between artifacts
-        :return: The dataframe containing new and old trace links
-        """
-        traces = {}
-        if predictions:
-            for link in predictions:
-                DataFrameUtil.append(traces, link)
-        new_trace_df = TraceDatasetCreator.generate_negative_links(layer_df=layer_df,
-                                                                   artifact_df=artifact_df,
-                                                                   trace_df=TraceDataFrame(traces))
-        return new_trace_df
-
-    @staticmethod
     def generate_negative_links(layer_df: LayerDataFrame, artifact_df: ArtifactDataFrame,
                                 trace_df: TraceDataFrame = None, n_threads: int = 10) -> TraceDataFrame:
         """
@@ -214,21 +194,32 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
             trace_df = TraceDataFrame()
         negative_links: Dict[int, Dict[TraceKeys, Any]] = {}
 
+        type2artifacts = defaultdict(list)
+        trace_layers = []
         for _, row in layer_df.itertuples():
             source_type = row[StructuredKeys.LayerMapping.SOURCE_TYPE]
             target_type = row[StructuredKeys.LayerMapping.TARGET_TYPE]
 
-            source_artifact_ids = artifact_df.get_artifacts_by_type(source_type).index
-            target_artifact_ids = artifact_df.get_artifacts_by_type(target_type).index
-            assert len(source_artifact_ids) > 0, f"Expected at least one source artifact of type {source_type}"
-            assert len(target_artifact_ids) > 0, f"Expected at least one target artifact of type {target_type}"
+            for type_name in (source_type, target_type):
+                type_artifacts = artifact_df.get_artifacts_by_type(type_name).index
+                type2artifacts[source_type] = type_artifacts
+                assert len(type_artifacts) > 0, f"Expected at least one source artifact of type {source_type}"
 
-            layer_link_map = {TraceDataFrame.generate_link_id(s_id, t_id): (s_id, t_id)
-                              for s_id in source_artifact_ids for t_id in target_artifact_ids}
-            negative_link_ids = set(layer_link_map.keys()).difference(set(trace_df.index))
-            for link_id in negative_link_ids:
-                s_id, t_id = layer_link_map[link_id]
-                negative_links[link_id] = trace_df.link_as_dict(source_id=s_id, target_id=t_id, label=0)
+            trace_layers.append((source_type, target_type))
+
+        trace_map = {}
+        for source_type, target_type in trace_layers:
+            source_artifact_ids = type2artifacts[source_type]
+            target_artifact_ids = type2artifacts[target_type]
+
+            layer_trace_map = {TraceDataFrame.generate_link_id(s_id, t_id): (s_id, t_id)
+                               for s_id in source_artifact_ids for t_id in target_artifact_ids}
+            trace_map.update(layer_trace_map)
+
+        negative_link_ids = set(trace_map.keys()).difference(set(trace_df.index))
+        for link_id in negative_link_ids:
+            s_id, t_id = trace_map[link_id]
+            negative_links[link_id] = trace_df.link_as_dict(source_id=s_id, target_id=t_id, label=0)
 
         all_links = trace_df.to_dict(orient="index")
         all_links.update(negative_links)

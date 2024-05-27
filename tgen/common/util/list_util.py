@@ -1,8 +1,6 @@
 from typing import Any, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
-import pandas as pd
-from scipy.stats import percentileofscore
 from tqdm import tqdm
 
 
@@ -99,9 +97,10 @@ class ListUtil:
         :param scores: The scores to convert.
         :return: List of percentiles.
         """
-        scores_sorted = sorted(scores)
-        s = pd.Series(scores)
-        percentiles = s.apply(lambda x: percentileofscore(scores_sorted, x)) / 100
+        scores = np.array(scores)
+        scores_sorted = np.sort(scores)
+        ranks = np.searchsorted(scores_sorted, scores, side='left')
+        percentiles = ranks / len(scores)
         return list(percentiles)
 
     @staticmethod

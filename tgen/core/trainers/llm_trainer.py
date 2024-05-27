@@ -22,7 +22,7 @@ from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.data.tdatasets.idataset import iDataset
 from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.metrics.metrics_manager import MetricsManager
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, Message, CONTENT_KEY
+from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, CONTENT_KEY, Message
 from tgen.models.llm.llm_responses import ClassificationResponse, GenerationResponse
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.prompt import Prompt
@@ -274,6 +274,7 @@ class LLMTrainer(AbstractTrainer):
             prediction_entries = []
 
             scores = []
+            labels = []
             classifications = []
             class2correct = {}
             for i, classification_item in enumerate(res.batch_responses):
@@ -296,6 +297,7 @@ class LLMTrainer(AbstractTrainer):
 
                 self._update_classification_metrics(class2correct, correct_label, entry, label)
                 scores.append(score)
+                labels.append(label)
                 classifications.append(entry["classification"])
                 prediction_entries.append(entry)
 
@@ -308,7 +310,7 @@ class LLMTrainer(AbstractTrainer):
                     logger.log_with_title("Candidate Metrics", repr(metrics))
                     logger.log_with_title("Class Counts", json.dumps(class2correct))
                 all_metrics = {metric: all_metrics.get(metric, 0) + result for metric, result in metrics.items()}
-                all_label_ids.extend(metrics_manager.trace_matrix.labels)
+                all_label_ids.extend(labels)
         all_metrics = {metric: all_metrics.get(metric, 0) / len(datasets) for metric, result in all_metrics.items()}
         output = TracePredictionOutput(prediction_entries=prediction_entries, metrics=all_metrics, label_ids=all_label_ids)
         return output

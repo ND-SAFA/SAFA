@@ -6,7 +6,10 @@
         <typography secondary value="Enables all permissions" />
       </template>
     </q-toggle>
-    <expansion-item label="Create Account">
+    <expansion-item
+      label="Create Account"
+      :disable="!adminApiStore.activeSuperuser"
+    >
       <email-input v-model="adminCreateEmail" />
       <text-input v-model="adminCreatePassword" label="Password" />
       <text-button
@@ -18,7 +21,10 @@
         @click="handleAdminCreate"
       />
     </expansion-item>
-    <expansion-item label="Enable Superuser">
+    <expansion-item
+      label="Enable Superuser"
+      :disable="!adminApiStore.activeSuperuser"
+    >
       <email-input v-model="adminSuperuserEmail" />
       <text-button
         block
@@ -29,7 +35,10 @@
         @click="handleAdminSuperuser"
       />
     </expansion-item>
-    <expansion-item label="Enable Generation">
+    <expansion-item
+      label="Enable Generation"
+      :disable="!adminApiStore.activeSuperuser"
+    >
       <select-input
         v-model="orgApiStore.currentOrg"
         :options="orgStore.allOrgs"
@@ -47,7 +56,10 @@
         @click="handleEnableGeneration"
       />
     </expansion-item>
-    <expansion-item label="Reset Password">
+    <expansion-item
+      label="Reset Password"
+      :disable="!adminApiStore.activeSuperuser"
+    >
       <email-input v-model="adminResetEmail" />
       <text-button
         block

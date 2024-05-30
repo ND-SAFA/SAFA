@@ -1,11 +1,11 @@
 from typing import Dict, List
 
+from tgen.common.objects.trace_layer import TraceLayer
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.testres.paths.project_paths import STRUCTURE_PROJECT_PATH
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.entry_creator import EntryCreator
-from tgen.common.objects.trace_layer import TraceLayer
 
 
 class StructuredTestProject(AbstractTestProject):
@@ -46,7 +46,7 @@ class StructuredTestProject(AbstractTestProject):
         """
         :return: Return trace entries of positive links defined in project.
         """
-        trace_data = [(1674, 80), (1674, 85), (1688, 142), (1688, 205)]
+        trace_data = [("1674", "80"), ("1674", "85"), ("1688", "142"), ("1688", "205")]
         return EntryCreator.create_trace_entries(trace_data)
 
     @classmethod

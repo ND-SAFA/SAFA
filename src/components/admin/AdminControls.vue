@@ -15,6 +15,7 @@
       <text-button
         block
         outlined
+        :disabled="!adminCreateEmail || !adminCreatePassword"
         color="primary"
         label="Create Account"
         icon="invite"

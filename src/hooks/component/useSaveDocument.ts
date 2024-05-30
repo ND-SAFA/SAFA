@@ -63,7 +63,11 @@ export const useSaveDocument = defineStore("saveDocument", {
      * @return Whether the document can be saved.
      */
     canSave(): boolean {
-      return this.editedDocument.name.length > 0 && this.isNameValid;
+      return (
+        this.editedDocument.name.length > 0 &&
+        this.isNameValid &&
+        this.editedDocument.artifactIds.length > 0
+      );
     },
     /**
      * @return The finalized document being saved.

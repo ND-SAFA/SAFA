@@ -1,6 +1,7 @@
 from typing import Dict, List
 
-from tgen.common.constants.concept_pipeline_constants import ENTITY_DESCRIPTION_TAG, ENTITY_NAME_TAG, ENTITY_TAG
+from tgen.common.constants.concept_pipeline_constants import ENTITY_NAME_TAG, ENTITY_TAG
+from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.objects.artifact import Artifact
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
@@ -29,6 +30,9 @@ class PredictEntityStep(AbstractPipelineStep):
         :param state: Stored entity df.
         :return: None
         """
+        if not args.use_llm_for_entity_extraction:
+            return
+
         artifact_responses = self.predict_artifact_prompt(args.artifacts,
                                                           SupportedPrompts.CONCEPT_ENTITY_EXTRACTION.value,
                                                           args.llm_manager)
@@ -79,7 +83,8 @@ class PredictEntityStep(AbstractPipelineStep):
         """
         entities = []
         for entity_dict in entity_response_dict:
+            if ENTITY_NAME_TAG not in entity_dict:
+                continue
             entity_name = entity_dict[ENTITY_NAME_TAG][0]
-            entity_description = entity_dict[ENTITY_DESCRIPTION_TAG][0]
-            entities.append(Artifact(id=entity_name, content=entity_description, layer_id=entity_layer_id, summary=""))
+            entities.append(Artifact(id=entity_name, content=EMPTY_STRING, layer_id=entity_layer_id, summary=""))
         return ArtifactDataFrame(entities)

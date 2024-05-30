@@ -2,7 +2,6 @@ import os
 from collections.abc import Set
 from copy import deepcopy
 from dataclasses import dataclass, field
-
 from typing import Any, Dict, List, Union
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, UNDERSCORE
@@ -233,8 +232,10 @@ class State(BaseObject):
             except Exception as e:
                 logger.error(f"Unable to create dataset: {name}")
                 raise e
-        if not ReflectionUtil.is_type(val, expected_param_type, name):
-            raise TypeError(f"Expected {name} to be {expected_param_type} but was type {type(val)}")
+        if not ReflectionUtil.is_type(val, expected_param_type, name, print_on_error=False):
+            val = cls._try_load_from_yaml(name, val, param_specs, expected_param_type)
+            if val is None:
+                raise TypeError(f"Expected {name} to be {expected_param_type} but was type {type(val)}")
         return val
 
     @staticmethod
@@ -254,6 +255,26 @@ class State(BaseObject):
         if not step_name:
             return directory
         return os.path.join(directory, State._get_filename(step_name, run_num, step_num))
+
+    @classmethod
+    def _try_load_from_yaml(cls, name: str, val: Any, param_specs: ParamSpecs, expected_param_type):
+        if ReflectionUtil.is_typed_class(expected_param_type):
+            parent_cls, *child_classes = ReflectionUtil.get_typed_class(expected_param_type)
+            for cls_ in child_classes:
+                if hasattr(cls_, "from_yaml"):
+                    try:
+                        if parent_cls == "dict":
+                            loaded_val = {cls_.from_yaml(item) for item in val.items()}
+                        elif parent_cls == "list":
+                            loaded_val = [cls_.from_yaml(v) for v in val]
+                        else:
+                            loaded_val = cls_.from_yaml(val)
+                        return cls._check_type(name, loaded_val, param_specs)
+                    except Exception as e:
+                        continue
+                loaded_val = cls._try_load_from_yaml(name, val, param_specs, cls_)
+                if loaded_val is not None:
+                    return loaded_val
 
     @staticmethod
     def _get_filename(step: Any, run_num: int = 1, step_num: int = None) -> str:

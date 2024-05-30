@@ -315,7 +315,7 @@ class ReflectionUtil:
 
             if ReflectionUtil.is_typed_dict(expected_type):
                 if not isinstance(val, dict):
-                    raise Exception(f"Expected a dictionary but while parsing {expected_type} got: {val}")
+                    return False
                 for field_name, expected_field_type in expected_type.__annotations__.items():
                     check_type(f"{param_name}-{field_name}", val.get(field_name, None), expected_field_type)
                 return True
@@ -337,7 +337,7 @@ class ReflectionUtil:
                         if len(invalid_runs) > 0:
                             raise TypeError(f"List elements {invalid_runs} was not of type {child_type}.")
                     return True
-                elif parent_class == "union" or parent_class == "optional":
+                elif parent_class == "union":
                     queries = [c for c in child_classes if ReflectionUtil.is_type(val, c, param_name, print_on_error=False)]
                     if len(queries) == 0:
                         raise TypeError(f"{val} was not of type: {child_classes}")

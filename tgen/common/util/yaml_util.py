@@ -145,6 +145,8 @@ class CustomDumper(Dumper):
                 data = converted_data
             except Exception:
                 pass
+        elif hasattr(data, "tolist"):
+            data = data.tolist()
         elif hasattr(data, "item"):
             data = data.item()
         node = super().represent_data(data)

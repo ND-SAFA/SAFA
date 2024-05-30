@@ -1,8 +1,11 @@
+import os
 import re
 import string
 import uuid
+from os.path import dirname
 from typing import Dict, List, Set, Tuple, Union
 
+import pandas as pd
 from nltk.corpus import stopwords
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, PERIOD, SPACE, UNDERSCORE
@@ -12,6 +15,7 @@ from tgen.common.logging.logger_manager import logger
 class StrUtil:
     FIND_FLOAT_PATTERN = r"\s+\d+\.\d+\s*$|^\s+\d+\.\d+\s+|(?<=\s)\d+\.\d+(?=\s)"
     STOP_WORDS = set(stopwords.words('english'))
+    COMMON_WORDS = set(pd.read_csv(os.path.join(dirname(os.path.abspath(__file__)), "common-words.csv"), header=None)[0])
 
     @staticmethod
     def get_letter_from_number(number: int, lower_case: bool = False) -> str:
@@ -224,6 +228,15 @@ class StrUtil:
         return SPACE.join([word for word in input_string.split() if word.lower() not in StrUtil.STOP_WORDS])
 
     @staticmethod
+    def remove_common_words(input_string: str) -> str:
+        """
+        Removes the stop words in the string.
+        :param input_string: The string to remove stopwords from.
+        :return: The string without stop words.
+        """
+        return SPACE.join([word for word in input_string.split() if word.lower() not in StrUtil.COMMON_WORDS])
+
+    @staticmethod
     def split_by_punctuation(input_string: str) -> List[str]:
         """
         Splits a string by punctuation.
@@ -264,3 +277,29 @@ class StrUtil:
         :return: Dictionary of word to empty to string to replace them with.
         """
         return {w: EMPTY_STRING for w in StrUtil.STOP_WORDS}
+
+    @staticmethod
+    def contains_unknown_characters(input_string: str) -> bool:
+        """
+        Returns True if the string contains any non english/ unknown characters.
+        :param input_string: The string to check.
+        :return: True if the string contains any non english/ unknown characters.
+        """
+        try:
+            input_string.encode(encoding='utf-8').decode('ascii')
+            return False
+        except UnicodeDecodeError:
+            return True
+
+    @staticmethod
+    def is_number(input_string: str) -> bool:
+        """
+        Returns true if the string consists only of numbers.
+        :param input_string: The string to check.
+        :return: True if the string consists only of numbers else False.
+        """
+        try:
+            float(input_string)
+            return True
+        except ValueError:
+            return False

@@ -56,14 +56,15 @@ class ArtifactPrompt(Prompt):
         super().__init__(value=prompt_start, prompt_args=prompt_args, response_manager=response_manager)
 
     @overrides(Prompt)
-    def build(self, artifact: EnumDict, **kwargs) -> str:
+    def _build(self, artifact: EnumDict, **kwargs) -> str:
         """
         Builds the artifact prompt using the given build method
         :param artifact: The dictionary containing the attributes representing an artifact
         :param kwargs: Ignored
         :return: The formatted prompt
         """
-        prompt = self.structure_value(super().build(**kwargs), NEW_LINE, NEW_LINE)
+        base_prompt = self.add_format_response_instructions(super()._build(**kwargs))
+        prompt = self.structure_value(base_prompt, NEW_LINE, NEW_LINE)
         if self.build_method not in self.build_methods:
             raise NameError(f"Unknown Build Method: {self.build_method}")
         build_method = self.build_methods[self.build_method]

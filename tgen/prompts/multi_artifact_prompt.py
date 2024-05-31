@@ -62,14 +62,15 @@ class MultiArtifactPrompt(Prompt):
         super().__init__(value=prompt_start, prompt_args=prompt_args, response_manager=response_manager)
 
     @overrides(Prompt)
-    def build(self, artifacts: List[EnumDict], **kwargs) -> str:
+    def _build(self, artifacts: List[EnumDict], **kwargs) -> str:
         """
         Builds the artifacts prompt using the given build method
         :param artifacts: The list of dictionaries containing the attributes representing each artifact
         :param kwargs: Ignored
         :return: The formatted prompt
         """
-        prompt = self.structure_value(super().build(**kwargs), NEW_LINE, NEW_LINE)
+        base_prompt = self.add_format_response_instructions(super()._build(**kwargs))
+        prompt = self.structure_value(base_prompt, NEW_LINE, NEW_LINE)
         if self.build_method in self.build_methods:
             artifact_params = deepcopy(self.artifact_params)
             artifact_tokens = [TokenCalculator.estimate_num_tokens(artifact[ArtifactKeys.CONTENT]) for artifact in artifacts]

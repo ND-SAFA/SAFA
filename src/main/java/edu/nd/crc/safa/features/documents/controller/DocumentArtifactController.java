@@ -110,7 +110,7 @@ public class DocumentArtifactController extends BaseDocumentController {
 
         AssertUtils.assertEqual(projectVersion.getProject().getId(), document.getProject().getId(),
             "Document and version IDs do not match.");
-        AssertUtils.assertEqual(projectVersion.getProject().getId(), artifact.getProject().getId(),
+        AssertUtils.assertEqual(projectVersion.getProject().getId(), artifact.getProjectId(),
             "Document and artifact IDs do not match.");
 
         Optional<DocumentArtifact> documentArtifactQuery =

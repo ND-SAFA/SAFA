@@ -10,8 +10,6 @@ import edu.nd.crc.safa.features.types.entities.db.ArtifactType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -46,13 +44,9 @@ public class Artifact implements Serializable, IBaseEntity, IArtifact {
     @Column(name = "artifact_id")
     private UUID artifactId;
 
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(
-        name = "project_id",
-        nullable = false
-    )
-    private Project project;
+    @Column(nullable = false)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private UUID projectId;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -69,7 +63,7 @@ public class Artifact implements Serializable, IBaseEntity, IArtifact {
 
     public Artifact(Project project, ArtifactType type, String name) {
         this();
-        this.project = project;
+        this.projectId = project.getId();
         this.type = type;
         this.name = name;
     }

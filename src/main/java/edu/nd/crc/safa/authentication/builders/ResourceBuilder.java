@@ -142,7 +142,8 @@ public class ResourceBuilder {
     public ObjectHolder<Artifact> fetchArtifact(UUID artifactId) {
         Artifact artifact = serviceProvider.getArtifactRepository().findById(artifactId)
             .orElseThrow(() -> new SafaItemNotFoundError("No artifact with ID %s found", artifactId));
-        return entityWithProjectHolder(artifact, Artifact::getProject);
+        return entityWithProjectHolder(artifact,
+                a -> serviceProvider.getProjectRepository().findByProjectId(a.getProjectId()));
     }
 
     /**

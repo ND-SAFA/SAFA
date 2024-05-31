@@ -54,11 +54,11 @@ public class TraceLinkVersionRepositoryImpl
 
     private void checkArtifactProjects(TraceLinkVersion traceLinkVersion) {
         Project project = traceLinkVersion.getProjectVersion().getProject();
-        Project sourceProject = traceLinkVersion.getTraceLink().getSourceArtifact().getProject();
-        Project targetProject = traceLinkVersion.getTraceLink().getTargetArtifact().getProject();
+        UUID sourceProjectId = traceLinkVersion.getTraceLink().getSourceArtifact().getProjectId();
+        UUID targetProjectId = traceLinkVersion.getTraceLink().getTargetArtifact().getProjectId();
 
-        assert sourceProject.getId().equals(project.getId());
-        assert targetProject.getId().equals(project.getId());
+        assert sourceProjectId.equals(project.getId());
+        assert targetProjectId.equals(project.getId());
     }
 
     @Override
@@ -232,7 +232,7 @@ public class TraceLinkVersionRepositoryImpl
 
     private TraceLink createNewTraceLink(TraceAppEntity newTrace, Project project) throws SafaError {
         Optional<TraceLink> traceLinkOptional = this.traceLinkRepository
-            .findBySourceArtifactProjectAndSourceArtifactNameAndTargetArtifactName(project,
+            .findBySourceArtifactProjectIdAndSourceArtifactNameAndTargetArtifactName(project.getId(),
                 newTrace.getSourceName(),
                 newTrace.getTargetName());
         if (traceLinkOptional.isPresent()) {
@@ -265,7 +265,8 @@ public class TraceLinkVersionRepositoryImpl
     }
 
     private Artifact assertAndFindArtifact(Project project, String artifactName) throws SafaError {
-        Optional<Artifact> sourceArtifactOptional = this.artifactRepository.findByProjectAndName(project, artifactName);
+        Optional<Artifact> sourceArtifactOptional = this.artifactRepository
+                .findByProjectIdAndName(project.getId(), artifactName);
         if (sourceArtifactOptional.isPresent()) {
             return sourceArtifactOptional.get();
         }

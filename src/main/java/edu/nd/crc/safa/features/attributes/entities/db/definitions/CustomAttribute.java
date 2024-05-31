@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppConstraints;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,8 +11,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
@@ -21,8 +18,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
 @Entity
@@ -55,9 +50,8 @@ public class CustomAttribute {
     @Column(nullable = false)
     private String label;
 
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(nullable = false)
+    private UUID projectId;
 
 }

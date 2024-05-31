@@ -3,7 +3,6 @@ package edu.nd.crc.safa.test.services;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -34,7 +33,7 @@ public class RetrievalTestService {
         Project project = this.dbEntityBuilder.getProject(projectName);
         Optional<Artifact> artifactOptional = this.serviceProvider
             .getArtifactRepository()
-            .findByProjectAndName(project,
+            .findByProjectIdAndName(project.getId(),
                 artifactName);
         if (artifactOptional.isPresent()) {
             return artifactOptional.get().getArtifactId().toString();
@@ -42,7 +41,7 @@ public class RetrievalTestService {
         throw new RuntimeException("Could not find artifact with name:" + artifactName);
     }
 
-    public JSONArray getProjectMembers(Project project) throws Exception {
+    public JSONArray getProjectMembers(Project project) {
         return SafaRequest
             .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
             .withEntityId(project.getProjectId())
@@ -54,7 +53,7 @@ public class RetrievalTestService {
             artifacts
                 .stream()
                 .filter(a -> a.getName().equals(artifactName))
-                .collect(Collectors.toList())
+                .toList()
                 .get(0);
         return artifact.getId();
     }

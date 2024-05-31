@@ -13,16 +13,16 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TraceLinkRepository extends CrudRepository<TraceLink, UUID> {
     default List<TraceLink> getLinksInProject(Project project) {
-        return findBySourceArtifactProject(project);
+        return findBySourceArtifactProjectId(project.getId());
     }
 
-    List<TraceLink> findBySourceArtifactProject(Project project);
+    List<TraceLink> findBySourceArtifactProjectId(UUID projectId);
 
     default Optional<TraceLink> getByProjectAndSourceAndTarget(Project project, String sourceName, String targetName) {
-        return findBySourceArtifactProjectAndSourceArtifactNameAndTargetArtifactName(project, sourceName, targetName);
+        return findBySourceArtifactProjectIdAndSourceArtifactNameAndTargetArtifactName(project.getId(), sourceName, targetName);
     }
 
-    Optional<TraceLink> findBySourceArtifactProjectAndSourceArtifactNameAndTargetArtifactName(Project project,
-                                                                                              String sourceName,
-                                                                                              String targetName);
+    Optional<TraceLink> findBySourceArtifactProjectIdAndSourceArtifactNameAndTargetArtifactName(UUID projectId,
+                                                                                                String sourceName,
+                                                                                                String targetName);
 }

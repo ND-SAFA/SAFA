@@ -2,7 +2,6 @@ package edu.nd.crc.safa.features.layout.entities.db;
 
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
@@ -34,10 +33,9 @@ public class ArtifactPosition {
     /**
      * The version in which artifact with this position exist in.
      */
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "artifact_id", nullable = false)
-    private Artifact artifact;
+    @Column(nullable = false)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private UUID artifactId;
     /**
      * The version in which artifact with this position exist in.
      */

@@ -216,7 +216,7 @@ public class TypeService implements IAppEntityService<TypeAppEntity> {
         Project project = artifactType.getProject();
 
         List<UUID> affectedArtifactIds = artifactRepository
-            .findByProjectAndType(project, artifactType)
+            .findByProjectIdAndType(project.getId(), artifactType)
             .stream()
             .map(Artifact::getArtifactId)
             .collect(Collectors.toList());

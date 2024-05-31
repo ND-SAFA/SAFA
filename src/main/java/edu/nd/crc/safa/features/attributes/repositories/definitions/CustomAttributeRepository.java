@@ -5,20 +5,19 @@ import java.util.Optional;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
-import edu.nd.crc.safa.features.projects.entities.db.Project;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 
 public interface CustomAttributeRepository extends CrudRepository<CustomAttribute, UUID>  {
 
-    Optional<CustomAttribute> findByProjectAndKeyname(Project project, String keyname);
+    Optional<CustomAttribute> findByProjectIdAndKeyname(UUID projectId, String keyname);
 
-    List<CustomAttribute> findByProject(Project project);
+    List<CustomAttribute> findByProjectId(UUID projectId);
 
-    List<CustomAttribute> findByProject(Project project, Sort sort);
+    List<CustomAttribute> findByProjectId(UUID projectId, Sort sort);
 
-    boolean existsByProjectAndKeyname(Project project, String keyname);
+    boolean existsByProjectIdAndKeyname(UUID projectId, String keyname);
 
-    void deleteByProjectAndKeyname(Project project, String key);
+    void deleteByProjectIdAndKeyname(UUID projectId, String key);
 }

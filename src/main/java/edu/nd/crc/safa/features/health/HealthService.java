@@ -62,7 +62,7 @@ public class HealthService {
      * @return Response containing health checks.
      */
     public HealthResponseDTO performArtifactHealthChecks(ProjectVersion projectVersion, ArtifactAppEntity artifact) {
-        List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(projectVersion.getProject());
+        List<Artifact> projectArtifacts = artifactRepository.getProjectArtifacts(projectVersion.getProject().getId());
         GenHealthResponse genResponse = generateHealthChecks(projectVersion, artifact);
         Artifact targetArtifact = null;
         if (artifact.getId() != null) {
@@ -440,7 +440,7 @@ public class HealthService {
      * @return Comment content.
      */
     private String createMultiMatchContent(List<ConceptMatchDTO> conceptMatches) {
-        String concepts = String.join(",", conceptMatches.stream().map(c -> c.getId()).toList());
+        String concepts = String.join(",", conceptMatches.stream().map(ConceptMatchDTO::getId).toList());
         return String.format(MULTI_CONTENT, concepts);
     }
 }

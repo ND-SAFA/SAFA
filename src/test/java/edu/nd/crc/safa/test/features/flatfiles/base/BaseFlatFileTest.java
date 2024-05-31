@@ -96,7 +96,7 @@ public abstract class BaseFlatFileTest extends ApplicationBaseTest {
 
         // VP - Verify that total number of artifacts is as expected.
         verifyNumberOfItems("Artifacts",
-            () -> artifactRepository.getProjectArtifacts(project),
+            () -> artifactRepository.getProjectArtifacts(project.getId()),
             DefaultProjectConstants.Entities.N_ARTIFACTS);
 
         // VP - Verify that artifact body created for each artifact
@@ -125,13 +125,13 @@ public abstract class BaseFlatFileTest extends ApplicationBaseTest {
 
         // VP - Verify that # of artifact is as expected.
         verifyNumberOfItems(typeName,
-            () -> artifactRepository.findByProjectAndType(project, artifactType.get()),
+            () -> artifactRepository.findByProjectIdAndType(project.getId(), artifactType.orElseThrow()),
             nArtifacts);
     }
 
-    protected <T extends Object> List<T> verifyNumberOfItems(String itemName,
-                                                             Supplier<List<T>> findFunction,
-                                                             int nItems) {
+    protected <T> List<T> verifyNumberOfItems(String itemName,
+                                              Supplier<List<T>> findFunction,
+                                              int nItems) {
         String testName = "Verified # of" + itemName + ":" + nItems;
         List<T> items = findFunction.get();
         assertThat(items)

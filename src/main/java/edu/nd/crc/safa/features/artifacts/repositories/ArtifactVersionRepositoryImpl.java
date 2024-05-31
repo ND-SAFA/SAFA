@@ -1,11 +1,9 @@
 package edu.nd.crc.safa.features.artifacts.repositories;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
@@ -140,7 +138,7 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public List<Artifact> retrieveBaseEntitiesByProject(Project project) {
-        return this.artifactRepository.findByProject(project);
+        return this.artifactRepository.findByProjectId(project.getId());
     }
 
     @Override
@@ -204,12 +202,15 @@ public class ArtifactVersionRepositoryImpl
 
     private void attachDocumentLinks(ArtifactVersion artifactVersion,
                                      ArtifactAppEntity artifactAppEntity) {
-        //TODO: Skipping versioning system, currently using artifact version which is not usually the user wants.
-        Artifact artifact = artifactVersion.getArtifact();
-        List<DocumentArtifact> allDocumentArtifactVersions = this.documentArtifactRepository.findByArtifact(artifact);
-        List<UUID> documentIds = new ArrayList<>();
-        for (DocumentArtifact documentArtifact : allDocumentArtifactVersions) {
-            documentIds.add(documentArtifact.getDocument().getDocumentId());
+
+        List<UUID> documentIds;
+        if (artifactVersion.getDocumentIds() != null) {
+            documentIds = artifactVersion.getDocumentIds();
+        } else {
+            //TODO: Skipping versioning system, currently using artifact version which is not usually the user wants.
+            Artifact artifact = artifactVersion.getArtifact();
+            List<DocumentArtifact> allDocumentArtifactVersions = this.documentArtifactRepository.findByArtifact(artifact);
+            documentIds = allDocumentArtifactVersions.stream().map(d -> d.getDocument().getDocumentId()).toList();
         }
 
         artifactAppEntity.setDocumentIds(documentIds);
@@ -223,12 +224,12 @@ public class ArtifactVersionRepositoryImpl
             .findByProjectVersionProjectAndArtifact(projectVersion.getProject(), artifact)
             .stream()
             .map(da -> da.getDocument().getDocumentId())
-            .collect(Collectors.toList());
+            .toList();
 
         List<UUID> newDocumentIds = incomingDocumentIds
             .stream()
             .filter(newDocumentId -> !persistedDocumentIds.contains(newDocumentId))
-            .collect(Collectors.toList());
+            .toList();
 
         for (UUID newDocumentId : newDocumentIds) {
             Optional<Document> documentQuery = this.documentRepository.findById(newDocumentId);
@@ -242,7 +243,7 @@ public class ArtifactVersionRepositoryImpl
         List<UUID> removedDocumentIds = persistedDocumentIds
             .stream()
             .filter(persistedDocumentId -> !incomingDocumentIds.contains(persistedDocumentId))
-            .collect(Collectors.toList());
+            .toList();
 
         for (UUID removedDocumentId : removedDocumentIds) {
             Optional<DocumentArtifact> documentArtifactQuery =
@@ -260,7 +261,7 @@ public class ArtifactVersionRepositoryImpl
         ArtifactType artifactType = findOrCreateArtifactType(project, typeName, user);
         if (artifactId == null) {
             Artifact newArtifact = this.artifactRepository
-                .findByProjectAndName(project, artifactName)
+                .findByProjectIdAndName(project.getId(), artifactName)
                 .orElseGet(() -> new Artifact(project, artifactType, artifactName));
             this.artifactRepository.save(newArtifact);
             return newArtifact;

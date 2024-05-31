@@ -16,8 +16,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DocumentArtifactRepository extends CrudRepository<DocumentArtifact, UUID> {
 
-    List<DocumentArtifact> findByProjectVersionAndArtifact(ProjectVersion projectVersion, Artifact artifact);
-
     Optional<DocumentArtifact> findByProjectVersionAndDocumentAndArtifact(ProjectVersion projectVersion,
                                                                           Document document,
                                                                           Artifact artifact);
@@ -31,4 +29,6 @@ public interface DocumentArtifactRepository extends CrudRepository<DocumentArtif
     List<DocumentArtifact> findByProjectVersionProjectAndArtifact(Project project, Artifact artifact);
 
     List<DocumentArtifact> findByArtifact(Artifact artifact);
+
+    List<DocumentArtifact> findByArtifactIn(List<Artifact> artifacts);
 }

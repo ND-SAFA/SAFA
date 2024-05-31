@@ -34,7 +34,7 @@ public class ParseArtifactStep implements IFlatFileBuilderStep {
         EntityParsingResult<ArtifactAppEntity, String> artifactCreationResponse = flatFileParser.parseArtifacts();
         List<ArtifactAppEntity> artifactsAdded = artifactCreationResponse.getEntities();
         for (ArtifactAppEntity artifact : artifactsAdded) {
-            serviceProvider.getArtifactRepository().findByProjectAndName(projectVersion.getProject(),
+            serviceProvider.getArtifactRepository().findByProjectIdAndName(projectVersion.getProject().getId(),
                 artifact.getName()).ifPresent(a -> artifact.setId(a.getArtifactId()));
         }
         projectCommitDefinition.getArtifacts().setAdded(artifactCreationResponse.getEntities());

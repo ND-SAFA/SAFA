@@ -29,7 +29,7 @@ public class CheckArtifactNameService {
         ArtifactNameCheck artifactNameCheck
     ) {
         Optional<Artifact> artifactQuery =
-            this.artifactRepository.findByProjectAndName(projectVersion.getProject(),
+            this.artifactRepository.findByProjectIdAndName(projectVersion.getProject().getId(),
                 artifactNameCheck.getArtifactName());
         boolean artifactExists = false;
         if (artifactQuery.isPresent()) {

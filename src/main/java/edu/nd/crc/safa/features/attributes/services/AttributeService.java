@@ -284,16 +284,17 @@ public class AttributeService {
     @Transactional
     public void saveEntity(SafaUser user, Project project, CustomAttributeAppEntity appEntity, boolean isNew) {
         CustomAttribute newAttribute = customAttributeFromAppEntity(appEntity);
-        newAttribute.setProject(project);
+        newAttribute.setProjectId(project.getId());
 
         if (isNew) {
-            if (serviceProvider.getCustomAttributeRepository().existsByProjectAndKeyname(project, appEntity.getKey())) {
+            if (serviceProvider.getCustomAttributeRepository()
+                    .existsByProjectIdAndKeyname(project.getId(), appEntity.getKey())) {
                 throw new SafaError("Attribute with the name %s already exists within this project.",
                     appEntity.getKey());
             }
         } else {
             Optional<CustomAttribute> oldAttributeOpt = serviceProvider.getCustomAttributeRepository()
-                .findByProjectAndKeyname(project, appEntity.getKey());
+                .findByProjectIdAndKeyname(project.getId(), appEntity.getKey());
 
             if (oldAttributeOpt.isEmpty()) {
                 throw new SafaError("Attribute with the name %s doesn't exist within this project.",
@@ -435,7 +436,7 @@ public class AttributeService {
      * @return All attributes in the given project.
      */
     public List<CustomAttribute> getAttributesForProject(Project project) {
-        return serviceProvider.getCustomAttributeRepository().findByProject(project);
+        return serviceProvider.getCustomAttributeRepository().findByProjectId(project.getId());
     }
 
     /**
@@ -446,7 +447,7 @@ public class AttributeService {
      * @return All attributes in the given project.
      */
     public List<CustomAttribute> getAttributesForProject(Project project, Sort sort) {
-        return serviceProvider.getCustomAttributeRepository().findByProject(project, sort);
+        return serviceProvider.getCustomAttributeRepository().findByProjectId(project.getId(), sort);
     }
 
     /**
@@ -484,7 +485,7 @@ public class AttributeService {
      * @return The attribute, if it exists.
      */
     public Optional<CustomAttribute> getByProjectAndKeyname(Project project, String keyname) {
-        return serviceProvider.getCustomAttributeRepository().findByProjectAndKeyname(project, keyname);
+        return serviceProvider.getCustomAttributeRepository().findByProjectIdAndKeyname(project.getId(), keyname);
     }
 
     /**
@@ -494,6 +495,6 @@ public class AttributeService {
      * @param keyname The key of the attribute to delete.
      */
     public void deleteByProjectAndKeyname(Project project, String keyname) {
-        serviceProvider.getCustomAttributeRepository().deleteByProjectAndKeyname(project, keyname);
+        serviceProvider.getCustomAttributeRepository().deleteByProjectIdAndKeyname(project.getId(), keyname);
     }
 }

@@ -10,7 +10,6 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttributeRepository;
@@ -52,6 +51,7 @@ import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.features.versions.services.VersionService;
 import edu.nd.crc.safa.test.features.attributes.AttributesForTesting;
 
+import lombok.Setter;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -91,13 +91,13 @@ public class DbEntityBuilder extends AbstractBuilder {
     Map<String, Map<String, Artifact>> artifacts;
     Map<String, Map<String, Map<Long, ArtifactVersion>>> bodies;
     int revisionNumber;
+    @Setter
     SafaUser currentUser;
 
     @Autowired
     public DbEntityBuilder(ServiceProvider serviceProvider,
                            CustomAttributeRepository customAttributeRepository,
-                           AttributeSystemServiceProvider attributeSystemServiceProvider,
-                           ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl) {
+                           AttributeSystemServiceProvider attributeSystemServiceProvider) {
         this.projects = new Hashtable<>();
         this.projectRepository = serviceProvider.getProjectRepository();
         this.projectService = serviceProvider.getProjectService();
@@ -156,10 +156,6 @@ public class DbEntityBuilder extends AbstractBuilder {
             projectService.deleteProject(null, project);
         }
         projectRepository.deleteAll();
-    }
-
-    public void setCurrentUser(SafaUser user) {
-        this.currentUser = user;
     }
 
     public Project newProjectWithReturn(String name) {
@@ -286,7 +282,7 @@ public class DbEntityBuilder extends AbstractBuilder {
         Project project = getProject(projectName);
 
         CustomAttribute field = new CustomAttribute();
-        field.setProject(project);
+        field.setProjectId(project.getId());
         field.setType(type);
         field.setLabel(label);
         field.setKeyname(key);

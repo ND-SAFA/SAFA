@@ -113,3 +113,12 @@ class TestStrUtil(BaseTest):
         self.assertEqual(StrUtil.find_start_and_end_loc(main_string, str2find), start_and_end)
         self.assertEqual(StrUtil.find_start_and_end_loc(main_string, str2find, start=start_and_end[-1])[0], len(main_string) - 2)
         self.assertEqual(StrUtil.find_start_and_end_loc(main_string, str2find, end=1), not_found)
+
+    def test_contains_unknown_characters(self):
+        unknown_chars = "К черту дерьмо"
+        self.assertTrue(StrUtil.contains_unknown_characters(unknown_chars))
+        self.assertFalse(StrUtil.contains_unknown_characters("ok"))
+
+    def test_is_number(self):
+        self.assertTrue(StrUtil.is_number("2.0"))
+        self.assertFalse(StrUtil.is_number("2k"))

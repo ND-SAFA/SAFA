@@ -12,10 +12,18 @@ from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, PERI
 from tgen.common.logging.logger_manager import logger
 
 
+def get_common_words() -> Set[str]:
+    """
+    Reads in a list of common words for pre-processing in nlp.
+    :return: A set of common words.
+    """
+    return set(pd.read_csv(os.path.join(dirname(os.path.abspath(__file__)), "common-words.csv"), header=None)[0])
+
+
 class StrUtil:
     FIND_FLOAT_PATTERN = r"\s+\d+\.\d+\s*$|^\s+\d+\.\d+\s+|(?<=\s)\d+\.\d+(?=\s)"
     STOP_WORDS = set(stopwords.words('english'))
-    COMMON_WORDS = set(pd.read_csv(os.path.join(dirname(os.path.abspath(__file__)), "common-words.csv"), header=None)[0])
+    COMMON_WORDS = get_common_words()
 
     @staticmethod
     def get_letter_from_number(number: int, lower_case: bool = False) -> str:

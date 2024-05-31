@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Type
 from typeguard import check_type
 
 from tgen.common.constants.deliminator_constants import PERIOD, UNDERSCORE
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.str_util import StrUtil
 from tgen.variables.undetermined_variable import UndeterminedVariable
@@ -315,6 +316,8 @@ class ReflectionUtil:
 
             if ReflectionUtil.is_typed_dict(expected_type):
                 if not isinstance(val, dict):
+                    logger.log_exception_on_condition(Exception, f"Expected a dictionary but while parsing {expected_type} got: {val}",
+                                                      condition=print_on_error)
                     return False
                 for field_name, expected_field_type in expected_type.__annotations__.items():
                     check_type(f"{param_name}-{field_name}", val.get(field_name, None), expected_field_type)
@@ -335,12 +338,16 @@ class ReflectionUtil:
                     if child_type is not None:
                         invalid_runs = [v for v in val if not ReflectionUtil.is_type(v, child_type, param_name, print_on_error=False)]
                         if len(invalid_runs) > 0:
-                            raise TypeError(f"List elements {invalid_runs} was not of type {child_type}.")
+                            logger.log_exception_on_condition(TypeError, f"List elements {invalid_runs} was not of type {child_type}.",
+                                                              condition=print_on_error)
+                            return False
                     return True
                 elif parent_class == "union":
                     queries = [c for c in child_classes if ReflectionUtil.is_type(val, c, param_name, print_on_error=False)]
                     if len(queries) == 0:
-                        raise TypeError(f"{val} was not of type: {child_classes}")
+                        logger.log_exception_on_condition(TypeError, f"{val} was not of type: {child_classes}",
+                                                          condition=print_on_error)
+                        return False
                     return True
                 elif parent_class == "callable":
                     check_type(param_name, val, expected_type)

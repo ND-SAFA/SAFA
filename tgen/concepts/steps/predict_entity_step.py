@@ -1,8 +1,11 @@
-from typing import Dict, List
+from typing import Dict, List, Set
+
+import stanza
 
 from tgen.common.constants.concept_pipeline_constants import ENTITY_NAME_TAG, ENTITY_TAG
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH, SPACE
 from tgen.common.objects.artifact import Artifact
+from tgen.common.util.str_util import StrUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.core.trainers.llm_trainer import LLMTrainer
@@ -23,6 +26,12 @@ class PredictEntityStep(AbstractPipelineStep):
     * This is just a starting point and more robust entity extraction must be researched.
     """
 
+    def __init__(self):
+        """
+        Initializes the pipeline from StandfordNLP.
+        """
+        self.nlp = stanza.Pipeline(lang='en', processors='tokenize,ner')
+
     def _run(self, args: ConceptArgs, state: ConceptState) -> None:
         """
         Extracts the most important entities from the target artifact.
@@ -30,12 +39,14 @@ class PredictEntityStep(AbstractPipelineStep):
         :param state: Stored entity df.
         :return: None
         """
-        if not args.use_llm_for_entity_extraction:
-            return
+        if args.use_llm_for_entity_extraction:
+            artifact_responses = self.predict_artifact_prompt(args.artifacts,
+                                                              SupportedPrompts.CONCEPT_ENTITY_EXTRACTION.value,
+                                                              args.llm_manager)
+        else:
+            direct_match_content = {match["matched_content"] for match in state.direct_matches}
+            artifact_responses = self.identify_entities_with_stanza(args.artifacts, direct_match_content)
 
-        artifact_responses = self.predict_artifact_prompt(args.artifacts,
-                                                          SupportedPrompts.CONCEPT_ENTITY_EXTRACTION.value,
-                                                          args.llm_manager)
         data_frames = []
         for artifact, artifact_response in zip(args.artifacts, artifact_responses):
             artifact_entity_df = self.create_artifact_df(artifact_response[ENTITY_TAG], args.entity_layer_id)
@@ -86,5 +97,33 @@ class PredictEntityStep(AbstractPipelineStep):
             if ENTITY_NAME_TAG not in entity_dict:
                 continue
             entity_name = entity_dict[ENTITY_NAME_TAG][0]
-            entities.append(Artifact(id=entity_name, content=EMPTY_STRING, layer_id=entity_layer_id, summary=""))
+            entities.append(Artifact(id=entity_name, content=EMPTY_STRING, layer_id=entity_layer_id))
         return ArtifactDataFrame(entities)
+
+    def identify_entities_with_stanza(self, artifacts: List[Artifact], direct_match_content: Set[str]) -> List[dict]:
+        """
+        Finds any entities that are mentioned in target artifact using stanza package.
+        :param artifacts: All artifacts to identify the entities.
+        :param direct_match_content: Set of concept that was directly matched.
+        :return: List of identified entities for each artifact, formatted in a response dict.
+        """
+        entities_response = []
+        for artifact in artifacts:
+            target_artifact_content = artifact[ArtifactKeys.CONTENT]
+            doc = self.nlp(target_artifact_content)
+            entities = {self.process_entity(e.text) for e in doc.entities if e.text not in direct_match_content}
+            artifacts = [{ENTITY_NAME_TAG: [e]} for e in entities if len(e) > 1 and not StrUtil.is_number(e)]
+            entities_response.append({ENTITY_TAG: artifacts})
+        return entities_response
+
+    @staticmethod
+    def process_entity(entity: str) -> str:
+        """
+        Run's pre-processing on the entity to clean it.
+        :param entity: The entity to process.
+        :return: The processed entity.
+        """
+        processed_entity = entity.replace(F_SLASH, SPACE)
+        processed_entity = StrUtil.remove_stop_words(processed_entity)
+        processed_entity = StrUtil.remove_common_words(processed_entity)
+        return processed_entity

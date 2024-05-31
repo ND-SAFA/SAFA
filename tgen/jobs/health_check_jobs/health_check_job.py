@@ -41,7 +41,7 @@ class HealthCheckJob(AbstractJob):
         :return: Results from each health check.
         """
         dataset: PromptDataset = self.job_args.dataset
-        contradictions_result = None  # self._run_contradictions_detector()
+        contradictions_result = self._run_contradictions_detector()
         concept_matches = self._run_concept_matching(dataset.artifact_df)
         related_traces = dataset.trace_dataset.trace_df.get_relationships(artifact_ids=self.query_ids,
                                                                           artifact_key=TraceKeys.child_label())
@@ -87,23 +87,25 @@ class HealthCheckJob(AbstractJob):
         :param query_ids: List of query ids which may contain selection commands.
         :return: List of artifacts ids in query.
         """
+        command = None
         if isinstance(query_ids, list) and len(query_ids) == 1:
             command = query_ids[0]
         elif isinstance(query_ids, str):
             command = query_ids
-        else:
-            return query_ids
 
-        artifact_ids = list(self.job_args.dataset.artifact_df.index)
-        command = command.upper()
-        if command == self.ALL_SELECTION:
-            return list(artifact_ids)
-        if command == self.RANDOM_SELECTION:
-            return random.choice(artifact_ids)
+        if command:
+            artifact_ids = list(self.job_args.dataset.artifact_df.index)
+            command = command.upper()
+            if command == self.ALL_SELECTION:
+                query_ids = list(artifact_ids)
+            if command == self.RANDOM_SELECTION:
+                query_ids = [random.choice(artifact_ids)]
 
-        if self.RANDOM_SELECTION in command:
-            try:
-                k = int(command.split(UNDERSCORE)[-1])
-                return random.sample(artifact_ids, k)
-            except Exception as e:
-                return query_ids
+            if self.RANDOM_SELECTION in command:
+                try:
+                    k = int(command.split(UNDERSCORE)[-1])
+                    query_ids = random.sample(artifact_ids, k)
+                except Exception as e:
+                    pass
+
+        return query_ids

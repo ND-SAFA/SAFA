@@ -1,4 +1,3 @@
 ENTITY_TAG = "entity"
 ENTITY_NAME_TAG = "name"
 ENTITY_DESCRIPTION_TAG = "desc"
-ENTITY_CLASSIFICATION_TAG = "classification"

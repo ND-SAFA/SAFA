@@ -2,7 +2,7 @@ import os
 from collections.abc import Set
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Union, Optional
 
 from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, UNDERSCORE
 from tgen.common.logging.logger_manager import logger
@@ -13,7 +13,6 @@ from tgen.common.util.param_specs import ParamSpecs
 from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.common.util.status import Status
 from tgen.common.util.yaml_util import YamlUtil
-from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 from tgen.summarizer.summary import Summary
 
@@ -109,7 +108,7 @@ class State(BaseObject):
             return False
 
     @classmethod
-    def delete_state_files(cls, load_dir: str, step_names: List[str], step_to_delete_from: str = None) -> "State":
+    def delete_state_files(cls, load_dir: str, step_names: List[str], step_to_delete_from: str = None) -> None:
         """
         Deletes all state files starting at the step to delete from
         :param load_dir: The directory to delete the state from
@@ -225,15 +224,8 @@ class State(BaseObject):
         if name not in param_specs.param_names:
             raise Exception(f"Unknown parameter {name} in {cls.__name__}")
         expected_param_type = param_specs.param_types.get(name, Any)
-        if isinstance(val, AbstractDatasetCreator) and not ReflectionUtil.is_type(val, expected_param_type, name,
-                                                                                  print_on_error=False):
-            try:
-                val = val.create()
-            except Exception as e:
-                logger.error(f"Unable to create dataset: {name}")
-                raise e
         if not ReflectionUtil.is_type(val, expected_param_type, name, print_on_error=False):
-            val = cls._try_load_from_yaml(name, val, param_specs, expected_param_type)
+            val = cls._try_convert_from_yaml(name, val, param_specs, expected_param_type)
             if val is None:
                 raise TypeError(f"Expected {name} to be {expected_param_type} but was type {type(val)}")
         return val
@@ -257,7 +249,15 @@ class State(BaseObject):
         return os.path.join(directory, State._get_filename(step_name, run_num, step_num))
 
     @classmethod
-    def _try_load_from_yaml(cls, name: str, val: Any, param_specs: ParamSpecs, expected_param_type):
+    def _try_convert_from_yaml(cls, name: str, val: Any, param_specs: ParamSpecs, expected_param_type: str) -> Optional[Any]:
+        """
+        Attempts to convert the object from its yaml form so that it is the correct type.
+        :param name: The name of the param being converted.
+        :param val: The value of the param to convert.
+        :param param_specs: Contains the expected type information.
+        :param expected_param_type: The expected type of the param.
+        :return: The value if successful converted, else None.
+        """
         if ReflectionUtil.is_typed_class(expected_param_type):
             parent_cls, *child_classes = ReflectionUtil.get_typed_class(expected_param_type)
             for cls_ in child_classes:
@@ -272,7 +272,7 @@ class State(BaseObject):
                         return cls._check_type(name, loaded_val, param_specs)
                     except Exception as e:
                         continue
-                loaded_val = cls._try_load_from_yaml(name, val, param_specs, cls_)
+                loaded_val = cls._try_convert_from_yaml(name, val, param_specs, cls_)
                 if loaded_val is not None:
                     return loaded_val
 

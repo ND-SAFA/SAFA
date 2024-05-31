@@ -12,6 +12,7 @@ from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
+from tgen.prompts.response_managers.abstract_response_manager import AbstractResponseManager
 
 
 class MultiArtifactPrompt(Prompt):
@@ -37,6 +38,7 @@ class MultiArtifactPrompt(Prompt):
                  starting_num: int = 1,
                  include_ids: bool = True,
                  prompt_args: PromptArgs = None,
+                 response_manager: AbstractResponseManager = None,
                  **artifact_params):
         """
         Constructor for making a prompt containing many artifacts.
@@ -47,6 +49,7 @@ class MultiArtifactPrompt(Prompt):
         :param starting_num: The number to start the artifacts at if using numbered build method
         :param include_ids: Whether to include artifact IDs in prompt.
         :param artifact_params: Parameters used to initialize artifact prompt
+        :param response_manager: Handles parsing responses from the LLM.
         """
         self.build_method = build_method
         self.build_methods = {self.BuildMethod.XML: self._build_as_xml,
@@ -56,17 +59,17 @@ class MultiArtifactPrompt(Prompt):
         self.artifact_params = artifact_params
         self.data_type = data_type
         self.starting_num = starting_num
-        super().__init__(value=prompt_start, prompt_args=prompt_args)
+        super().__init__(value=prompt_start, prompt_args=prompt_args, response_manager=response_manager)
 
     @overrides(Prompt)
-    def _build(self, artifacts: List[EnumDict], **kwargs) -> str:
+    def build(self, artifacts: List[EnumDict], **kwargs) -> str:
         """
         Builds the artifacts prompt using the given build method
         :param artifacts: The list of dictionaries containing the attributes representing each artifact
         :param kwargs: Ignored
         :return: The formatted prompt
         """
-        prompt = self.structure_value(super()._build(**kwargs), NEW_LINE, NEW_LINE)
+        prompt = self.structure_value(super().build(**kwargs), NEW_LINE, NEW_LINE)
         if self.build_method in self.build_methods:
             artifact_params = deepcopy(self.artifact_params)
             artifact_tokens = [TokenCalculator.estimate_num_tokens(artifact[ArtifactKeys.CONTENT]) for artifact in artifacts]

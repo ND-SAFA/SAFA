@@ -2,7 +2,7 @@ from typing import List
 
 import pandas as pd
 
-from test.concepts.constants import CONCEPT_ARTIFACT_PATH, CONCEPT_DF_PATH, CONCEPT_TARGET_LAYER_ID, CONCEPT_TYPE
+from test.concepts.constants import CONCEPT_ARTIFACT_PATH, CONCEPT_DF_PATH, CONCEPT_TARGET_LAYER_ID, CONCEPT_TYPE, CONCEPT_CONTEXT_PATH
 from tgen.common.objects.artifact import Artifact
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
@@ -21,7 +21,8 @@ def create_concept_args() -> ConceptArgs:
     target_artifacts = create_target_artifacts()
     args = ConceptArgs(dataset=PromptDataset(artifact_df=ArtifactDataFrame(raw_df)),
                        concept_layer_id=CONCEPT_TYPE,
-                       artifacts=target_artifacts)
+                       artifacts=target_artifacts,
+                       context_doc_path=CONCEPT_CONTEXT_PATH)
     return args
 
 

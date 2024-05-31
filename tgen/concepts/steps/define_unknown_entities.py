@@ -6,6 +6,7 @@ from pypdf import PdfReader
 from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.file_util import FileUtil
+from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.types.undefined_concept import UndefinedConcept
@@ -21,6 +22,7 @@ from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder
+from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 
 
 class DefineUnknownEntitiesStep(AbstractPipelineStep):
@@ -37,7 +39,7 @@ class DefineUnknownEntitiesStep(AbstractPipelineStep):
         original_content = self._read_context_document(args.context_doc_path)
 
         undefined_entities = state.response["undefined_entities"]
-        context, undefined_entity_artifacts = self._identify_context_for_entities(original_content, args.dataset.artifact_df,
+        context, undefined_entity_artifacts = self._identify_context_for_entities(original_content, args.artifacts,
                                                                                   undefined_entities)
 
         entity_id_to_definition = self._predict_entity_definitions(context, undefined_entity_artifacts, args.llm_manager)
@@ -58,7 +60,7 @@ class DefineUnknownEntitiesStep(AbstractPipelineStep):
         instruction_prompt = ArtifactPrompt(prompt_args=PromptArgs(title="Tasks"),
                                             prompt_start="Based on the provided information, summarize what the following "
                                                          "term means in the context of this project. ",
-                                            include_id=False)
+                                            include_id=False, response_manager=XMLResponseManager(response_tag="definition"))
         prompt_builder = PromptBuilder([context_prompt, instruction_prompt])
         dataset = PromptDataset(artifact_df=ArtifactDataFrame(undefined_entities))
         dataset_manager = TrainerDatasetManager.create_from_datasets({DatasetRole.EVAL: dataset})
@@ -66,27 +68,31 @@ class DefineUnknownEntitiesStep(AbstractPipelineStep):
                                         llm_manager=llm_manager)
         llm_trainer = LLMTrainer(trainer_state)
         res = llm_trainer.perform_prediction()
-        entity_id_to_definition = {e_id: pred for e_id, pred in zip(dataset.artifact_df.index, res.predictions)}
+        predictions = LLMResponseUtil.extract_predictions_from_response(res.predictions, instruction_prompt.args.prompt_id,
+                                                                        instruction_prompt.get_all_response_tags()[0],
+                                                                        return_first=True)
+        entity_id_to_definition = {e_id: pred for e_id, pred in zip(dataset.artifact_df.index, predictions)}
         return entity_id_to_definition
 
-    def _identify_context_for_entities(self, context_doc_content: str, artifact_df: ArtifactDataFrame,
+    def _identify_context_for_entities(self, context_doc_content: str, artifacts: List[Artifact],
                                        undefined_entities: List[UndefinedConcept]) -> Tuple[Dict[str, List[Artifact]], List[Artifact]]:
         """
         Identifies relevant context for each undefined entity.
         :param context_doc_content: The content from the context document.
-        :param artifact_df: Contains all project artifacts.
+        :param artifacts: Contains all project artifacts.
         :param undefined_entities: List of undefined concepts.
         :return: Mapping of entity id to related artifacts for context and a list of corresponding undefined entity as artifacts.
         """
+        id2artifacts = {a["id"]: a for a in artifacts}
         chunks = NLTKTextSplitter().split_text(context_doc_content)
         context, undefined_entity_artifacts = {}, []
         for entity in undefined_entities:
             entity_id = entity["concept_id"]
             found_chunks = self._find_chunks_related_to_entity(entity_id, chunks)
 
-            artifacts = artifact_df.filter_by_index(entity["artifact_ids"]).to_artifacts()
-            entity_context = artifacts + found_chunks
-            if entity_context > 1:
+            related_artifacts = [id2artifacts[a_id] for a_id in entity["artifact_ids"]]
+            entity_context = related_artifacts + found_chunks
+            if len(entity_context) > 1:
                 context[entity_id] = entity_context
                 undefined_entity_artifacts.append(Artifact(id=entity_id, content=entity_id, layer_id="undefined"))
         return context, undefined_entity_artifacts

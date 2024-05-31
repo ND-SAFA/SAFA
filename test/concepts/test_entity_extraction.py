@@ -14,6 +14,24 @@ from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestPredictEntityStep(BaseTest):
+
+    def test_entity_extraction_with_stanza(self) -> None:
+        """
+        Verifies that entities are extracted correctly and saved to state.
+        """
+        args = create_concept_args()
+        args.use_llm_for_entity_extraction = False
+
+        step = PredictEntityStep()
+
+        state = ConceptState()
+        step.run(args, state)
+
+        entity_batches = [['GS', 'GS Antenna', 'GOES-N', 'GOES-R'], ['SSP']]
+        self.assertEqual(len(entity_batches), len(state.entity_data_frames))
+        for entity_batch, entity_df in zip(entity_batches, state.entity_data_frames):
+            self.verify_entity_df(entity_batch, entity_df)
+
     @mock_anthropic
     def test_entity_extraction(self, ai_manager: TestAIManager) -> None:
         """

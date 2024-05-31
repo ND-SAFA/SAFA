@@ -58,10 +58,20 @@
 
     <artifact-input
       v-if="!artifactSaveStore.isUpdate"
-      v-model="artifactSaveStore.parentId"
+      v-model="artifactSaveStore.parentIds"
+      multiple
       only-document-artifacts
-      label="Parent Artifact"
+      label="Parent Artifacts"
       data-cy="input-artifact-parent"
+      class="q-mb-md"
+    />
+    <artifact-input
+      v-if="!artifactSaveStore.isUpdate"
+      v-model="artifactSaveStore.childIds"
+      multiple
+      only-document-artifacts
+      label="Child Artifacts"
+      data-cy="input-artifact-child"
       class="q-mb-md"
     />
 

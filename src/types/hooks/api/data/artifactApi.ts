@@ -32,13 +32,15 @@ export interface ArtifactApiHook {
    * @param artifact - The artifact to create.
    * @param isUpdate - Whether this operation should label this commit as
    * updating a previously existing artifact.
-   * @param parentArtifact - The parent artifact to link to.
+   * @param parentArtifacts - The parent artifacts to link to.
+   * @param childArtifacts - The child artifacts to link to.
    * @param callbacks - Callbacks to run after the action.
    */
   handleSave(
     artifact: ArtifactSchema,
     isUpdate: boolean,
-    parentArtifact: ArtifactSchema | undefined,
+    parentArtifacts?: ArtifactSchema[],
+    childArtifacts?: ArtifactSchema[],
     callbacks?: IOHandlerCallback
   ): Promise<void>;
   /**

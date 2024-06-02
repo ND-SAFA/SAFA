@@ -104,6 +104,7 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
 
     @Override
     public GithubCommitDiffResponseDTO getDiffBetweenOldCommitAndHead(GithubAccessCredentials credentials,
+                                                                      String repositoryOwner,
                                                                       String repositoryName,
                                                                       String baseCommitSha,
                                                                       String branchName) {
@@ -113,7 +114,7 @@ public class GithubConnectionServiceImpl implements GithubConnectionService {
             this.webClient
                 .method(ApiRoute.COMMIT_DIFF.getMethod())
                 .uri(ApiRoute.COMMIT_DIFF.getFullPath(),
-                    credentials.getGithubHandler(), repositoryName, commitRange
+                    repositoryOwner, repositoryName, commitRange
                 )
                 .header(HttpHeaders.AUTHORIZATION,
                     this.buildAuthorizationHeaderValue(credentials.getAccessToken()))

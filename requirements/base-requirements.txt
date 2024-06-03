@@ -7,6 +7,9 @@ GitPython==3.1.41
 hdbscan==0.8.33
 javac-parser==1.0.0
 javalang==0.13.0
+langchain==0.2.1
+langchain-core==0.2.1
+langchain-text-splitters==0.2.0
 lxml==4.9.2
 openai==0.27.4
 python-dotenv==0.21.1

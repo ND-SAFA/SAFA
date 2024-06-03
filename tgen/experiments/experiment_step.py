@@ -1,10 +1,13 @@
+import json
 import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
 
 from tgen.common.constants.deliminator_constants import UNDERSCORE
 from tgen.common.constants.experiment_constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
+from tgen.common.logging.logger_manager import logger
 from tgen.common.util.base_object import BaseObject
+from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.json_util import JsonUtil
 from tgen.common.util.list_util import ListUtil
@@ -59,6 +62,8 @@ class ExperimentStep(BaseObject):
                 self.status = Status.FAILURE
                 break
 
+        self._collect_results(job_runs)
+
         if self.status != Status.FAILURE:
             self.status = Status.SUCCESS
         self.save_results(output_dir)
@@ -101,6 +106,27 @@ class ExperimentStep(BaseObject):
         best_job = self._get_best_job(jobs, self.best_job)
         self._run_on_jobs(jobs, "save", output_dir=output_dir)
         return best_job
+
+    @staticmethod
+    def _collect_results(job_runs: List[List[AbstractJob]]) -> None:
+        """
+        Collects all results from the job if they are trace prediction output so metrics can be printed.
+        :param jobs: List of all jobs.
+        :return: None.
+        """
+        collected_results = [job.result for jobs in job_runs for job in jobs
+                             if isinstance(job.result.body, TracePredictionOutput) and job.result.body.metrics]
+        if len(collected_results) > 1:
+            combined_metrics = {}
+            for result in collected_results:
+                logger.log_with_title(f"\n\nRanking Metrics for Job with {result.get_printable_experiment_vars()}",
+                                      json.dumps(result.body.metrics))
+                for metric_name, metric_result in result.body.metrics.items():
+                    if isinstance(metric_result, float):
+                        DictUtil.set_or_increment_count(combined_metrics, metric_name, metric_result)
+            for metric_name, metric_result in combined_metrics.items():
+                combined_metrics[metric_name] /= len(collected_results)
+            logger.log_with_title(f"Averaged Metrics", json.dumps(combined_metrics))
 
     @staticmethod
     def _get_failed_jobs(jobs: List[AbstractJob]) -> List[str]:

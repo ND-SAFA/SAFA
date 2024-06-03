@@ -49,11 +49,11 @@ class EntityMatchingContext:
         direct_match_content = {match["matched_content"] for match in self.state.direct_matches}
         for artifact_index, (entity_df, target_artifact) in enumerate(zip(self.state.entity_data_frames, self.args.artifacts)):
             entities: List[Artifact] = entity_df.to_artifacts()
-            if not entities:
+            concepts: List[Artifact] = self.state.concept_df.to_artifacts()
+            if not entities or not concepts:
                 self.state.predicted_matches = []
                 continue
 
-            concepts: List[Artifact] = self.state.concept_df.to_artifacts()
             filtered_entities = [e for e in entities if e[ArtifactKeys.ID] not in direct_match_content]
             self._create_prompts(filtered_entities,
                                  concepts,

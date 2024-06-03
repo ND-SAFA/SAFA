@@ -1,4 +1,4 @@
-from tgen.common.constants.concept_pipeline_constants import ENTITY_DESCRIPTION_TAG, ENTITY_NAME_TAG, ENTITY_TAG
+from tgen.common.constants.concept_pipeline_constants import ENTITY_NAME_TAG, ENTITY_TAG
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
@@ -14,13 +14,12 @@ def get_response_format():
     Creates the example response format used in the prompt to the LLM.
     :return: Example of how to format an extracted entity.
     """
-    return create_entity_extraction_response("ACRONYM", "DESCRIPTION", prefix="Record each acronym like so: \n")
+    return create_entity_extraction_response("ENTITY", prefix="Record each entity like so: \n")
 
 
-def create_entity_extraction_response(name: str, description: str, prefix: str = EMPTY_STRING) -> str:
+def create_entity_extraction_response(name: str, prefix: str = EMPTY_STRING) -> str:
     """
     :param name: The entity name.
-    :param description: The description of the entity.
     :param prefix: Goes before the response tags.
     :return: Expected response format for each entity found.
     """
@@ -28,17 +27,19 @@ def create_entity_extraction_response(name: str, description: str, prefix: str =
         f"{prefix}"
         f"<{ENTITY_TAG}>"
         f"<{ENTITY_NAME_TAG}>{name}</{ENTITY_NAME_TAG}>"
-        f"<{ENTITY_DESCRIPTION_TAG}>{description}</{ENTITY_DESCRIPTION_TAG}>"
         f"</{ENTITY_TAG}>"
     )
 
 
 ENTITY_EXTRACTION_PROMPT = Prompt("Above is an artifact from a software system. "
-                                  "Please extract the acronyms used in the artifact. "
-                                  "Give the most probably definition for each acronym found. ",
-                                  prompt_args=PromptArgs(title="Instructions\n"),
+                                  "Please extract the key project-specific entities used in the artifact. "
+                                  "Entities include project concepts, acronyms, and terminology "
+                                  "that would mostly likely need to be defined in a project glossary. "
+                                  ""
+                                  "If none exists, just say 'NA'",
+                                  prompt_args=PromptArgs(title="Task\n"),
                                   response_manager=XMLResponseManager(
-                                      response_tag={ENTITY_TAG: [ENTITY_NAME_TAG, ENTITY_DESCRIPTION_TAG]},
+                                      response_tag={ENTITY_TAG: [ENTITY_NAME_TAG, ENTITY_NAME_TAG]},
                                       response_instructions_format=get_response_format()))
 
 """

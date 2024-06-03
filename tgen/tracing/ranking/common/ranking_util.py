@@ -28,8 +28,8 @@ class RankingUtil:
     """
 
     @staticmethod
-    def evaluate_trace_predictions(trace_df: TraceDataFrame, predicted_entries: List[Trace],
-                                   log_results: bool = False) -> Optional[Dict]:
+    def evaluate_trace_predictions(trace_df: TraceDataFrame, predicted_entries: List[EnumDict],
+                                   all_scores: Dict[int, float] = None, log_results: bool = True) -> Optional[Dict]:
         """
         Calculates ranking metrics for ranking predictions.
         :param trace_df: The trace data frame containing true labels.
@@ -38,28 +38,7 @@ class RankingUtil:
         :param log_results: If True, logs the results to the console.
         :return: The dictionary of metrics.
         """
-        id2pred = {}
-        for pred in predicted_entries:
-            id2pred[pred[TraceKeys.LINK_ID]] = pred
-
-        scores = [id2pred[t_id].get(TraceKeys.SCORE, 0) for t_id in trace_df.index]
-        metric_manager = MetricsManager(trace_df, predicted_similarities=scores)
-        metrics = metric_manager.eval(SupportedTraceMetric.get_keys())
-        logger.log_with_title("Ranking Metrics", json.dumps(metrics))
-
-        if log_results:
-            RankingUtil.log_classification_results(trace_df, predicted_entries)
-
-        return metrics
-
-    @staticmethod
-    def log_classification_results(trace_df: TraceDataFrame, predicted_entries: List[Trace]) -> None:
-        """
-        Logs the false negatives and positives in predictions.
-        :param trace_df: Trace data frame containing links for traces.
-        :param predicted_entries: Entries representing trace link predictions.
-        :return: None
-        """
+        all_scores = {} if not all_scores else all_scores
         if trace_df is None:
             logger.info("Skipping evaluation, trace data frame is none.")
             return
@@ -70,6 +49,7 @@ class RankingUtil:
         if not isinstance(predicted_entries[0], EnumDict):
             predicted_entries = [EnumDict(e) for e in predicted_entries]
 
+        all_link_ids = list(trace_df.index)
         positive_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(1)]
         negative_link_ids = [t[TraceKeys.LINK_ID] for t in trace_df.get_links_with_label(0)]
         predicted_link_ids = [TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET]) for
@@ -79,8 +59,28 @@ class RankingUtil:
         false_negative_ids = list(set(positive_link_ids).difference(set(predicted_link_ids)))
         false_positive_ids = list(set(negative_link_ids).intersection(set(predicted_link_ids)))
 
-        RankingUtil.log_artifacts("False Negatives", trace_df.to_map(), false_negative_ids)
-        RankingUtil.log_artifacts("False Positives", predicted_t_map, false_positive_ids)
+        other_link_ids = set(all_link_ids).difference(predicted_link_ids)
+        ordered_link_ids = predicted_link_ids + list(other_link_ids)
+        scores = [entry[TraceKeys.SCORE.value] for entry in predicted_entries]
+        missing_scores = [all_scores.get(i, 0) for i in other_link_ids]
+        all_scores = scores + missing_scores
+
+        metrics_manager_scores = MetricsManager(trace_df, predicted_similarities=all_scores, link_ids=ordered_link_ids)
+        score_based_metrics = SupportedTraceMetric.get_score_based_metrics()
+        metric_results = metrics_manager_scores.eval(score_based_metrics)
+
+        metrics_manager_labels = MetricsManager(trace_df,
+                                                predicted_similarities=[int(id_ in predicted_link_ids) for id_ in ordered_link_ids],
+                                                link_ids=ordered_link_ids)
+        other_metrics = set(SupportedTraceMetric.get_keys()).difference(score_based_metrics)
+        other_metric_results = metrics_manager_labels.eval(other_metrics)
+
+        metric_results.update(other_metric_results)
+        if log_results:
+            RankingUtil.log_artifacts("False Negatives", trace_df.to_map(), false_negative_ids)
+            RankingUtil.log_artifacts("False Positives", predicted_t_map, false_positive_ids)
+            logger.log_with_title("Ranking Metrics", json.dumps(metric_results))
+        return metric_results
 
     @staticmethod
     def ranking_to_predictions(parent2rankings, parent2explanations: Dict[str, List[str]] = None) -> List[Trace]:
@@ -169,12 +169,12 @@ class RankingUtil:
         if secondary_threshold is None:
             secondary_threshold = primary_threshold - 0.1
 
-        # Group trace predictions by artifact
+            # Group trace predictions by artifact
         artifact2predictions = defaultdict(list)
         for prediction in trace_predictions:
             artifact2predictions[prediction[artifact_key.value]].append(prediction)
 
-        predictions = []
+        selections = []
 
         for artifact_preds in artifact2predictions.values():
             # Sort predictions by score in descending order
@@ -183,19 +183,19 @@ class RankingUtil:
             # Select based on thresholds
             t1_preds = [s for s in sorted_entries if s[TraceKeys.SCORE] >= primary_threshold]
             if t1_preds:
-                predictions.extend(t1_preds)
+                selections.extend(t1_preds)
                 continue
 
             t2_preds = [s for s in sorted_entries if secondary_threshold <= s[TraceKeys.SCORE] < primary_threshold]
             if t2_preds:
-                predictions.extend(t2_preds)
+                selections.extend(t2_preds)
                 continue
 
             if sorted_entries[0][TraceKeys.SCORE] >= min_threshold:
-                predictions.append(sorted_entries[0])
+                selections.append(sorted_entries[0])
                 continue
 
-        return predictions
+        return selections
 
     @staticmethod
     def group_trace_predictions(predictions: List[Trace], key_id: str, sort_entries: bool = False):

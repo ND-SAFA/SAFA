@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from test.ranking.steps.ranking_pipeline_test import DEFAULT_PARENT_IDS, DEFAULT_CHILDREN_IDS
+from test.ranking.steps.ranking_pipeline_test import DEFAULT_CHILDREN_IDS, DEFAULT_PARENT_IDS
 from tgen.common.util.enum_util import EnumDict
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import TraceKeys
@@ -28,7 +28,7 @@ class TestSelectCandidateLinksStep(TestCase):
         self.assertEqual(len(state.selected_entries), len(expected_links_by_threshold))
         self.assert_links(expected_links_by_threshold, state)
 
-        expected_links_by_parent = [2, 4, 3]
+        expected_links_by_parent = [2, 3, 4]
         state = self.get_state(children_ids, parent_ids)
         args.selection_method = SupportedSelectionMethod.SELECT_TOP_PARENTS
         SelectCandidateLinksStep().run(args, state)
@@ -73,15 +73,16 @@ class TestSelectCandidateLinksStep(TestCase):
         self.assert_links(expected_links_missing, state)
 
     def assert_links(self, expected_links, state):
-        for link in state.selected_entries:
-            self.assertIn(link['id'], expected_links)
+        selected_link_ids = set([link[TraceKeys.LINK_ID] for link in state.selected_entries])
+        expected_link_ids = set(expected_links)
+        self.assertEqual(expected_link_ids, selected_link_ids)
 
     @staticmethod
     def get_state(children_ids, parent_ids):
-        children_entries = [EnumDict({'id': 1, 'source': 't6', 'target': 's4', 'score': 0.4}),
-                            EnumDict({'id': 2, 'source': 't1', 'target': 's4', 'score': 0.7}),
-                            EnumDict({'id': 3, 'source': 't6', 'target': 's5', 'score': 0.5}),
-                            EnumDict({'id': 4, 'source': 't1', 'target': 's5', 'score': 0.7})
+        children_entries = [EnumDict({'link_id': 1, 'source': 't6', 'target': 's4', 'score': 0.4}),
+                            EnumDict({'link_id': 2, 'source': 't1', 'target': 's4', 'score': 0.7}),
+                            EnumDict({'link_id': 3, 'source': 't6', 'target': 's5', 'score': 0.5}),
+                            EnumDict({'link_id': 4, 'source': 't1', 'target': 's5', 'score': 0.7})
                             ]
         return RankingState(sorted_parent2children={p_id: [RankingUtil.create_entry(p_id, c_id) for c_id in children_ids]
                                                     for p_id in parent_ids}, candidate_entries=children_entries)

@@ -114,6 +114,7 @@ class DictUtil:
         :param enum_type: The properties to extract if they exist.
         :return: EnumDict containing keys found.
         """
+
         trace_keys = [key for key in enum_type if key.value in obj]
         return EnumDict({k: obj[k.value] for k in trace_keys})
 

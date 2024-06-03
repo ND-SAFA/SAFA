@@ -157,10 +157,16 @@ class TraceDataFrame(AbstractProjectDataFrame):
         :return: A dictionary mapping column names to the corresponding link information
         """
         relationship_type = relationship_type
-        dict_ = {TraceKeys.LINK_ID: link_id} if link_id else {}
-        dict_.update({TraceKeys.SOURCE: source_id, TraceKeys.TARGET: target_id,
-                      TraceKeys.LABEL: label, TraceKeys.SCORE: score, TraceKeys.EXPLANATION: explanation,
-                      TraceKeys.RELATIONSHIP_TYPE: relationship_type})
+        dict_ = {
+            TraceKeys.SOURCE: source_id,
+            TraceKeys.TARGET: target_id,
+            TraceKeys.LABEL: label,
+            TraceKeys.SCORE: score,
+            TraceKeys.EXPLANATION: explanation,
+            TraceKeys.RELATIONSHIP_TYPE: relationship_type
+        }
+        if link_id:
+            dict_[TraceKeys.LINK_ID] = link_id
         return EnumDict(dict_)
 
     @staticmethod

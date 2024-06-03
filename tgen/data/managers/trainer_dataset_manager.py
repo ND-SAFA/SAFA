@@ -35,8 +35,7 @@ class TrainerDatasetManager(BaseObject):
                  train_dataset_creator: AbstractDatasetCreator = None,
                  val_dataset_creator: AbstractDatasetCreator = None,
                  eval_dataset_creator: AbstractDatasetCreator = None,
-                 augmenter: DataAugmenter = None
-                 ):
+                 augmenter: DataAugmenter = None):
         """
         Container to hold all the data used in the TraceTrainer
         :param pre_train_dataset_creator: The pre-training dataset creator.
@@ -241,7 +240,8 @@ class TrainerDatasetManager(BaseObject):
                 for dataset_role, dataset_creator in dataset_creators_map.items()}
 
     @staticmethod
-    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[Union[TraceDataset, PreTrainDataset]]:
+    def __optional_create(dataset_creator: Optional[AbstractDatasetCreator]) -> Optional[
+        Union[TraceDataset, PreTrainDataset]]:
         """
         Creates dataset set if not None, otherwise None is returned.
         :param dataset_creator: The optional dataset creator to use.

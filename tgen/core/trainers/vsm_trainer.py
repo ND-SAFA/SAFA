@@ -1,4 +1,5 @@
 import time
+from collections import defaultdict
 from typing import Dict, Iterable, List, Tuple, Union
 
 import numpy as np
@@ -7,9 +8,11 @@ from scipy.sparse import csr_matrix
 from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
+from tqdm import tqdm
 
-from tgen.common.constants.other_constants import VSM_SELECTION_THRESHOLDS, VSM_THRESHOLD_DEFAULT
+from tgen.common.constants.other_constants import VSM_SELECTION_THRESHOLDS
 from tgen.common.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
+from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.util.list_util import ListUtil
@@ -85,9 +88,8 @@ class VSMTrainer(AbstractTrainer):
         return TraceTrainOutput(training_time=finish_time - start_time)
 
     @overrides(AbstractTrainer)
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,
-                           dataset: iDataset = None,
-                           threshold: float = VSM_THRESHOLD_DEFAULT, **kwargs) -> TracePredictionOutput:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None,
+                           **kwargs) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
@@ -97,7 +99,7 @@ class VSMTrainer(AbstractTrainer):
         """
         eval_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         try:
-            output = self.predict(eval_dataset, threshold, **kwargs)
+            output = self.predict(eval_dataset, **kwargs)
         except exceptions.NotFittedError:
             raise exceptions.NotFittedError("Model must be trained before calling predict")
         return output
@@ -131,7 +133,7 @@ class VSMTrainer(AbstractTrainer):
         """
         return [self.artifact_map[a_id] for a_id in artifact_ids]
 
-    def predict(self, eval_dataset: TraceDataset, threshold: float, evaluate: bool = True) -> TracePredictionOutput:
+    def predict(self, eval_dataset: TraceDataset, evaluate: bool = True) -> TracePredictionOutput:
         """
         Uses the trained model to predict on the raw source and target tokens
         :param eval_dataset: The dataset to use for predicting
@@ -143,20 +145,22 @@ class VSMTrainer(AbstractTrainer):
                                                                 eval_dataset.layer_df.as_list(),
                                                                 eval_dataset.artifact_df.to_map())
         prediction_entries = []
+        trace_map = eval_dataset.trace_df.to_map()
 
         for tracing_request in tracing_requests:
+            request_title = f"Tracing ({len(tracing_request.child_ids)}) -> ({len(tracing_request.parent_ids)})"
             parent_artifacts = self.get_artifacts(tracing_request.parent_ids)
             child_artifacts = self.get_artifacts(tracing_request.child_ids)
-            child_parent_pairs = tracing_request.get_tracing_pairs()
 
             parent_tf_matrix, child_tf_matrix = self.create_term_frequency_matrices(parent_artifacts, child_artifacts)
             similarity_matrix = self.calculate_similarity_matrix_from_term_frequencies(parent_tf_matrix, child_tf_matrix)
 
-            for i, (child_id, parent_id) in enumerate(child_parent_pairs):
+            request_iterable = list(enumerate(tracing_request.get_tracing_pairs()))
+            for i, (child_id, parent_id) in tqdm(request_iterable, desc=request_title):
                 row, col = divmod(i, len(child_artifacts))
                 similarity_score = similarity_matrix[row][col]
                 link_id = eval_dataset.trace_df.generate_link_id(child_id, parent_id)
-                link = eval_dataset.trace_df.get_link(link_id)
+                link = trace_map[link_id]
                 label = link[TraceKeys.LABEL] if link else 0
                 prediction_entry = Trace(link_id=link_id, source=child_id, target=parent_id, score=similarity_score, label=label)
                 prediction_entries.append(prediction_entry)
@@ -246,11 +250,10 @@ class VSMTrainer(AbstractTrainer):
         :param predictions: The trace predictions containing scores.
         :return: None
         """
-        parent2preds = {}
+        logger.info("Converting scores to percentiles...")
+        parent2preds = defaultdict(list)
         for p in predictions:
             parent_id = p["target"]
-            if parent_id not in parent2preds:
-                parent2preds[parent_id] = []
             parent2preds[parent_id].append(p)
 
         for parent, preds in parent2preds.items():

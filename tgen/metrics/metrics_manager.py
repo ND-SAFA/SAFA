@@ -5,8 +5,8 @@ import numpy as np
 from evaluate import load
 from scipy.special import softmax
 
+from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.common.logging.logger_manager import logger
-from tgen.common.objects.trace import Trace
 from tgen.common.util.dict_util import DictUtil
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
@@ -52,9 +52,8 @@ class MetricsManager:
         metric_paths = [get_metric_path(name) for name in metric_names]
         results = {}
         trace_matrix_metrics = SupportedTraceMetric.get_query_metrics()
-        scores = self.trace_matrix.scores
-        predicted_labels = list(map(lambda p: 1 if p >= 0.5 else 0, self.trace_matrix.scores))
-        labels = self.trace_matrix.labels
+        scores, labels = self.trace_matrix.get_prediction_payload()
+        predicted_labels = list(map(lambda p: 1 if p >= THRESHOLD_DEFAULT else 0, self.trace_matrix.scores))
         supported_metrics = {e.value.name for e in SupportedTraceMetric}
         for metric_path in metric_paths:
             metric = load(metric_path, keep_in_memory=True)
@@ -78,13 +77,6 @@ class MetricsManager:
         :return: Returns the similarity scores of the prediction output.
         """
         return self.trace_matrix.scores
-
-    def get_trace_predictions(self) -> List[Trace]:
-        """
-        Constructs trace predictions for trace matrix.
-        :return: Trace predictions used in evaluation.
-        """
-        return self.trace_matrix.entries
 
     @staticmethod
     def get_similarity_scores(predictions: Union[np.ndarray, Tuple[np.ndarray]]) -> List[float]:

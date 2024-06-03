@@ -6,7 +6,7 @@ from tgen.common.util.json_util import JsonUtil
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.dataframes.layer_dataframe import LayerDataFrame
 from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import StructuredKeys
+from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
 from tgen.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 
@@ -60,6 +60,9 @@ class ApiProjectReader(AbstractProjectReader[TraceDataFramesTypes]):
         trace_df_entries = []
 
         for trace_entry in links:
+            if TraceKeys.LINK_ID not in trace_entry:
+                trace_entry[TraceKeys.LINK_ID] = TraceDataFrame.generate_link_id(trace_entry[TraceKeys.SOURCE],
+                                                                                 trace_entry[TraceKeys.TARGET])
             trace_enum = DictUtil.create_trace_enum(trace_entry, StructuredKeys.Trace)
             trace_df_entries.append(trace_enum)
         trace_df = TraceDataFrame(trace_df_entries)

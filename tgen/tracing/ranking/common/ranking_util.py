@@ -1,5 +1,6 @@
 import json
-from typing import Dict, List, Optional, Tuple, Set, Union
+from collections import defaultdict
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 
@@ -165,28 +166,36 @@ class RankingUtil:
         :param artifact_key: The key of the primary artifact, from which top candidates will be established.
         :return: List of selected predictions.
         """
-        secondary_threshold = primary_threshold - 0.1 if not secondary_threshold else secondary_threshold
-        artifact2entries = RankingUtil.group_trace_predictions(trace_predictions, artifact_key.value)
-        predictions = []
+        if secondary_threshold is None:
+            secondary_threshold = primary_threshold - 0.1
 
-        for artifact, artifact_preds in artifact2entries.items():
+            # Group trace predictions by artifact
+        artifact2predictions = defaultdict(list)
+        for prediction in trace_predictions:
+            artifact2predictions[prediction[artifact_key.value]].append(prediction)
+
+        selections = []
+
+        for artifact_preds in artifact2predictions.values():
+            # Sort predictions by score in descending order
             sorted_entries = sorted(artifact_preds, key=lambda e: e[TraceKeys.SCORE], reverse=True)
-            if not sorted_entries:
+
+            # Select based on thresholds
+            t1_preds = [s for s in sorted_entries if s[TraceKeys.SCORE] >= primary_threshold]
+            if t1_preds:
+                selections.extend(t1_preds)
                 continue
 
-            t1_preds = [s for s in sorted_entries if s[TraceKeys.SCORE] >= primary_threshold]
-            t2_preds = [s for s in sorted_entries if secondary_threshold <= s[TraceKeys.SCORE] < min_threshold]
-            t3_preds = sorted_entries[:1] if sorted_entries[0][TraceKeys.SCORE] >= min_threshold else []
-            if len(t1_preds) > 0:
-                selected_entries = t1_preds
-            elif len(t2_preds) > 0:
-                selected_entries = t2_preds
-            else:
-                selected_entries = t3_preds
+            t2_preds = [s for s in sorted_entries if secondary_threshold <= s[TraceKeys.SCORE] < primary_threshold]
+            if t2_preds:
+                selections.extend(t2_preds)
+                continue
 
-            predictions.extend(selected_entries)
+            if sorted_entries[0][TraceKeys.SCORE] >= min_threshold:
+                selections.append(sorted_entries[0])
+                continue
 
-        return predictions
+        return selections
 
     @staticmethod
     def group_trace_predictions(predictions: List[Trace], key_id: str, sort_entries: bool = False):

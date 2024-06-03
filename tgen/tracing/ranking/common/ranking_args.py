@@ -7,8 +7,9 @@ from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager
 from tgen.common.constants.ranking_constants import DEFAULT_CROSS_ENCODER_MODEL, DEFAULT_EMBEDDINGS_SCORE_WEIGHT, \
     DEFAULT_EMBEDDING_MODEL, DEFAULT_EXPLANATION_SCORE_WEIGHT, DEFAULT_LINK_THRESHOLD, DEFAULT_MAX_CONTEXT_ARTIFACTS, \
-    DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_SCALED_THRESHOLD, DEFAULT_TEST_EMBEDDING_MODEL, \
-    DEFAULT_SORTING_ALGORITHM, GENERATE_EXPLANATIONS_DEFAULT
+    DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_PARENT_SECONDARY_THRESHOLD, DEFAULT_SCALED_THRESHOLD, \
+    DEFAULT_SORTING_ALGORITHM, \
+    DEFAULT_TEST_EMBEDDING_MODEL, GENERATE_EXPLANATIONS_DEFAULT
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dataclass_util import required_field
 from tgen.common.util.file_util import FileUtil
@@ -82,7 +83,8 @@ class RankingArgs(PipelineArgs):
     """
     - parent_thresholds: The threshold used to establish parents from (primary, secondary and min)
     """
-    parent_thresholds: Tuple[float, float, float] = (DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_PARENT_MIN_THRESHOLD,
+    parent_thresholds: Tuple[float, float, float] = (DEFAULT_PARENT_PRIMARY_THRESHOLD,
+                                                     DEFAULT_PARENT_SECONDARY_THRESHOLD,
                                                      DEFAULT_PARENT_MIN_THRESHOLD)
     """
     - max_context_artifacts: The maximum number of artifacts to consider in a context window. 

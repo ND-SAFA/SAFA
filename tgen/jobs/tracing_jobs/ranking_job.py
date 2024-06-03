@@ -78,7 +78,7 @@ class RankingJob(AbstractJob):
             predicted_entries, scores = self.trace_layer(self.job_args.dataset, tracing_type)
             global_predictions.extend(predicted_entries)
             all_scores.update(scores)
-        metrics = self.optional_eval(self.job_args.dataset.trace_dataset, global_predictions, all_scores, tracing_types,
+        metrics = self.optional_eval(self.job_args.dataset.trace_dataset, global_predictions, tracing_types,
                                      self.log_results)
         return TracePredictionOutput(prediction_entries=global_predictions, metrics=metrics)
 
@@ -116,13 +116,12 @@ class RankingJob(AbstractJob):
         return TraceDataFrame.generate_link_id(entry[TraceKeys.SOURCE], entry[TraceKeys.TARGET])
 
     @staticmethod
-    def optional_eval(dataset: TraceDataset, predictions: List, all_scores: Dict[int, float],
-                      tracing_types: List[Tuple[str, str]], log_results: bool) -> Dict[str, float]:
+    def optional_eval(dataset: TraceDataset, predictions: List, tracing_types: List[Tuple[str, str]],
+                      log_results: bool) -> Dict[str, float]:
         """
         Evaluates the results of the predictions if the dataset contains positive labeled links.
         :param dataset: The dataset representing the ground truth.
         :param predictions: The predictions for the links in the dataset.
-        :param all_scores: A dictionary mapping trace id to the score obtained for it.
         :param tracing_types: The types being traced on.
         :param log_results: If True, logs the results to the console.
         :return: None
@@ -134,7 +133,7 @@ class RankingJob(AbstractJob):
         child_type_ids = set(dataset.artifact_df.get_artifacts_by_type(child_types).index)
         trace_df = dataset.trace_df.filter_by_row(lambda row: row[TraceKeys.child_label().value] in child_type_ids or
                                                               row[TraceKeys.parent_label().value] in parent_type_ids)
-        metrics = RankingUtil.evaluate_trace_predictions(trace_df, predictions, all_scores, log_results=log_results)
+        metrics = RankingUtil.evaluate_trace_predictions(trace_df, predictions, log_results=log_results)
         return metrics
 
     def _create_ranking_args(self, layer_dataset: PromptDataset, types_to_trace: Tuple[str, str],

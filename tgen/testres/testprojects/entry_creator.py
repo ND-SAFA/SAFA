@@ -2,9 +2,10 @@ from typing import Any, Dict, List, Tuple
 
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
+from tgen.common.objects.trace_layer import TraceLayer
+from tgen.data.dataframes.trace_dataframe import TraceDataFrame
 from tgen.data.keys.structure_keys import StructuredKeys
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.common.objects.trace_layer import TraceLayer
 
 ArtifactInstruction = Tuple[Any, str]
 LayerInstruction = List[ArtifactInstruction]
@@ -76,9 +77,12 @@ class EntryCreator:
         entries = []
         for p_id in range(n_parents):
             for c_id in range(n_children):
+                s_id = f"c{c_id}"
+                t_id = f"p{p_id}"
                 entry = Trace(
-                    source=f"c{c_id}",
-                    target=f"p{p_id}",
+                    link_id=TraceDataFrame.generate_link_id(s_id, t_id),
+                    source=s_id,
+                    target=t_id,
                     score=None,
                     label=None,
                     explanation=None

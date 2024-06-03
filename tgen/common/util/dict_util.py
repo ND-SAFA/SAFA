@@ -200,7 +200,7 @@ class DictUtil:
         return False
 
     @staticmethod
-    def set_or_increment_count(mapping: Dict, item_key: Any, increment_value: int = 1) -> None:
+    def set_or_increment_count(mapping: Dict, item_key: Any, increment_value: float = 1) -> None:
         """
         Adds item to mapping if it does not exists, otherwise increments it.
         :param mapping: The map to add item to.

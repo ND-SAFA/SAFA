@@ -1,3 +1,4 @@
+import os
 from typing import Dict
 
 from tgen.variables.definition_variable import DefinitionVariable
@@ -36,7 +37,11 @@ class ExperimentSerializer:
         if isinstance(value, dict):
             value_definition = ExperimentSerializer.create(value)
             if value.get(ExperimentalVariable.SYMBOL, None):
-                values = [ExperimentSerializer.create_variable(v) for v in value[ExperimentalVariable.SYMBOL]]
+                experiment_vals = value[ExperimentalVariable.SYMBOL]
+                if isinstance(experiment_vals, dict) and ExperimentalVariable.CONCAT in experiment_vals:
+                    base_val, concat_values = experiment_vals[ExperimentalVariable.CONCAT]
+                    experiment_vals = [os.path.join(base_val, v) for v in concat_values]
+                values = [ExperimentSerializer.create_variable(v) for v in experiment_vals]
                 return ExperimentalVariable(values)
             elif value.get(TypedDefinitionVariable.OBJECT_TYPE_KEY, None):
                 return TypedDefinitionVariable(value_definition)

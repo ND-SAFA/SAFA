@@ -111,7 +111,7 @@ class ExperimentStep(BaseObject):
     def _collect_results(job_runs: List[List[AbstractJob]]) -> None:
         """
         Collects all results from the job if they are trace prediction output so metrics can be printed.
-        :param jobs: List of all jobs.
+        :param job_runs: List of all jobs for each batch.
         :return: None.
         """
         collected_results = [job.result for jobs in job_runs for job in jobs

@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics import pairwise_distances
 from tqdm import tqdm
 
-from tgen.common.constants.other_constants import VSM_SELECTION_THRESHOLDS, VSM_THRESHOLD_DEFAULT
+from tgen.common.constants.other_constants import VSM_SELECTION_THRESHOLDS
 from tgen.common.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
 from tgen.common.logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
@@ -88,9 +88,8 @@ class VSMTrainer(AbstractTrainer):
         return TraceTrainOutput(training_time=finish_time - start_time)
 
     @overrides(AbstractTrainer)
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,
-                           dataset: iDataset = None,
-                           threshold: float = VSM_THRESHOLD_DEFAULT, **kwargs) -> TracePredictionOutput:
+    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL, dataset: iDataset = None,
+                           **kwargs) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)
@@ -100,7 +99,7 @@ class VSMTrainer(AbstractTrainer):
         """
         eval_dataset: TraceDataset = self.trainer_dataset_manager[dataset_role] if not dataset else dataset
         try:
-            output = self.predict(eval_dataset, threshold, **kwargs)
+            output = self.predict(eval_dataset, **kwargs)
         except exceptions.NotFittedError:
             raise exceptions.NotFittedError("Model must be trained before calling predict")
         return output
@@ -134,7 +133,7 @@ class VSMTrainer(AbstractTrainer):
         """
         return [self.artifact_map[a_id] for a_id in artifact_ids]
 
-    def predict(self, eval_dataset: TraceDataset, threshold: float, evaluate: bool = True) -> TracePredictionOutput:
+    def predict(self, eval_dataset: TraceDataset, evaluate: bool = True) -> TracePredictionOutput:
         """
         Uses the trained model to predict on the raw source and target tokens
         :param eval_dataset: The dataset to use for predicting

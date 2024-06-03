@@ -3,6 +3,7 @@ from typing import Dict
 import datasets
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 
+from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
@@ -39,7 +40,7 @@ class ClassificationMetrics(AbstractTraceMetric):
         :param kwargs: any other necessary params
         :return: Precision@K score.
         """
-        predictions = list(map(lambda p: 1 if p >= 0.5 else 0, predictions))
+        predictions = list(map(lambda p: 1 if p >= THRESHOLD_DEFAULT else 0, predictions))
         precision = precision_score(references, predictions)
         recall = recall_score(references, predictions)
         f1 = fbeta_score(references, predictions, beta=1)

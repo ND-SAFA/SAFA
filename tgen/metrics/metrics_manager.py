@@ -5,6 +5,7 @@ import numpy as np
 from evaluate import load
 from scipy.special import softmax
 
+from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
 from tgen.common.logging.logger_manager import logger
 from tgen.common.util.dict_util import DictUtil
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
@@ -52,7 +53,7 @@ class MetricsManager:
         results = {}
         trace_matrix_metrics = SupportedTraceMetric.get_query_metrics()
         scores, labels = self.trace_matrix.get_prediction_payload()
-        predicted_labels = list(map(lambda p: 1 if p >= 0.5 else 0, self.trace_matrix.scores))
+        predicted_labels = list(map(lambda p: 1 if p >= THRESHOLD_DEFAULT else 0, self.trace_matrix.scores))
         supported_metrics = {e.value.name for e in SupportedTraceMetric}
         for metric_path in metric_paths:
             metric = load(metric_path, keep_in_memory=True)

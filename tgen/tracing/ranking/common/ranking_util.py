@@ -42,7 +42,7 @@ class RankingUtil:
         for pred in predicted_entries:
             id2pred[pred[TraceKeys.LINK_ID]] = pred
 
-        scores = [id2pred[t_id][TraceKeys.SCORE] if t_id in id2pred else 0 for t_id in trace_df.index]
+        scores = [id2pred[t_id].get(TraceKeys.SCORE, 0) for t_id in trace_df.index]
         metric_manager = MetricsManager(trace_df, predicted_similarities=scores)
         metrics = metric_manager.eval(SupportedTraceMetric.get_keys())
         logger.log_with_title("Ranking Metrics", json.dumps(metrics))

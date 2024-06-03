@@ -158,7 +158,6 @@ class TraceDataFrame(AbstractProjectDataFrame):
         """
         relationship_type = relationship_type
         dict_ = {
-            TraceKeys.LINK_ID: link_id,
             TraceKeys.SOURCE: source_id,
             TraceKeys.TARGET: target_id,
             TraceKeys.LABEL: label,
@@ -166,6 +165,8 @@ class TraceDataFrame(AbstractProjectDataFrame):
             TraceKeys.EXPLANATION: explanation,
             TraceKeys.RELATIONSHIP_TYPE: relationship_type
         }
+        if link_id:
+            dict_[TraceKeys.LINK_ID] = link_id
         return EnumDict(dict_)
 
     @staticmethod

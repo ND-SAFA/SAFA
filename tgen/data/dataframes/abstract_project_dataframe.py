@@ -317,6 +317,25 @@ class AbstractProjectDataFrame(pd.DataFrame):
         """
         return self.__class__(self[self.index.notnull()])
 
+    def to_yaml(self, export_path: str):
+        """
+        Creates a yaml savable dataset by saving as a creator.
+        :param export_path: The path to export everything to
+        :return: The dataset as a creator
+        """
+        export_path += ".csv"
+        self.to_csv(export_path)
+        return export_path
+
+    @classmethod
+    def from_yaml(cls, val: Any) -> "iDataset":
+        """
+        Creates a dataset from the yaml representation (dataset creator)
+        :param val: The yaml representation (dataset creator)
+        :return: The dataset created
+        """
+        return cls(pd.read_csv(val))
+
     def __setitem__(self, key: Any, value: Any) -> None:
         """
         Sets an item for the dataframe

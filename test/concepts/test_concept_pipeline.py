@@ -1,5 +1,6 @@
 from test.concepts.constants import ConceptData
 from test.concepts.test_create_response import TestCreateResponse
+from test.concepts.test_define_unknown_entities import TestDefineUnknownEntities
 from test.concepts.test_entity_extraction import TestPredictEntityStep
 from test.concepts.test_entity_matching import TestEntityMatching
 from test.concepts.utils import create_concept_args
@@ -24,6 +25,7 @@ class TestConceptPipeline(BaseTest):
         for test_entity_df in test_entity_data_frames:
             TestPredictEntityStep.mock_entity_extraction(ai_manager, test_entity_df)
         TestEntityMatching.mock_entity_matching(ai_manager)
+        TestDefineUnknownEntities.mock_entity_definitions(self, ai_manager)
 
         # Execution
         pipeline = ConceptPipeline(args)

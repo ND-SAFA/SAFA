@@ -1,5 +1,6 @@
 from functools import lru_cache
 from logging import Logger
+from typing import Type
 
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
 
@@ -54,6 +55,20 @@ class TGenLogger(Logger):
         :return: None
         """
         return self.log(level=level, msg=msg, *args, **kwargs)
+
+    def log_exception_on_condition(self, exception_class: Type[Exception], exception_msg: str, condition: bool = True) -> None:
+        """
+        Logs an exception and stack trace.
+        :param exception_class: The class of the exception.
+        :param exception_msg: The corresponding message of the exception.
+        :param condition: Only logs if condition is True.
+        :return: None.
+        """
+        try:
+            raise exception_class(exception_msg)
+        except Exception:
+            if condition:
+                self.exception(exception_msg)
 
     @staticmethod
     def __create_title(title: str, prefix: str = EMPTY_STRING):

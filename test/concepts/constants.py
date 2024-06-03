@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from tgen.common.objects.artifact import Artifact
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -11,6 +11,7 @@ CONCEPT_TARGET_LAYER_ID = "Requirement"
 CONCEPT_DATA_PATH = os.path.join(TEST_DATA_DIR, "concepts")
 CONCEPT_DF_PATH = os.path.join(CONCEPT_DATA_PATH, "Concept.csv")
 CONCEPT_ARTIFACT_PATH = os.path.join(CONCEPT_DATA_PATH, "requirement.csv")
+CONCEPT_CONTEXT_PATH = os.path.join(TEST_DATA_DIR, "concepts", "GLM_context.pdf")
 CONCEPT_TYPE = "Concept"
 CONCEPT_ENTITY_MATCHED = "GS"
 CONCEPT_ENTITY_UNDEFINED = "IFDS"
@@ -58,6 +59,7 @@ class ConceptData:
         MULTI_MATCH_LOC = 4
         N_PREDICTED_MATCHES = 1
         N_UNDEFINED = 3
+        N_IN_CONTEXT = 2
 
     class Entities:
         """
@@ -71,6 +73,15 @@ class ConceptData:
         E4 = "GLM"  # R2 - Undefined
         E5 = "SSP"  # R3 - Undefined
         UNDEFINED = E3
+
+        @staticmethod
+        def get_context_entities() -> Dict[str, str]:
+            """
+            Returns list containing each entity that is found in the context doc.
+            :return: List containing each entity that is found in the context doc.
+            """
+            return {ConceptData.Entities.E3: "IFDS is the Intermediate Frequency Distribution System",
+                    ConceptData.Entities.E4: "The concept for the GLM is to perform much of the raw data processing on the ground"}
 
         @staticmethod
         def get_undefined_entities() -> List[Tuple[str, List[str]]]:

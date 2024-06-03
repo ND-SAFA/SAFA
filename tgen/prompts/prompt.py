@@ -36,9 +36,7 @@ class Prompt:
         :return: The formatted prompt + instructions for the response expected from the model
         """
         prompt = self._build(**kwargs)
-        expected_response = self.response_manager.format_response_instructions()
-        if expected_response:
-            prompt = f"{prompt}{SPACE}{expected_response}"
+        prompt = self.add_format_response_instructions(prompt)
         return prompt
 
     def format_value(self, update_value: bool = True, *args: object, **kwargs: object) -> str:
@@ -81,6 +79,17 @@ class Prompt:
         """
         value = self.value if not value else value
         return f"{value_prefix}{value}{value_suffix}" if self.value else EMPTY_STRING
+
+    def add_format_response_instructions(self, prompt: str) -> str:
+        """
+        Adds the instructions for the format for the response to the prompt.
+        :param prompt: Prompt content to add to.
+        :return: The prompt with the instructions included.
+        """
+        expected_response = self.response_manager.format_response_instructions()
+        if expected_response and expected_response not in prompt:
+            prompt = f"{prompt}{SPACE}{expected_response}"
+        return prompt
 
     def _build(self, **kwargs) -> str:
         """

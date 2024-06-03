@@ -31,6 +31,7 @@ class FileUtil:
     NUMPY_EXT = "npy"
     HEADER_EXT = ".h"
     TEXT_EXT = "txt"
+    PDF_EXT = "pdf"
 
     @staticmethod
     def get_directory_path(file_path: str) -> str:

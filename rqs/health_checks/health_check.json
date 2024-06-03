@@ -4,11 +4,10 @@
       "jobs": [
         {
           "object_type": "HEALTH_CHECK",
-          "query_ids": [
-            "MRD631",
-            "MRD638"
-          ],
+          "query_ids": "RANDOM_50",
           "concept_layer_id": "Concept",
+          "use_llm_for_entity_extraction": "[USE_LLM_FOR_ENTITY_EXTRACTION]",
+          "context_doc_path": "[CONTEXT_DOC_PATH]",
           "job_args": {
             "dataset_creator": {
               "object_type": "PROMPT",

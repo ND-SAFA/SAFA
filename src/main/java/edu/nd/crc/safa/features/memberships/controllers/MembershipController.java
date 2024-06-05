@@ -8,11 +8,17 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
+import edu.nd.crc.safa.features.memberships.entities.db.OrganizationMembership;
 import edu.nd.crc.safa.features.memberships.services.MembershipService;
+import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.IRole;
+import edu.nd.crc.safa.features.organizations.entities.db.Organization;
+import edu.nd.crc.safa.features.organizations.entities.db.OrganizationRole;
 import edu.nd.crc.safa.features.permissions.services.PermissionService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.utilities.exception.UserError;
@@ -31,14 +37,17 @@ public class MembershipController extends BaseController {
     private final MembershipService membershipService;
     private final SafaUserService safaUserService;
     private final PermissionService permissionService;
+    private final OrganizationMembershipService orgMembershipService;
 
     public MembershipController(ResourceBuilder resourceBuilder, ServiceProvider serviceProvider,
                                 MembershipService membershipService, SafaUserService safaUserService,
-                                PermissionService permissionService) {
+                                PermissionService permissionService,
+                                OrganizationMembershipService orgMembershipService) {
         super(resourceBuilder, serviceProvider);
         this.membershipService = membershipService;
         this.safaUserService = safaUserService;
         this.permissionService = permissionService;
+        this.orgMembershipService = orgMembershipService;
     }
 
     /**
@@ -70,13 +79,36 @@ public class MembershipController extends BaseController {
         SafaUser newMember = safaUserService.getUserByEmail(newMembership.getEmail());
 
         List<IRole> userRoles = membershipService.getUserRoles(newMember, entityId);
-        if (userRoles.isEmpty() && !permissionService.isActiveSuperuser(getCurrentUser())) {
+        if (userRoles.isEmpty()
+                && !isSameOrgProject(entityId, newMember)
+                && !permissionService.isActiveSuperuser(getCurrentUser())) {
             throw new UserError("User is not yet a member of this entity and must be invited first.");
         }
 
         IEntityMembership membership =
                 membershipService.createMembership(entityId, newMembership.getRole(), newMember, getCurrentUser());
         return new MembershipAppEntity(membership);
+    }
+
+    /**
+     * Returns true if the entity is a project and the user is a member of the org that owns the project
+     *
+     * @param entityId The entity to check
+     * @param user The user
+     * @return True if the above condition is met, false otherwise
+     */
+    private boolean isSameOrgProject(UUID entityId, SafaUser user) {
+        IEntityWithMembership entity = membershipService.getEntity(entityId);
+        if (!(entity instanceof Project)) {
+            return false;
+        }
+
+        List<OrganizationMembership> userOrgs = orgMembershipService.getOrganizationMembershipsForUser(user);
+        Organization projectOrg = ((Project) entity).getOwningTeam().getOrganization();
+
+        return userOrgs.stream().anyMatch(membership ->
+                membership.getRole() != OrganizationRole.NONE  // Shouldn't ever show up but just in case
+                        && membership.getOrganization().equals(projectOrg));
     }
 
     /**

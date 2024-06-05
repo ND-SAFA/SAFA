@@ -70,6 +70,7 @@ public class MembershipInviteService {
      */
     public IEntityMembership useToken(MembershipInviteToken token, SafaUser user) {
         if (token.getExpiration().isBefore(LocalDateTime.now())) {
+            tokenRepo.delete(token);
             throw new InvalidTokenException();
         }
 

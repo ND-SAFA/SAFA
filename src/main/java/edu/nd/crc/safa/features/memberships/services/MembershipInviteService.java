@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.memberships.entities.db.IEntityMembership;
 import edu.nd.crc.safa.features.memberships.entities.db.MembershipInviteToken;
+import edu.nd.crc.safa.features.memberships.entities.db.TokenUses;
 import edu.nd.crc.safa.features.memberships.repositories.MembershipInviteTokenRepository;
 import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.IRole;
@@ -76,7 +77,9 @@ public class MembershipInviteService {
         IRole role = membershipService.getRoleForEntity(entity, token.getRole());
         IEntityMembership membership = membershipService.createMembership(user, entity, role);
 
-        tokenRepo.delete(token);
+        if (token.getUses() == TokenUses.SINGLE) {
+            tokenRepo.delete(token);
+        }
 
         return membership;
     }

@@ -10,6 +10,7 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.email.services.EmailService;
 import edu.nd.crc.safa.features.memberships.entities.app.InviteTokenDTO;
 import edu.nd.crc.safa.features.memberships.entities.db.MembershipInviteToken;
+import edu.nd.crc.safa.features.memberships.entities.db.TokenUses;
 import edu.nd.crc.safa.features.memberships.services.MembershipInviteService;
 import edu.nd.crc.safa.features.memberships.services.MembershipService;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
@@ -56,7 +57,13 @@ public class MembershipInviteController extends BaseController {
     public InviteTokenDTO createInvite(@PathVariable UUID entityId, @RequestBody InviteRequestDTO inviteRequest) {
         SafaUser user = getCurrentUser();
 
-        MembershipInviteToken token = inviteService.generateSharingToken(entityId, inviteRequest.getRole(), user);
+        TokenUses uses = TokenUses.SINGLE;
+        String requestUses = inviteRequest.getUses();
+        if (requestUses != null && !requestUses.isBlank()) {
+            uses = TokenUses.valueOf(requestUses);
+        }
+
+        MembershipInviteToken token = inviteService.generateSharingToken(entityId, inviteRequest.getRole(), uses, user);
         InviteTokenDTO tokenResponse = new InviteTokenDTO(token, fendPathConfig.getAcceptInviteUrl());
 
         String email = inviteRequest.getEmail();
@@ -96,5 +103,6 @@ public class MembershipInviteController extends BaseController {
         @NotEmpty
         private String role;
         private String email;
+        private String uses;
     }
 }

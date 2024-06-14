@@ -27,12 +27,14 @@ public class MembershipInviteService {
      *
      * @param entity The entity to invite to
      * @param role The role for the new user
+     * @param uses The number of uses for the token
      * @param asUser The user doing the sharing
      * @return The generated token
      */
-    public MembershipInviteToken generateSharingToken(IEntityWithMembership entity, IRole role, SafaUser asUser) {
+    public MembershipInviteToken generateSharingToken(IEntityWithMembership entity, IRole role, TokenUses uses,
+                                                      SafaUser asUser) {
         membershipService.requireEditMembersPermission(entity, asUser);
-        return generateSharingTokenNoPermissionCheck(entity, role);
+        return generateSharingTokenNoPermissionCheck(entity, role, uses);
     }
 
     /**
@@ -40,13 +42,14 @@ public class MembershipInviteService {
      *
      * @param entityId The id of the entity to invite to
      * @param roleName The role for the new user
+     * @param uses The number of uses for the token
      * @param asUser The user doing the sharing
      * @return The generated token
      */
-    public MembershipInviteToken generateSharingToken(UUID entityId, String roleName, SafaUser asUser) {
+    public MembershipInviteToken generateSharingToken(UUID entityId, String roleName, TokenUses uses, SafaUser asUser) {
         IEntityWithMembership entity = membershipService.getEntity(entityId);
         IRole role = membershipService.getRoleForEntity(entity, roleName);
-        return generateSharingToken(entity, role, asUser);
+        return generateSharingToken(entity, role, uses, asUser);
     }
 
     /**
@@ -54,10 +57,12 @@ public class MembershipInviteService {
      *
      * @param entity The entity to invite to
      * @param role The role for the new user
+     * @param uses The number of uses for the token
      * @return The generated token
      */
-    public MembershipInviteToken generateSharingTokenNoPermissionCheck(IEntityWithMembership entity, IRole role) {
-        MembershipInviteToken token = new MembershipInviteToken(entity, role);
+    public MembershipInviteToken generateSharingTokenNoPermissionCheck(IEntityWithMembership entity, IRole role,
+                                                                       TokenUses uses) {
+        MembershipInviteToken token = new MembershipInviteToken(entity, role, uses);
         return tokenRepo.save(token);
     }
 

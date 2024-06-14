@@ -49,13 +49,18 @@ public class MembershipInviteToken {
     private TokenUses uses;
 
     public MembershipInviteToken(IEntityWithMembership entity, IRole role) {
-        this(entity.getId(), role.name());
+        this(entity.getId(), role.name(), TokenUses.SINGLE);
     }
 
-    public MembershipInviteToken(UUID entityId, String role) {
+    public MembershipInviteToken(IEntityWithMembership entity, IRole role, TokenUses uses) {
+        this(entity.getId(), role.name(), uses);
+    }
+
+    public MembershipInviteToken(UUID entityId, String role, TokenUses uses) {
         this.entityId = entityId;
         this.role = role;
         this.expiration = LocalDateTime.now().plusWeeks(1);
+        this.uses = uses;
     }
 
 }

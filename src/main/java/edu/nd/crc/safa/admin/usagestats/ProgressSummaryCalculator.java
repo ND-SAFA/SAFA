@@ -6,9 +6,9 @@ import java.time.temporal.ChronoUnit;
 import edu.nd.crc.safa.admin.usagestats.entities.app.AccountCreationStatistics;
 import edu.nd.crc.safa.admin.usagestats.entities.app.GenerationStatistics;
 import edu.nd.crc.safa.admin.usagestats.entities.app.GithubIntegrationStatistics;
+import edu.nd.crc.safa.admin.usagestats.entities.app.OnboardingProgressSummaryDTO;
 import edu.nd.crc.safa.admin.usagestats.entities.app.ProjectImportStatistics;
 import edu.nd.crc.safa.admin.usagestats.entities.app.ProjectSummarizationStatistics;
-import edu.nd.crc.safa.admin.usagestats.entities.app.UserProgressSummaryAppEntity;
 import edu.nd.crc.safa.admin.usagestats.entities.db.ApplicationUsageStatistics;
 
 import lombok.AccessLevel;
@@ -23,8 +23,8 @@ public class ProgressSummaryCalculator {
      * @param stats All user usage stats
      * @return Calculated progress summary
      */
-    public static UserProgressSummaryAppEntity fromUsageStats(Iterable<ApplicationUsageStatistics> stats) {
-        UserProgressSummaryAppEntity summaryObj = new UserProgressSummaryAppEntity();
+    public static OnboardingProgressSummaryDTO fromUsageStats(Iterable<ApplicationUsageStatistics> stats) {
+        OnboardingProgressSummaryDTO summaryObj = new OnboardingProgressSummaryDTO();
 
         for (ApplicationUsageStatistics userStats : stats) {
             countUser(summaryObj, userStats);
@@ -35,7 +35,7 @@ public class ProgressSummaryCalculator {
         return summaryObj;
     }
 
-    private static void countUser(UserProgressSummaryAppEntity summaryObj, ApplicationUsageStatistics userStats) {
+    private static void countUser(OnboardingProgressSummaryDTO summaryObj, ApplicationUsageStatistics userStats) {
         countAccountCreation(summaryObj.getAccounts(), userStats);
         countGithub(summaryObj.getGithub(), userStats);
         countImports(summaryObj.getImports(), userStats);
@@ -153,13 +153,13 @@ public class ProgressSummaryCalculator {
         return ChronoUnit.SECONDS.between(ldt1, ldt2);
     }
 
-    private static void calculateAverages(UserProgressSummaryAppEntity summaryObj) {
+    private static void calculateAverages(OnboardingProgressSummaryDTO summaryObj) {
         calculateAveragesGithub(summaryObj);
         calculateAveragesImport(summaryObj);
         calculateAveragesGeneration(summaryObj);
     }
 
-    private static void calculateAveragesGithub(UserProgressSummaryAppEntity summaryObj) {
+    private static void calculateAveragesGithub(OnboardingProgressSummaryDTO summaryObj) {
         AccountCreationStatistics accounts = summaryObj.getAccounts();
         GithubIntegrationStatistics github = summaryObj.getGithub();
 
@@ -172,7 +172,7 @@ public class ProgressSummaryCalculator {
         withTracking.setAverageTime((long) safeDivide(withTracking.getAverageTime(), withTracking.getAccounts()));
     }
 
-    private static void calculateAveragesImport(UserProgressSummaryAppEntity summaryObj) {
+    private static void calculateAveragesImport(OnboardingProgressSummaryDTO summaryObj) {
         AccountCreationStatistics accounts = summaryObj.getAccounts();
         GithubIntegrationStatistics github = summaryObj.getGithub();
         ProjectImportStatistics imports = summaryObj.getImports();
@@ -191,7 +191,7 @@ public class ProgressSummaryCalculator {
                 (long) safeDivide(fromGithubProper.getAverageTime(), fromGithubProper.getAccounts()));
     }
 
-    private static void calculateAveragesGeneration(UserProgressSummaryAppEntity summaryObj) {
+    private static void calculateAveragesGeneration(OnboardingProgressSummaryDTO summaryObj) {
         AccountCreationStatistics accounts = summaryObj.getAccounts();
         ProjectImportStatistics imports = summaryObj.getImports();
         GenerationStatistics generations = summaryObj.getGenerations();

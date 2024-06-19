@@ -22,7 +22,7 @@ export async function createProject(
     ProjectSchema,
     string,
     Pick<ProjectSchema, "projectId" | "name" | "description">
-  >("project").post(project);
+  >("projectCollection").post(project);
 }
 
 /**
@@ -38,7 +38,7 @@ export async function editProject(
     ProjectSchema,
     string,
     Pick<ProjectSchema, "projectId" | "name" | "description">
-  >("project").put(project);
+  >("projectCollection").put(project);
 }
 
 export async function createProjectCreationJob(

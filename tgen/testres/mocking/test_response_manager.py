@@ -77,7 +77,7 @@ class TestAIManager:
                      explanations: List[str] = None, default_score: float = DEFAULT_SCORE,
                      default_explanation: str = DEFAULT_EXPLANATION):
         """
-
+        TODO: This needs to be moved into a separate class that uses this class to add the responses.
         :param artifact_ids: Artifacts being ranked.
         :param scores: The score to assign to each artifact.
         :param explanations: The explanations to assign to each artifact item.

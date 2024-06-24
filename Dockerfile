@@ -6,10 +6,8 @@ RUN pip install --upgrade pip
 
 ## Step - Install requirements
 ADD tgen/requirements/ /app/tgen/requirements/
+RUN pip3 install -r /app/tgen/requirements/nlp-requirements.txt
 RUN pip3 install -r /app/tgen/requirements/base-requirements.txt
-
-COPY tgen/requirements.txt /app/tgen/
-RUN pip3 install -r /app/tgen/requirements.txt
 
 COPY requirements.txt /app/
 RUN pip3 install -r /app/requirements.txt

@@ -34,6 +34,7 @@ jobs:
         pip3 install -r tgen/requirements/devops-requirements.txt
         pip3 install -r tgen/requirements.txt
         pip3 install -r requirements.txt
+        pip3 install -r requirements/s3-requirements.txt
         python3 tgen/download_static.py
 
     - name: Run Dev-Ops Checks
@@ -45,6 +46,7 @@ jobs:
       run: |
         python src/api/manage.py test src/apiTests
       env:
+        DEFAULT_EMBEDDING_MODEL: "sentence-transformers/all-MiniLM-L6-v2"
         DEPLOYMENT: test
         DJANGO_SETTINGS_MODULE: api.server.settings
         SECRET_KEY: "qc&bx49=cmhwi)^a+v@2e%^_hp(3a)e3+49q!lxj_p8oza7$^z"

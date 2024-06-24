@@ -28,4 +28,4 @@ class TestTGen(BaseTest):
             TestVerifier.verify_order(self, {
                 "FR1": ["/Artifact.java", "/ArtifactService.java", "/TraceLink.java", "/TraceLinkService.java"],
                 "FR2": ["/TraceLink.java", "/TraceLinkService.java", "/Artifact.java", "/ArtifactService.java"]
-            }, trace_predictions)
+            }, trace_predictions, msg_suffix=f"\n while sync={sync}")

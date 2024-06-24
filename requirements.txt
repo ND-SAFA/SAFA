@@ -8,6 +8,4 @@ mock~=5.0.1
 setuptools~=69.1.1
 boto3~=1.26.136
 markdown==3.4.4
-celery-s3==1.0.1
-redis==5.0.4
 PyJWT==2.8.0

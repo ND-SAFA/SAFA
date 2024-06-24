@@ -56,12 +56,13 @@ class TestVerifier:
                 test_case.assertEqual(e_value, r_value, msg=f"{r_value}\n\nEXPECTED VALUE\n\n{e_value}")
 
     @staticmethod
-    def verify_order(tc: TestCase, expected_parent_predictions: Dict, resulting_predictions: List[Trace]) -> None:
+    def verify_order(tc: TestCase, expected_parent_predictions: Dict, resulting_predictions: List[Trace], msg_suffix="") -> None:
         """
         Verifies the order of the trace links for each parent.
         :param tc: The test case to use to make assertions with.
         :param expected_parent_predictions: Map of parent to its ranked list of children.
         :param resulting_predictions: The predictions to verify the ranked order of children.
+        :param msg_suffix:
         :return: None.
         """
         resulting_parent2children = RankingUtil.group_trace_predictions(resulting_predictions, TraceKeys.parent_label())
@@ -71,7 +72,7 @@ class TestVerifier:
             parent_msg = ",".join(expected_children_ids)
             received_msg = ",".join(predicted_ids)
             received_display = ",".join([TestVerifier.display_trace(p) for p in parent_predictions])
-            tc.assertEqual(parent_msg, received_msg, msg=f"\n\nHashes did not match.\n{parent_msg}\n\n{received_display}")
+            tc.assertEqual(parent_msg, received_msg, msg=f"\n\nHashes did not match.\n{parent_msg}\n\n{received_display}{msg_suffix}")
 
     @staticmethod
     def display_trace(trace: Trace) -> str:

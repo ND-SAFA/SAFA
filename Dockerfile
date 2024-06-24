@@ -12,6 +12,11 @@ RUN pip3 install -r /app/tgen/requirements/base-requirements.txt
 COPY requirements.txt /app/
 RUN pip3 install -r /app/requirements.txt
 
+# install task manager package.
+ARG TASK_MANAGER=s3
+COPY requirements/ /app/requirements
+RUN pip3 install -r "/app/requirements/$TASK_MANAGER-requirements.txt"
+
 ## Step - Copy source and build files
 COPY tgen/tgen/ /app/tgen/
 COPY src/api/ /app/api/

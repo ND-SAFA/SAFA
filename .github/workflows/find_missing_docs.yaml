@@ -1,4 +1,4 @@
-name: Django Unit Tests
+name: Find Missing Docs
 
 on:
   pull_request:

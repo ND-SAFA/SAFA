@@ -7,25 +7,36 @@ from tgen.testres.mocking.test_response_manager import TestAIManager
 
 
 class TestTGen(BaseTest):
+    """
+    Traces between the source and target artifacts of test dataset.
+    """
+
+    def test_use_case_sync(self) -> None:
+        """
+        Performs traceability using just an embedding model to rank the candidate artifacts.
+        """
+        self.run_tgen_case()
 
     @mock_anthropic
     def test_use_case(self, ai_manager: TestAIManager) -> None:
         """
-        Traces between the source and target artifacts of test dataset.
-        :param ai_manager: The AI manages used to mock responses.
-        :return: None
+        Performs traceability by refining the rankings of the embedding model using an LLM.
         """
-        for sync in [True, False]:
-            dataset = TestData.get_dataset(TestSubset.FULL)
+        self.run_tgen_case(ai_manager)
 
-            if not sync:
-                ai_manager.mock_ranking(artifact_ids=[0, 1, 2, 3], scores=[5, 5, 2, 2])
-                ai_manager.mock_ranking(artifact_ids=[0, 1, 2, 3], scores=[5, 5, 2, 2])
-                ai_manager.mock_explanations(8)
+    def run_tgen_case(self, ai_manager=None):
+        dataset = TestData.get_dataset(TestSubset.FULL)
 
-            trace_predictions = RequestProxy.trace(dataset, sync=sync)
-            self.assertEqual(8, len(trace_predictions))
-            TestVerifier.verify_order(self, {
-                "FR1": ["/Artifact.java", "/ArtifactService.java", "/TraceLink.java", "/TraceLinkService.java"],
-                "FR2": ["/TraceLink.java", "/TraceLinkService.java", "/Artifact.java", "/ArtifactService.java"]
-            }, trace_predictions, msg_suffix=f"\n while sync={sync}")
+        if ai_manager:
+            ai_manager.mock_ranking(artifact_ids=[0, 1, 2, 3], scores=[5, 5, 2, 2])
+            ai_manager.mock_ranking(artifact_ids=[0, 1, 2, 3], scores=[5, 5, 2, 2])
+            ai_manager.mock_explanations(8)
+
+        is_sync = ai_manager is None
+        trace_predictions = RequestProxy.trace(dataset, sync=is_sync)
+        self.assertEqual(8, len(trace_predictions))
+        TestVerifier.verify_order(self, {
+            "FR1": ["/Artifact.java", "/ArtifactService.java", "/TraceLink.java", "/TraceLinkService.java"],
+            "FR2": ["/TraceLink.java", "/TraceLinkService.java", "/Artifact.java", "/ArtifactService.java"]
+        }, trace_predictions, msg_suffix=f"\n while sync={is_sync}")
+        print("Done")

@@ -48,7 +48,8 @@ def perform_trace_prediction(prediction_payload: TraceRequest) -> TracingOutput:
     dataset: ApiDefinition = prediction_payload["dataset"]
     return perform_tracing_job(dataset,
                                RankingJob,
-                               select_top_predictions=False)
+                               select_top_predictions=False,
+                               generate_explanations=True)
 
 
 @endpoint(TraceSerializer)

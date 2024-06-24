@@ -1,4 +1,4 @@
-from typing import Dict, List, TypedDict, Set
+from typing import Dict, Set, TypedDict
 
 from rest_framework import serializers
 
@@ -35,5 +35,5 @@ class MessageMetaSerializer(AbstractSerializer):
         role = validated_data["role"]
         assert role.upper() in dir(PromptRoles), f"Unknown role: {role}"
         message = Message(content=content, role=role)
-
-        return MessageMeta(message=message, artifact_ids=set(validated_data.get("artifact_ids", set())))
+        artifact_id_set = set(validated_data.get("artifact_ids", set()))
+        return MessageMeta(message=message, artifact_ids=artifact_id_set)

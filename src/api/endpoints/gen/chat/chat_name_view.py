@@ -3,6 +3,7 @@ from typing import Dict, List
 from api.endpoints.gen.chat.chat_serializer import ChatRequest, ChatSerializer
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
+from tgen.chat.chat_node_ids import ChatNodeIDs
 from tgen.chat.message_meta import MessageMeta
 from tgen.common.util.llm_response_util import LLMResponseUtil
 from tgen.jobs.chat_jobs.chat_job import ChatJob
@@ -21,12 +22,12 @@ def perform_chat_name(request: ChatRequest) -> Dict:
     """
     job_args = ViewUtil.create_job_args_from_api_definition(request.dataset)
     prompt_message = Message(role="user", content=PROMPT)
-    title_message = MessageMeta(message=prompt_message, artifact_ids=[])
+    title_message = MessageMeta(message=prompt_message, artifact_ids=set())
 
     chat_history = retrieve_valid_chat_history(request.chat_history)
     chat_history.append(title_message)
 
-    job = ChatJob(job_args, chat_history=chat_history)
+    job = ChatJob(job_args, chat_history=chat_history, root_node_id=ChatNodeIDs.USER_CHAT)
 
     response_message: MessageMeta = ViewUtil.run_job(job)
     response = response_message.message["content"]

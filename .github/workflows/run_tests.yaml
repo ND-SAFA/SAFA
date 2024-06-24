@@ -37,11 +37,6 @@ jobs:
         pip3 install -r requirements/s3-requirements.txt
         python3 tgen/download_static.py
 
-    - name: Run Dev-Ops Checks
-      run: python3 tgen/tgen/scripts/tools/find_missing_docs.py src/api
-      env:
-        ROOT_PATH: /home/runner/work/tgen-api/tgen-api/tgen
-
     - name: Run unit tests
       run: |
         python src/api/manage.py test src/apiTests

@@ -25,8 +25,8 @@ class TestChatTitle(BaseTest):
         artifacts = prompt_dataset.artifact_df.to_artifacts()
         dataset = ApiDefinition(artifacts=artifacts)
         chat_history: List[MessageDTO] = [
-            {"artifact_ids": [], "role": "user", "content": QUERY[ArtifactKeys.CONTENT]},
-            {"artifact_ids": [], "role": "assistant", "content": "blah blah"}
+            {"artifact_ids": set(), "role": "user", "content": QUERY[ArtifactKeys.CONTENT]},
+            {"artifact_ids": set(), "role": "assistant", "content": "blah blah"}
         ]
         response = RequestProxy.chat(dataset, chat_history, AppEndpoints.CHAT_TITLE)
         self.assertEqual(response["title"], "chat title")

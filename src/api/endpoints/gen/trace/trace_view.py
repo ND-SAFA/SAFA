@@ -4,14 +4,10 @@ from typing import List, Type, TypedDict, Union
 from api.endpoints.gen.trace.trace_serializer import TraceRequest, TraceSerializer
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
-from tgen.common.constants.dataset_constants import NO_CHECK
-from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_EMBEDDING_MODEL, DEFAULT_SEARCH_FILTER
+from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_FILTER
 from tgen.common.objects.trace import Trace
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.jobs.tracing_jobs.tracing_job import TracingJob
 from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
@@ -52,7 +48,8 @@ def perform_trace_prediction(prediction_payload: TraceRequest) -> TracingOutput:
     dataset: ApiDefinition = prediction_payload["dataset"]
     return perform_tracing_job(dataset,
                                RankingJob,
-                               select_top_predictions=False)
+                               select_top_predictions=False,
+                               generate_explanations=True)
 
 
 @endpoint(TraceSerializer)
@@ -67,6 +64,6 @@ def perform_embedding_search(prediction_payload: TraceRequest) -> TracingOutput:
                                RankingJob,
                                ranking_pipeline=SupportedRankingPipelines.SEARCH,
                                max_children_per_query=DEFAULT_SEARCH_FILTER,
-                               embedding_model_name=DEFAULT_SEARCH_EMBEDDING_MODEL,
+                               embedding_model_name=SMALL_EMBEDDING_MODEL,
                                select_top_predictions=False,
                                sorter=SupportedSorter.TRANSFORMER)

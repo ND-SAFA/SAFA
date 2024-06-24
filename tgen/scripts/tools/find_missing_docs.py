@@ -2,7 +2,7 @@ import ast
 import os
 import sys
 from _ast import AST, ClassDef, FunctionDef, arg
-from typing import List
+from typing import Callable, List, Union
 
 from dotenv import load_dotenv
 from mccabe import get_module_complexity
@@ -11,14 +11,37 @@ load_dotenv()
 ROOT_PATH = os.path.expanduser(os.environ["ROOT_PATH"])
 sys.path.append(ROOT_PATH)
 
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.file_util import FileUtil
-
 NodeType = AST
 EXCLUDES = ["tgen/tgen/testres", "tgen/test", "venv"]
 DEFAULT_TGEN_PATH = os.path.join(ROOT_PATH, "tgen")
 IGNORED_PARAM_NAMES = ["self", "cls", "_"]
 DEFAULT_COMPLEXITY_THRESHOLD = 7
+
+
+def read_file(f_path: str):
+    with open(f_path) as f:
+        return f.read()
+
+
+def get_all_paths(dir_path: Union[List[str], str], condition: Callable = None) -> List[str]:
+    """
+    Reads all code files in directory with allowed extensions.
+    :param dir_path: Path to directory where code files live
+    :param condition: A callable that returns True if the filepath should be included
+    :return: List containing all code file paths.
+    """
+    if isinstance(dir_path, list):
+        paths = set()
+        for p in dir_path:
+            paths.update(set(get_all_paths(p)))
+        return list(paths)
+    condition = condition if condition is not None else lambda x: True
+    file_paths = []
+    for subdir, dirs, files in os.walk(dir_path):
+        for f in files:
+            if condition(f):
+                file_paths.append(os.path.join(subdir, f))
+    return file_paths
 
 
 class DocNode:
@@ -33,7 +56,7 @@ class DocNode:
 
     def get_name(self) -> str:
         """
-        :return: Name of node. Function name if function, class name if class.
+        :return: Name of node (e.g. function / class name)
         """
         return self.node.name
 
@@ -113,7 +136,7 @@ class FileNode:
         :param file_path: The path to file to read nodes from.
         :return: List of nodes.
         """
-        file_content = FileUtil.read_file(file_path)
+        file_content = read_file(file_path)
         tree = ast.parse(file_content, filename=file_path)
         nodes = [DocNode(node, file_path) for node in ast.walk(tree)]
         return nodes
@@ -181,8 +204,8 @@ def calculate_missing_doc_map(directory_path: str) -> List[str]:
     :param directory_path: The directory to traverse.
     :return: Map of file paths to their errors.
     """
-    files = [f for f in FileUtil.get_all_paths(directory_path) if filter_files(f)]
-    logger.info(f"Checking {len(files)} files in {directory_path}...")
+    files = [f for f in get_all_paths(directory_path) if filter_files(f)]
+    print(f"Checking {len(files)} files in {directory_path}...")
     errors = []
     for file_path in files:
         file_node = FileNode(file_path)
@@ -239,7 +262,7 @@ def print_complex_functions(paths: List[str] = None, threshold: int = DEFAULT_CO
     """
     if paths is None or len(paths) == 0:
         paths = [DEFAULT_TGEN_PATH]
-    files = [f for directory_path in paths for f in FileUtil.get_all_paths(directory_path) if filter_files(f)]
+    files = [f for directory_path in paths for f in get_all_paths(directory_path) if filter_files(f)]
     for file in files:
         get_module_complexity(file, threshold=threshold)
 

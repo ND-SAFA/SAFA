@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
@@ -30,6 +31,7 @@ import edu.nd.crc.safa.features.users.services.EmailVerificationService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -40,10 +42,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * Controller containing endpoints for:
@@ -326,6 +331,24 @@ public class SafaUserController extends BaseController {
     public void deactivateSuperuser() {
         SafaUser currentUser = getCurrentUser();
         permissionService.setActiveSuperuser(currentUser, false);
+    }
+
+    /**
+     * Execute a request as another user. Requires active superuser
+     *
+     * @param request The request details (autowired by Spring)
+     * @param user The user to execute the request as
+     * @return Whatever the underlying request returns, unless there is an error becoming the other user
+     */
+    @RequestMapping(AppRoutes.Accounts.IMPERSONATE + "/**")
+    public ModelAndView executeAsUser(HttpServletRequest request, @PathVariable String user) {
+        permissionService.requireActiveSuperuser(getCurrentUser());
+        AuthorizationSetter.setSessionAuthorization(user, getServiceProvider());
+        String path = request.getRequestURI().replace(AppRoutes.Accounts.IMPERSONATE.replace("{user}", user), "");
+
+        //TODO log request
+
+        return new ModelAndView("forward:" + path);
     }
 
     @Data

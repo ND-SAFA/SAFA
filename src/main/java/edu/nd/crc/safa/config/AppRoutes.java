@@ -394,4 +394,10 @@ public class AppRoutes {
         public static final String ONBOARDING_ROOT = ROOT + "/onboarding";
         public static final String ONBOARDING_BY_USER = ONBOARDING_ROOT + "/{userId}";
     }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Audit {
+        public static final String ROOT = "/auditing";
+        public static final String LOGS = ROOT + "/logs";
+    }
 }

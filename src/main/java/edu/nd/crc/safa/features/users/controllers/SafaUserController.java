@@ -3,8 +3,10 @@ package edu.nd.crc.safa.features.users.controllers;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import edu.nd.crc.safa.admin.auditlog.services.AuditLogService;
 import edu.nd.crc.safa.authentication.AuthorizationSetter;
 import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -30,6 +32,8 @@ import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.EmailVerificationService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -68,6 +72,7 @@ public class SafaUserController extends BaseController {
     private final PermissionService permissionService;
     private final EmailVerificationService emailVerificationService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final AuditLogService auditLogService;
 
     @Value("${security.allow_new_accounts}")
     private boolean allowNewAccounts;
@@ -78,7 +83,8 @@ public class SafaUserController extends BaseController {
                               EmailService emailService,
                               PermissionService permissionService,
                               EmailVerificationService emailVerificationService,
-                              PasswordResetTokenRepository passwordResetTokenRepository) {
+                              PasswordResetTokenRepository passwordResetTokenRepository,
+                              AuditLogService auditLogService) {
         super(resourceBuilder, serviceProvider);
         this.tokenService = serviceProvider.getTokenService();
         this.passwordEncoder = serviceProvider.getPasswordEncoder();
@@ -88,6 +94,7 @@ public class SafaUserController extends BaseController {
         this.permissionService = permissionService;
         this.emailVerificationService = emailVerificationService;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.auditLogService = auditLogService;
     }
 
     /**
@@ -342,13 +349,26 @@ public class SafaUserController extends BaseController {
      */
     @RequestMapping(AppRoutes.Accounts.IMPERSONATE + "/**")
     public ModelAndView executeAsUser(HttpServletRequest request, @PathVariable String user) {
+        SafaUser currentUser = getCurrentUser();
+
         permissionService.requireActiveSuperuser(getCurrentUser());
         AuthorizationSetter.setSessionAuthorization(user, getServiceProvider());
         String path = request.getRequestURI().replace(AppRoutes.Accounts.IMPERSONATE.replace("{user}", user), "");
 
-        //TODO log request
+        String message = String.format(
+                "Execute request as another user:%n\tRequest: %s %s%n\tAs-user: %s%n\tParams: %s",
+                request.getMethod(), path, user, mapToString(request.getParameterMap()));
+        auditLogService.createEntry(currentUser, message);
 
         return new ModelAndView("forward:" + path);
+    }
+
+    private String mapToString(Map<String, String[]> map) {
+        try {
+            return new ObjectMapper().writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Data

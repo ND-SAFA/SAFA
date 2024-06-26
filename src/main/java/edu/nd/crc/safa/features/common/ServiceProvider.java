@@ -70,6 +70,7 @@ import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.AccountLookupService;
 import edu.nd.crc.safa.features.users.services.DefaultProjectCreatorService;
+import edu.nd.crc.safa.features.users.services.PermissionCheckerService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.features.versions.services.VersionService;
@@ -117,6 +118,7 @@ public class ServiceProvider {
     private final TeamService teamService;
     private final OrganizationService organizationService;
     private final PermissionService permissionService;
+    private final PermissionCheckerService permissionCheckerService;
     // Versions
     private final VersionService versionService;
     // Types

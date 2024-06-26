@@ -13,8 +13,9 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 public class JobTopicPermissionCheck implements TopicPermissionCheckFunction {
     @Override
     public boolean canSubscribe(SafaUser user, DestinationPath destinationPath) {
+        ServiceProvider serviceProvider = ServiceProvider.getInstance();
         UUID id = destinationPath.getTopicId();
-        JobDbEntity job = ServiceProvider.getInstance().getJobService().getJobById(id);
-        return job.getUser().equals(user);
+        JobDbEntity job = serviceProvider.getJobService().getJobById(id);
+        return serviceProvider.getPermissionCheckerService().hasViewPermission(job, user);
     }
 }

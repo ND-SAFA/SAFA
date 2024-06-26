@@ -18,7 +18,7 @@ public class GenHealthResponse {
     /**
      * List of Artifact IDs that experience a contradiction with target artifact.
      */
-    private GenContradiction contradictions;
+    private List<GenContradiction> contradictions;
     /**
      * Links of project artifacts to target artifact.
      */

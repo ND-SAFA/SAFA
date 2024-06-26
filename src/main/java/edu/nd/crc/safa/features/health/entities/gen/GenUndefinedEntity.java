@@ -2,8 +2,6 @@ package edu.nd.crc.safa.features.health.entities.gen;
 
 import java.util.List;
 
-import edu.nd.crc.safa.features.generation.common.GenerationDataset;
-
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -12,17 +10,17 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GenHealthRequest {
+public class GenUndefinedEntity {
     /**
-     * List of artifacts in project.
+     * Ids of artifacts referencing undefined entity.
      */
-    private GenerationDataset dataset;
+    private List<String> artifactIds;
     /**
-     * ID of artifact representing the target artifac.t
+     * Name of concept, used as ID.
      */
-    private List<String> queryIds;
+    private String conceptId;
     /**
-     * Target artifact to generate health checks for.
+     * Predicted definition of undefined concept.
      */
-    private String conceptLayerId;
+    private String conceptDefinition;
 }

@@ -3,7 +3,6 @@ package edu.nd.crc.safa.features.health.entities.gen;
 import java.util.List;
 import java.util.Map;
 
-import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
 import edu.nd.crc.safa.features.health.entities.ConceptMatchDTO;
 
@@ -21,7 +20,7 @@ public class GenConceptResponse {
     /**
      * Map of location matched to the multiple concepts matched at that location.
      */
-    private Map<Integer, List<ConceptMatchDTO>> multiMatches;
+    private Map<String, Map<Integer, List<ConceptMatchDTO>>> multiMatches;
     /**
      * List of traces predicted between concept and artifact.
      */
@@ -29,5 +28,5 @@ public class GenConceptResponse {
     /**
      * List of entities found in artifact but missing in concept artifacts.
      */
-    private List<GenerationArtifact> undefinedEntities;
+    private List<GenUndefinedEntity> undefinedEntities;
 }

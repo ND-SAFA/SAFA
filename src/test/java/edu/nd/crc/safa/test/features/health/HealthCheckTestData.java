@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
 import edu.nd.crc.safa.features.health.HealthConstants;
 import edu.nd.crc.safa.features.health.entities.ConceptMatchDTO;
 import edu.nd.crc.safa.features.health.entities.gen.GenConceptResponse;
 import edu.nd.crc.safa.features.health.entities.gen.GenContradiction;
 import edu.nd.crc.safa.features.health.entities.gen.GenHealthResponse;
+import edu.nd.crc.safa.features.health.entities.gen.GenUndefinedEntity;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.services.builders.DbEntityBuilder;
 
@@ -24,6 +24,7 @@ import edu.nd.crc.safa.test.services.builders.DbEntityBuilder;
  * Contradiction with C1
  */
 public class HealthCheckTestData {
+    public static final String UNDEFINED_CONCEPT_DEFINITION = "example definition";
     private static final int C1_START_LOC = 4;
     private static final int C1_END_LOC = C1_START_LOC + 3;
     private static final int MULTI_START_LOC = 20;
@@ -31,7 +32,6 @@ public class HealthCheckTestData {
     private static final String TARGET_NAME = "Target";
     private static final String UNDEFINED_CONCEPT_DEF = "Undefined concept.";
     private static final String CONTRADICTION_ID = "C4";
-
     public static int N_MULTI_MATCHES = 2;
 
     public UUID createProjectArtifacts(ProjectVersion projectVersion, DbEntityBuilder dbEntityBuilder) {
@@ -58,43 +58,44 @@ public class HealthCheckTestData {
         GenHealthResponse genResponse = new GenHealthResponse();
 
         GenConceptResponse genConceptResponse = new GenConceptResponse();
-        genConceptResponse.setMatches(List.of(new ConceptMatchDTO("C1", C1_START_LOC, C1_END_LOC)));
+        genConceptResponse.setMatches(List.of(new ConceptMatchDTO(TARGET_NAME, "C1", C1_START_LOC, C1_END_LOC)));
         genConceptResponse.setMultiMatches(getTestMultiMatchMap());
         genConceptResponse.setPredictedMatches(List.of(asLink("C4")));
-        genConceptResponse.setUndefinedEntities(List.of(asArtifact("U1")));
+        genConceptResponse.setUndefinedEntities(List.of(
+            new GenUndefinedEntity(
+                List.of(TARGET_NAME),
+                "U1",
+                UNDEFINED_CONCEPT_DEFINITION
+            )
+        ));
 
         GenContradiction genContradiction = new GenContradiction();
-        genContradiction.setConflictingIds(List.of(CONTRADICTION_ID));
+        genContradiction.setConflictingIds(List.of(TARGET_NAME));
         genContradiction.setExplanation(HealthCheckTestVerifier.CONTRADICTION_MSG);
 
         genResponse.setConceptMatches(genConceptResponse);
-        genResponse.setContradictions(genContradiction);
+        genResponse.setContradictions(List.of(genContradiction));
         return genResponse;
     }
 
-    private GenerationLink asLink(String aId) {
+    private GenerationLink asLink(String conceptID) {
         GenerationLink link = new GenerationLink();
-        link.setTarget(aId);
-        link.setSource("test entity");
+        link.setSource(conceptID);
+        link.setTarget(TARGET_NAME);
         return link;
     }
 
-    private GenerationArtifact asArtifact(String aId) {
-        GenerationArtifact artifact = new GenerationArtifact();
-        artifact.setId(aId);
-        artifact.setContent(UNDEFINED_CONCEPT_DEF);
-        return artifact;
-    }
-
-    private Map<Integer, List<ConceptMatchDTO>> getTestMultiMatchMap() {
-        Map<Integer, List<ConceptMatchDTO>> multiMatchMap = new HashMap<>();
-        multiMatchMap.put(MULTI_START_LOC,
+    private Map<String, Map<Integer, List<ConceptMatchDTO>>> getTestMultiMatchMap() {
+        Map<Integer, List<ConceptMatchDTO>> artifactMultiMatch = new HashMap<>();
+        artifactMultiMatch.put(MULTI_START_LOC,
             List.of(
-                new ConceptMatchDTO("C2", MULTI_START_LOC, MULTI_END_LOC),
-                new ConceptMatchDTO("C3", MULTI_START_LOC, MULTI_END_LOC)
+                new ConceptMatchDTO(TARGET_NAME, "C2", MULTI_START_LOC, MULTI_END_LOC),
+                new ConceptMatchDTO(TARGET_NAME, "C3", MULTI_START_LOC, MULTI_END_LOC)
             )
         );
-        return multiMatchMap;
+        Map<String, Map<Integer, List<ConceptMatchDTO>>> multiMatch = new HashMap<>();
+        multiMatch.put(TARGET_NAME, artifactMultiMatch);
+        return multiMatch;
     }
 
 }

@@ -1,5 +1,6 @@
 package edu.nd.crc.safa.features.health;
 
+import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
@@ -39,6 +40,6 @@ public class HealthController extends BaseController {
             .asUser(currentUser)
             .withPermission(ProjectPermission.EDIT)
             .get();
-        return getServiceProvider().getHealthService().performArtifactHealthChecks(projectVersion, artifact);
+        return getServiceProvider().getHealthService().performArtifactHealthChecks(projectVersion, List.of(artifact));
     }
 }

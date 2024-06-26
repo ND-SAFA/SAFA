@@ -12,12 +12,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.type.SqlTypes;
 
+@NoArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -45,6 +47,11 @@ public class CommentArtifact {
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "artifact_id", nullable = false)
     private Artifact artifactReferenced;
+
+    public CommentArtifact(Comment comment, Artifact artifact) {
+        this.comment = comment;
+        this.artifactReferenced = artifact;
+    }
 
     /**
      * @return Hash of ID.

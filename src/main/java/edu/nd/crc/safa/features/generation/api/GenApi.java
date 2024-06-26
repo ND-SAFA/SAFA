@@ -44,13 +44,14 @@ public class GenApi implements ITraceGenerationController {
      * Generates health check for target artifacts.
      *
      * @param projectArtifacts List of artifacts in project.
-     * @param targetArtifact   Target artifact to generate health checks for.
+     * @param targetArtifacts  Target artifact to generate health checks for.
      * @return Health checks generated for artifact.
      */
     public GenHealthResponse generateHealthChecks(List<GenerationArtifact> projectArtifacts,
-                                                  GenerationArtifact targetArtifact) {
+                                                  List<GenerationArtifact> targetArtifacts) {
         GenerationDataset dataset = new GenerationDataset(projectArtifacts);
-        GenHealthRequest request = new GenHealthRequest(dataset, targetArtifact.getId(), HealthConstants.CONCEPT_TYPE);
+        List<String> queryIds = targetArtifacts.stream().map(GenerationArtifact::getId).toList();
+        GenHealthRequest request = new GenHealthRequest(dataset, queryIds, HealthConstants.CONCEPT_TYPE);
         String chatEndpoint = TGenConfig.getEndpoint("health");
         return genApiController.performJob(chatEndpoint, request, GenHealthResponse.class, null);
     }

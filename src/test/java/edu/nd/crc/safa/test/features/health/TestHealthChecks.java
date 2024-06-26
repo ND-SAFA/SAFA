@@ -32,7 +32,7 @@ class TestHealthChecks extends GenerationalTest {
 
         HealthResponseDTO healthResponseDTO = getServiceProvider()
             .getHealthService()
-            .performArtifactHealthChecks(projectVersion, targetArtifact);
+            .performArtifactHealthChecks(projectVersion, List.of(targetArtifact));
 
         HealthCheckTestVerifier testVerifier = new HealthCheckTestVerifier(projectVersion, projectArtifacts);
         testVerifier.verifyHealthResponse(healthResponseDTO);
@@ -41,7 +41,6 @@ class TestHealthChecks extends GenerationalTest {
             getServiceProvider().getCommentRetrievalService().getArtifactComments(artifactId);
 
         testVerifier.verifyArtifactComments(artifactComments);
-
     }
 
     public void mockHealthResponse(GenHealthResponse genResponse) {

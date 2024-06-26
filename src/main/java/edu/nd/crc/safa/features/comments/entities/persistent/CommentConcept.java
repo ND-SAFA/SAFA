@@ -43,6 +43,11 @@ public class CommentConcept {
     @Column(name = "concept_name")
     private String conceptName;
 
+    public CommentConcept(Comment comment, String conceptName) {
+        this.comment = comment;
+        this.conceptName = conceptName;
+    }
+
     /**
      * @return Hash of ID.
      */

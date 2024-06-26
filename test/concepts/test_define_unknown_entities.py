@@ -1,3 +1,4 @@
+from typing import List
 from unittest import TestCase
 
 from test.concepts.constants import ConceptData
@@ -32,7 +33,8 @@ class TestDefineUnknownEntities(BaseTest):
         TestEntityMatching.mock_entity_matching(ai_manager)
         EntityMatchingStep().run(args, state)
         CreateResponseStep().run(args, state)
-        self.mock_entity_definitions(self, ai_manager)
+        entity_ids = [ConceptData.Entities.E3, ConceptData.Entities.E4]
+        self.mock_entity_definitions(ai_manager, entity_ids=entity_ids, tc=self)
         DefineUnknownEntitiesStep().run(args, state)
 
         res = state.response
@@ -40,30 +42,35 @@ class TestDefineUnknownEntities(BaseTest):
         TestDefineUnknownEntities.verify_response(self, res)
 
     @staticmethod
-    def mock_entity_definitions(tc, ai_manager):
+    def mock_entity_definitions(ai_manager, entity_ids: List[str], tc=None):
         """
         Mocks response for entity definition.
         :param ai_manager: AI manager.
+        :param entity_ids: List of entity ids to mock definitions for.
         :param tc: Test case.
         :return: None
         """
-        ai_manager.add_responses([lambda prompt: TestDefineUnknownEntities.assert_prediction(tc, prompt)
-                                  for _ in ConceptData.Entities.get_context_entities()])
+        if entity_ids is None:
+            entity_ids = [ConceptData.Entities.E3, ConceptData.Entities.E4]
+        ai_manager.add_responses([lambda prompt: TestDefineUnknownEntities.mock_prediction(prompt, tc)
+                                  for entity_id in ConceptData.Entities.get_expected_definitions()
+                                  if not entity_ids or entity_id in entity_ids])
 
     @staticmethod
-    def assert_prediction(tc, prompt):
+    def mock_prediction(prompt, tc=None):
         """
         Asserts context matches entity.
         :param prompt: The prompt given to LLM.
         :param tc: Test case.
         :return: The mocked response form lLM.
         """
-        expected_context_definitions = ConceptData.Entities.get_context_entities()
+        expected_context_definitions = ConceptData.Entities.get_expected_definitions()
 
         message_prompt, system_prompt = prompt
         entity_id = message_prompt.splitlines()[-1]
-        tc.assertIn(entity_id, expected_context_definitions)
-        tc.assertIn(entity_id, system_prompt)
+        if tc:
+            tc.assertIn(entity_id, expected_context_definitions)
+            tc.assertIn(entity_id, system_prompt)
         return PromptUtil.create_xml("definition", expected_context_definitions[entity_id])
 
     @staticmethod
@@ -76,7 +83,7 @@ class TestDefineUnknownEntities(BaseTest):
         """
         undefined_entity_lookup = {e["concept_id"]: e for e in res["undefined_entities"]}
         expected_undefined_entities = ConceptData.Entities.get_undefined_entities()
-        expected_context_definitions = ConceptData.Entities.get_context_entities()
+        expected_context_definitions = ConceptData.Entities.get_expected_definitions()
 
         for target_artifact_id, expected_undefined_entities in expected_undefined_entities:
             for e in expected_undefined_entities:

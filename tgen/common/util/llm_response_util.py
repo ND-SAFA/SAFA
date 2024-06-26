@@ -79,7 +79,8 @@ class LLMResponseUtil:
                 if raise_exception:
                     raise Exception(error)
             content = [res] if return_res_on_failure else []
-        return [html.unescape(c) for c in content]
+        res = [html.unescape(c) for c in content]
+        return res
 
     @staticmethod
     def _parse_children(tag: Tag) -> Dict[str, List]:

@@ -1,11 +1,14 @@
-from typing import Dict, List, Set
+from collections import defaultdict
+from typing import Dict, List, Set, Tuple
 
 from tgen.common.objects.artifact import Artifact
+from tgen.common.objects.trace import Trace
 from tgen.common.util.dict_util import DictUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.types.concept_match import ConceptMatch
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
+from tgen.concepts.types.entity_matching_pred import EntityMatchingPred
 from tgen.concepts.types.undefined_concept import UndefinedConcept
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.keys.structure_keys import ArtifactKeys
@@ -25,31 +28,39 @@ class CreateResponseStep(AbstractPipelineStep):
         # Undefined entities
         direct_matched_entities = set([m["matched_content"] for m in state.direct_matches])
         predicted_matched_entities = set([t["entity_id"] for t in state.predicted_matches])
+        predicted_links = [self.to_link(p) for p in state.predicted_matches]
         matched_entities = direct_matched_entities.union(predicted_matched_entities)
         undefined_concepts = self.create_undefined_concepts(args.artifacts, state.entity_data_frames, matched_entities)
 
         state.response = ConceptPipelineResponse(
             matches=direct_matches,
             multi_matches=multi_matches,
-            predicted_matches=state.predicted_matches,
+            predicted_matches=predicted_links,
             undefined_entities=undefined_concepts
         )
 
     @staticmethod
-    def analyze_matches(direct_matches: List[ConceptMatch]):
+    def analyze_matches(matches: List[ConceptMatch]) -> Tuple[List[ConceptMatch], Dict[str, Dict[int, List[ConceptMatch]]]]:
         """
         Reads direct matches and identifies those that are multi-matches.
-        :param direct_matches: The direct matches to separate from multi-matches.
+        :param matches: The direct matches to separate from multi-matches.
         :return: List of purely direct matches and then list of multi-matches.
         """
-        loc2match: Dict[int, List[ConceptMatch]] = CreateResponseStep.create_loc2match_map(direct_matches)
+        artifact2matches = defaultdict(list)
+        for match in matches:
+            artifact2matches[match["artifact_id"]].append(match)
+
         direct_matches: List[ConceptMatch] = []
-        multi_matches = {}
-        for loc, matches in loc2match.items():
-            if len(matches) == 1:
-                direct_matches.append(matches[0])
-            else:
-                multi_matches[loc] = matches
+        multi_matches = {}  # artifact id -> loc -> multi-matches
+        for artifact, artifact_matches in artifact2matches.items():
+            loc2match: Dict[int, List[ConceptMatch]] = CreateResponseStep.create_loc2match_map(artifact_matches)
+            artifact_multi_matches = {}
+            for loc, matches in loc2match.items():
+                if len(matches) == 1:
+                    direct_matches.append(matches[0])
+                else:
+                    artifact_multi_matches[loc] = matches
+            multi_matches[artifact] = artifact_multi_matches
         return direct_matches, multi_matches
 
     @staticmethod
@@ -98,3 +109,16 @@ class CreateResponseStep(AbstractPipelineStep):
                 match_map[loc] = []
             match_map[loc].append(m)
         return match_map
+
+    @staticmethod
+    def to_link(pred: EntityMatchingPred):
+        """
+        Converts entity match prediction into trace link.
+        :param pred: The prediction.
+        :return: Trace link between concept and artifact.
+        """
+        return Trace(
+            source=pred["concept_id"],
+            target=pred["artifact_id"],
+            score=1
+        )

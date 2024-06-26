@@ -1,4 +1,5 @@
-from test.jobs.health_check_jobs.health_check_utils import QUERY, assert_correct_related_artifacts, assert_correct_related_traces, \
+from test.jobs.health_check_jobs.health_check_constants import QUERY
+from test.jobs.health_check_jobs.health_check_utils import assert_correct_related_artifacts, assert_correct_related_traces, \
     get_dataset_for_context
 from tgen.common.constants.hugging_face_constants import SMALL_CROSS_ENCODER, SMALL_EMBEDDING_MODEL
 from tgen.data.keys.structure_keys import ArtifactKeys

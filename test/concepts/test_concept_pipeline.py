@@ -25,7 +25,8 @@ class TestConceptPipeline(BaseTest):
         for test_entity_df in test_entity_data_frames:
             TestPredictEntityStep.mock_entity_extraction(ai_manager, test_entity_df)
         TestEntityMatching.mock_entity_matching(ai_manager)
-        TestDefineUnknownEntities.mock_entity_definitions(self, ai_manager)
+        entity_ids = [ConceptData.Entities.E3, ConceptData.Entities.E4]
+        TestDefineUnknownEntities.mock_entity_definitions(ai_manager, entity_ids=entity_ids, tc=self)
 
         # Execution
         pipeline = ConceptPipeline(args)

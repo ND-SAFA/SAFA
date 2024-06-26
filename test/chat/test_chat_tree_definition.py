@@ -1,4 +1,5 @@
-from test.jobs.health_check_jobs.health_check_utils import get_dataset_for_context, get_chat_history, QUERY, EXPECTED_CONTEXT_IDS
+from test.jobs.health_check_jobs.health_check_constants import EXPECTED_CONTEXT_IDS, QUERY
+from test.jobs.health_check_jobs.health_check_utils import get_chat_history, get_dataset_for_context
 from tgen.chat.chat_args import ChatArgs
 from tgen.chat.chat_node_ids import ChatNodeIDs
 from tgen.chat.chat_state import ChatState

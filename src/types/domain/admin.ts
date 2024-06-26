@@ -167,3 +167,41 @@ interface GenerationStatisticsSingleSchema {
    */
   averageTime: number;
 }
+
+/**
+ * Defines the schema for a single user's progress summary.
+ */
+export interface SingleUserProgressSummarySchema {
+  /**
+   * Number of imports performed.
+   */
+  importsPerformed: number;
+  /**
+   * Number of summarizations performed.
+   */
+  summarizationsPerformed: number;
+  /**
+   * Number of generations performed.
+   */
+  generationsPerformed: number;
+  /**
+   * Number of lines generated on.
+   */
+  linesGeneratedOn: number;
+  /**
+   * ISO Time the account was created.
+   */
+  accountCreatedTime: string;
+  /**
+   * ISO Time the github was linked.
+   */
+  githubLinkedTime: string;
+  /**
+   * ISO Time the first project was imported.
+   */
+  firstProjectImportedTime: string;
+  /**
+   * ISO Time the first generation was performed.
+   */
+  firstGenerationPerformedTime: string;
+}

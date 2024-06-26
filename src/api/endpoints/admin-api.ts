@@ -1,4 +1,8 @@
-import { UserProgressSummarySchema } from "@/types";
+import {
+  SingleUserProgressSummarySchema,
+  UserProgressSummarySchema,
+  UserSchema,
+} from "@/types";
 import { buildRequest } from "@/api";
 
 /**
@@ -26,8 +30,40 @@ export async function deactivateSuperuser(): Promise<void> {
 }
 
 /**
+ * Retrieves all users in the system.
+ */
+export async function getUsers(): Promise<UserSchema[]> {
+  return buildRequest<UserSchema[]>("accountCollection").get();
+}
+
+/**
  * Retrieves the statistics for the user progress in the app.
+ * @returns The user progress statistics.
  */
 export async function getOnboardingStatistics(): Promise<UserProgressSummarySchema> {
   return buildRequest<UserProgressSummarySchema>("statisticsOnboarding").get();
+}
+
+/**
+ * Retrieves the statistics for the user progress in the app.
+ * @param userId - The id of the user to retrieve statistics for.
+ * @returns The user progress statistics.
+ */
+export async function getUserStatistics(
+  userId: string
+): Promise<SingleUserProgressSummarySchema> {
+  return {
+    importsPerformed: 0,
+    summarizationsPerformed: 0,
+    generationsPerformed: 0,
+    linesGeneratedOn: 0,
+    accountCreatedTime: new Date().toISOString(),
+    githubLinkedTime: new Date().toISOString(),
+    firstProjectImportedTime: new Date().toISOString(),
+    firstGenerationPerformedTime: new Date().toISOString(),
+  };
+  return buildRequest<SingleUserProgressSummarySchema, "userId">(
+    "statisticsUser",
+    { userId }
+  ).get();
 }

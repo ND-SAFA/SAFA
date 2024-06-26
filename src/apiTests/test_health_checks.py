@@ -1,7 +1,7 @@
 from apiTests.base_test import BaseTest
 from apiTests.common.request_proxy import RequestProxy
-
-from test.jobs.health_check_jobs.health_check_utils import CONCEPT_LAYER_ID, QUERY_ID, assert_health_check_success, \
+from test.jobs.health_check_jobs.health_check_constants import CONCEPT_LAYER_ID, QUERY_ID
+from test.jobs.health_check_jobs.health_check_utils import assert_health_check_success, \
     get_dataset_for_health_checks, mocks_for_health_checks
 from tgen.data.readers.definitions.api_definition import ApiDefinition
 from tgen.testres.mocking.mock_anthropic import mock_anthropic

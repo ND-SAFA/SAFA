@@ -25,7 +25,7 @@ from api.constants.config import get_current_version, get_home_page
 from api.endpoints.auth_view import generate_key
 from api.endpoints.gen.chat.chat_name_view import perform_chat_name
 from api.endpoints.gen.chat.chat_view import perform_chat
-from api.endpoints.gen.health_checks.health_check_view import perform_health_check
+from api.endpoints.gen.health.health_check_view import perform_health_check
 from api.endpoints.gen.hgen.hgen_view import perform_hgen
 from api.endpoints.gen.summarize.summarize_view import perform_summarization_job, perform_summarization_sync
 from api.endpoints.gen.trace.trace_view import perform_embedding_search, perform_trace_prediction

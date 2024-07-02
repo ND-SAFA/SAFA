@@ -42,7 +42,7 @@ class TestSTTrainer(TestCase):
         for loss_function in SupportedSTLossFunctions:
             trainer = self.create_trainer(trainer_args_kwargs={"num_train_epochs": 1, "st_loss_function": loss_function.name})
             training_metrics = trainer.perform_training().metrics
-            self.verify_training_metrics(self, training_metrics, 1)
+            self.verify_training_metrics(self, training_metrics, 1, msg=f"Loss function: {loss_function}")
 
     def test_zero_loss(self) -> None:
         """
@@ -95,7 +95,7 @@ class TestSTTrainer(TestCase):
         return trainer
 
     @staticmethod
-    def verify_training_metrics(tc: TestCase, metrics: List[Dict], n_expected: int) -> None:
+    def verify_training_metrics(tc: TestCase, metrics: List[Dict], n_expected: int, **kwargs) -> None:
         """
         Asserts that metrics have a certain number and that MAP is greater than or equal to 0.5
         :param tc: The test case used to make assertions.
@@ -105,7 +105,7 @@ class TestSTTrainer(TestCase):
         """
         tc.assertEqual(n_expected, len(metrics))
         for metric in metrics:
-            tc.assertGreater(metric["loss"], 0)
+            tc.assertGreater(metric["loss"], 0, **kwargs)
 
     @staticmethod
     def get_cat_dataset_definition():

@@ -1,7 +1,6 @@
 import os
 from typing import Dict, List, Tuple
 
-from test.jobs.health_check_jobs.health_check_constants import UNDEFINED_CONCEPT
 from tgen.common.objects.artifact import Artifact
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.testres.paths.paths import TEST_DATA_DIR
@@ -82,9 +81,9 @@ class ConceptData:
             :return: List containing each entity that is found in the context doc.
             """
             return {
-                UNDEFINED_CONCEPT: "This is a new project concept",
                 ConceptData.Entities.E3: "IFDS is the Intermediate Frequency Distribution System",
-                ConceptData.Entities.E4: "The concept for the GLM is to perform much of the raw data processing on the ground"
+                ConceptData.Entities.E4: "The concept for the GLM is to perform much of the raw data processing on the ground",
+                ConceptData.Entities.E5: "Sub-Satelliate Point"
             }
 
         @staticmethod

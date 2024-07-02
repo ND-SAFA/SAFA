@@ -102,11 +102,9 @@ class ContradictionsDetector:
             query_prediction_output = query_prediction[task_prompt.args.prompt_id]
 
             for query_contradiction in query_prediction_output[CONTRADICTION_TAG]:
-                query_contradiction_explanation = query_contradiction[EXPLANATION_TAG][0]
-                query_contradiction_ids = query_contradiction[CONFLICTING_IDS_TAG][0]
                 query_contradiction_result = ContradictionsResult(
-                    explanation=query_contradiction_explanation,
-                    conflicting_ids=query_contradiction_ids
+                    explanation=query_contradiction[EXPLANATION_TAG][0],
+                    conflicting_ids=query_contradiction[CONFLICTING_IDS_TAG][0]
                 )
                 self._filter_unknown_ids(query_contradiction_result, id2context[query_id])
                 query_contradiction_result["conflicting_ids"] += [query_id]

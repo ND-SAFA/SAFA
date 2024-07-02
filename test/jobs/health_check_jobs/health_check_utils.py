@@ -101,4 +101,5 @@ def mocks_for_health_checks(ai_manager):
     ai_manager.add_responses([create_contradiction_response(EXPECTED_CONTRADICTION_EXPLANATION, EXPECTED_CONFLICTING_IDS)])
     TestPredictEntityStep.mock_entity_extraction(ai_manager, test_entity_df)
     TestEntityMatching.mock_entity_matching(ai_manager, [QUERY_CONCEPTS[1]] + ["NA"])
-    TestDefineUnknownEntities.mock_entity_definitions(ai_manager, entity_ids=[UNDEFINED_CONCEPT])
+    mock_entity_definitions = {UNDEFINED_CONCEPT: "This is a new project concept"}
+    TestDefineUnknownEntities.mock_entity_definitions(ai_manager, mock_entity_definitions)

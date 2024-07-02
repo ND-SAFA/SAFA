@@ -79,7 +79,8 @@ public class HealthService {
      * @param targetArtifacts Target artifact being checks.
      * @return GEN response.
      */
-    private GenHealthResponse generateHealthChecks(ProjectVersion projectVersion, List<ArtifactAppEntity> targetArtifacts) {
+    private GenHealthResponse generateHealthChecks(ProjectVersion projectVersion,
+                                                   List<ArtifactAppEntity> targetArtifacts) {
         List<GenerationArtifact> artifacts = artifactService
             .getAppEntities(projectVersion).stream().map(GenerationArtifact::new).collect(Collectors.toList());
         List<GenerationArtifact> targetGenArtifacts = targetArtifacts
@@ -217,9 +218,10 @@ public class HealthService {
      * @param artifactNameLookup Map of artifact name to artifact entity.
      * @return List of DTOs.
      */
-    public List<MultiArtifactCommentDTO> saveMultiMatchedConcepts(ProjectVersion projectVersion,
-                                                                  Map<String, Map<Integer, List<ConceptMatchDTO>>> multiMatches,
-                                                                  Map<String, Artifact> artifactNameLookup) {
+    public List<MultiArtifactCommentDTO> saveMultiMatchedConcepts(
+        ProjectVersion projectVersion,
+        Map<String, Map<Integer, List<ConceptMatchDTO>>> multiMatches,
+        Map<String, Artifact> artifactNameLookup) {
         Map<Comment, List<CommentArtifact>> comment2commentArtifacts = new HashMap<>();
         for (Map.Entry<String, Map<Integer, List<ConceptMatchDTO>>> entry : multiMatches.entrySet()) {
             Artifact artifact = artifactNameLookup.get(entry.getKey());

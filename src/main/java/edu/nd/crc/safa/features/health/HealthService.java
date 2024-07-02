@@ -46,7 +46,7 @@ public class HealthService {
     private static final Logger logger = LoggerFactory.getLogger(HealthService.class);
     private static final String UNKNOWN_CONTENT = "`%s` is used in artifact but undefined in project concepts.";
     private static final String MULTI_CONTENT = "Found multiple, conflicting concepts matching in artifact: %s";
-    private static final String PREDICTED_CONTENT = "The entity `%s` was predicted to matched with concept `%s`.";
+    private static final String PREDICTED_CONTENT = "The concept `%s` was predicted to be used within the artifact.";
     private static final String CITED_CONTENT = "`%s` was cited in artifact.";
 
     private CommentRepository commentRepository;
@@ -343,9 +343,7 @@ public class HealthService {
      * @return Content.
      */
     private String generatePredictionContent(GenerationLink link) {
-        String entityName = link.getSource();
-        String conceptName = link.getTarget();
-        return String.format(PREDICTED_CONTENT, entityName, conceptName);
+        return String.format(PREDICTED_CONTENT, link.getSource());
     }
 
     /**

@@ -40,7 +40,7 @@ class TestMembershipNotifications extends ApplicationBaseTest {
             .and()
             .request((s, r) -> r
                 .project()
-                .shareProject(s.getProject("project"), newMemberEmail, ProjectRole.VIEWER))
+                .addUserToProject(s.getProject("project"), newMemberEmail, ProjectRole.VIEWER, getCurrentUser()))
             .and()
             .notifications((s, n) -> n
                 .getEntityMessage(getCurrentUser()))

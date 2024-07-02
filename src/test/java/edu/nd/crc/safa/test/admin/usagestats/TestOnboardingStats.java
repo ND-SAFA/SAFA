@@ -97,15 +97,15 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
     @BeforeEach
     public void setup() {
         userService.addSuperUser(getCurrentUser());
+        makeUnlimited(getCurrentUser());
+
         for (UserDef user : users) {
             if (!user.getUsername().equals(currentUserName)) {
                 rootBuilder.authorize(a -> a.createUser(user.getUsername(), user.getPassword()));
             }
 
             SafaUser safaUser = userService.getUserByEmail(user.getUsername());
-            Organization userOrg = organizationService.getPersonalOrganization(safaUser);
-            userOrg.setPaymentTier(PaymentTier.UNLIMITED);
-            organizationService.updateOrganization(userOrg);
+            makeUnlimited(safaUser);
         }
 
         Mockito.doReturn(new GithubAccessCredentialsDTO())
@@ -118,6 +118,12 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
             .when(genApi).generateProjectSummary(Mockito.any(), Mockito.any());
         Mockito.doAnswer(this::getHierarchy)
             .when(genApi).generateHierarchy(Mockito.any(), Mockito.any());
+    }
+
+    private void makeUnlimited(SafaUser user) {
+        Organization userOrg = organizationService.getPersonalOrganization(user);
+        userOrg.setPaymentTier(PaymentTier.UNLIMITED);
+        organizationService.updateOrganization(userOrg);
     }
 
     private HGenResponse getHierarchy(InvocationOnMock invocationOnMock) {

@@ -69,8 +69,8 @@ public abstract class AbstractSharingTest extends ApplicationBaseTest implements
             .authorize((s, a) -> a
                 .loginDefaultUser(this))
             .and()
-            .request((s, r) -> r.project().shareProject(s.getProject("project"), Sharee.email,
-                this.otherUserProjectRole));
+            .request((s, r) -> r.project().addUserToProject(s.getProject("project"), Sharee.email,
+                this.otherUserProjectRole, getCurrentUser()));
 
         // TODO https://www.notion.so/nd-safa/BE-Tests-Occasionally-Fail-9500d5c1f1d84a76acf429ee3653bb86
         /*

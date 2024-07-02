@@ -5,10 +5,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.organizations.entities.app.OrganizationAppEntity;
-import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.PaymentTier;
 import edu.nd.crc.safa.features.organizations.services.OrganizationService;
 import edu.nd.crc.safa.features.users.controllers.SafaUserController;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 
@@ -75,15 +75,22 @@ public class TestSuperuser extends ApplicationBaseTest {
 
     @Test
     public void testAddingAdminUpdatesPaymentTier() {
-        Organization organization = organizationService.getPersonalOrganization(getCurrentUser());
-        organization.setPaymentTier(PaymentTier.AS_NEEDED);
-        organizationService.updateOrganization(organization);
+        String newUserEmail = "new@user.com";
+        String newUserPassword = "newuserpassword";
+
+        rootBuilder.getAuthorizationTestService()
+            .createUser(newUserEmail, newUserPassword);
 
         rootBuilder.getCommonRequestService().user()
             .makeUserSuperuser(getCurrentUser())
             .activateSuperuser();
+        SafaRequest.withRoute(AppRoutes.Accounts.SuperUser.ROOT)
+            .putWithJsonObject(new SafaUserController.CreateSuperUserDTO(newUserEmail));
+        rootBuilder.getCommonRequestService().user().deactivateSuperuser();
 
-        assertThat(organizationService.getPersonalOrganization(getCurrentUser()).getPaymentTier())
+        SafaUser otherUser = getServiceProvider().getSafaUserService().getUserByEmail(newUserEmail);
+
+        assertThat(organizationService.getPersonalOrganization(otherUser).getPaymentTier())
             .isEqualTo(PaymentTier.UNLIMITED);
     }
 

@@ -40,7 +40,7 @@ public class AuditLogController extends BaseController {
             after = LocalDateTime.MIN;
         }
 
-        return auditLogService.getBetween(after, before)
+        return auditLogService.getBetween(before, after)
                 .stream()
                 .map(AuditLogEntryDTO::new)
                 .toList();

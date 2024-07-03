@@ -9,5 +9,5 @@ import edu.nd.crc.safa.admin.auditlog.entities.db.AuditLogEntry;
 import org.springframework.data.repository.CrudRepository;
 
 public interface AuditLogRepository extends CrudRepository<AuditLogEntry, UUID> {
-    List<AuditLogEntry> findByTimestampBetweenOrderByTimestampDesc(LocalDateTime timestampBefore, LocalDateTime timestampAfter);
+    List<AuditLogEntry> findByTimestampBetweenOrderByTimestampDesc(LocalDateTime timestampAfter, LocalDateTime timestampBefore);
 }

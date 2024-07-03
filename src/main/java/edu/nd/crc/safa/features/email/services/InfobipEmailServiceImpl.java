@@ -6,8 +6,11 @@ import java.util.concurrent.Callable;
 import javax.annotation.PostConstruct;
 
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.config.FendPathConfig;
 import edu.nd.crc.safa.features.email.entities.InfobipProperties;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
+import edu.nd.crc.safa.features.memberships.entities.db.MembershipInviteToken;
+import edu.nd.crc.safa.features.organizations.entities.db.IEntityWithMembership;
 import edu.nd.crc.safa.features.organizations.entities.db.Organization;
 import edu.nd.crc.safa.features.organizations.entities.db.Team;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
@@ -44,21 +47,10 @@ public class InfobipEmailServiceImpl implements EmailService {
     private static final Logger log = LoggerFactory.getLogger(InfobipEmailServiceImpl.class.getName());
 
     private final InfobipProperties infobipProperties;
-
-    @Value("${fend.base}")
-    private String fendBase;
+    private final FendPathConfig fendPathConfig;
 
     @Value("${bend.base}")
     private String bendBase;
-
-    @Value("${fend.reset-email-path}")
-    private String resetPasswordUrl;
-
-    @Value("${fend.verify-email-path}")
-    private String verifyEmailUrl;
-
-    @Value("${email.infobip.fakeEmails}")
-    private boolean fakeSendingEmails;
 
     private EmailApi emailApi;
 
@@ -74,13 +66,13 @@ public class InfobipEmailServiceImpl implements EmailService {
     @Override
     public void sendPasswordReset(String recipient, String resetAccount, String token) {
         String body = "Here is the requested link to reset the password for the account belonging to " + resetAccount
-            + "\n\n" + String.format(fendBase + resetPasswordUrl, token);
+            + "\n\n" + String.format(fendPathConfig.getResetPasswordUrl(), token);
         sendSimpleEmail(recipient, "Requested password reset token", body);
     }
 
     @Override
     public void sendEmailVerification(String recipient, String token) {
-        String url = String.format(fendBase + verifyEmailUrl, token);
+        String url = String.format(fendPathConfig.getVerifyEmailUrl(), token);
         sendTemplatedEmail(List.of(recipient), InfobipProperties.EmailType.VERIFY_EMAIL_ADDRESS,
             Map.of(
                 "accountlink", url
@@ -107,6 +99,42 @@ public class InfobipEmailServiceImpl implements EmailService {
         );
         sendSimpleEmail("generate@safa.ai", "Customer generation failed",
             makeFailedGenerationText(projectVersion, jobEntity));
+    }
+
+    @Override
+    public void sendMembershipInvite(String recipient, IEntityWithMembership entity, MembershipInviteToken token) {
+        // TODO update with templated email
+        sendSimpleEmail(recipient, "New Invitation",
+            String.format(
+                "You have been invited to join the %s %s. Please use the link below to accept the invitation\n%s",
+                getEntityType(entity), getEntityName(entity),
+                String.format(fendPathConfig.getAcceptInviteUrl(), token.getId())
+            )
+        );
+    }
+
+    private String getEntityName(IEntityWithMembership entity) {
+        if (entity instanceof Organization) {
+            return ((Organization) entity).getName();
+        } else if (entity instanceof Team) {
+            return ((Team) entity).getName();
+        } else if (entity instanceof Project) {
+            return ((Project) entity).getName();
+        } else {
+            throw new IllegalArgumentException("Unknown type " + entity.getClass());
+        }
+    }
+
+    private String getEntityType(IEntityWithMembership entity) {
+        if (entity instanceof Organization) {
+            return "Organization";
+        } else if (entity instanceof Team) {
+            return "Team";
+        } else if (entity instanceof Project) {
+            return "Project";
+        } else {
+            throw new IllegalArgumentException("Unknown type " + entity.getClass());
+        }
     }
 
     private void sendSimpleEmail(String recipient, String subject, String text) {
@@ -149,7 +177,7 @@ public class InfobipEmailServiceImpl implements EmailService {
      * @return The response from sending the email, or null if email sending is disabled
      */
     private EmailSendResponse sendConfiguredEmail(EmailApi.SendEmailRequest emailRequest) throws ApiException {
-        if (!fakeSendingEmails) {
+        if (!infobipProperties.isFakeEmails()) {
             return emailRequest.execute();
         } else {
             return null;
@@ -172,7 +200,7 @@ public class InfobipEmailServiceImpl implements EmailService {
     }
 
     private String makeProjectVersionLink(ProjectVersion projectVersion) {
-        return fendBase + "/project?version=" + projectVersion.getId();
+        return fendPathConfig.getBase() + "/project?version=" + projectVersion.getId();
     }
 
     private String makeFailedGenerationText(ProjectVersion projectVersion, JobDbEntity jobEntity) {

@@ -27,10 +27,11 @@ class TestSharingWithMissingAccount extends AbstractSharingTest {
     @Test
     void userNotFoundError() throws Exception {
         // Step - Share with non-existent user
-        JSONObject response = CommonProjectRequests.shareProject(
+        JSONObject response = CommonProjectRequests.addUserToProject(
             project,
             nonUserEmail,
             ProjectRole.VIEWER,
+            getCurrentUser(),
             status().is4xxClientError());
 
         // VP - Verify that error informs that email not associated with account

@@ -47,7 +47,7 @@ class TestJobRetrieval extends ApplicationBaseTest {
             .log("Creating new user")
             .authorize(a -> a.createUser(otherUserName, otherPassword))
             .and("Sharing project with new user")
-            .request(r -> r.project().shareProject(project, otherUserName, ProjectRole.VIEWER))
+            .request(r -> r.project().addUserToProject(project, otherUserName, ProjectRole.VIEWER, getCurrentUser()))
             .and("Setting current user as the new user.")
             .authorize(a -> a.loginUser(otherUserName, otherPassword, this));
 

@@ -159,10 +159,16 @@ public class SafaUserService {
     public void addSuperUser(SafaUser updatedUser) {
         updatedUser.setSuperuser(true);
         safaUserRepository.save(updatedUser);
+    }
 
-        Organization personalOrg = organizationService.getPersonalOrganization(updatedUser);
-        personalOrg.setPaymentTier(PaymentTier.UNLIMITED);
-        organizationService.updateOrganization(personalOrg);
+    /**
+     * Removes the superuser permission from the given user
+     *
+     * @param updatedUser The user to update
+     */
+    public void removeSuperUser(SafaUser updatedUser) {
+        updatedUser.setSuperuser(false);
+        safaUserRepository.save(updatedUser);
     }
 
     /**

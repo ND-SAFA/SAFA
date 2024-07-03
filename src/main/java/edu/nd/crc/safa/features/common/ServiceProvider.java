@@ -47,7 +47,7 @@ import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.layout.repositories.ArtifactPositionRepository;
 import edu.nd.crc.safa.features.layout.services.ArtifactPositionService;
 import edu.nd.crc.safa.features.memberships.repositories.UserProjectMembershipRepository;
-import edu.nd.crc.safa.features.memberships.services.MemberService;
+import edu.nd.crc.safa.features.memberships.services.MembershipService;
 import edu.nd.crc.safa.features.memberships.services.OrganizationMembershipService;
 import edu.nd.crc.safa.features.memberships.services.ProjectMembershipService;
 import edu.nd.crc.safa.features.memberships.services.TeamMembershipService;
@@ -70,6 +70,7 @@ import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.repositories.SafaUserRepository;
 import edu.nd.crc.safa.features.users.services.AccountLookupService;
 import edu.nd.crc.safa.features.users.services.DefaultProjectCreatorService;
+import edu.nd.crc.safa.features.users.services.PermissionCheckerService;
 import edu.nd.crc.safa.features.users.services.SafaUserService;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.features.versions.services.VersionService;
@@ -109,7 +110,7 @@ public class ServiceProvider {
     private final ProjectSummaryService projectSummaryService;
     // Members
     private final UserProjectMembershipRepository userProjectMembershipRepository;
-    private final MemberService memberService;
+    private final MembershipService membershipService;
     private final TeamMembershipService teamMembershipService;
     private final OrganizationMembershipService orgMembershipService;
     private final ProjectMembershipService projectMembershipService;
@@ -117,6 +118,7 @@ public class ServiceProvider {
     private final TeamService teamService;
     private final OrganizationService organizationService;
     private final PermissionService permissionService;
+    private final PermissionCheckerService permissionCheckerService;
     // Versions
     private final VersionService versionService;
     // Types

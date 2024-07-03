@@ -1,5 +1,7 @@
 package edu.nd.crc.safa.test.services.requests;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -7,15 +9,16 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
-import edu.nd.crc.safa.features.memberships.entities.api.ProjectMembershipRequest;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
 import edu.nd.crc.safa.features.projects.controllers.ProjectController;
 import edu.nd.crc.safa.features.projects.entities.app.ProjectIdAppEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
 import edu.nd.crc.safa.features.traces.entities.app.TraceAppEntity;
+import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.requests.SafaRequest;
+import edu.nd.crc.safa.test.services.UserUtils;
 import edu.nd.crc.safa.test.services.builders.AndBuilder;
 import edu.nd.crc.safa.test.services.builders.BuilderState;
 import edu.nd.crc.safa.test.services.builders.CustomAttributeBuilder;
@@ -49,25 +52,25 @@ public class CommonProjectRequests {
             .getAsArray(TraceAppEntity.class);
     }
 
-    public static JSONObject shareProject(Project project,
-                                          String email,
-                                          ProjectRole role) {
-        MembershipAppEntity membershipAppEntity = new MembershipAppEntity(email, role.toString());
-        return SafaRequest
-            .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
-            .withEntityId(project.getProjectId())
-            .postWithJsonObject(membershipAppEntity);
+    public static JSONObject addUserToProject(Project project,
+                                              String email,
+                                              ProjectRole role,
+                                              SafaUser asUser) {
+        return addUserToProject(project, email, role, asUser, status().is2xxSuccessful());
     }
 
-    public static JSONObject shareProject(Project project,
-                                          String email,
-                                          ProjectRole role,
-                                          ResultMatcher resultMatcher) {
-        ProjectMembershipRequest request = new ProjectMembershipRequest(email, role);
-        return SafaRequest
-            .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
-            .withEntityId(project.getProjectId())
-            .postWithJsonObject(request, resultMatcher);
+    public static JSONObject addUserToProject(Project project,
+                                              String email,
+                                              ProjectRole role,
+                                              SafaUser asUser,
+                                              ResultMatcher resultMatcher) {
+        return UserUtils.asActiveSuperuser(asUser, () -> {
+            MembershipAppEntity request = new MembershipAppEntity(email, role.name());
+            return SafaRequest
+                .withRoute(AppRoutes.Memberships.BY_ENTITY_ID)
+                .withEntityId(project.getProjectId())
+                .postWithJsonObject(request, resultMatcher);
+        });
     }
 
     public static ProjectIdAppEntity transferProjectOwnership(Project project,

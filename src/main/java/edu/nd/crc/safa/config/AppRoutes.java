@@ -359,6 +359,13 @@ public class AppRoutes {
         public static final String ROOT = "/members";
         public static final String BY_ENTITY_ID = ROOT + "/{entityId}";
         public static final String BY_ENTITY_ID_AND_MEMBERSHIP_ID = BY_ENTITY_ID + "/{membershipId}";
+
+        @NoArgsConstructor(access = AccessLevel.NONE)
+        public static class Invites {
+            public static final String BY_ENTITY_ID = Memberships.BY_ENTITY_ID + "/invite";
+            public static final String ACCEPT_INVITE = Memberships.ROOT + "/accept-invite";
+            public static final String DECLINE_INVITE = Memberships.ROOT + "/decline-invite";
+        }
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)

@@ -17,10 +17,7 @@ public class AuditLogService {
     private final AuditLogRepository auditLogRepo;
 
     public List<AuditLogEntry> getBetween(LocalDateTime before, LocalDateTime after) {
-        List<AuditLogEntry> data = auditLogRepo.findByTimestampBetweenOrderByTimestampDesc(before, after);
-        System.out.println(data);
-        System.out.println(auditLogRepo.findAll());
-        return data;
+        return auditLogRepo.findByTimestampBetweenOrderByTimestampDesc(before, after);
     }
 
     public List<AuditLogEntry> getBefore(LocalDateTime before) {

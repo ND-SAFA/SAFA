@@ -45,9 +45,13 @@ public class AuditLogEntry {
     @ManyToOne
     private SafaUser user;
 
+    @Column
+    private String userEmail;
+
     public AuditLogEntry(SafaUser user, String message) {
         this.user = user;
         this.entry = message;
         this.timestamp = LocalDateTime.now();
+        this.userEmail = user.getEmail();
     }
 }

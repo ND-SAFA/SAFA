@@ -14,9 +14,13 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ConceptMatchDTO {
     /**
+     * The artifact ID containing concept ID
+     */
+    private String artifactId;
+    /**
      * ID of concept artifact matched.
      */
-    private String id;
+    private String conceptId;
     /**
      * Index of start of match string.
      */

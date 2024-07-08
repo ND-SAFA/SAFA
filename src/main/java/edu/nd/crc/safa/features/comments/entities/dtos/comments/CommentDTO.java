@@ -17,6 +17,10 @@ public class CommentDTO {
      */
     private UUID id;
     /**
+     * ID of artifact owning comment.
+     */
+    private UUID artifactId;
+    /**
      * Text of comment
      */
     private String content;
@@ -54,6 +58,7 @@ public class CommentDTO {
     public static CommentDTO fromComment(Comment comment) {
         CommentDTO dto = new CommentDTO();
         dto.setId(comment.getId());
+        dto.setArtifactId(comment.getArtifact().getArtifactId());
         dto.setContent(comment.getContent());
         dto.setType(comment.getType());
         dto.setStatus(comment.getStatus());
@@ -75,6 +80,7 @@ public class CommentDTO {
      */
     public void copyTo(CommentDTO other) {
         other.setId(this.id);
+        other.setArtifactId(this.artifactId);
         other.setContent(this.content);
         other.setUserId(this.userId);
         other.setVersionId(this.versionId);

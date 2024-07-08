@@ -63,7 +63,7 @@ public class HealthCheckTestVerifier {
 
     private void verifyUndefinedMatches(List<CommentDTO> healthChecks, UUID versionId) {
         UndefinedConceptCommentDTO comment = filterType(healthChecks, CommentType.UNDEFINED_CONCEPT, UndefinedConceptCommentDTO.class);
-        verifyCommentContent(versionId, comment, "undefined");
+        verifyCommentContent(versionId, comment, HealthCheckTestData.UNDEFINED_CONCEPT_DEFINITION);
         assertThat(comment.getUndefinedConcept()).contains("U1");
     }
 

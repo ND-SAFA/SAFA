@@ -46,6 +46,7 @@ public class GenApiController {
         task.setResponseClass(responseClass);
         setTaskId(logger, task.getTaskId());
         T result = pollTGenTask(task, t -> writeLogs(logger, t), MAX_DURATION, WAIT_SECONDS);
+        System.out.print("Result:" + result);
         setTaskId(logger, null);
         return result;
     }

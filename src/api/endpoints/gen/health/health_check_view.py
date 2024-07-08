@@ -1,4 +1,4 @@
-from api.endpoints.gen.health_checks.health_check_serializer import HealthCheckRequest, HealthCheckSerializer
+from api.endpoints.gen.health.health_check_serializer import HealthCheckRequest, HealthCheckSerializer
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
 from tgen.jobs.health_check_jobs.health_check_job import HealthCheckJob
@@ -13,6 +13,6 @@ def perform_health_check(request: HealthCheckRequest) -> HealthCheckResults:
     :return: The results of the health check.
     """
     job_args = ViewUtil.create_job_args_from_api_definition(request.dataset)
-    job = HealthCheckJob(job_args, query_ids=[request.query_id], concept_layer_id=request.concept_layer_id)
+    job = HealthCheckJob(job_args, query_ids=request.query_ids, concept_layer_id=request.concept_layer_id)
     health_check_results = ViewUtil.run_job(job)
     return health_check_results

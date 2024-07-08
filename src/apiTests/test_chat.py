@@ -3,7 +3,8 @@ from typing import List
 from api.endpoints.gen.serializers.message_serializer import MessageDTO
 from apiTests.base_test import BaseTest
 from apiTests.common.request_proxy import RequestProxy
-from test.jobs.health_check_jobs.health_check_utils import QUERY, assert_correct_related_artifacts, get_dataset_for_context
+from test.jobs.health_check_jobs.health_check_constants import QUERY
+from test.jobs.health_check_jobs.health_check_utils import assert_correct_related_artifacts, get_dataset_for_context
 from tgen.common.util.prompt_util import PromptUtil
 from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.readers.definitions.api_definition import ApiDefinition

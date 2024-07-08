@@ -40,7 +40,7 @@ class RequestProxy:
         :param concept_layer_id: The id of the layer containing concept artifacts.
         :return: The health check results.
         """
-        data = {"dataset": dataset, "query_id": query_id, "concept_layer_id": concept_layer_id}
+        data = {"dataset": dataset, "query_ids": [query_id], "concept_layer_id": concept_layer_id}
         response = RequestProxy._request(AppEndpoints.HEALTH, data)
         return response
 

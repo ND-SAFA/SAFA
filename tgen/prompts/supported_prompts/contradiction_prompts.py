@@ -92,6 +92,8 @@ def format_response(tag: str, value: str) -> Optional[List[str]]:
     :param value: The value of the response.
     :return: List of conflicting ids if there is a conflict, else None
     """
+    if tag != CONFLICTING_IDS_TAG:  # also used to parse contradiction explanation
+        return value
     conflicting_ids = value.split(COMMA)
     if len(conflicting_ids) == 1 and conflicting_ids[0].lower() == CommonChoices.NO:
         return CommonChoices.NO

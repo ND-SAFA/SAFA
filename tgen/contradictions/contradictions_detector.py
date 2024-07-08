@@ -94,16 +94,21 @@ class ContradictionsDetector:
                                                  save_and_load_path=save_and_load_path)
 
         results = []
-        for output, prompt_builder, query_id in zip(output.predictions, prompt_builders_global, query_ids):
-            task_prompt = prompt_builder.prompts[-1]
-            parsed_output = output[task_prompt.args.prompt_id]
-            for contradiction_dict in parsed_output[CONTRADICTION_TAG]:
-                contradiction_explanation = contradiction_dict[EXPLANATION_TAG][0][0]
-                contradicting_ids = contradiction_dict[CONFLICTING_IDS_TAG][0]
-                result = ContradictionsResult(explanation=contradiction_explanation, conflicting_ids=contradicting_ids)
-                self._filter_unknown_ids(result, id2context[query_id])
-                result["conflicting_ids"] += [query_id]
-                results.append(result)
+        for i, query_id in enumerate(query_ids):
+            query_prediction = output.predictions[i]
+            query_prompt_builder = prompt_builders_global[i]
+
+            task_prompt = query_prompt_builder.prompts[-1]
+            query_prediction_output = query_prediction[task_prompt.args.prompt_id]
+
+            for query_contradiction in query_prediction_output[CONTRADICTION_TAG]:
+                query_contradiction_result = ContradictionsResult(
+                    explanation=query_contradiction[EXPLANATION_TAG][0],
+                    conflicting_ids=query_contradiction[CONFLICTING_IDS_TAG][0]
+                )
+                self._filter_unknown_ids(query_contradiction_result, id2context[query_id])
+                query_contradiction_result["conflicting_ids"] += [query_id]
+                results.append(query_contradiction_result)
 
         results = self._consolidate_results(results)
 

@@ -1,6 +1,7 @@
 from typing import Dict, List
 
-from test.jobs.health_check_jobs.health_check_utils import CONCEPT_LAYER_ID, QUERY_ID, assert_health_check_success, \
+from test.jobs.health_check_jobs.health_check_constants import CONCEPT_LAYER_ID, QUERY_ID
+from test.jobs.health_check_jobs.health_check_utils import assert_health_check_success, \
     get_dataset_for_health_checks, mocks_for_health_checks
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs

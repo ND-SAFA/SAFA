@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple, Dict
+from typing import Dict, List, Tuple
 
 from tgen.common.objects.artifact import Artifact
 from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -75,13 +75,16 @@ class ConceptData:
         UNDEFINED = E3
 
         @staticmethod
-        def get_context_entities() -> Dict[str, str]:
+        def get_expected_definitions() -> Dict[str, str]:
             """
             Returns list containing each entity that is found in the context doc.
             :return: List containing each entity that is found in the context doc.
             """
-            return {ConceptData.Entities.E3: "IFDS is the Intermediate Frequency Distribution System",
-                    ConceptData.Entities.E4: "The concept for the GLM is to perform much of the raw data processing on the ground"}
+            return {
+                ConceptData.Entities.E3: "IFDS is the Intermediate Frequency Distribution System",
+                ConceptData.Entities.E4: "The concept for the GLM is to perform much of the raw data processing on the ground",
+                ConceptData.Entities.E5: "Sub-Satelliate Point"
+            }
 
         @staticmethod
         def get_undefined_entities() -> List[Tuple[str, List[str]]]:

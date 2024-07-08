@@ -69,10 +69,13 @@ class LLMTrainer(AbstractTrainer):
         logger.info(res.events[-1].message)
         return res
 
-    def perform_prediction(self, dataset_role: DatasetRole = DatasetRole.EVAL,
-                           datasets: Union[List[iDataset], iDataset] = None, message_prompts: List[str] = None,
+    def perform_prediction(self,
+                           dataset_role: DatasetRole = DatasetRole.EVAL,
+                           datasets: Union[List[iDataset], iDataset] = None,
+                           message_prompts: List[str] = None,
                            system_prompts: List[str] = None,
-                           save_and_load_path: str = EMPTY_STRING, raise_exception: bool = True) -> TracePredictionOutput:
+                           save_and_load_path: str = EMPTY_STRING,
+                           raise_exception: bool = True) -> TracePredictionOutput:
         """
         Performs the prediction and (optionally) evaluation for the model
         :param dataset_role: The dataset role to use for evaluation (e.g. VAL or EVAL)

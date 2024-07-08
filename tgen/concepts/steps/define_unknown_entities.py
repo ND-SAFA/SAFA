@@ -1,9 +1,9 @@
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
 
 from langchain.text_splitter import NLTKTextSplitter
 from pypdf import PdfReader
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
+from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.file_util import FileUtil
 from tgen.common.util.llm_response_util import LLMResponseUtil
@@ -33,14 +33,14 @@ class DefineUnknownEntitiesStep(AbstractPipelineStep):
         :param state: Used to retrieve intermediate and store final result.
         :return: None
         """
-        if not args.context_doc_path:
-            return
-
-        original_content = self._read_context_document(args.context_doc_path)
+        original_content = None
+        if args.context_doc_path:
+            original_content = self._read_context_document(args.context_doc_path)
 
         undefined_entities = state.response["undefined_entities"]
-        context, undefined_entity_artifacts = self._identify_context_for_entities(original_content, args.artifacts,
-                                                                                  undefined_entities)
+        context, undefined_entity_artifacts = self._identify_context_for_entities(args.artifacts,
+                                                                                  undefined_entities,
+                                                                                  original_content)
 
         entity_id_to_definition = self._predict_entity_definitions(context, undefined_entity_artifacts, args.llm_manager)
         for entity in undefined_entities:
@@ -74,8 +74,10 @@ class DefineUnknownEntitiesStep(AbstractPipelineStep):
         entity_id_to_definition = {e_id: pred for e_id, pred in zip(dataset.artifact_df.index, predictions)}
         return entity_id_to_definition
 
-    def _identify_context_for_entities(self, context_doc_content: str, artifacts: List[Artifact],
-                                       undefined_entities: List[UndefinedConcept]) -> Tuple[Dict[str, List[Artifact]], List[Artifact]]:
+    def _identify_context_for_entities(self,
+                                       artifacts: List[Artifact],
+                                       undefined_entities: List[UndefinedConcept],
+                                       context_doc_content: str = None) -> Tuple[Dict[str, List[Artifact]], List[Artifact]]:
         """
         Identifies relevant context for each undefined entity.
         :param context_doc_content: The content from the context document.
@@ -84,17 +86,25 @@ class DefineUnknownEntitiesStep(AbstractPipelineStep):
         :return: Mapping of entity id to related artifacts for context and a list of corresponding undefined entity as artifacts.
         """
         id2artifacts = {a["id"]: a for a in artifacts}
-        chunks = NLTKTextSplitter().split_text(context_doc_content)
-        context, undefined_entity_artifacts = {}, []
+        context = {}
+        undefined_entity_artifacts = []
+        chunks = None
+
+        if context_doc_content:
+            chunks = NLTKTextSplitter().split_text(context_doc_content)
+
         for entity in undefined_entities:
             entity_id = entity["concept_id"]
-            found_chunks = self._find_chunks_related_to_entity(entity_id, chunks)
 
             related_artifacts = [id2artifacts[a_id] for a_id in entity["artifact_ids"]]
-            entity_context = related_artifacts + found_chunks
-            if len(entity_context) > 1:
-                context[entity_id] = entity_context
-                undefined_entity_artifacts.append(Artifact(id=entity_id, content=entity_id, layer_id="undefined"))
+            entity_context = related_artifacts
+
+            if chunks:
+                found_chunks = self._find_chunks_related_to_entity(entity_id, chunks)
+                entity_context += found_chunks
+
+            context[entity_id] = entity_context
+            undefined_entity_artifacts.append(Artifact(id=entity_id, content=entity_id, layer_id="undefined"))
         return context, undefined_entity_artifacts
 
     def _find_chunks_related_to_entity(self, entity_id: str, chunks: List[str]) -> List[Artifact]:
@@ -172,5 +182,5 @@ class DefineUnknownEntitiesStep(AbstractPipelineStep):
             original_content = NEW_LINE.join(pages)
 
         else:
-            raise Exception(f"Unsupported file format {FileUtil.get_file_ext(args.context_doc_path)}")
+            raise Exception(f"Unsupported file format {FileUtil.get_file_ext(context_doc_path)}")
         return original_content

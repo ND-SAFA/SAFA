@@ -13,7 +13,7 @@ class ConceptPipelineResponse(TypedDict):
     """
     List of ambiguous matches found in artifact.
     """
-    multi_matches: Dict[int, List[ConceptMatch]]
+    multi_matches: Dict[str, Dict[int, List[ConceptMatch]]]
     """
     List of predicted matches found in artifact.
     """

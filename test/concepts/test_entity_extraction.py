@@ -84,5 +84,4 @@ class TestPredictEntityStep(BaseTest):
         :return: String representing response.
         """
         entity_name = artifact[ArtifactKeys.ID]
-        entity_description = artifact[ArtifactKeys.CONTENT]
-        return create_entity_extraction_response(entity_name, entity_description)
+        return create_entity_extraction_response(entity_name)

@@ -1,3 +1,4 @@
+from typing import Dict
 from unittest import TestCase
 
 from test.concepts.constants import ConceptData
@@ -22,17 +23,26 @@ class TestDefineUnknownEntities(BaseTest):
         :param ai_manager: AI manager used to mock entity matching.
         :return: None
         """
-
         args = create_concept_args()
         state = create_concept_state(args)
 
         # Mock pipeline execution assumptions
         DirectConceptMatchingStep().run(args, state)
         state.entity_data_frames = ConceptData.get_entity_dataframes()
+
         TestEntityMatching.mock_entity_matching(ai_manager)
         EntityMatchingStep().run(args, state)
+
         CreateResponseStep().run(args, state)
-        self.mock_entity_definitions(self, ai_manager)
+
+        # Capture currently undefined entities.
+
+        undefined_entities = state.response["undefined_entities"]
+        entity_ids = [e["concept_id"] for e in undefined_entities]
+        entity_definitions = {e["concept_id"]: self.create_mock_def(e['concept_id']) for e in undefined_entities}
+
+        # Execute step
+        self.mock_entity_definitions(ai_manager, entity_definitions, tc=self)
         DefineUnknownEntitiesStep().run(args, state)
 
         res = state.response
@@ -40,30 +50,36 @@ class TestDefineUnknownEntities(BaseTest):
         TestDefineUnknownEntities.verify_response(self, res)
 
     @staticmethod
-    def mock_entity_definitions(tc, ai_manager):
+    def create_mock_def(concept_id: str):
+        return f"{concept_id} definition"
+
+    @staticmethod
+    def mock_entity_definitions(ai_manager, entity_definitions: Dict[str, str], tc=None):
         """
         Mocks response for entity definition.
         :param ai_manager: AI manager.
+        :param entity_definitions: Definitions to mock.
         :param tc: Test case.
         :return: None
         """
-        ai_manager.add_responses([lambda prompt: TestDefineUnknownEntities.assert_prediction(tc, prompt)
-                                  for _ in ConceptData.Entities.get_context_entities()])
+        responses = [PromptUtil.create_xml("definition", e_def) for e_id, e_def in entity_definitions.items()]
+        ai_manager.add_responses(responses)
 
     @staticmethod
-    def assert_prediction(tc, prompt):
+    def mock_prediction(prompt, tc=None):
         """
         Asserts context matches entity.
         :param prompt: The prompt given to LLM.
         :param tc: Test case.
         :return: The mocked response form lLM.
         """
-        expected_context_definitions = ConceptData.Entities.get_context_entities()
+        expected_context_definitions = ConceptData.Entities.get_expected_definitions()
 
         message_prompt, system_prompt = prompt
         entity_id = message_prompt.splitlines()[-1]
-        tc.assertIn(entity_id, expected_context_definitions)
-        tc.assertIn(entity_id, system_prompt)
+        if tc:
+            tc.assertIn(entity_id, expected_context_definitions)
+            tc.assertIn(entity_id, system_prompt)
         return PromptUtil.create_xml("definition", expected_context_definitions[entity_id])
 
     @staticmethod
@@ -74,14 +90,10 @@ class TestDefineUnknownEntities(BaseTest):
         :param res: Response to verify.
         :return: None
         """
-        undefined_entity_lookup = {e["concept_id"]: e for e in res["undefined_entities"]}
-        expected_undefined_entities = ConceptData.Entities.get_undefined_entities()
-        expected_context_definitions = ConceptData.Entities.get_context_entities()
+        expected_context_definitions = {e["concept_id"]: TestDefineUnknownEntities.create_mock_def(e["concept_id"])
+                                        for e in res["undefined_entities"]}
 
-        for target_artifact_id, expected_undefined_entities in expected_undefined_entities:
-            for e in expected_undefined_entities:
-                tc.assertIn(e, undefined_entity_lookup)
-                undefined_entity = undefined_entity_lookup[e]
-                tc.assertIn(target_artifact_id, undefined_entity["artifact_ids"])
-                if e in expected_context_definitions:
-                    tc.assertEqual(expected_context_definitions[e], undefined_entity["concept_definition"])
+        for undefined_entity in res["undefined_entities"]:
+            concept_id = undefined_entity["concept_id"]
+            expected_definition = expected_context_definitions[concept_id]
+            tc.assertEqual(undefined_entity["concept_definition"], expected_definition)

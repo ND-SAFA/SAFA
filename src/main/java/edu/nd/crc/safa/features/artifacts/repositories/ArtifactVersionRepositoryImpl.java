@@ -184,7 +184,7 @@ public class ArtifactVersionRepositoryImpl
 
             TypeAppEntity typeAppEntity = new TypeAppEntity(type);
             typeAppEntity.setCount(typeCount.getCount());
-            
+
             notificationService
                 .broadcastChange(EntityChangeBuilder.create(user, projectVersion)
                     .withTypeUpdate(typeAppEntity));

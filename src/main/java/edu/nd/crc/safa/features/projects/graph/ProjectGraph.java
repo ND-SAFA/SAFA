@@ -33,7 +33,7 @@ public class ProjectGraph {
      * Adds artifacts as nodes and traces as edges.
      *
      * @param artifacts The project artifacts to create graph from.
-     * @param traces The project traces to create graph from.
+     * @param traces    The project traces to create graph from.
      */
     public void addProjectRelationships(List<ArtifactAppEntity> artifacts, List<TraceAppEntity> traces) {
         for (ArtifactAppEntity artifact : artifacts) {
@@ -44,6 +44,9 @@ public class ProjectGraph {
             if (traceLinkIsVisible(trace)) {
                 ArtifactNode sourceNode = artifactsMap.get(trace.getSourceId());
                 ArtifactNode targetNode = artifactsMap.get(trace.getTargetId());
+                if (sourceNode == null || targetNode == null) {
+                    continue;
+                }
                 addRelationship(targetNode, sourceNode);
             }
         }
@@ -89,8 +92,8 @@ public class ProjectGraph {
     /**
      * Broadcasts this item into a supertree/subtree set all the way up/down its reachability chain.
      *
-     * @param item Item we are processing.
-     * @param subtreeRetriever Function which will grab the supertree/subtree set from the app entity.
+     * @param item               Item we are processing.
+     * @param subtreeRetriever   Function which will grab the supertree/subtree set from the app entity.
      * @param nextItemsRetriever Function which will grab the parent/children set from the app entity.
      */
     private void broadcastTreeMembership(ArtifactNode item,

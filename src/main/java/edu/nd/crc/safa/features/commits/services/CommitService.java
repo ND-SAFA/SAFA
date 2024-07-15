@@ -140,7 +140,6 @@ public class CommitService {
         commitErrors.addAll(modifiedResponse.getErrors());
 
         // Commit deleted entities
-        System.out.println("Entities to delete:" + projectChange.getRemoved());
         EntityParsingResult<A, CommitError> removeResponse = commitActionOnAppEntities(
             projectChange.getRemoved(),
             deleteAction,

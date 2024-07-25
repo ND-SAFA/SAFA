@@ -14,6 +14,20 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
   const loading = computed(() => getOrgApi.loading);
 
+  async function handleLoad(orgId: string): Promise<void> {
+    await getOrgApi.handleRequest(
+      async () => {
+        orgStore.allOrgs = await getOrganizations();
+        orgApiStore.currentOrg =
+          orgStore.allOrgs.find((org) => org.id === orgId) ||
+          orgStore.allOrgs[0];
+      },
+      {
+        error: "Unable to load organization.",
+      }
+    );
+  }
+
   async function handleLoadCurrent(): Promise<void> {
     await getOrgApi.handleRequest(
       async () => {
@@ -29,6 +43,7 @@ export const useGetOrgApi = defineStore("getOrgApi", (): GetOrgApiHook => {
 
   return {
     loading,
+    handleLoad,
     handleLoadCurrent,
   };
 });

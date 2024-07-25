@@ -20,6 +20,10 @@ class RequestBuilder<
    */
   private readonly pathVariables: Record<string, string>;
   /**
+   * Any query variables to fill into the request URL query.
+   */
+  private readonly queryVariables: Record<string, string>;
+  /**
    * Format the request data as JSON.
    * @private
    */
@@ -37,10 +41,12 @@ class RequestBuilder<
 
   constructor(
     endpoint: keyof typeof Endpoint,
-    pathVariables?: Record<QueryParam, string>
+    pathVariables?: Record<QueryParam, string>,
+    queryVariables?: Record<string, string>
   ) {
     this.relativeUrl = Endpoint[endpoint];
     this.pathVariables = pathVariables || {};
+    this.queryVariables = queryVariables || {};
   }
 
   /**
@@ -50,9 +56,10 @@ class RequestBuilder<
    */
   static buildRequest<R = void, Q extends string = string, B = void>(
     endpoint: keyof typeof Endpoint,
-    pathVariables?: Record<Q, string>
+    pathVariables?: Record<Q, string>,
+    queryVariables?: Record<string, string>
   ): RequestBuilder<R, Q, B> {
-    return new RequestBuilder<R, Q, B>(endpoint, pathVariables);
+    return new RequestBuilder<R, Q, B>(endpoint, pathVariables, queryVariables);
   }
 
   /**
@@ -144,9 +151,15 @@ class RequestBuilder<
   ): Promise<ReturnType> {
     let url = `${BASE_URL}/${this.relativeUrl}`;
 
+    // Add path variables to the URL.
     Object.entries(this.pathVariables).forEach(([key, value]) => {
       url = url.replace(`:${key}`, value);
     });
+
+    // Add query parameters to the URL.
+    const query = new URLSearchParams(this.queryVariables);
+
+    url = `${url}${query ? `?${query}` : ""}`;
 
     const res = await fetch(url, {
       credentials: "include",

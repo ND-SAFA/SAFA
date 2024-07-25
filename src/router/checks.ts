@@ -3,6 +3,7 @@ import { PaymentStatus } from "@/types";
 import {
   billingApiStore,
   getVersionApiStore,
+  memberApiStore,
   sessionApiStore,
 } from "@/hooks/api";
 import { appStore, sessionStore } from "@/hooks/core";
@@ -82,6 +83,15 @@ export const routerBeforeChecks: RouteChecks = {
     } else if (status === PaymentStatus.cancel) {
       await billingApiStore.handleCancelPayment(sessionId);
     }
+
+    return { path: Routes.HOME };
+  },
+  async acceptInvite(to) {
+    if (to.path !== Routes.INVITE || permissionStore.isDemo) return;
+
+    const token = String(to.query[QueryParams.INVITE_TOKEN]);
+
+    await memberApiStore.handleAcceptInvite(token);
 
     return { path: Routes.HOME };
   },

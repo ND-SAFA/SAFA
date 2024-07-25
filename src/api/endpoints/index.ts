@@ -26,3 +26,4 @@ export * from "./admin-api";
 export * from "./billing-api";
 export * from "./comment-api";
 export * from "./chat-api";
+export * from "./member-api";

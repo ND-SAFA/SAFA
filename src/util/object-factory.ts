@@ -21,6 +21,7 @@ import {
   CreatorFilePanel,
   ProjectChatSchema,
   ChatMessageSchema,
+  MembershipSchema,
 } from "@/types";
 
 export function buildSnackbarMessage(): SnackbarMessage {
@@ -245,6 +246,18 @@ export function buildTeam(team: Partial<TeamSchema> = {}): TeamSchema {
     members: team.members || [],
     projects: team.projects || [],
     permissions: team?.permissions || [],
+  };
+}
+
+export function buildMember(
+  member: Partial<MembershipSchema> = {}
+): MembershipSchema {
+  return {
+    id: member.id || "",
+    email: member.email || "",
+    role: member.role || "PENDING",
+    entityType: member.entityType || "PROJECT",
+    entityId: member.entityId || "",
   };
 }
 

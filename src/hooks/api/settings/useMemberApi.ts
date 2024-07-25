@@ -3,6 +3,8 @@ import { defineStore } from "pinia";
 import { computed } from "vue";
 import {
   IdentifierSchema,
+  InviteMembershipSchema,
+  InviteTokenSchema,
   IOHandlerCallback,
   MemberApiHook,
   MemberEntitySchema,
@@ -10,15 +12,24 @@ import {
   OrganizationSchema,
   TeamSchema,
 } from "@/types";
+import { buildMember } from "@/util";
 import {
+  getOrgApiStore,
   getProjectApiStore,
+  getVersionApiStore,
   logStore,
   membersStore,
   projectStore,
   sessionStore,
   useApi,
 } from "@/hooks";
-import { createMember, deleteMember, editMember, getMembers } from "@/api";
+import {
+  acceptInvite,
+  createMember,
+  deleteMember,
+  editMember,
+  getMembers,
+} from "@/api";
 import { pinia } from "@/plugins";
 
 /**
@@ -43,24 +54,56 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
   }
 
   async function handleInvite(
-    member: MembershipSchema,
-    callbacks: IOHandlerCallback
+    member: InviteMembershipSchema,
+    entity: MemberEntitySchema,
+    callbacks: IOHandlerCallback<InviteTokenSchema> = {}
   ): Promise<void> {
     await memberApi.handleRequest(
       async () => {
-        const entityId = member.entityId || projectStore.projectId;
+        const inviteToken = await createMember(entity.entityId, member);
 
-        const invitedMember = await createMember({
-          ...member,
-          entityId,
-        });
+        membersStore.updateMembers(
+          [buildMember({ ...member, ...entity })],
+          entity
+        );
 
-        membersStore.updateMembers([invitedMember], member);
+        if (!member.email) {
+          await navigator.clipboard.writeText(inviteToken.url);
+        }
+
+        return inviteToken;
       },
       {
         ...callbacks,
-        success: `Member has been added: ${member.email}`,
-        error: `Unable save member: ${member.email}`,
+        success: member.email
+          ? `An invite has been sent to ${member.email}`
+          : `Invite link copied to clipboard`,
+        error: member.email
+          ? `Unable to invite member: ${member.email}`
+          : "Unable to create invite link",
+      }
+    );
+  }
+
+  async function handleAcceptInvite(token: string): Promise<void> {
+    await memberApi.handleRequest(
+      async () => {
+        const newMember = await acceptInvite(token);
+
+        if (newMember.entityType === "PROJECT") {
+          await getVersionApiStore.handleLoadCurrent({
+            projectId: newMember.entityId,
+          });
+        } else if (newMember.entityType === "ORGANIZATION") {
+          await getOrgApiStore.handleLoad(newMember.entityId);
+        } else if (newMember.entityType === "TEAM") {
+          // TODO: navigate to the correct org and team.
+          await getOrgApiStore.handleLoadCurrent();
+        }
+      },
+      {
+        success: "Successfully accepted invite",
+        error: "Unable to accept invite",
       }
     );
   }
@@ -137,6 +180,7 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
     loading,
     handleReload,
     handleInvite,
+    handleAcceptInvite,
     handleDelete,
     handleSaveRole,
   };

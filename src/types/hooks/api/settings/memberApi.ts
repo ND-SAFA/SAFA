@@ -1,6 +1,8 @@
 import { ComputedRef } from "vue";
 import {
   IdentifierSchema,
+  InviteMembershipSchema,
+  InviteTokenSchema,
   IOHandlerCallback,
   MemberEntitySchema,
   MembershipSchema,
@@ -28,12 +30,20 @@ export interface MemberApiHook {
    * Invites a user to a project, team, or organization.
    *
    * @param member - The member to invite.
+   * @param entity - The project/org/team to add the member to.
    * @param callbacks - Callbacks for the request.
    */
   handleInvite(
-    member: MembershipSchema,
-    callbacks: IOHandlerCallback
+    member: InviteMembershipSchema,
+    entity: MemberEntitySchema,
+    callbacks?: IOHandlerCallback<InviteTokenSchema>
   ): Promise<void>;
+
+  /**
+   * Accepts an invite to a project, team, or organization.
+   * After accepting, navigates to view the project, team, or organization.
+   */
+  handleAcceptInvite(token: string): Promise<void>;
 
   /**
    * Updates the role of a member.

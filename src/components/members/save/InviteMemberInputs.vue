@@ -3,17 +3,17 @@
     <typography variant="subtitle" value="Invite Members" />
     <separator b="2" />
     <typography secondary :value="subtitle" el="p" b="4" />
-    <text-input
+    <email-input
       v-model="userEmail"
-      label="Email"
-      :error-message="emailErrorMessage"
+      v-model:error-message="emailErrorMessage"
       data-cy="input-member-email"
     />
     <select-input
       v-model="userRole"
       label="Role"
+      hint="Required"
       :options="roles"
-      :option-label="(opt) => `${opt.id}: ${opt.name}`"
+      :option-label="(opt: SelectOption) => `${opt.id}: ${opt.name}`"
       option-value="id"
       option-to-value
       class="q-mb-lg"
@@ -23,6 +23,7 @@
       v-if="props.entity.entityType === 'PROJECT'"
       v-model="entityIds"
       multiple
+      hint="Required"
     />
     <multiselect-input
       v-else-if="props.entity.entityType === 'TEAM'"
@@ -32,14 +33,23 @@
       option-label="name"
       option-to-value
       :options="teamStore.allTeams"
+      hint="Required"
     />
-    <flex-box full-width justify="end" t="2">
+    <flex-box full-width justify="between" t="2">
       <text-button
-        :disabled="!isValid"
+        :disabled="!isValidCopy"
+        text
+        label="Copy link"
+        icon="link"
+        data-cy="button-invite-link"
+        @click="handleCopyLink"
+      />
+      <text-button
+        :disabled="!isValidEmail"
         :label="submitLabel"
         color="primary"
         data-cy="button-invite-member"
-        @click="handleSave"
+        @click="handleSaveEmail"
       />
     </flex-box>
   </div>
@@ -56,12 +66,12 @@ export default {
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { InviteMemberInputsProps, MemberRole } from "@/types";
+import { InviteMemberInputsProps, MemberRole, SelectOption } from "@/types";
 import { memberRoleOptions } from "@/util";
 import { memberApiStore, teamStore } from "@/hooks";
 import {
   ProjectInput,
-  TextInput,
+  EmailInput,
   SelectInput,
   TextButton,
   FlexBox,
@@ -76,33 +86,28 @@ const emit = defineEmits<{
   (e: "save"): void;
 }>();
 
-const roles = memberRoleOptions();
-
 const entityIds = ref<string[]>([]);
 const userEmail = ref("");
 const userRole = ref<MemberRole>();
+const emailErrorMessage = ref<string | false>(false);
+
+const roles = computed(() => memberRoleOptions(props.entity.entityType));
 
 const subtitle = computed(
   () =>
-    `Invite new members to this ${props.entity.entityType?.toLowerCase()}. Members must already have an account with SAFA.`
+    `Invite new members to this ${props.entity.entityType?.toLowerCase()}.
+    Members will receive an email to accept the invite.`
 );
 
 const submitLabel = computed(
   () => `Invite to ${props.entity.entityType?.toLowerCase() || ""}`
 );
 
-const emailErrorMessage = computed(() => {
-  if (
-    userEmail.value &&
-    !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(userEmail.value)
-  ) {
-    return "E-mail must be valid";
-  } else {
-    return false;
-  }
-});
+const isValidCopy = computed(
+  () => entityIds.value.length === 1 && !!userRole.value
+);
 
-const isValid = computed(
+const isValidEmail = computed(
   () =>
     userEmail.value.length > 0 &&
     !emailErrorMessage.value &&
@@ -111,17 +116,18 @@ const isValid = computed(
 );
 
 /**
- * Invites a member to the selected projects.
+ * Invites a member to the selected entities.
  */
-function handleSave() {
+function handleSaveEmail() {
   entityIds.value.forEach((entityId) => {
-    if (!isValid.value || !userRole.value) return;
+    if (!isValidEmail.value || !userRole.value) return;
 
     memberApiStore.handleInvite(
       {
-        id: "",
         email: userEmail.value,
         role: userRole.value,
+      },
+      {
         entityType: props.entity.entityType,
         entityId,
       },
@@ -130,6 +136,21 @@ function handleSave() {
       }
     );
   });
+}
+
+/**
+ * Creates a shareable link to the selected entities.
+ */
+function handleCopyLink() {
+  if (!isValidCopy.value || !userRole.value) return;
+
+  memberApiStore.handleInvite(
+    { role: userRole.value },
+    {
+      entityType: props.entity.entityType,
+      entityId: entityIds.value[0],
+    }
+  );
 }
 
 /**

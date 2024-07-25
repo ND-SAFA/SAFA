@@ -108,7 +108,8 @@ export type IconVariant =
   | "health-unknown"
   | "health-concept"
   | "health-concept-multiple"
-  | "health-conflict";
+  | "health-conflict"
+  | "link";
 
 /**
  * Defines props for an icon.

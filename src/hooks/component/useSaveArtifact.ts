@@ -20,9 +20,13 @@ export const useSaveArtifact = defineStore("saveArtifact", {
      */
     editedArtifact: buildArtifact(artifactStore.selectedArtifact),
     /**
-     * The id of the parent artifact to connect to, if there is one.
+     * The ids of the parent artifacts to connect to.
      */
-    parentId: "",
+    parentIds: [] as string[],
+    /**
+     * The ids of the child artifacts to connect to.
+     */
+    childIds: [] as string[],
     /**
      * Whether the artifact's name is valid.
      */
@@ -48,12 +52,20 @@ export const useSaveArtifact = defineStore("saveArtifact", {
       return !!artifactStore.selectedArtifact?.summary;
     },
     /**
-     * @return The parent artifact of a logic node.
+     * @return The parent artifacts.
      */
-    parentArtifact(): ArtifactSchema | undefined {
-      return this.parentId
-        ? artifactStore.getArtifactById(this.parentId)
-        : undefined;
+    parentArtifacts(): ArtifactSchema[] {
+      return this.parentIds
+        .map((id) => artifactStore.getArtifactById(id))
+        .filter((artifact) => !!artifact) as ArtifactSchema[];
+    },
+    /**
+     * @return The child artifacts.
+     */
+    childArtifacts(): ArtifactSchema[] {
+      return this.childIds
+        .map((id) => artifactStore.getArtifactById(id))
+        .filter((artifact) => !!artifact) as ArtifactSchema[];
     },
     /**
      * @return Any errors to report on the name.
@@ -100,7 +112,8 @@ export const useSaveArtifact = defineStore("saveArtifact", {
         ...updatedArtifact,
       });
       this.isNameValid = !!this.editedArtifact.name;
-      this.parentId = parentId;
+      this.parentIds = parentId ? [parentId] : [];
+      this.childIds = [];
     },
 
     /**

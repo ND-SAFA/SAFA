@@ -63,7 +63,8 @@ function handleSubmit(): void {
   artifactApiStore.handleSave(
     artifactSaveStore.finalizedArtifact,
     artifactSaveStore.isUpdate,
-    artifactSaveStore.parentArtifact,
+    artifactSaveStore.parentArtifacts,
+    artifactSaveStore.childArtifacts,
     {
       onSuccess: () => appStore.openDetailsPanel("displayArtifact"),
     }

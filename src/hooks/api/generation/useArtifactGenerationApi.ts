@@ -59,7 +59,8 @@ export const useArtifactGenerationApi = defineStore(
                 summary: summaryGenConfirm.value?.summary || "",
               },
               true,
-              undefined,
+              [],
+              [],
               { onComplete: clear }
             );
 

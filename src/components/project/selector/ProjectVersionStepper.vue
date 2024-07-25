@@ -147,7 +147,12 @@ function handleVersionSelect(version: VersionSchema | undefined) {
  * Loads the selected project.
  */
 function handleSubmit(): void {
-  if (!selectedProject.value || !selectedVersion.value) return;
+  if (
+    !selectedProject.value ||
+    !selectedVersion.value ||
+    getVersionApiStore.loadLoading
+  )
+    return;
 
   getVersionApiStore
     .handleLoad(selectedVersion.value.versionId)

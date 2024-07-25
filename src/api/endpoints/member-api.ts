@@ -34,7 +34,7 @@ export async function createMember(
   member: InviteMembershipSchema
 ): Promise<InviteTokenSchema> {
   return buildRequest<InviteTokenSchema, "entityId", InviteMembershipSchema>(
-    "memberCollection",
+    "memberInvite",
     { entityId }
   ).post(member);
 }
@@ -76,10 +76,11 @@ export async function deleteMember(member: MembershipSchema): Promise<void> {
  * @return The accepted membership.
  */
 export function acceptInvite(token: string): Promise<MembershipSchema> {
-  return buildRequest<MembershipSchema, string, { token: string }>(
+  return buildRequest<MembershipSchema, string>(
     "memberInviteAccept",
+    {},
     { token }
-  ).put({ token });
+  ).put();
 }
 
 /**
@@ -87,7 +88,5 @@ export function acceptInvite(token: string): Promise<MembershipSchema> {
  * @param token - The invite token.
  */
 export function declineInvite(token: string): Promise<void> {
-  return buildRequest<void, string, { token: string }>("memberInviteDecline", {
-    token,
-  }).put({ token });
+  return buildRequest<void, string>("memberInviteDecline", {}, { token }).put();
 }

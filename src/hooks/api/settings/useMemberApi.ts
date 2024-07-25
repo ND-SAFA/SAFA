@@ -23,7 +23,6 @@ import {
   sessionStore,
   useApi,
 } from "@/hooks";
-import { navigateTo, Routes } from "@/router";
 import {
   acceptInvite,
   createMember,
@@ -97,11 +96,9 @@ export const useMemberApi = defineStore("memberApi", (): MemberApiHook => {
           });
         } else if (newMember.entityType === "ORGANIZATION") {
           await getOrgApiStore.handleLoad(newMember.entityId);
-          await navigateTo(Routes.ORG);
         } else if (newMember.entityType === "TEAM") {
           // TODO: navigate to the correct org and team.
           await getOrgApiStore.handleLoadCurrent();
-          await navigateTo(Routes.ORG);
         }
       },
       {

@@ -86,12 +86,12 @@ const emit = defineEmits<{
   (e: "save"): void;
 }>();
 
-const roles = memberRoleOptions();
-
 const entityIds = ref<string[]>([]);
 const userEmail = ref("");
 const userRole = ref<MemberRole>();
 const emailErrorMessage = ref<string | false>(false);
+
+const roles = computed(() => memberRoleOptions(props.entity.entityType));
 
 const subtitle = computed(
   () =>

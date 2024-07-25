@@ -92,6 +92,8 @@ export const routerBeforeChecks: RouteChecks = {
     const token = String(to.query[QueryParams.INVITE_TOKEN]);
 
     await memberApiStore.handleAcceptInvite(token);
+
+    return { path: Routes.HOME };
   },
   async checkSuperuserStatus(to) {
     const requiresSuperuser = to.matched.some(

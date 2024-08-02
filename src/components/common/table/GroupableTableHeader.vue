@@ -17,7 +17,7 @@
         clearable
         dense
         label="Group By"
-        :options="inputOptions"
+        :options="groupOptions"
         option-value="name"
         option-label="label"
         class="q-mr-sm q-mb-sm"
@@ -31,7 +31,7 @@
         clearable
         dense
         label="Sort By"
-        :options="inputOptions"
+        :options="sortOptions"
         option-value="name"
         option-label="label"
         option-to-value
@@ -99,9 +99,15 @@ const sortBy = useVModel(props, "sortBy");
 const sortDesc = useVModel(props, "sortDesc");
 const groupBy = useVModel(props, "groupBy");
 
-const inputOptions = computed(() =>
+const groupOptions = computed(() =>
   props.columns
-    .filter(({ name }) => name !== "actions")
+    .filter(({ name, groupable }) => name !== "actions" && groupable !== false)
+    .map(({ name, label }) => ({ name, label }))
+);
+
+const sortOptions = computed(() =>
+  props.columns
+    .filter(({ name, sortable }) => name !== "actions" && sortable !== false)
     .map(({ name, label }) => ({ name, label }))
 );
 

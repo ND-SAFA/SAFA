@@ -23,6 +23,10 @@ export interface TableColumn<Row = Record<string, unknown>> {
    */
   sortable?: boolean;
   /**
+   * Whether this column is groupable.
+   */
+  groupable?: boolean;
+  /**
    * How to align the text content.
    */
   align?: "left" | "center" | "right";

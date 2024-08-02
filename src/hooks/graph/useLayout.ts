@@ -79,14 +79,13 @@ export const useLayout = defineStore("layout", {
      * @param animated - Whether to animate the layout, and keep the graph displayed.
      */
     setGraphLayout(type?: "project" | "creator", animated?: boolean): void {
-      const cyPromise = cyStore.getCy(type);
       const generate =
         animated ||
         type === "creator" ||
         this.mode === "tim" ||
         Object.keys(this.artifactPositions).length === 0;
 
-      cyPromise.then((cy) => {
+      cyStore.getCy(type).then((cy) => {
         if (!animated) appStore.onLoadStart();
 
         if (generate) {
@@ -111,8 +110,9 @@ export const useLayout = defineStore("layout", {
           appStore.popups.detailsPanel !== "displayProject" &&
           cy.nodes().length > 0
         ) {
-          // On the TIM page, open the project details panel.
+          // On the TIM page, open the project details panel, then recenter the layout after it opens.
           appStore.openDetailsPanel("displayProject");
+          setTimeout(() => cyStore.centerNodes(true), 400);
         }
 
         // Wait for the graph to render and panel to open, then center on the nodes.

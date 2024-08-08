@@ -30,18 +30,20 @@ class ChildThread(threading.Thread):
             self.state.on_item_finished(work_result, index)
             work = self.state.get_work()
 
-    def _perform_work(self, item: Any, index: int) -> Any:
+    def _perform_work(self, item: Any, index: int, sleep_time: int = None) -> Any:
         """
         Performs work on item.
         :param item: The item to perform work on.
         :param index: The index of the item.
+        :param sleep_time: Time to sleep before performing work.
         :return: The result of the work.
         """
+        while self.state.pause_work:
+            time.sleep(self.state.sleep_time_on_error)
+
         attempts = 0
         has_performed_work = False
         while not has_performed_work and self.state.should_attempt_work(attempts):
-            if self.state.pause_work:
-                time.sleep(self.state.sleep_time_on_error)
             if attempts > 0:
                 logger.info(f"Re-trying request...")
             try:

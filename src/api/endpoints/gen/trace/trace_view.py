@@ -13,7 +13,6 @@ from tgen.jobs.tracing_jobs.tracing_job import TracingJob
 from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 from tgen.tracing.ranking.trace_selectors.i_selection_method import iSelector
-from tgen.tracing.ranking.trace_selectors.selection_by_threshold_scaled_across_all import SelectByThresholdScaledAcrossAll
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
@@ -71,5 +70,4 @@ def perform_embedding_search(prediction_payload: TraceRequest) -> TracingOutput:
                                    embedding_model_name=SMALL_EMBEDDING_MODEL,
                                    select_top_predictions=False,
                                    sorter=SupportedSorter.TRANSFORMER)
-    response["predictions"] = SelectByThresholdScaledAcrossAll.select(response["predictions"], threshold=0.7)
     return response

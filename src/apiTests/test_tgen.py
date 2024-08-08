@@ -25,6 +25,11 @@ class TestTGen(BaseTest):
         self.run_tgen_case(ai_manager)
 
     def run_tgen_case(self, ai_manager=None):
+        """
+
+        :param ai_manager:
+        :return:
+        """
         dataset = TestData.get_dataset(TestSubset.FULL)
 
         if ai_manager:

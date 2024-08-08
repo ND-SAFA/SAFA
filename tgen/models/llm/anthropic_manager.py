@@ -13,7 +13,7 @@ from tgen.common.util.dict_util import DictUtil
 from tgen.common.util.thread_util import ThreadUtil
 from tgen.core.args.anthropic_args import AnthropicArgs, AnthropicParams
 from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.anthropic_overloaded_handler import anthropic_error_handler
+from tgen.models.llm.anthropic_exception_handler import anthropic_exception_handler
 from tgen.models.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, SupportedLLMResponses
 from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
@@ -124,7 +124,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                                                          max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS,
                                                                          raise_exception=raise_exception,
                                                                          rpm=anthropic_constants.ANTHROPIC_MAX_RPM,
-                                                                         exception_handlers=[anthropic_error_handler])
+                                                                         exception_handlers=[anthropic_exception_handler])
         close_client(anthropic_client)
         if raise_exception and global_state.exception:
             raise global_state.exception

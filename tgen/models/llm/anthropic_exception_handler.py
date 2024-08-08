@@ -12,9 +12,9 @@ ANTHROPIC_OVERLOADED_TIMEOUT = 1200
 ANTHROPIC_ERRORS = [InternalServerError, RateLimitError, APIConnectionError]
 
 
-def anthropic_error_handler(state: MultiThreadState, e: Exception,
-                            timeout: float = ANTHROPIC_OVERLOADED_TIMEOUT,
-                            sleep_time: float = ANTHROPIC_OVERLOADED_SLEEP_TIME) -> bool:
+def anthropic_exception_handler(state: MultiThreadState, e: Exception,
+                                timeout: float = ANTHROPIC_OVERLOADED_TIMEOUT,
+                                sleep_time: float = ANTHROPIC_OVERLOADED_SLEEP_TIME) -> bool:
     """
     If anthropic overloaded error is detected, pauses state until anthropic is back up.
     :param state: The multi-threaded state controlling requests to anthropic.

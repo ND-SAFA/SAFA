@@ -62,12 +62,14 @@ class RateLimitedQueue(Generic[ItemType]):
             item = self.queue.get()
             return item
 
-    def increment_interval(self, delta: float) -> None:
+    def change_time_per_request(self, delta: float) -> None:
         """
         Increments the expected seconds per request.
         :param delta: The delta to increase interval by.
         :return: None
         """
+        if self.time_between_requests is None:
+            raise Exception("RPM is not set, therefore, cannot change time between requests.")
         self.time_between_requests += delta
 
     def pause(self) -> None:

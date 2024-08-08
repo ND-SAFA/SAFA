@@ -81,7 +81,7 @@ class MultiThreadState:
                 self.result_list[index] = result
         self.progress_bar.update()
 
-    def on_exception(self, e: Exception, attempts: int, index: int):
+    def on_exception(self, e: Exception, attempts: int = None, index: int = None):
         """
         Handles exception happening in child thread.
         :param e: The exception occurring.
@@ -96,24 +96,27 @@ class MultiThreadState:
                 self.item_queue.unpause()
                 return
 
-        if self.below_attempt_threshold(attempts):
+        if attempts and self.below_attempt_threshold(attempts):
             logger.exception(e)
             logger.info(f"Request failed, retrying in {self.sleep_time} seconds.")
             time.sleep(self.sleep_time)
-            self.item_queue.unpause()
         else:
             self.successful = False
             self.exception = e
+            if not index:
+                self.item_queue.unpause()
+                return
             self.failed_responses.add(index)
             if self.collect_results:
                 self.result_list[index] = e
+        self.item_queue.unpause()
 
     def reduce_rpm(self, amount: float) -> None:
         """
         Increases the interval to wait between items in queue.
         :return: None
         """
-        self.item_queue.increment_interval(amount)
+        self.item_queue.change_time_per_request(amount)
         logger.info(f"Reduced time-between-requests to {self.item_queue.time_between_requests} seconds.")
 
     def _init_progress_bar(self) -> None:

@@ -6,7 +6,7 @@ ALLOWED_CODE_EXTENSIONS = {
     '.py', '.pyc', '.pyo', '.pyd', '.pyw', '.pyx', '.r', '.rb', '.php',
     '.pl', '.pm', '.tcl', '.sh', '.bash', '.zsh', '.fish', '.bat', '.cmd',
     '.ps1', '.awk', '.asm', '.csh', '.cs', '.css', '.html', '.htm', '.xml',
-    '.json', '.yaml', '.yml', '.ini', '.cfg', '.conf', '.toml',
+    '.json', '.yaml', '.yml', '.ini', '.cfg', '.conf', '.toml', '.gitignore',
 
     # Assembly
     '.asm', '.s',

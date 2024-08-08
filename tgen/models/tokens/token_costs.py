@@ -22,6 +22,7 @@ class ModelTokenCost(Enum):
     CLAUDE_3_HAIKU = (0.00025, 0.00125)
     CLAUDE_3_SONNET = (0.003, 0.015)
     CLAUDE_3_OPUS = (0.0015, 0.075)
+    CLAUDE_3_5_SONNET = (0.003, 0.015)
 
     @classmethod
     def calculate_cost_for_content(cls, content: str, model_name: str, input_or_output: int = INPUT_TOKENS,

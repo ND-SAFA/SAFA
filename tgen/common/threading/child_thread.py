@@ -38,7 +38,7 @@ class ChildThread(threading.Thread):
         :return: The result of the work.
         """
         while self.state.pause_work:
-            time.sleep(self.state.sleep_time_on_error)
+            time.sleep(self.state.sleep_time)
 
         attempts = 0
         has_performed_work = False

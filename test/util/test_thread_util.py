@@ -40,7 +40,7 @@ class TestThreadUtil(BaseTest):
                                                   n_threads=n_threads,
                                                   collect_results=True,
                                                   max_attempts=max_attempts,
-                                                  thread_sleep=thread_sleep).results
+                                                  sleep_time=thread_sleep).results
         self.assertEqual(payloads, results)
 
     def test_assert_max_retries(self):
@@ -64,6 +64,6 @@ class TestThreadUtil(BaseTest):
                                             n_threads=n_threads,
                                             collect_results=True,
                                             max_attempts=max_attempts,
-                                            thread_sleep=thread_sleep)
+                                            sleep_time=thread_sleep)
 
         self.assert_error(try_threading, ValueError, "This is a test error.")

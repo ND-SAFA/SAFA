@@ -11,9 +11,9 @@ ANTHROPIC_OVERLOADED_SLEEP_TIME = 1000
 ANTHROPIC_OVERLOADED_TIMEOUT = 1200
 
 
-def anthropic_overloaded_handler(state: MultiThreadState, e: Exception,
-                                 timeout: float = ANTHROPIC_OVERLOADED_TIMEOUT,
-                                 sleep_time: float = ANTHROPIC_OVERLOADED_SLEEP_TIME) -> bool:
+def anthropic_error_handler(state: MultiThreadState, e: Exception,
+                            timeout: float = ANTHROPIC_OVERLOADED_TIMEOUT,
+                            sleep_time: float = ANTHROPIC_OVERLOADED_SLEEP_TIME) -> bool:
     """
     If anthropic overloaded error is detected, pauses state until anthropic is back up.
     :param state: The multi-threaded state controlling requests to anthropic.

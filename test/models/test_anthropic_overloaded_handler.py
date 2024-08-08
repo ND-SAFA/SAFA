@@ -4,7 +4,7 @@ import httpx
 from anthropic import InternalServerError
 
 from tgen.common.util.thread_util import ThreadUtil
-from tgen.models.llm.anthropic_overloaded_handler import anthropic_overloaded_handler
+from tgen.models.llm.anthropic_overloaded_handler import anthropic_error_handler
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.test_response_manager import TestAIManager
@@ -45,6 +45,6 @@ class TestAnthropicOverloadedHandler(BaseTest):
                                                 n_threads=4,
                                                 sleep_time=0.01,
                                                 max_attempts=3,
-                                                exception_handlers=[anthropic_overloaded_handler])
+                                                exception_handlers=[anthropic_error_handler])
 
         self.assertTrue(state.successful)

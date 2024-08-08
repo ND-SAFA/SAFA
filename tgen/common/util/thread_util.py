@@ -13,7 +13,7 @@ class ThreadUtil:
     @staticmethod
     def multi_thread_process(title: str, iterable: List, thread_work: Callable, n_threads: int, max_attempts: int = 1,
                              collect_results: bool = False, thread_sleep: float = THREAD_SLEEP,
-                             retries: Set = None, raise_exception: bool = True, rpm: int = None) -> MultiThreadState:
+                             retries: Set = None, raise_exception: bool = True, rpm: int = None, **kwargs) -> MultiThreadState:
         """
         Performs distributed work over threads.
         :param title: The title of the work being done, used for logging.
@@ -26,6 +26,7 @@ class ThreadUtil:
         :param retries: List of indices to retry if they failed initially.
         :param raise_exception: Throws an exception if one of the threads fails.
         :param rpm: Maximum requests per minutes allowed.
+        :param kwargs: Keyword arguments passed to thread state.
         :return: None
         """
 
@@ -35,7 +36,8 @@ class ThreadUtil:
                                                           max_attempts=max_attempts,
                                                           collect_results=collect_results,
                                                           sleep_time_on_error=thread_sleep,
-                                                          rpm=rpm)
+                                                          rpm=rpm,
+                                                          **kwargs)
 
         threads = []
         for i in range(n_threads):

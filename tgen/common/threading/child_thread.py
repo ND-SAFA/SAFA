@@ -2,7 +2,6 @@ import threading
 import time
 from typing import Any, Callable
 
-from tgen.common.constants.threading_constants import OVERLOADED_ERROR
 from tgen.common.logging.logger_manager import logger
 from tgen.common.threading.threading_state import MultiThreadState
 
@@ -52,19 +51,4 @@ class ChildThread(threading.Thread):
                 self.state.pause_work = False
                 return thread_result
             except Exception as e:
-                self._handle_exception(attempts, e, index)
-
-    def _handle_exception(self, attempts: int, e: Exception, index: int) -> None:
-        """
-        Handles exception caused while performing work.
-        :param attempts: The number of attempts on this current work.
-        :param e: The exception thrown.
-        :param index: The item's index
-        :return: None
-        """
-        if not self.state.below_attempt_threshold(attempts):
-            self.state.on_item_fail(e, index=index)
-        else:
-            self.state.on_valid_exception(e)
-        if OVERLOADED_ERROR in str(e).lower():
-            self.state.increase_interval()
+                self.state.on_exception(e=e, attempts=attempts, index=index)

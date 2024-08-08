@@ -1,6 +1,6 @@
 import time
 
-from anthropic import InternalServerError
+from anthropic import APIConnectionError, InternalServerError, RateLimitError
 
 from tgen.common.logging.logger_manager import logger
 from tgen.common.threading.threading_state import MultiThreadState
@@ -9,6 +9,7 @@ from tgen.prompts.prompt_builder import PromptBuilder
 
 ANTHROPIC_OVERLOADED_SLEEP_TIME = 1000
 ANTHROPIC_OVERLOADED_TIMEOUT = 1200
+ANTHROPIC_ERRORS = [InternalServerError, RateLimitError, APIConnectionError]
 
 
 def anthropic_error_handler(state: MultiThreadState, e: Exception,
@@ -22,11 +23,12 @@ def anthropic_error_handler(state: MultiThreadState, e: Exception,
     :param sleep_time: The amount of time to sleep before checking for anthropic's status.
     :return: None
     """
-    if _is_overloaded_error(e):
-        logger.info("Anthropic is currently overloaded. Pausing work and resuming once anthropic comes back online.")
-        state.pause_work = True
+
+    if any([isinstance(e, error_type) for error_type in ANTHROPIC_ERRORS]):
+        logger.info(f"Received anthropic error: {e}")
+        logger.info("Anthropic is currently overloaded. Resuming once anthropic comes back online.")
+        state.reduce_rpm(1)
         _wait_until_online(state, timeout=timeout, sleep_time=sleep_time)
-        state.pause_work = False
         return True
     return False
 
@@ -57,6 +59,7 @@ def _is_anthropic_online(state: MultiThreadState) -> bool:
         manager = AnthropicManager()
         builders = [PromptBuilder([Prompt("Hi, what is your name?")])]
         response = LLMTrainer.predict_from_prompts(llm_manager=manager, prompt_builders=builders)
+        logger.info("Anthropic is online.")
         return True
     except Exception as e:
         if isinstance(e, InternalServerError):
@@ -64,21 +67,3 @@ def _is_anthropic_online(state: MultiThreadState) -> bool:
         state.successful = False
         state.exception = e
         raise e
-
-
-def _is_overloaded_error(exception: Exception) -> bool:
-    """
-    Returns whether exception is of type overloaded_error
-    :param exception: The exception occurring during request to anthropic.
-    :return: Whether the exception is of type overloaded_error.
-    """
-    if isinstance(exception, InternalServerError):
-        try:
-            # Check if the status code is 529 and the error type is 'overloaded_error'
-            if (exception.status_code == 529 and
-                    exception.response.json().get('error', {}).get('type') == 'overloaded_error'):
-                return True
-        except AttributeError:
-            return False
-
-    return False

@@ -1,5 +1,4 @@
 import threading
-import time
 from typing import Any, Callable
 
 from tgen.common.logging.logger_manager import logger
@@ -37,9 +36,6 @@ class ChildThread(threading.Thread):
         :param sleep_time: Time to sleep before performing work.
         :return: The result of the work.
         """
-        while self.state.pause_work:
-            time.sleep(self.state.sleep_time)
-
         attempts = 0
         has_performed_work = False
         while not has_performed_work and self.state.should_attempt_work(attempts):
@@ -48,7 +44,6 @@ class ChildThread(threading.Thread):
             try:
                 attempts += 1
                 thread_result = self.thread_work(item)
-                self.state.pause_work = False
                 return thread_result
             except Exception as e:
                 self.state.on_exception(e=e, attempts=attempts, index=index)

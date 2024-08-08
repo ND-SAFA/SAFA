@@ -18,6 +18,8 @@ class RateLimitedQueue(Generic[ItemType]):
         self.lock = threading.Lock()
         self.last_access_time = None
         self.time_between_requests = SEC_PER_MIN / items_per_minute if items_per_minute else None
+        self.pause_event = threading.Event()
+        self.pause_event.set()  # Start with the queue unpaused
 
     def __len__(self) -> int:
         """
@@ -38,17 +40,24 @@ class RateLimitedQueue(Generic[ItemType]):
         Gets the next item in the queue.
         :return: Returns next item in the queue.
         """
+        self.pause_event.wait()  # Wait until unpaused
+
         if self.time_between_requests is None:
             return None if self.queue.qsize() == 0 else self.queue.get()
+
         with self.lock:
             if self.queue.qsize() == 0:
                 return None
+
             elapsed_time = time.time() - self.last_access_time if self.last_access_time else self.time_between_requests
+
             if elapsed_time < self.time_between_requests:
                 sleep_time = self.time_between_requests - elapsed_time
                 time.sleep(sleep_time)
+
             if self.queue.qsize() == 0:
                 return None
+
             self.last_access_time = time.time()
             item = self.queue.get()
             return item
@@ -60,3 +69,17 @@ class RateLimitedQueue(Generic[ItemType]):
         :return: None
         """
         self.time_between_requests += delta
+
+    def pause(self) -> None:
+        """
+        Pauses the queue, preventing items from being retrieved.
+        :return: None
+        """
+        self.pause_event.clear()
+
+    def unpause(self) -> None:
+        """
+        Unpauses the queue, allowing items to be retrieved again.
+        :return: None
+        """
+        self.pause_event.set()

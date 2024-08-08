@@ -27,7 +27,7 @@ def perform_summarization_sync(request_data: SummarizeRequest):
     :param request_data: The data containing dataset to summarize.
     :return: Summary output.
     """
-    return perform_summarize_request(request_data, project_summary_sections=[])
+    return perform_summarize_request(request_data, project_summary_sections=[], summarize_code_only=False)
 
 
 @endpoint(SummarizeSerializer, is_async=True)

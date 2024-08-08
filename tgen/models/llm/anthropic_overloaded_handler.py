@@ -68,9 +68,9 @@ def _is_anthropic_online(state: MultiThreadState) -> bool:
 
 def _is_overloaded_error(exception: Exception) -> bool:
     """
-    Returns whether exception
-    :param exception:
-    :return:
+    Returns whether exception is of type overloaded_error
+    :param exception: The exception occurring during request to anthropic.
+    :return: Whether the exception is of type overloaded_error.
     """
     if isinstance(exception, InternalServerError):
         try:

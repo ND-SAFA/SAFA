@@ -4,6 +4,7 @@ import time
 from typing import Generic, TypeVar
 
 ItemType = TypeVar("ItemType")
+SEC_PER_MIN = 60.0
 
 
 class RateLimitedQueue(Generic[ItemType]):
@@ -16,7 +17,7 @@ class RateLimitedQueue(Generic[ItemType]):
         self.items_per_minute = items_per_minute
         self.lock = threading.Lock()
         self.last_access_time = None
-        self.interval = 60.0 / items_per_minute if items_per_minute else None
+        self.time_between_requests = SEC_PER_MIN / items_per_minute if items_per_minute else None
 
     def __len__(self) -> int:
         """
@@ -37,14 +38,14 @@ class RateLimitedQueue(Generic[ItemType]):
         Gets the next item in the queue.
         :return: Returns next item in the queue.
         """
-        if self.interval is None:
+        if self.time_between_requests is None:
             return None if self.queue.qsize() == 0 else self.queue.get()
         with self.lock:
             if self.queue.qsize() == 0:
                 return None
-            elapsed_time = time.time() - self.last_access_time if self.last_access_time else self.interval
-            if elapsed_time < self.interval:
-                sleep_time = self.interval - elapsed_time
+            elapsed_time = time.time() - self.last_access_time if self.last_access_time else self.time_between_requests
+            if elapsed_time < self.time_between_requests:
+                sleep_time = self.time_between_requests - elapsed_time
                 time.sleep(sleep_time)
             if self.queue.qsize() == 0:
                 return None
@@ -58,4 +59,4 @@ class RateLimitedQueue(Generic[ItemType]):
         :param delta: The delta to increase interval by.
         :return: None
         """
-        self.interval += delta
+        self.time_between_requests += delta

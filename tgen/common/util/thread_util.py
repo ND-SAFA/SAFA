@@ -29,9 +29,13 @@ class ThreadUtil:
         :return: None
         """
 
-        global_state: MultiThreadState = MultiThreadState(iterable, title=title, retries=retries,
-                                                          max_attempts=max_attempts, collect_results=collect_results,
-                                                          sleep_time_on_error=thread_sleep, rpm=rpm)
+        global_state: MultiThreadState = MultiThreadState(iterable,
+                                                          title=title,
+                                                          retries=retries,
+                                                          max_attempts=max_attempts,
+                                                          collect_results=collect_results,
+                                                          sleep_time_on_error=thread_sleep,
+                                                          rpm=rpm)
 
         threads = []
         for i in range(n_threads):

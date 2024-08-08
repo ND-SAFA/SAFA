@@ -39,7 +39,7 @@ class MultiThreadState:
 
     def get_work(self) -> Any:
         """
-        :return: Returns whether there is work to be performed and its still valid to do so.
+        :return: Whether there is work to be performed and its still valid to do so.
         """
         return self.item_queue.get()
 

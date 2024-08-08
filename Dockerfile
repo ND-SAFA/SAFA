@@ -1,5 +1,5 @@
 ## Step - Build Arguments
-FROM public.ecr.aws/docker/library/python:3.10 as base
+FROM public.ecr.aws/docker/library/python:3.10 AS base
 SHELL ["/bin/bash", "-c"]
 
 RUN pip install --upgrade pip

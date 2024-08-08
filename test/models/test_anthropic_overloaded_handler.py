@@ -29,19 +29,18 @@ class TestAnthropicOverloadedHandler(BaseTest):
         """
         # Define the mocked request
         ai_manager.add_responses(["Hi, my name is Claude."])
-        mock_request = MagicMock(spec=httpx.Request)
-        response = httpx.Response(
-            status_code=529,
-            json=MOCK_ANTHROPIC_OVERLOADED_RESPONSE,
-            request=mock_request
-        )
-
         state = {"i": 0}
 
         def thread_word(work):
             if state["i"] == 1:
                 state["i"] += 1
-                raise InternalServerError(message="This is the message", response=response, body=MOCK_ANTHROPIC_OVERLOADED_RESPONSE)
+                raise InternalServerError(message="This is the message",
+                                          response=httpx.Response(
+                                              status_code=529,
+                                              json=MOCK_ANTHROPIC_OVERLOADED_RESPONSE,
+                                              request=MagicMock(spec=httpx.Request)
+                                          ),
+                                          body=MOCK_ANTHROPIC_OVERLOADED_RESPONSE)
             else:
                 state["i"] += 1
 

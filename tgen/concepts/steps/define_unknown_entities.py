@@ -56,6 +56,8 @@ class DefineUnknownEntitiesStep(AbstractPipelineStep):
         :param llm_manager: Manages the llm used for creating the predictions.
         :return: Maps entity id to its definition response.
         """
+        if len(undefined_entities) == 0:
+            return {}
         context_prompt = ContextPrompt(artifact2context, prompt_args=PromptArgs(system_prompt=True))
         instruction_prompt = ArtifactPrompt(prompt_args=PromptArgs(title="Tasks"),
                                             prompt_start="Based on the provided information, summarize what the following "

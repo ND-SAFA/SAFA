@@ -1,4 +1,5 @@
-from typing import Any, Iterable, List, Optional, Set
+import time
+from typing import Any, Callable, Iterable, List, Optional, Set
 
 from tqdm import tqdm
 
@@ -7,10 +8,12 @@ from tgen.common.constants.threading_constants import THREAD_SLEEP
 from tgen.common.logging.logger_manager import logger
 from tgen.common.threading.rate_limited_queue import RateLimitedQueue
 
+ExceptionHandler = Callable[["MultiThreadState", Exception], bool]
+
 
 class MultiThreadState:
     def __init__(self, iterable: Iterable, title: str, retries: Set, collect_results: bool = False, max_attempts: int = 3,
-                 sleep_time_on_error: float = THREAD_SLEEP, rpm: int = None):
+                 sleep_time: float = THREAD_SLEEP, rpm: int = None, exception_handlers: List[ExceptionHandler] = None):
         """
         Creates the state to synchronize a multi-threaded job.
         :param iterable: List of items to perform work on.
@@ -18,7 +21,7 @@ class MultiThreadState:
         :param retries: The indices of the iterable to retry.
         :param collect_results: Whether to collect the results of the jobs.
         :param max_attempts: The maximum number of retries after exception is thrown.
-        :param sleep_time_on_error: The time to sleep after an exception has been thrown.
+        :param sleep_time: The time to sleep after an exception has been thrown.
         :param rpm: Maximum rate of items per minute.
         """
         self.title = title
@@ -28,18 +31,18 @@ class MultiThreadState:
         self.progress_bar = None
         self.successful: bool = True
         self.exception: Optional[Exception] = None
-        self.pause_work: bool = False
         self.failed_responses: Set[int] = set()
         self.results: Optional[List[Any]] = None
         self.collect_results = collect_results
-        self.sleep_time_on_error = sleep_time_on_error
+        self.sleep_time = sleep_time
         self.max_attempts = max_attempts
+        self.exception_handlers = exception_handlers if exception_handlers else []
         self._init_retries(retries)
         self._init_progress_bar()
 
     def get_work(self) -> Any:
         """
-        :return: Returns whether there is work to be performed and its still valid to do so.
+        :return: Whether there is work to be performed and its still valid to do so.
         """
         return self.item_queue.get()
 
@@ -78,35 +81,43 @@ class MultiThreadState:
                 self.result_list[index] = result
         self.progress_bar.update()
 
-    def on_item_fail(self, e: Exception, index: int) -> None:
+    def on_exception(self, e: Exception, attempts: int = None, index: int = None):
         """
-        Handler for when a child-thread has completely failed, reaching its max attempts.
-        :param e: The final exception thrown.
-        :param index: The index of the work being processed.
+        Handles exception happening in child thread.
+        :param e: The exception occurring.
+        :param attempts: The number of attempts the child has attempted.
+        :param index: The child index (also a unique identifier).
         :return: None
         """
-        self.successful = False
-        self.exception = e
-        self.failed_responses.add(index)
-        if self.collect_results:
-            self.result_list[index] = e
+        self.item_queue.pause()
+        for exception_handler in self.exception_handlers:
+            is_handled = exception_handler(self, e, sleep_time=self.sleep_time)
+            if is_handled:
+                self.item_queue.unpause()
+                return
 
-    def on_valid_exception(self, e: Exception) -> None:
-        """
-        Handler for when a thread caught an exception and is still within its threshold of max attempts.
-        :param e: The exception thrown.
-        :return: None
-        """
-        self.pause_work = True
-        logger.exception(e)
-        logger.info(f"Request failed, retrying in {self.sleep_time_on_error} seconds.")
+        if attempts and self.below_attempt_threshold(attempts):
+            logger.exception(e)
+            logger.info(f"Request failed, retrying in {self.sleep_time} seconds.")
+            time.sleep(self.sleep_time)
+        else:
+            self.successful = False
+            self.exception = e
+            if not index:
+                self.item_queue.unpause()
+                return
+            self.failed_responses.add(index)
+            if self.collect_results:
+                self.result_list[index] = e
+        self.item_queue.unpause()
 
-    def increase_interval(self) -> None:
+    def reduce_rpm(self, amount: float) -> None:
         """
         Increases the interval to wait between items in queue.
         :return: None
         """
-        self.item_queue.increment_interval(.1)
+        self.item_queue.change_time_per_request(amount)
+        logger.info(f"Reduced time-between-requests to {self.item_queue.time_between_requests} seconds.")
 
     def _init_progress_bar(self) -> None:
         """

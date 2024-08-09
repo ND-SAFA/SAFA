@@ -14,20 +14,14 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "fairscale",
-    "fire",
     "sentencepiece==0.1.97",
     "datasets==2.14.6",
-    "deepspeed",
-    "huggingface-hub",
     "nltk==3.8.1",
     "numpy==1.23.0",
     "python-dotenv==0.21.1",
-    "regex",
     "scikit-learn==1.0.2",
     "scipy==1.10.1",
     "tokenizers==0.15.2",
-    "torch",
     "tqdm==4.66.3",
     "transformers==4.38.0",
     "typeguard==2.13.3",
@@ -36,7 +30,6 @@ dependencies = [
     "typing==3.7.4.3",
     "openai==0.27.4",
     "setuptools",
-    "mock",
     "javac_parser==1.0.0",
     "comment_parser==1.2.4",
     "PyGithub==1.58.0",
@@ -71,8 +64,6 @@ dependencies = [
 ]
 [project.urls]
 homepage = "https://safa.ai"  # Replace with your actual homepage URL if needed
-
-
 
 [tool.setuptools.packages.find]
 exclude = ["tgen_test*"]

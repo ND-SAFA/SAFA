@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<artifacts>
+    <project_id>1</project_id>
+    <artifact_type>CCHIT Data</artifact_type>
+    <artifact>
+        <art_id>1674</art_id>
+        <art_title>The system shall improve accessibility of online clinical information and results.</art_title>
+        <art_parent/>
+        <art_content></art_content>
+        <art_type/>
+    </artifact>
+    <artifact>
+        <art_id>1688</art_id>
+        <art_title>The system shall integrate all components of the patient record to provide comprehensive and intelligent clinical information access and reporting.
+        </art_title>
+        <art_parent/>
+        <art_content></art_content>
+        <art_type/>
+    </artifact>
+</artifacts>

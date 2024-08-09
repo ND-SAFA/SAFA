@@ -1,0 +1,38 @@
+{
+  "job_id": "6346158c-f9a6-4945-81a8-d73ed9be7452",
+  "body": {
+    "global_step": 7,
+    "training_loss": 4.851851463317871,
+    "metrics": {},
+    "val_metrics": {
+      "0": {
+        "map": 0.24208646291979627,
+        "ap": 0.0819169908856435,
+        "f1": 0.17699115044247787,
+        "f2": 0.34965034965034963,
+        "precision@1": 0.105,
+        "precision@2": 0.053,
+        "precision@3": 0.053,
+        "avg_true_links": 1.2,
+        "lag": 5,
+        "precision_at_recall": 0.25
+      }
+    },
+    "prediction_output": {
+      "eval_metrics": {
+        "map": 0.19425862598939522,
+        "ap": 0.07689384274230604,
+        "f1": 0.16,
+        "f2": 0.314207650273224,
+        "precision@1": 0.053,
+        "precision@2": 0.053,
+        "precision@3": 0.035,
+        "avg_true_links": 1.1,
+        "lag": 6,
+        "precision_at_recall": 0.20
+      }
+    }
+  },
+  "experimental_vars": {},
+  "status": 0
+}

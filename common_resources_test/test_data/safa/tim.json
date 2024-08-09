@@ -1,0 +1,32 @@
+{
+  "artifacts": [
+    {
+      "type": "Layer 1: Source",
+      "fileName": "Layer1Source.json"
+    },
+    {
+      "type": "Layer 1: Target",
+      "fileName": "Layer1Target.json"
+    },
+    {
+      "type": "Layer 2: Source",
+      "fileName": "Layer2Source.json"
+    },
+    {
+      "type": "Layer 2: Target",
+      "fileName": "Layer2Target.json"
+    }
+  ],
+  "traces": [
+    {
+      "fileName": "Layer1Source2Target.json",
+      "sourceType": "Layer 1: Source",
+      "targetType": "Layer 1: Target"
+    },
+    {
+      "fileName": "Layer2Source2Target.json",
+      "sourceType": "Layer 2: Source",
+      "targetType": "Layer 2: Target"
+    }
+  ]
+}

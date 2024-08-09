@@ -1,0 +1,13 @@
+id,content,layer_id
+s1,s_token1,Layer 1: Source
+s2,s_token2,Layer 1: Source
+s3,s_token3,Layer 1: Source
+t1,t_token1,Layer 1: Target
+t2,t_token2,Layer 1: Target
+t3,t_token3,Layer 1: Target
+s4,s_token4,Layer 2: Source
+s5,s_token5,Layer 2: Source
+s6,s_token6,Layer 2: Source
+t4,t_token4,Layer 2: Target
+t5,t_token5,Layer 2: Target
+t6,t_token6,Layer 2: Target

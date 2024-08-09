@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gen-common-resources"
+version = "0.0.1"
+description = "SAFA.ai common utilities for python / generative workloads."
+readme = "README.md"
+keywords = ["traceability"]
+authors = [
+    { name = "Katherine Dearstyne", email = "kat@safa.ai" },
+    { name = "Alberto Rodriguez", email = "alberto@safa.ai" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic==0.28.0",
+    "beautifulsoup4==4.12.3",
+    "comment-parser==1.2.4",
+    "chromadb==0.5.5",
+    "datasets==2.19.2",
+    "evaluate==0.4.2",
+    "langchain==0.2.7",
+    "langchain-anthropic==0.1.19",
+    "langchain-community==0.2.7",
+    "langchain-core==0.2.16",
+    "langchain-huggingface==0.0.3",
+    "langchain-openai==0.1.15",
+    "langchain-text-splitters==0.2.1",
+    "langgraph==0.1.1",
+    "langsmith==0.1.81",
+    "lxml==5.2.2",
+    "networkx==3.3",
+    "nltk==3.8.1",
+    "numpy==1.26.4",
+    "scikit-learn==1.5.0",
+    "scipy==1.13.1",
+    "sentence-transformers==3.0.1",
+    "tqdm==4.66.4",
+    "transformers==4.41.2",
+    "typeguard==4.3.0",
+    "tiktoken==0.7.0",
+    "python-dotenv==0.21.1"
+]
+[project.urls]
+homepage = "https://safa.ai"  # Replace with your actual homepage URL if needed
+
+[tool.setuptools.packages.find]
+exclude = ["common_resources_test*"]

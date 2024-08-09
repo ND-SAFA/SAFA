@@ -115,7 +115,6 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             local_response = anthropic_client.messages.create(**prompt_params)
             return local_response
 
-        logger.info(f"Concurrent requests: {anthropic_constants.ANTHROPIC_MAX_THREADS}")
         global_state: MultiThreadState = ThreadUtil.multi_thread_process("Completing prompts", list(enumerate(prompts)),
                                                                          thread_work,
                                                                          retries=retries,

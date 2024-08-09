@@ -1,1 +1,2 @@
 mock==5.1.0
+python_package_manager@git+https://github.com/ND-SAFA/python-package-manager

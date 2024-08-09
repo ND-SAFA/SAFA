@@ -5,10 +5,10 @@ chromadb==0.5.5
 datasets==2.19.2
 evaluate==0.4.2
 extendable-enum==1.0.1
-langchain==0.2.7
-langchain-anthropic==0.1.19
-langchain-community==0.2.9
-langchain-core==0.2.16
+langchain==0.2.12
+langchain-anthropic==0.1.22
+langchain-community==0.2.11
+langchain-core==0.2.27
 langchain-huggingface==0.0.3
 langchain-openai==0.1.15
 langchain-text-splitters==0.2.1

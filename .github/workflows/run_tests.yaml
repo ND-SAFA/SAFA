@@ -3,7 +3,9 @@ name: Unit Tests
 on:
   pull_request:
     branches:
+    - main
     - development
+    - production
     types: [opened, synchronize]
   issue_comment:
     types: [created]

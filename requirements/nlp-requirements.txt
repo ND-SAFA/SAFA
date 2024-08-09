@@ -1,9 +1,9 @@
 accelerate==0.27.2
-datasets==2.14.6
-sentence-transformers==2.5.1
-scikit-learn==1.0.2
-scipy==1.10.1
-numpy==1.23.0
+datasets==2.19.2
+sentence-transformers==3.0.1
+scikit-learn==1.5.0
+scipy==1.13.1
+numpy==1.26.4
 nltk==3.8.1
 pandas==2.0.0
-transformers==4.38.0
+transformers==4.41.2

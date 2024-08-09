@@ -4,15 +4,10 @@ version = "0.0.1"
 description = "SAFA.ai generative server."
 readme = "README.md"
 keywords = ["traceability"]
-
-[project.authors]
-name = "Kat Dearstyne"
-email = "kat@safa.ai"
-
-[[project.authors]]
-name = "Alberto Rodriguez"
-email = "alberto@safa.ai"
-
+authors = [
+    { name = "Katherine Dearstyne", email = "kat@safa.ai" },
+    { name = "Alberto Rodriguez", email = "alberto@safa.ai" },
+]
 [project.urls]
 homepage = "https://safa.ai"  # Replace with your actual homepage URL if needed
 
@@ -81,7 +76,6 @@ tiktoken = "0.3.3"
 whitenoise = "6.4.0"
 itypes = "1.2.0"
 ruamel.yaml = "0.17.21"
-ruamel.yaml.clib = "0.2.7"
 
 [tool.setuptools.package-data]
 include_package_data = true

@@ -24,11 +24,11 @@ class TestTGen(BaseTest):
         """
         self.run_tgen_case(ai_manager)
 
-    def run_tgen_case(self, ai_manager=None):
+    def run_tgen_case(self, ai_manager=None) -> None:
         """
-
-        :param ai_manager:
-        :return:
+        Performs a ranking job against test dataset, creates mock responses if an AI manager is given.
+        :param ai_manager: Optional AI manager to use to mock ranking responses.
+        :return: None
         """
         dataset = TestData.get_dataset(TestSubset.FULL)
 
@@ -44,4 +44,3 @@ class TestTGen(BaseTest):
             "FR1": ["/Artifact.java", "/ArtifactService.java", "/TraceLink.java", "/TraceLinkService.java"],
             "FR2": ["/TraceLink.java", "/TraceLinkService.java", "/Artifact.java", "/ArtifactService.java"]
         }, trace_predictions, msg_suffix=f"\n while sync={is_sync}")
-        print("Done")

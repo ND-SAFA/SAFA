@@ -12,14 +12,7 @@ authors = [
     { name = "Katherine Dearstyne", email = "kat@safa.ai" },
     { name = "Alberto Rodriguez", email = "alberto@safa.ai" }
 ]
-
-[project.urls]
-homepage = "https://safa.ai"  # Replace with your actual homepage URL if needed
-
-[project.optional-dependencies]
-# Define any optional dependencies here if necessary
-
-[project.dependencies]
+requires-python = ">=3.10"
 dependencies = [
     "fairscale",
     "fire",
@@ -76,12 +69,10 @@ dependencies = [
     "itypes==1.2.0",
     "ruamel.yaml==0.17.21"
 ]
+[project.urls]
+homepage = "https://safa.ai"  # Replace with your actual homepage URL if needed
+
+
 
 [tool.setuptools.packages.find]
 exclude = ["tgen_test*"]
-
-[tool.setuptools.package-data]
-include_package_data = true
-
-[tool.setuptools.python-requires]
-python = ">=3.10"

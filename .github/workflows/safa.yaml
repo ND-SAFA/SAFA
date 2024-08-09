@@ -33,7 +33,7 @@ jobs:
         ROOT_PATH: /home/runner/work/tgen/tgen
 
     - name: Run Unit Tests.
-      run: python -m unittest discover -s test
+      run: python -m unittest discover -s tgen_test
       env:
         DEPLOYMENT: test
         ROOT_PATH: /home/runner/work/tgen/tgen

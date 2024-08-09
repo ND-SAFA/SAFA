@@ -1,1 +1,1 @@
-gen-common-resources@git+https://github.com/ND-SAFA/gen-common-resources
+git+https://github.com/ND-SAFA/gen-common-resources.git

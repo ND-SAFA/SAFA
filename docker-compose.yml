@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   gen:
     container_name: gen

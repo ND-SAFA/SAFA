@@ -12,6 +12,7 @@ from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.jobs.tracing_jobs.tracing_job import TracingJob
 from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
+from tgen.tracing.ranking.trace_selectors.i_selection_method import iSelector
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 
@@ -23,7 +24,10 @@ class TracingOutput(TypedDict):
     predictions: List[Trace]
 
 
-def perform_tracing_job(dataset: ApiDefinition, job: Union[Type[RankingJob], Type[TracingJob]], **kwargs) -> TracingOutput:
+def perform_tracing_job(dataset: ApiDefinition,
+                        job: Union[Type[RankingJob], Type[TracingJob]],
+                        selection_method: iSelector = None,
+                        **kwargs) -> TracingOutput:
     """
     Runs a tracing job on given dataset.
     :param dataset: The dataset containing artifacts to compare.
@@ -34,7 +38,6 @@ def perform_tracing_job(dataset: ApiDefinition, job: Union[Type[RankingJob], Typ
     job_args = ViewUtil.create_job_args_from_api_definition(dataset)
     tracing_job = job(job_args, **kwargs)
     prediction_result = ViewUtil.run_job(tracing_job)
-
     return {"predictions": prediction_result.prediction_entries}
 
 
@@ -60,10 +63,11 @@ def perform_embedding_search(prediction_payload: TraceRequest) -> TracingOutput:
     :return: List of trace links.
     """
     dataset: ApiDefinition = prediction_payload["dataset"]
-    return perform_tracing_job(dataset,
-                               RankingJob,
-                               ranking_pipeline=SupportedRankingPipelines.SEARCH,
-                               max_children_per_query=DEFAULT_SEARCH_FILTER,
-                               embedding_model_name=SMALL_EMBEDDING_MODEL,
-                               select_top_predictions=False,
-                               sorter=SupportedSorter.TRANSFORMER)
+    response = perform_tracing_job(dataset,
+                                   RankingJob,
+                                   ranking_pipeline=SupportedRankingPipelines.SEARCH,
+                                   max_children_per_query=DEFAULT_SEARCH_FILTER,
+                                   embedding_model_name=SMALL_EMBEDDING_MODEL,
+                                   select_top_predictions=False,
+                                   sorter=SupportedSorter.TRANSFORMER)
+    return response

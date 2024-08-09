@@ -205,3 +205,4 @@ if DEBUG:
     logger.info(f"Environment: {ENV_NAME}")
     logger.info(f"Static root path: {STATIC_ROOT}")
     logger.info(f"Failure Path: {ENV_FAILURE_PATH}")
+    logger.info(f"Concurrent requests: {anthropic_constants.ANTHROPIC_MAX_THREADS}")

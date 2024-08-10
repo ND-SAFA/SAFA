@@ -1,0 +1,6 @@
+# Include the specific .txt file
+include tgen/common/util/common-words.csv
+
+# Exclude __pycache__ and .pyc files
+global-exclude __pycache__/
+global-exclude *.py[cod]

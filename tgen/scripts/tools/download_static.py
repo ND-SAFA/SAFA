@@ -1,6 +1,7 @@
 import nltk
 
-if __name__ == "__main__":
+
+def main():
     nltk.download('stopwords', quiet=True)
     nltk.download('wordnet', quiet=True)
     nltk.download('omw-1.4', quiet=True)

@@ -25,12 +25,17 @@ jobs:
       run: |
         pip install -r requirements/devops-requirements.txt
         pip install -r requirements.txt
-        python3 download_static.py
+
+    - name: Download Static
+      run: |
+        python3 tgen/scripts/tools/download_static.py
 
     - name: Run Dev-Ops Checks
-      run: python3 tgen/scripts/tools/find_missing_docs.py
+      run: |
+        pip install git+https://${{ secrets.TGEN_TOKEN }}@github.com/ND-SAFA/python-package-manager.git
+        ppm find_missing_docs tgen
       env:
-        ROOT_PATH: /home/runner/work/tgen/tgen
+        PIP_EXTRA_INDEX_URL: "https://${{ secrets.TGEN_TOKEN }}:x-oauth-basic@github.com"
 
     - name: Run Unit Tests.
       run: python -m unittest discover -s tgen_test

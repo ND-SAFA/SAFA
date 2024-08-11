@@ -19,7 +19,7 @@ class TestRankingUtil(BaseTest):
         predictions = EntryCreator.create_trace_predictions(3, 1, scores=[0.75, 0.8, 0.95])
         trace_df = TraceDataFrame(true_links)
         metrics = RankingUtil.evaluate_trace_predictions(trace_df, predictions)
-        self.assertEqual(1, metrics[MAP_KEY])
+        self.assertAlmostEquals(1 / 3, metrics[MAP_KEY])  # three thresholds, AP scores are 0, 100, 0
         self.assertEqual(1, metrics[LAG_KEY])
 
     def test_select_predictions(self):

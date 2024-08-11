@@ -1,9 +1,8 @@
 from collections import namedtuple
-from typing import List, Set
+from typing import Any, List, Set
 from unittest.mock import MagicMock
 
 import openai
-from openai.openai_object import OpenAIObject
 
 from tgen.common.constants import open_ai_constants
 from tgen.common.constants.deliminator_constants import EMPTY_STRING
@@ -19,6 +18,7 @@ from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 
 Res = namedtuple('Res', ['choices'])
+OpenAIObject = Any
 
 
 class OpenAIManager(AbstractLLMManager[OpenAIObject]):

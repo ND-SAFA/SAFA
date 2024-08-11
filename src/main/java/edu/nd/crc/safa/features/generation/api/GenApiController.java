@@ -24,7 +24,7 @@ public class GenApiController {
     private static final String GEN_COOKIE_KEY = "GEN_KEY";
     private static final int WAIT_SECONDS = 2;
     private static final int HOURS = 3600;
-    private static final int MAX_DURATION = 6 * HOURS; // 6 hours
+    private static final int MAX_DURATION = 12 * HOURS;
     private final RequestService requestService;
     private JobService jobService;
 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Set, Optional
+from typing import List, Set, Optional, Tuple
 
 from tgen.common.util.base_object import BaseObject
 from tgen.common.util.list_util import ListUtil
@@ -22,6 +22,15 @@ class MessageMeta(BaseObject):
         :return: A list of messages for the llm api.
         """
         return [m.message for m in metas]
+
+    @staticmethod
+    def to_langchain_messages(metas: list["MessageMeta"]) -> List[Tuple]:
+        """
+        Converts a list of metas to a list of messages for the langchain api.
+        :param metas: List of message meta objects.
+        :return: A list of messages for the langchain api.
+        """
+        return [(m.message["role"], m.message["content"]) for m in metas]
 
     @staticmethod
     def get_most_recent_message(metas: list["MessageMeta"], role: str = None) -> Optional[Message]:

@@ -2,8 +2,6 @@ import json
 from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from openai.api_resources.fine_tune import FineTune
-
 from tgen.chat.message_meta import MessageMeta
 from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.logging.logger_manager import logger
@@ -44,7 +42,7 @@ class LLMTrainer(AbstractTrainer):
         super().__init__(initial_state.trainer_dataset_manager, trainer_args=initial_state.llm_manager.llm_args)
         self.state = initial_state
 
-    def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> FineTune:
+    def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> Any:
         """
         Handles training of the model
         :param completion_type: The type of completion task being performed.

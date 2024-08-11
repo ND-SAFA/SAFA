@@ -34,7 +34,7 @@ jobs:
 
     - name: Run Dev-Ops Checks
       run: |
-        pip install git+https://${{ secrets.TGEN_TOKEN }}@github.com/ND-SAFA/python-package-manager.git
+        pip install git+https://github.com/ND-SAFA/python-package-manager.git
         ppm find_missing_docs tgen
       env:
         PIP_EXTRA_INDEX_URL: "https://${{ secrets.TGEN_TOKEN }}:x-oauth-basic@github.com"

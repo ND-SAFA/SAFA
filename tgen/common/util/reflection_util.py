@@ -5,7 +5,7 @@ import typing
 from enum import Enum
 from typing import Any, Dict, List, Optional, Type
 
-from typeguard import check_type
+from typeguard import TypeCheckError, check_type
 
 from tgen.common.constants.deliminator_constants import PERIOD, UNDERSCORE
 from tgen.common.logging.logger_manager import logger
@@ -320,7 +320,7 @@ class ReflectionUtil:
                                                       condition=print_on_error)
                     return False
                 for field_name, expected_field_type in expected_type.__annotations__.items():
-                    check_type(f"{param_name}-{field_name}", val.get(field_name, None), expected_field_type)
+                    check_type(val.get(field_name, None), expected_field_type)
                 return True
 
             if ReflectionUtil.is_typed_class(expected_type):
@@ -350,13 +350,13 @@ class ReflectionUtil:
                         return False
                     return True
                 elif parent_class == "callable":
-                    check_type(param_name, val, expected_type)
+                    check_type(val, expected_type)
                     return True
                 else:
                     expected_type = parent_class
 
-            check_type(param_name, val, expected_type)
-        except TypeError as e:
+            check_type(val, expected_type)
+        except TypeCheckError as e:
             if print_on_error:
                 traceback.print_exc()
             return False

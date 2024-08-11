@@ -36,6 +36,9 @@ class ExploreArtifactNeighborhood(BaseTool):
                                                                  "to explore the neighborhood of multiple artifacts.")
 
 
+DEFAULT_FAILURE_RESPONSE = "I don't have any information to relevant to the question."
+
+
 class RequestAssistance(BaseTool):
     """
     Invoke this tool only when you have exhausted all other strategies for answering the user, including using available context,

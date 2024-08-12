@@ -19,15 +19,18 @@ from .paths import load_source_code_paths
 
 load_source_code_paths()
 
-from tgen.common.constants import anthropic_constants
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.json_util import NpEncoder
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.json_util import NpEncoder
+from common_resources.tools.constants import anthropic_constants
 
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 load_dotenv()
+
+ENV_NAME = os.environ.get("ENV_MODE", "production")
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -39,8 +42,10 @@ ROOT_PASSWORD = os.environ.get("ROOT_PASSWORD", None)
 JWT_ALGO = "HS256"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
-ALLOWED_HOSTS = ["*"]
+SAFA_HOSTS = ['https://api.safa.ai',
+              'https://dev.api.safa.ai',
+              'https://staging.api.safa.ai']
+ALLOWED_HOSTS = SAFA_HOSTS
 
 # Application definition
 
@@ -130,22 +135,20 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    },
+}
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
-CORS_ALLOWED_ORIGINS = [
-    'https://localhost:3000',
-    "https://api.safa.ai",
-    "https://dev.api.safa.ai",
-    "https://staging.api.safa.ai"
-]
-ENV_NAME = os.environ.get("ENV_MODE", "development")
-FAILURE_PATHS = {"test": "~/desktop"}
+CORS_ALLOWED_ORIGINS = SAFA_HOSTS
+
+FAILURE_PATHS = {"test": "~/server_output"}
 ENV_FAILURE_PATH = FAILURE_PATHS.get(ENV_NAME, "/")
 # Request Encoder/Decoer
 register('NpEncoder',
@@ -167,13 +170,12 @@ CELERYD_HIJACK_ROOT_LOGGER = False
 CELERY_TASK_ALWAYS_EAGER = ENV_NAME.lower() == "test"
 CELERY_EAGER_PROPAGATES_EXCEPTIONS = CELERY_TASK_ALWAYS_EAGER
 
-DEBUG = True if "DEBUG" in os.environ else CELERY_TASK_ALWAYS_EAGER
+DEBUG = True if ENV_NAME.lower() == "test" else False
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 25_000_000
 CELERY_ACCEPT_CONTENT = ['NpEncoder']
 CELERY_TASK_SERIALIZER = 'NpEncoder'
 CELERY_RESULT_SERIALIZER = 'NpEncoder'
-
 GEN_BROKER = os.environ.get("BROKER", "celery")
 
 if GEN_BROKER == "celery":
@@ -206,3 +208,11 @@ if DEBUG:
     logger.info(f"Static root path: {STATIC_ROOT}")
     logger.info(f"Failure Path: {ENV_FAILURE_PATH}")
     logger.info(f"Concurrent requests: {anthropic_constants.ANTHROPIC_MAX_THREADS}")
+
+if ENV_NAME == "test":
+    ALLOWED_HOSTS = ['*']
+    CORS_ALLOWED_ORIGINS = ["https://localhost:3000"]
+if ENV_NAME == "development":
+    ALLOWED_HOSTS = ['*']
+    CORS_ALLOWED_ORIGINS = ["https://localhost:3000"]
+    DEBUG = True

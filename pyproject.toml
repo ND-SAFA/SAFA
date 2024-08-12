@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tgen"
-version = "0.0.10"
+version = "0.0.11"
 description = "SAFA.ai generative server."
 readme = "README.md"
 keywords = ["traceability"]
@@ -19,9 +19,6 @@ homepage = "https://safa.ai"  # Replace with your actual homepage URL if needed
 
 [tool.setuptools]
 include-package-data = true
-
-[tool.setuptools.packages.find]
-exclude = ["tgen_test*"]
 
 [tool.setuptools.package-data]
 "tgen" = ["common/util/common_words.csv"]

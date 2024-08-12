@@ -1,5 +1,6 @@
 from functools import lru_cache
 from logging import Logger
+from typing import Type
 
 from common_resources.tools.constants.symbol_constants import EMPTY_STRING
 
@@ -42,6 +43,20 @@ class TheLogger(Logger):
         """
         step_formatted = TheLogger.__create_step(step)
         self.info(step_formatted)
+
+    def log_exception_on_condition(self, exception_class: Type[Exception], exception_msg: str, condition: bool = True) -> None:
+        """
+        Logs an exception and stack trace.
+        :param exception_class: The class of the exception.
+        :param exception_msg: The corresponding message of the exception.
+        :param condition: Only logs if condition is True.
+        :return: None.
+        """
+        try:
+            raise exception_class(exception_msg)
+        except Exception:
+            if condition:
+                self.exception(exception_msg)
 
     @lru_cache(maxsize=5)
     def log_without_spam(self, level: int, msg: object, *args: object, **kwargs) -> None:

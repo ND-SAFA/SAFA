@@ -20,6 +20,10 @@ homepage = "https://safa.ai"  # Replace with your actual homepage URL if needed
 [tool.setuptools]
 include-package-data = true
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tgen", "tgen_test"]
+
 [tool.setuptools.package-data]
 "tgen" = ["common/util/common_words.csv"]
 

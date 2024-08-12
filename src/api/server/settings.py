@@ -19,9 +19,9 @@ from .paths import load_source_code_paths
 
 load_source_code_paths()
 
-from common_resources.tools.t_logging.logger_manager import logger
-from common_resources.tools.util.json_util import NpEncoder
-from common_resources.tools.constants import anthropic_constants
+from tgen.common.constants import anthropic_constants
+from tgen.common.logging.logger_manager import logger
+from tgen.common.util.json_util import NpEncoder
 
 from pathlib import Path
 

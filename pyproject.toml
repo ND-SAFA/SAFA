@@ -24,8 +24,5 @@ include-package-data = true
 where = ["."]
 include = ["tgen", "tgen_test"]
 
-[tool.setuptools.package-data]
-"tgen" = ["common/util/common_words.csv"]
-
 [project.scripts]
 tgen_download_static = "tgen.scripts.tools.download_static:main"

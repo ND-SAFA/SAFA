@@ -1,7 +1,6 @@
 # Include the specific .txt file
-include tgen/common/util/common-words.csv
-include tgen/hgen/inputs_for_generation/*
+recursive-include tgen *
+recursive-include tgen_test *
 
 # Exclude __pycache__ and .pyc files
 global-exclude __pycache__/
-global-exclude *.py[cod]

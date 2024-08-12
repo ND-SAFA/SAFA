@@ -30,17 +30,17 @@ jobs:
       run: |
         python3 tgen/scripts/tools/download_static.py
 
-    - name: Download Sub-Module
+    - name: Download Sub-Modules
       run: |
-        pip3 install git+https://${{ secrets.TGEN_TOKEN }}@github.com/ND-SAFA/gen-common-resources
-
-    - name: Run Dev-Ops Checks
-      run: |
+        pip install git+https://${{ secrets.TGEN_TOKEN }}@github.com/ND-SAFA/gen-common-resources
         pip install git+https://${{ secrets.TGEN_TOKEN }}@github.com/ND-SAFA/python-package-manager.git
-        ppm find_missing_docs tgen
       env:
         PIP_EXTRA_INDEX_URL: "https://${{ secrets.TGEN_TOKEN }}:x-oauth-basic@github.com"
 
+    - name: Run Dev-Ops Checks
+      run: |
+        ppm find_missing_docs tgen
+      
     - name: Run Unit Tests.
       run: python -m unittest discover -s tgen_test
       env:

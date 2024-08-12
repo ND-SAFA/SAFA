@@ -4,17 +4,18 @@ import sys
 from os.path import dirname
 from typing import Any, Optional
 
+from common_resources.tools.t_logging.the_logger import TheLogger
+
 from tgen.common.constants.logging_constants import LOG_FORMAT
 from tgen.common.logging.logger_config import LoggerConfig
-from tgen.common.logging.tgen_logger import TGenLogger
 
 
 class LoggerManager:
-    __logger: Optional[TGenLogger] = None
+    __logger: Optional[TheLogger] = None
     __logger_is_configured = False
 
     @staticmethod
-    def configure_logger(logger_config: LoggerConfig) -> TGenLogger:
+    def configure_logger(logger_config: LoggerConfig) -> TheLogger:
         """
         Setups the logger to use for TGEN
         :param logger_config: Configurations for the logger
@@ -24,7 +25,7 @@ class LoggerManager:
             curr_logger = LoggerManager.get_logger()
             return curr_logger
         LoggerManager.__logger_is_configured = True
-        LoggerManager.__logger: TGenLogger = logging.getLogger("tgen")
+        LoggerManager.__logger: TheLogger = logging.getLogger("tgen")
         logger.setLevel(logger_config.log_level)
 
         console_handler = logging.StreamHandler(sys.stdout)
@@ -52,7 +53,7 @@ class LoggerManager:
         return LoggerManager.__logger
 
     @staticmethod
-    def get_logger() -> TGenLogger:
+    def get_logger() -> TheLogger:
         """
         Gets the logger for TGen
         :return: The Logger
@@ -85,7 +86,7 @@ class LoggerManager:
         return getattr(LoggerManager.get_logger(), attr)
 
 
-logging.setLoggerClass(TGenLogger)
+logging.setLoggerClass(TheLogger)
 LoggerManager.turn_off_hugging_face_logging()
-logger: TGenLogger = LoggerManager()
+logger: TheLogger = LoggerManager()
 logger.propagate = False

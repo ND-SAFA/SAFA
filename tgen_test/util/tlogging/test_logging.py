@@ -1,12 +1,13 @@
 import logging
 from logging import FileHandler
-from unittest import skip, mock
+from unittest import mock, skip
 from unittest.mock import MagicMock
 
-from tgen.common.logging.tgen_logger import TGenLogger
-from tgen.testres.base_tests.base_test import BaseTest
-from tgen.common.util.file_util import FileUtil
+from common_resources.tools.t_logging.the_logger import TheLogger
+
 from tgen.common.logging.logger_manager import logger
+from tgen.common.util.file_util import FileUtil
+from tgen.testres.base_tests.base_test import BaseTest
 
 
 class TestLogging(BaseTest):
@@ -32,15 +33,15 @@ class TestLogging(BaseTest):
         # assert_log_only_if_main_thread(False)
         assert_log_only_if_main_thread(True)
 
-    @mock.patch.object(TGenLogger, "_log")
+    @mock.patch.object(TheLogger, "_log")
     def test_log_once(self, log_mock: MagicMock = None):
         log_memory = 5
-        for i in range(2*log_memory):
-            logger.log_without_spam(logging.WARNING, f"msg{i%log_memory}")
+        for i in range(2 * log_memory):
+            logger.log_without_spam(logging.WARNING, f"msg{i % log_memory}")
         self.assertEqual(log_mock.call_count, log_memory)
         logger.log_without_spam(logging.WARNING, "another one")
         logger.log_without_spam(logging.WARNING, "msg0")
-        self.assertEqual(log_mock.call_count, log_memory+2)
+        self.assertEqual(log_mock.call_count, log_memory + 2)
 
     def get_log_baseFilename(self):
         file_handler = None

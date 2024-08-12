@@ -42,7 +42,7 @@ class LLMTrainer(AbstractTrainer):
         super().__init__(initial_state.trainer_dataset_manager, trainer_args=initial_state.llm_manager.llm_args)
         self.state = initial_state
 
-    def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> "FineTune":
+    def perform_training(self, completion_type: LLMCompletionType = LLMCompletionType.CLASSIFICATION) -> Any:
         """
         Handles training of the model
         :param completion_type: The type of completion task being performed.

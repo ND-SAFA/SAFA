@@ -1,2 +1,3 @@
 -r requirements/nlp-requirements.txt
 -r requirements/base-requirements.txt
+-r requirements/submodules-requirements.txt

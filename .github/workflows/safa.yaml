@@ -1,4 +1,4 @@
-name: Django Unit Tests
+name: Build Pipeline
 
 on:
   pull_request:
@@ -23,12 +23,9 @@ jobs:
 
     - name: Install Packages
       run: |
+        pip install -r requirements/nlp-requirements.txt
         pip install -r requirements/devops-requirements.txt
-        pip install -r requirements.txt
-
-    - name: Download Static
-      run: |
-        python3 tgen/scripts/tools/download_static.py
+        pip install -r requirements/base-requirements.txt
 
     - name: Download Sub-Modules
       run: |
@@ -38,6 +35,10 @@ jobs:
         PIP_EXTRA_INDEX_URL: "https://${{ secrets.TGEN_TOKEN }}:x-oauth-basic@github.com"
         GEN_COMMON_RESOURCES_COMMIT: 3c05914803b7e8b438365a2982ed36d40e167596
         PYTHON_PACKAGE_MANAGER_COMMIT: 65414e36acf64635d48333936a9188dc196a6a1a
+
+    - name: Download Static
+      run: |
+        python3 tgen/scripts/tools/download_static.py
 
     - name: Run Dev-Ops Checks
       run: |

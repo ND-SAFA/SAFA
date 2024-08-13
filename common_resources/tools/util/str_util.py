@@ -99,6 +99,19 @@ class StrUtil:
             return False
 
     @staticmethod
+    def is_number(input_string: str) -> bool:
+        """
+        Returns true if the string consists only of numbers.
+        :param input_string: The string to check.
+        :return: True if the string consists only of numbers else False.
+        """
+        try:
+            float(input_string)
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
     def snake_case_to_pascal_case(snake_case: str) -> str:
         """
         Converts a snake case string to pascal

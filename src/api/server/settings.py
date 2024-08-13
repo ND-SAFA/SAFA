@@ -42,9 +42,12 @@ ROOT_PASSWORD = os.environ.get("ROOT_PASSWORD", None)
 JWT_ALGO = "HS256"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-SAFA_HOSTS = ['https://api.safa.ai',
-              'https://dev.api.safa.ai',
-              'https://staging.api.safa.ai']
+SAFA_HOSTS = [
+    "https://localhost:3000",
+    'https://api.safa.ai',
+    'https://dev.api.safa.ai',
+    'https://staging.api.safa.ai'
+]
 ALLOWED_HOSTS = SAFA_HOSTS
 
 # Application definition

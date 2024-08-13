@@ -24,7 +24,8 @@ from tgen.common.logging.logger_manager import logger
 from tgen.common.util.json_util import NpEncoder
 
 from pathlib import Path
-
+from socket import gethostbyname
+from socket import gethostname
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -43,13 +44,13 @@ JWT_ALGO = "HS256"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 SAFA_HOSTS = [
-    "http://localhost",
     'https://api.safa.ai',
     'https://dev.api.safa.ai',
     'https://staging.api.safa.ai'
 ]
-ALLOWED_HOSTS = SAFA_HOSTS
 
+ALLOWED_HOSTS = SAFA_HOSTS
+ALLOWED_HOSTS.append(gethostbyname(gethostname()))
 # Application definition
 
 INSTALLED_APPS = [

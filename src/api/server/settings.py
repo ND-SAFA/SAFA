@@ -43,7 +43,7 @@ JWT_ALGO = "HS256"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 SAFA_HOSTS = [
-    "https://localhost:3000",
+    "https://localhost",
     'https://api.safa.ai',
     'https://dev.api.safa.ai',
     'https://staging.api.safa.ai'

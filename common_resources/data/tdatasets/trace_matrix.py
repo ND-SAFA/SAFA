@@ -7,8 +7,8 @@ import numpy as np
 
 from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
 from common_resources.data.keys.structure_keys import TraceKeys
-from common_resources.tools.t_logging.logger_manager import logger
 from common_resources.data.objects.trace import Trace
+from common_resources.tools.t_logging.logger_manager import logger
 from common_resources.tools.util.enum_util import EnumDict
 
 Query = namedtuple('Query', ['links', 'preds'])
@@ -36,6 +36,19 @@ class TraceMatrix:
         self._fill_trace_matrix(trace_df, predicted_scores, link_ids)
         if randomize:
             self._do_randomize()
+
+    def get_prediction_payload(self):
+        """
+        Returns set of scores and labels in trace matrix.
+        :return: List of scores and labels.
+        """
+        scores = []
+        labels = []
+        for source, query in self.query_matrix.items():
+            query_labels = [link[TraceKeys.LABEL] for link in query.links]
+            scores.extend(query.preds)
+            labels.extend(query_labels)
+        return scores, labels
 
     def calculate_query_metric(self, metric: Callable[[List[int], List[float]], float], default_value: float = None,
                                joining_function: Callable = None):

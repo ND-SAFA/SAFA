@@ -43,16 +43,9 @@ ROOT_PASSWORD = os.environ.get("ROOT_PASSWORD", None)
 JWT_ALGO = "HS256"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-SAFA_HOSTS = [
-    'https://api.safa.ai',
-    'https://dev.api.safa.ai',
-    'https://staging.api.safa.ai'
-]
+ALLOWED_HOSTS = ["*"]
 
-ALLOWED_HOSTS = SAFA_HOSTS
-ALLOWED_HOSTS.append(gethostbyname(gethostname()))
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -150,7 +143,12 @@ STORAGES = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APPEND_SLASH = True
 CSRF_COOKIE_SECURE = False
-CORS_ALLOWED_ORIGINS = SAFA_HOSTS
+CORS_ALLOWED_ORIGINS = [
+    "https://localhost:3000",
+    "https://api.safa.ai",
+    "https://dev.api.safa.ai",
+    "https://staging.api.safa.ai"
+]
 
 FAILURE_PATHS = {"test": "~/server_output"}
 ENV_FAILURE_PATH = FAILURE_PATHS.get(ENV_NAME, "/")
@@ -214,9 +212,7 @@ if DEBUG:
     logger.info(f"Concurrent requests: {anthropic_constants.ANTHROPIC_MAX_THREADS}")
 
 if ENV_NAME == "test":
-    ALLOWED_HOSTS = ['*']
     CORS_ALLOWED_ORIGINS = ["https://localhost:3000"]
 if ENV_NAME == "development":
-    ALLOWED_HOSTS = ['*']
     CORS_ALLOWED_ORIGINS = ["https://localhost:3000"]
     DEBUG = True

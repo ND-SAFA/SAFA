@@ -2,12 +2,12 @@ from unittest.mock import MagicMock
 
 import httpx
 from anthropic import InternalServerError
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
+from common_resources.tools.util.thread_util import ThreadUtil
 
-from tgen.common.util.thread_util import ThreadUtil
 from tgen.models.llm.anthropic_exception_handler import anthropic_exception_handler
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
 
 MOCK_ANTHROPIC_OVERLOADED_RESPONSE = {
     "type": "error",

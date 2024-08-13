@@ -1,20 +1,21 @@
 import os
 from typing import Dict, List, Tuple, Union
 
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
+from common_resources.data.exporters.safa_exporter import SafaExporter
+from common_resources.data.keys.structure_keys import TraceKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.list_util import ListUtil
+
 from tgen.common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.list_util import ListUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
-from tgen.data.exporters.safa_exporter import SafaExporter
-from tgen.data.keys.structure_keys import TraceKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
@@ -194,7 +195,7 @@ class RankingJob(AbstractJob):
         :return: The embedding manager if there is one and the cross encoder manager if there is one
         """
         if not self.relationship_manager and self.relationship_manager_type:
-            model_name = DictUtil.get_kwarg_values(self.ranking_kwargs, embedding_model_name=None)
+            model_name = DictUtil.get_dict_values(self.ranking_kwargs, embedding_model_name=None)
             kwargs = DictUtil.update_kwarg_values({}, model_name=model_name) if model_name else {}
             self.relationship_manager = self.relationship_manager_type.value(**kwargs)
         embeddings_manager, cross_encoder_manager = None, None

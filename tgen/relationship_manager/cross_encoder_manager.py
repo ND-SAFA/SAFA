@@ -1,11 +1,11 @@
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
+from common_resources.tools.constants.environment_constants import DEFAULT_CROSS_ENCODER_MODEL
+from common_resources.tools.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from sentence_transformers import SentenceTransformer
 
-from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
-from tgen.common.constants.ranking_constants import DEFAULT_CROSS_ENCODER_MODEL
-from tgen.common.util.list_util import ListUtil
+from common_resources.tools.util.list_util import ListUtil
 from tgen.models.model_properties import ModelTask
 from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
 

@@ -1,8 +1,8 @@
 from typing import Type
 
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
-from tgen.pipeline.state import State
+from common_resources.tools.state_management.state import State
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.summarizer.steps.step_combine_project_summaries import StepCombineProjectSummaries
 from tgen.summarizer.steps.step_create_artifact_batches import StepCreateArtifactBatches

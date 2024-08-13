@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from tgen.common.util.list_util import ListUtil
+from common_resources.tools.util.list_util import ListUtil
 from tgen.tracing.ranking.sorters.i_sorter import iSorter
 from tgen.tracing.ranking.sorters.transformer_sorter import TransformerSorter
 from tgen.tracing.ranking.sorters.vsm_sorter import VSMSorter

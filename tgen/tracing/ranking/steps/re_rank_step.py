@@ -1,4 +1,4 @@
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.relationship_manager.cross_encoder_manager import CrossEncoderManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs

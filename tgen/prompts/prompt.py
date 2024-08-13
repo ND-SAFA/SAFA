@@ -1,9 +1,10 @@
 from typing import Any, Dict, List
 
-from tgen.common.constants.deliminator_constants import SPACE, NEW_LINE, EMPTY_STRING
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE, SPACE
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.tools.util.str_util import StrUtil
+
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.response_managers.abstract_response_manager import AbstractResponseManager
 from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
@@ -97,7 +98,7 @@ class Prompt:
         :param kwargs: Any additional arguments for the prompt
         :return: The formatted prompt
         """
-        update_value = DictUtil.get_kwarg_values(kwargs=kwargs, update_value=False, pop=True)
+        update_value = DictUtil.get_dict_values(kwargs=kwargs, update_value=False, pop=True)
         value = self.format_value(update_value=update_value, **kwargs)
         if self.args.title:
             value = f"{PromptUtil.as_markdown_header(self.args.title)}{NEW_LINE}{value}"

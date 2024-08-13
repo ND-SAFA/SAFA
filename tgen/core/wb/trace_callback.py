@@ -1,9 +1,8 @@
 import os
 
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
 from transformers import is_torch_tpu_available
 from transformers.integrations import WandbCallback
-
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
 
 
 class TraceCallback(WandbCallback):

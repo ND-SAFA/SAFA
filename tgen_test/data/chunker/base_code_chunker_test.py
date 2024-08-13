@@ -1,8 +1,9 @@
 from collections import Counter
 from typing import Callable
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.util.file_util import FileUtil
+from common_resources.tools.constants.symbol_constants import NEW_LINE
+from common_resources.tools.util.file_util import FileUtil
+
 from tgen.data.chunkers.token_limit_chunkers.chunked_node import ChunkedNode
 from tgen.models.tokens.token_calculator import TokenCalculator
 

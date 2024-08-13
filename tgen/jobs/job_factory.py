@@ -1,7 +1,7 @@
 from typing import Type
 
 from tgen.jobs.abstract_job import AbstractJob
-from tgen.variables.definition_variable import DefinitionVariable
+from common_resources.tools.variables.definition_variable import DefinitionVariable
 
 
 class JobFactory:

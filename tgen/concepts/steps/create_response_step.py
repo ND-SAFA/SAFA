@@ -3,15 +3,15 @@ from typing import Dict, List, Set, Tuple
 
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
-from tgen.common.util.dict_util import DictUtil
+from common_resources.tools.util.dict_util import DictUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.types.concept_match import ConceptMatch
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
 from tgen.concepts.types.entity_matching_pred import EntityMatchingPred
 from tgen.concepts.types.undefined_concept import UndefinedConcept
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 

@@ -5,14 +5,14 @@ from typing import Dict, List, Optional, Set, Tuple, Union
 import numpy as np
 
 from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
-from tgen.common.logging.logger_manager import logger
+from common_resources.tools.t_logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.list_util import ListUtil
-from tgen.common.util.math_util import MathUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.list_util import ListUtil
+from common_resources.tools.util.math_util import MathUtil
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.prompts.prompt import Prompt

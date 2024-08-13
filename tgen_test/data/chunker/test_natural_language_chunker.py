@@ -1,4 +1,5 @@
-from tgen.common.constants.open_ai_constants import TOKENS_2_WORDS_CONVERSION
+from common_resources.tools.constants.open_ai_constants import TOKENS_2_WORDS_CONVERSION
+
 from tgen.data.chunkers.token_limit_chunkers.natural_language_chunker import NaturalLanguageChunker
 from tgen.testres.base_tests.base_test import BaseTest
 

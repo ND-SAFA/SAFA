@@ -8,12 +8,12 @@ from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.jobs.supported_job_type import SupportedJobType
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.variables.definition_variable import DefinitionVariable
-from tgen.variables.experimental_variable import ExperimentalVariable
-from tgen.variables.multi_variable import MultiVariable
-from tgen.variables.typed_definition_variable import TypedDefinitionVariable
-from tgen.variables.undetermined_variable import UndeterminedVariable
-from tgen.variables.variable import Variable
+from common_resources.tools.variables.definition_variable import DefinitionVariable
+from common_resources.tools.variables.experimental_variable import ExperimentalVariable
+from common_resources.tools.variables.multi_variable import MultiVariable
+from common_resources.tools.variables.typed_definition_variable import TypedDefinitionVariable
+from common_resources.tools.variables.undetermined_variable import UndeterminedVariable
+from common_resources.tools.variables.variable import Variable
 
 
 class BaseExperimentTest(BaseTest):

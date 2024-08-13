@@ -1,4 +1,5 @@
-from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context
+from common_resources.tools.constants.default_model_managers import get_best_default_llm_manager_long_context
+
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer

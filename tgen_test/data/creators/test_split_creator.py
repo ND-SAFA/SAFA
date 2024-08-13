@@ -1,4 +1,4 @@
-from tgen.data.creators.split_dataset_creator import SplitDatasetCreator
+from common_resources.data.creators.split_dataset_creator import SplitDatasetCreator
 from tgen.testres.base_tests.base_test import BaseTest
 
 

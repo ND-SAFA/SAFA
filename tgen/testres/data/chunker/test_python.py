@@ -6,8 +6,9 @@ from inspect import getfullargspec
 from os.path import splitext
 from typing import Callable, Dict, IO, List, Set, Tuple, Type, Union, get_type_hints
 
-from tgen.common.constants.path_constants import USER_SYM
-from tgen.common.util.json_util import JsonUtil
+from common_resources.tools.constants.symbol_constants import USER_SYM
+
+from common_resources.tools.util.json_util import JsonUtil
 
 
 class FileUtilTest:

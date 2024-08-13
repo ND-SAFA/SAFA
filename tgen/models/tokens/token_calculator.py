@@ -1,6 +1,6 @@
 import tiktoken
 
-from tgen.common.constants.open_ai_constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
+from common_resources.tools.constants.open_ai_constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
     TOKENS_2_WORDS_CONVERSION, MAX_TOKENS_BUFFER, MAX_CHARS_BUFFER
 from tgen.models.tokens.token_limits import ModelTokenLimits
 

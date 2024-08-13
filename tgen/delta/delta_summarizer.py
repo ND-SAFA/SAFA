@@ -2,7 +2,7 @@ import os
 import uuid
 from typing import Dict, Type
 
-from tgen.common.util.file_util import FileUtil
+from common_resources.tools.util.file_util import FileUtil
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
 from tgen.delta.steps.impact_analysis_step import ImpactAnalysisStep

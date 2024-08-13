@@ -1,17 +1,18 @@
 from dataclasses import dataclass, field
 from typing import Dict, Union
 
-from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context
-from tgen.common.util.dataclass_util import required_field
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.json_util import JsonUtil
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.tools.constants.default_model_managers import get_best_default_llm_manager_long_context
+from common_resources.tools.state_management.args import Args
+from common_resources.tools.util.dataclass_util import required_field
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.json_util import JsonUtil
+
 from tgen.delta.change_type import ChangeType
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.pipeline.pipeline_args import PipelineArgs
 
 
 @dataclass
-class DeltaArgs(PipelineArgs):
+class DeltaArgs(Args):
     """
     :param diffs: A dictionary mapping type of change (e.g. Added, Deleted, etc.) to a dictionary of filename to diff
     """

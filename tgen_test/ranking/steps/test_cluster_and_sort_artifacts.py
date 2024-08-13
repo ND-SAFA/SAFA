@@ -1,5 +1,5 @@
 from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.tracing.ranking.steps.cluster_and_sort_artifacts_step import ClusterAndSortArtifactsStep
 

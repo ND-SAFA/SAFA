@@ -1,15 +1,16 @@
 from typing import Dict, List
 
-from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
+
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_responses import TEST_PROJECT_SUMMARY
-from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
+from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 
 
 class TestEmbeddingPipeline(BaseTest):

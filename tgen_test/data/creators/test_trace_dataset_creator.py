@@ -1,4 +1,4 @@
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 from tgen.testres.testprojects.api_test_project import ApiTestProject

@@ -1,14 +1,15 @@
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
+from common_resources.tools.variables.typed_definition_variable import TypedDefinitionVariable
+
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.test_assertions import TestAssertions
-from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestPredictJob(BaseJobTest):

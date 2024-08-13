@@ -2,11 +2,11 @@ from collections import OrderedDict
 from unittest import mock
 from unittest.mock import patch
 
-from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
-from tgen.data.processing.augmentation.resample_step import ResampleStep
-from tgen.data.splitting.dataset_splitter import DatasetSplitter
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.data.processing.augmentation.data_augmenter import DataAugmenter
+from common_resources.data.processing.augmentation.resample_step import ResampleStep
+from common_resources.data.splitting.dataset_splitter import DatasetSplitter
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_split_test import BaseSplitTest
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest

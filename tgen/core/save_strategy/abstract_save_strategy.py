@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict
 
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.enum_util import FunctionalWrapper
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.enum_util import FunctionalWrapper
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.core.save_strategy.save_strategy_stage import SaveStrategyStage
 from tgen.core.trace_output.stage_eval import Metrics
 

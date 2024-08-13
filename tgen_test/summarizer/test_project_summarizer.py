@@ -1,22 +1,23 @@
-from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE, PS_DATA_FLOW_TITLE, CUSTOM_TITLE_TAG, PS_NOTES_TAG
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.models.llm.anthropic_manager import AnthropicManager
+from common_resources.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.keys.prompt_keys import PromptKeys
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.llm.anthropic_manager import AnthropicManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.prompt_util import PromptUtil
+
+from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, PS_DATA_FLOW_TITLE, PS_NOTES_TAG, PS_OVERVIEW_TITLE
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.summarizer.project.supported_project_summary_sections import PROJECT_SUMMARY_MAP
 from tgen.summarizer.summarizer_args import SummarizerArgs
-from tgen.summarizer.summary import SummarySectionKeys, Summary
+from tgen.summarizer.summary import Summary, SummarySectionKeys
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_responses import MockResponses, create, TEST_PROJECT_SUMMARY
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen.testres.mocking.mock_responses import MockResponses, TEST_PROJECT_SUMMARY, create
 from tgen.testres.testprojects.safa_test_project import SafaTestProject
 
 

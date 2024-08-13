@@ -1,10 +1,10 @@
 from typing import List
 
-from tgen.common.logging.logger_manager import logger
+from common_resources.tools.t_logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState

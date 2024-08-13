@@ -4,9 +4,9 @@ from typing import Dict, List, Tuple
 import bs4
 from yaml.constructor import SafeConstructor
 
-from tgen.common.constants.path_constants import INPUTS_FOR_GENERATION_PATH
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.file_util import FileUtil
+from tgen.common.constants.hgen_constants import INPUTS_FOR_GENERATION_PATH
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.file_util import FileUtil
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep
 from tgen.hgen.hgen_state import HGenState

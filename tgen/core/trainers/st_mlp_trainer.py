@@ -2,14 +2,14 @@ import os
 from typing import Iterable
 
 import torch
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
+from common_resources.tools.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.override import overrides
+from common_resources.tools.util.tf_util import TFUtil
 from torch import nn
 from torch.nn import Parameter
 
-from tgen.common.constants.hugging_face_constants import DEFAULT_MAX_STEPS_BEFORE_EVAL
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.override import overrides
-from tgen.common.util.tf_util import TFUtil
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st.st_mlp import STMLP
 from tgen.core.trainers.st_loss_functions import SupportedSTLossFunctions
 from tgen.core.trainers.st_trainer import STTrainer

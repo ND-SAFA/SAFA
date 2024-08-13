@@ -1,13 +1,13 @@
 import json
 import os
 
-from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.readers.prompt_project_reader import PromptProjectReader
+from common_resources.data.keys.prompt_keys import PromptKeys
+from common_resources.data.readers.prompt_project_reader import PromptProjectReader
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from common_resources.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_DATA_DIR
 from tgen.testres.test_assertions import TestAssertions
 

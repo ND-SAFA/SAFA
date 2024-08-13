@@ -2,7 +2,7 @@ import os
 from typing import Dict, List, Tuple
 
 from tgen.common.objects.artifact import Artifact
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.testres.paths.paths import TEST_DATA_DIR
 
 CONCEPT_R1 = "GSFPS-3221"

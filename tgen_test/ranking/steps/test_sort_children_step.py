@@ -1,8 +1,9 @@
-from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.common.constants.ranking_constants import DEFAULT_TEST_EMBEDDING_MODEL
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.data.keys.structure_keys import TraceKeys
+from common_resources.tools.constants.model_constants import DEFAULT_TEST_EMBEDDING_MODEL
+
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.tracing.ranking.steps.sort_children_step import SortChildrenStep
+from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 
 
 class TestSortChildrenStep(BaseTest):

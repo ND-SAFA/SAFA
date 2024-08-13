@@ -1,7 +1,8 @@
 import os
 
-from tgen.common.constants.code_extensions import ALLOWED_CODE_EXTENSIONS
-from tgen.common.util.file_util import FileUtil
+from common_resources.tools.constants.code_extensions import ALLOWED_CODE_EXTENSIONS
+
+from common_resources.tools.util.file_util import FileUtil
 from tgen.data.github.gartifacts.gcode_file import GCodeFile
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR

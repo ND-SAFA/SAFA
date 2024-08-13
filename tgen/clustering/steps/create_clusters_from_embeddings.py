@@ -7,9 +7,9 @@ from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.clustering_algorithm_manager import ClusteringAlgorithmManager
-from tgen.common.constants.logging_constants import TQDM_NCOLS
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.list_util import ListUtil
+from common_resources.tools.constants.logging_constants import TQDM_NCOLS
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.list_util import ListUtil
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 

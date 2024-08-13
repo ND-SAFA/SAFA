@@ -3,16 +3,18 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
-from tgen.common.constants.deliminator_constants import PERIOD
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.status import Status
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from common_resources.data.readers.definitions.structure_project_definition import StructureProjectDefinition
+from common_resources.data.readers.structured_project_reader import StructuredProjectReader
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
+from common_resources.tools.constants.symbol_constants import PERIOD
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.status import Status
+from common_resources.tools.variables.undetermined_variable import UndeterminedVariable
+
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
-from tgen.data.readers.structured_project_reader import StructuredProjectReader
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.experiments.experiment_step import ExperimentStep
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
@@ -21,7 +23,6 @@ from tgen.models.model_manager import ModelManager
 from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.variables.undetermined_variable import UndeterminedVariable
 
 
 class TestExperimentStep(BaseExperimentTest):

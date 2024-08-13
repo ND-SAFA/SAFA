@@ -1,5 +1,5 @@
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.data.processing.augmentation.resample_step import ResampleStep
+from common_resources.data.processing.augmentation.resample_step import ResampleStep
 
 
 class TestResampleStep(BaseTest):

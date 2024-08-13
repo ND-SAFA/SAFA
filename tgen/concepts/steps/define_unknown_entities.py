@@ -3,20 +3,20 @@ from typing import Dict, List, Tuple
 from langchain.text_splitter import NLTKTextSplitter
 from pypdf import PdfReader
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.llm_response_util import LLMResponseUtil
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.llm_response_util import LLMResponseUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.types.undefined_concept import UndefinedConcept
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt

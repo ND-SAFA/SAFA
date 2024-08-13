@@ -2,19 +2,26 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from tgen.common.constants import environment_constants
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager
-from tgen.common.constants.ranking_constants import DEFAULT_CROSS_ENCODER_MODEL, DEFAULT_EMBEDDINGS_SCORE_WEIGHT, \
-    DEFAULT_EMBEDDING_MODEL, DEFAULT_EXPLANATION_SCORE_WEIGHT, DEFAULT_LINK_THRESHOLD, DEFAULT_MAX_CONTEXT_ARTIFACTS, \
-    DEFAULT_PARENT_MIN_THRESHOLD, DEFAULT_PARENT_PRIMARY_THRESHOLD, DEFAULT_PARENT_SECONDARY_THRESHOLD, DEFAULT_SCALED_THRESHOLD, \
-    DEFAULT_SORTING_ALGORITHM, \
-    DEFAULT_TEST_EMBEDDING_MODEL, GENERATE_EXPLANATIONS_DEFAULT
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.dataclass_util import required_field
-from tgen.common.util.file_util import FileUtil
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.pipeline.pipeline_args import PipelineArgs
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.tools.constants import environment_constants
+from common_resources.tools.constants.default_model_managers import get_best_default_llm_manager_long_context, \
+    get_efficient_default_llm_manager
+from common_resources.tools.constants.environment_constants import DEFAULT_CROSS_ENCODER_MODEL, DEFAULT_EMBEDDING_MODEL
+from common_resources.tools.constants.model_constants import DEFAULT_TEST_EMBEDDING_MODEL
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
+from common_resources.tools.state_management.args import Args
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.dataclass_util import required_field
+from common_resources.tools.util.file_util import FileUtil
+
+from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDINGS_SCORE_WEIGHT, DEFAULT_EXPLANATION_SCORE_WEIGHT, \
+    DEFAULT_LINK_THRESHOLD, \
+    DEFAULT_MAX_CONTEXT_ARTIFACTS, \
+    DEFAULT_PARENT_MIN_THRESHOLD, \
+    DEFAULT_PARENT_PRIMARY_THRESHOLD, \
+    DEFAULT_PARENT_SECONDARY_THRESHOLD, \
+    DEFAULT_SCALED_THRESHOLD, DEFAULT_SORTING_ALGORITHM, \
+    GENERATE_EXPLANATIONS_DEFAULT
 from tgen.relationship_manager.cross_encoder_manager import CrossEncoderManager
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.filters.supported_filters import SupportedFilter
@@ -23,7 +30,7 @@ from tgen.tracing.ranking.trace_selectors.selection_methods import SupportedSele
 
 
 @dataclass
-class RankingArgs(PipelineArgs):
+class RankingArgs(Args):
     """
     parent_ids: List of parent artifact ids.
     """

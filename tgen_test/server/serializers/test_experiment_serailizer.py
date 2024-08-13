@@ -1,7 +1,7 @@
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.definition_creator import DefinitionCreator
-from tgen.variables.definition_variable import DefinitionVariable
-from tgen.variables.multi_variable import MultiVariable
+from common_resources.tools.variables.definition_variable import DefinitionVariable
+from common_resources.tools.variables.multi_variable import MultiVariable
 
 
 class TestExperimentSerializer(BaseTest):

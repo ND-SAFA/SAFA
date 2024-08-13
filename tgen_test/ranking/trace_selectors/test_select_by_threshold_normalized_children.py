@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from tgen.common.util.enum_util import EnumDict
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 
 

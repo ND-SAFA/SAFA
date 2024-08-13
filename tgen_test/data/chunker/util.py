@@ -2,7 +2,7 @@ from typing import List
 from unittest import TestCase
 
 from tgen_test.data.chunker.constants import CHUNK_TEST_SENTENCE
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.util.str_util import StrUtil
 
 
 def verify_test_chunks(tc: TestCase, result_chunks: List[str], expected_chunks: List[str] = None) -> None:

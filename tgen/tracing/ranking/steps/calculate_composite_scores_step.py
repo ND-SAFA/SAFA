@@ -1,12 +1,12 @@
 from typing import Dict, List, Tuple
 
 from tgen.common.objects.trace import Trace
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.math_util import MathUtil
-from tgen.common.util.supported_enum import SupportedEnum
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.math_util import MathUtil
+from common_resources.tools.util.supported_enum import SupportedEnum
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState

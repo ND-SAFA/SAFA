@@ -1,11 +1,12 @@
 from copy import deepcopy
 
-from tgen_test.prompts.artifact_prompt_test_util import ArtifactPromptTestUtil
+from common_resources.data.keys.structure_keys import ArtifactKeys, TraceKeys
+
 from tgen.common.constants.hgen_constants import MAX_TOKENS_FOR_NO_SUMMARIES
-from tgen.common.util.enum_util import EnumDict
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from common_resources.tools.util.enum_util import EnumDict
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen_test.prompts.artifact_prompt_test_util import ArtifactPromptTestUtil
 
 
 class TestMultiArtifactPrompt(BaseTest):

@@ -1,10 +1,10 @@
 import uuid
 from typing import Any, Dict, List
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.str_util import StrUtil
-from tgen.data.keys.prompt_keys import PromptKeys
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.str_util import StrUtil
+from common_resources.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs

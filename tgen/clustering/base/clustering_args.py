@@ -1,20 +1,23 @@
 from dataclasses import dataclass, field
 from typing import Dict, List
 
+from common_resources.tools.constants import environment_constants
+from common_resources.tools.constants.environment_constants import DEFAULT_EMBEDDING_MODEL
+from common_resources.tools.constants.model_constants import DEFAULT_TEST_EMBEDDING_MODEL
+from common_resources.tools.state_management.args import Args
+
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
 from tgen.clustering.methods.supported_seed_clustering_methods import SupportedSeedClusteringMethods
-from tgen.common.constants import environment_constants
 from tgen.common.constants.clustering_constants import CLUSTER_ARTIFACT_TYPE, DEFAULT_ADD_CLUSTERS_TO_DATASET, \
-    DEFAULT_CLUSTERING_METHODS, DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, \
-    DEFAULT_MAX_CLUSTER_SIZE, \
-    DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_MIN_ORPHAN_SIMILARITY, DEFAULT_SEED_CLUSTERING_METHOD, DEFAULT_SORT_METRIC
-from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL, DEFAULT_TEST_EMBEDDING_MODEL
-from tgen.pipeline.pipeline_args import PipelineArgs
+    DEFAULT_CLUSTERING_METHODS, \
+    DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, \
+    DEFAULT_FILTER_BY_COHESIVENESS, DEFAULT_MAX_CLUSTER_SIZE, DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_MIN_ORPHAN_SIMILARITY, \
+    DEFAULT_SEED_CLUSTERING_METHOD, DEFAULT_SORT_METRIC
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 
 @dataclass
-class ClusteringArgs(PipelineArgs):
+class ClusteringArgs(Args):
     """
     :param: clustering_methods: The methods used to create different clusters from the embeddings.
     :param clustering_method_args: Keyword arguments to pass to each clustering method.

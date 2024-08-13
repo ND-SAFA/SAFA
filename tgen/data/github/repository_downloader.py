@@ -13,6 +13,8 @@ from github import Github, Repository
 from github.Issue import Issue
 from tqdm import tqdm
 
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.file_util import FileUtil
 from tgen.data.github.code.cpp_to_header_link_creator import CPPToHeaderLinkCreator
 from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
@@ -23,8 +25,6 @@ from tgen.data.github.gartifacts.gpull import GPull
 from tgen.data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE_ARTIFACT_FILE, COMMIT_ARTIFACT_FILE, \
     ISSUE_ARTIFACT_FILE, \
     PULL_ARTIFACT_FILE
-from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
 
 
 class RepositoryDownloader:

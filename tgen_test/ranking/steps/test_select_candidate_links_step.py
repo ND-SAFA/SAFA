@@ -1,10 +1,10 @@
 from unittest import TestCase
 
 from tgen_test.ranking.steps.ranking_pipeline_test import DEFAULT_CHILDREN_IDS, DEFAULT_PARENT_IDS
-from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil

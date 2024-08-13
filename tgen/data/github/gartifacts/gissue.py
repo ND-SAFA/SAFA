@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Callable, Dict, List, Union
 
+from common_resources.tools.constants.symbol_constants import SPACE
 from github import Issue
 
-from tgen.common.util.date_time_util import DateTimeUtil
-from tgen.common.util.override import overrides
-from tgen.common.constants.deliminator_constants import SPACE
+from common_resources.tools.util.date_time_util import DateTimeUtil
+from common_resources.tools.util.override import overrides
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
 

@@ -2,7 +2,7 @@ from typing import Any, List
 
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
-from tgen.data.exporters.safa_exporter import SafaExporter
+from common_resources.data.exporters.safa_exporter import SafaExporter
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 

@@ -10,13 +10,13 @@ from inspect import getfullargspec
 from typing import Any, Dict, Type
 
 from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.override import overrides
-from tgen.common.util.random_util import RandomUtil
-from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
-from tgen.common.util.status import Status
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.override import overrides
+from common_resources.tools.util.random_util import RandomUtil
+from common_resources.tools.util.reflection_util import ParamScope, ReflectionUtil
+from common_resources.tools.util.status import Status
 from tgen.core.wb.wb_manager import WBManager
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult

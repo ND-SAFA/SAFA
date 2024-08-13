@@ -2,13 +2,13 @@ import os
 from copy import deepcopy
 
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.definition_creator import DefinitionCreator
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
-from tgen.variables.typed_definition_variable import TypedDefinitionVariable
+from common_resources.tools.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestDefinitionCreator(BaseTest):

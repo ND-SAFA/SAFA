@@ -4,8 +4,8 @@ from tgen.common.constants.project_summary_constants import PROJECT_SUMMARY_TAGS
     PS_FEATURE_TITLE, \
     PS_NOTES_TAG, \
     PS_OVERVIEW_TITLE, PS_SUBSYSTEM_TITLE, SPECIAL_TAGS_ITEMS
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.summarizer.summary import Summary
 
 MOCK_PS_RES_MAP = {

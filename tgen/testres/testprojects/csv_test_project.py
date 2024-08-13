@@ -1,9 +1,9 @@
 from typing import Dict, List, Tuple
 
 from tgen.common.objects.trace_layer import TraceLayer
-from tgen.data.keys.csv_keys import CSVKeys
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
-from tgen.data.readers.csv_project_reader import CsvProjectReader
+from common_resources.data.keys.csv_keys import CSVKeys
+from common_resources.data.readers.abstract_project_reader import AbstractProjectReader
+from common_resources.data.readers.csv_project_reader import CsvProjectReader
 from tgen.testres.paths.project_paths import CSV_PROJECT_PATH
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 

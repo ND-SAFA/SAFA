@@ -5,12 +5,12 @@ from tgen_test.concepts.utils import create_concept_args
 from tgen.common.objects.artifact import Artifact
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.steps.predict_entity_step import PredictEntityStep
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
 from tgen.prompts.supported_prompts.concept_prompts import create_entity_extraction_response
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 
 
 class TestPredictEntityStep(BaseTest):

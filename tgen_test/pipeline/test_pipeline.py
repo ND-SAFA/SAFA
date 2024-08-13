@@ -1,9 +1,9 @@
 import os
 from unittest import mock
 
-from tgen.common.util.file_util import FileUtil
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
@@ -14,7 +14,7 @@ from tgen.hgen.steps.step_initialize_dataset import InitializeDatasetStep
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
-from tgen.pipeline.state import State
+from common_resources.tools.state_management.state import State
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_STATE_PATH
 from tgen.testres.testprojects.safa_test_project import SafaTestProject

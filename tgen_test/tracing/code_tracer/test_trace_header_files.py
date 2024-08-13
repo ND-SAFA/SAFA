@@ -1,5 +1,5 @@
 from tgen_test.tracing.code_tracer.code_tracer_test_util import CodeTracerTestUtil
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.tracing.code.code_tracer import CodeTracer
 

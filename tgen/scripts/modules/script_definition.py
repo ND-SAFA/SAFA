@@ -1,8 +1,8 @@
 import os
 from typing import Any, Dict, Tuple
 
-from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM
-from tgen.scripts.toolset.rq_definition import RQDefinition
+from common_resources.tools.constants.env_var_name_constants import OUTPUT_PATH_PARAM
+from common_resources.tools.rq.rq_definition import RQDefinition
 
 
 class ScriptDefinition:

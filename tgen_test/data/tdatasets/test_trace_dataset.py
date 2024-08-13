@@ -3,16 +3,16 @@ import uuid
 from collections import Counter
 from unittest.mock import patch
 
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.csv_keys import CSVKeys
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
-from tgen.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
-from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
-from tgen.data.processing.augmentation.resample_step import ResampleStep
-from tgen.data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
-from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from tgen.data.tdatasets.data_key import DataKey
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.csv_keys import CSVKeys
+from common_resources.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from common_resources.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
+from common_resources.data.processing.augmentation.data_augmenter import DataAugmenter
+from common_resources.data.processing.augmentation.resample_step import ResampleStep
+from common_resources.data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
+from common_resources.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
+from common_resources.data.tdatasets.data_key import DataKey
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_properties import ModelArchitectureType
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR

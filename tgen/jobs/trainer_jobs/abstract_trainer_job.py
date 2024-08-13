@@ -6,9 +6,9 @@ from typing import Any, Dict, Optional, Type, Union
 
 from tgen.common.constants.experiment_constants import BEST_MODEL_NAME
 from tgen.common.constants.job_constants import SAVE_DATASET_SPLITS_DEFAULT
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.override import overrides
-from tgen.common.util.reflection_util import ReflectionUtil
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.override import overrides
+from common_resources.tools.util.reflection_util import ReflectionUtil
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.trainer_task import TrainerTask
@@ -19,7 +19,7 @@ from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob
 from tgen.models.model_manager import ModelManager
-from tgen.variables.definition_variable import DefinitionVariable
+from common_resources.tools.variables.definition_variable import DefinitionVariable
 
 
 class AbstractTrainerJob(AbstractJob, ABC):

@@ -1,10 +1,10 @@
 import abc
 import uuid
 from dataclasses import dataclass, field
-from typing import Dict, Any, Callable
+from typing import Any, Callable, Dict
 
-from tgen.pipeline.pipeline_args import PipelineArgs
-from tgen.pipeline.state import State
+from common_resources.tools.state_management.args import Args
+from common_resources.tools.state_management.state import State
 
 DEFAULT_BRANCH = str(uuid.uuid4())
 
@@ -54,7 +54,7 @@ class AbstractNode(abc.ABC):
         """
         return len(self.branches) == 0 or self.branches is None
 
-    def make_choice(self, args: PipelineArgs, state: State) -> Any:
+    def make_choice(self, args: Args, state: State) -> Any:
         """
         Decides which path to take from the current node.
         :param args: The arguments to the node.
@@ -81,7 +81,7 @@ class AbstractNode(abc.ABC):
         assert self.default_choice is not None, "Must provide a default branch to skip node."
 
     @abc.abstractmethod
-    def _make_choice(self, args: PipelineArgs, state: State) -> Any:
+    def _make_choice(self, args: Args, state: State) -> Any:
         """
         Decides which path to take from the current node.
         :param args: The arguments to the node.

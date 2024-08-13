@@ -2,10 +2,10 @@ from typing import Dict, List
 
 import datasets
 
-from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.metrics_util import MetricsUtil
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.constants.metric_constants import THRESHOLD_DEFAULT
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.metrics_util import MetricsUtil
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """

@@ -5,10 +5,10 @@ from unittest.mock import MagicMock
 import numpy as np
 from sentence_transformers.SentenceTransformer import SentenceTransformer
 
-from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
-from tgen.common.util.list_util import ListUtil
-from tgen.common.util.yaml_util import YamlUtil
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from common_resources.tools.util.list_util import ListUtil
+from common_resources.tools.util.yaml_util import YamlUtil
+from common_resources.data.keys.structure_keys import ArtifactKeys
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR

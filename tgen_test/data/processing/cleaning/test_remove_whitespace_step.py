@@ -1,5 +1,5 @@
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.data.processing.cleaning.remove_white_space_step import RemoveWhiteSpaceStep
+from common_resources.data.processing.cleaning.remove_white_space_step import RemoveWhiteSpaceStep
 
 
 class TestRemoveWhitespaceStep(BaseTest):

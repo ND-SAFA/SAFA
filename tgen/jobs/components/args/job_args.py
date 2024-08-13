@@ -1,15 +1,16 @@
 from dataclasses import dataclass
 from typing import Any, Dict, Type
 
+from common_resources.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from common_resources.data.tdatasets.idataset import iDataset
+from common_resources.tools.state_management.args import Args
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.dataclass_util import DataclassUtil
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.reflection_util import ReflectionUtil
+
 from tgen.common.constants.job_constants import SAVE_OUTPUT_DEFAULT
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tgen.data.tdatasets.idataset import iDataset
-from tgen.pipeline.pipeline_args import PipelineArgs
 
 
 @dataclass
@@ -64,7 +65,7 @@ class JobArgs(BaseObject):
         """
         return {attr_name: getattr(self, attr_name) for attr_name in dir(self) if not attr_name.startswith("__")}
 
-    def get_args_for_pipeline(self, pipeline_args_class: Type[PipelineArgs]) -> Dict[str, Any]:
+    def get_args_for_pipeline(self, pipeline_args_class: Type[Args]) -> Dict[str, Any]:
         """
         Gets job args that are needed for the pipeline.
         :param pipeline_args_class: The pipeline args class.
@@ -72,5 +73,5 @@ class JobArgs(BaseObject):
         """
         job_args_dict = DataclassUtil.convert_to_dict(self)
         args4pipeline = ReflectionUtil.get_constructor_params(pipeline_args_class, job_args_dict)
-        DictUtil.get_kwarg_values(args4pipeline, dataset_creator=None, pop=True)
+        DictUtil.get_dict_values(args4pipeline, dataset_creator=None, pop=True)
         return args4pipeline

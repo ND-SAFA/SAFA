@@ -1,7 +1,8 @@
 from copy import deepcopy
 from typing import List
 
-from tgen.common.constants.deliminator_constants import SPACE
+from common_resources.tools.constants.symbol_constants import SPACE
+
 from tgen.data.chunkers.token_limit_chunkers.abstract_token_limit_chunker import AbstractTokenLimitChunker
 from tgen.models.tokens.token_calculator import TokenCalculator
 

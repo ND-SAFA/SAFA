@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-from typing import List, Set, Optional, Tuple
+from typing import List, Optional, Set, Tuple
 
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.list_util import ListUtil
-from tgen.models.llm.abstract_llm_manager import Message, ROLE_KEY
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.list_util import ListUtil
+from common_resources.llm.abstract_llm_manager import Message, ROLE_KEY
 
 
 @dataclass

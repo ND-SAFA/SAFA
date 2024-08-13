@@ -1,10 +1,11 @@
 from typing import Any, Dict, List
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE
+
 from tgen.common.constants.other_constants import DEFAULT_CONTEXT_THRESHOLD
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.override import overrides
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.override import overrides
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 
 

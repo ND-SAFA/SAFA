@@ -1,7 +1,7 @@
-from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
+from common_resources.data.processing.augmentation.data_augmenter import DataAugmenter
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.object_creator import ObjectCreator
-from tgen.variables.experimental_variable import ExperimentalVariable
+from common_resources.tools.variables.experimental_variable import ExperimentalVariable
 
 
 class TestDataAugmenterFromDefinition(BaseTest):

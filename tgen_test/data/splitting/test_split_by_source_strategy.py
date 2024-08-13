@@ -1,4 +1,4 @@
-from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
+from common_resources.data.splitting.supported_split_strategy import SupportedSplitStrategy
 from tgen.testres.base_tests.base_split_test import BaseSplitTest
 
 

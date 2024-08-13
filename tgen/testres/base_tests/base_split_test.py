@@ -1,8 +1,8 @@
 from collections import OrderedDict
 
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
-from tgen.data.splitting.dataset_splitter import DatasetSplitter
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.splitting.supported_split_strategy import SupportedSplitStrategy
+from common_resources.data.splitting.dataset_splitter import DatasetSplitter
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
 
 
@@ -15,7 +15,7 @@ class BaseSplitTest(BaseTraceTest):
         trace_dataset = self.get_trace_dataset()
         n_orig_links = len(trace_dataset)
         percent_splits = OrderedDict({DatasetRole.TRAIN: 0.5, DatasetRole.VAL: 0.3, DatasetRole.EVAL: 0.2})
-        splitter = DatasetSplitter(trace_dataset, percent_splits, strategies=[strategy] * (len(percent_splits)-1))
+        splitter = DatasetSplitter(trace_dataset, percent_splits, strategies=[strategy] * (len(percent_splits) - 1))
         splits = splitter.split_dataset()
         split_link_ids = [set(split.trace_df.index) for split in splits.values()]
         self.assertEqual(sum([len(split) for split in splits.values()]), n_orig_links)

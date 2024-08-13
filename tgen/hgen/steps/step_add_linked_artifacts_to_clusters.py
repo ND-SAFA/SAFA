@@ -1,9 +1,10 @@
+from common_resources.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from common_resources.tools.constants.model_constants import USE_NL_SUMMARY_EMBEDDINGS
+
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.add_orphans_to_clusters import AddOrphansToClusters
-from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep

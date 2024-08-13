@@ -1,8 +1,8 @@
 from typing import List
 
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 
 
 class GenerationTestProject:

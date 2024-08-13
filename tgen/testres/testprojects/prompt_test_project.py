@@ -2,17 +2,17 @@ import os
 from typing import Any, Dict, List, Union
 
 from tgen.common.objects.artifact import Artifact
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys
-from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
-from tgen.data.readers.prompt_project_reader import PromptProjectReader
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.models.llm.open_ai_manager import OpenAIManager
+from common_resources.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.prompt_dataframe import PromptDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys, ArtifactKeys
+from common_resources.data.keys.prompt_keys import PromptKeys
+from common_resources.data.readers.artifact_project_reader import ArtifactProjectReader
+from common_resources.data.readers.prompt_project_reader import PromptProjectReader
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.llm.open_ai_manager import OpenAIManager
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.question_prompt import QuestionPrompt

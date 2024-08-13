@@ -1,17 +1,17 @@
 import random
 from typing import List, Union
 
-from tgen.common.constants.deliminator_constants import UNDERSCORE
-from tgen.common.util.reflection_util import ReflectionUtil
+from common_resources.tools.constants.symbol_constants import UNDERSCORE
+from common_resources.tools.util.reflection_util import ReflectionUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_pipeline import ConceptPipeline
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
 from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.contradictions.contradictions_detector import ContradictionsDetector
 from tgen.contradictions.contradictions_result import ContradictionsResult
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, TraceRelationshipType
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys, TraceRelationshipType
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.health_check_jobs.health_check_results import HealthCheckResults

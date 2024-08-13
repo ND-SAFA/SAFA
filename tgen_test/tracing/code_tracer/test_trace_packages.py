@@ -1,14 +1,15 @@
 from typing import Dict, List
 from unittest import TestCase
 
-from tgen_test.tracing.code_tracer.code_tracer_test_util import CodeTracerTestUtil
+from common_resources.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
+
 from tgen.common.constants.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
 from tgen.tracing.code.code_tracer import CodeTracer
 from tgen.tracing.code.package_tracer import PackageTracer
+from tgen_test.tracing.code_tracer.code_tracer_test_util import CodeTracerTestUtil
 
 
 class TestPackageTracer(BaseTest):

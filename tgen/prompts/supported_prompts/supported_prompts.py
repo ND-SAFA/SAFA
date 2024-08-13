@@ -1,7 +1,7 @@
 from copy import deepcopy
 from types import DynamicClassAttribute
 
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.artifact_summary_prompts import CODE_SUMMARY, NL_SUMMARY
 from tgen.prompts.supported_prompts.chunk_prompts import CHUNK_PROMPT

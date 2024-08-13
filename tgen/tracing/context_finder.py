@@ -1,11 +1,11 @@
 from typing import List, Tuple, Dict, Set
 
-from tgen.common.logging.logger_manager import logger
+from common_resources.tools.t_logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.embedding_ranking_pipeline import EmbeddingRankingPipeline
 

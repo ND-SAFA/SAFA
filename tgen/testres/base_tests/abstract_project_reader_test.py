@@ -1,10 +1,10 @@
 from typing import Dict, List
 
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from common_resources.mocking.test_open_ai_responses import SUMMARY_FORMAT
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 

@@ -2,7 +2,7 @@ import string
 from enum import Enum
 from typing import Set
 
-from tgen.data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
+from common_resources.data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
 
 
 class ModelTokenLimits(Enum):
@@ -61,5 +61,3 @@ class ModelTokenLimits(Enum):
                     token_limit = mtl
                     break
         return token_limit
-
-

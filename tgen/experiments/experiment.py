@@ -2,12 +2,12 @@ import os
 import uuid
 from typing import List
 
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_config import LoggerConfig
-from tgen.common.logging.logger_manager import LoggerManager
-from tgen.common.util.status import Status
 from tgen.common.constants.experiment_constants import EXPERIMENT_ID_DEFAULT
+from common_resources.tools.t_logging.logger_config import LoggerConfig
+from common_resources.tools.t_logging.logger_manager import LoggerManager
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.status import Status
 from tgen.experiments.experiment_step import ExperimentStep
 from tgen.jobs.abstract_job import AbstractJob
 

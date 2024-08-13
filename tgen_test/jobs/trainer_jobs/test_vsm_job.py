@@ -1,13 +1,13 @@
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.trainer_jobs.vsm_job import VSMJob
 from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.test_assertions import TestAssertions
-from tgen.variables.typed_definition_variable import TypedDefinitionVariable
+from common_resources.tools.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestVSMJob(BaseJobTest):

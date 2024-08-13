@@ -1,12 +1,12 @@
-from dataclasses import field, dataclass
+from dataclasses import dataclass, field
 
-from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.pipeline.pipeline_args import PipelineArgs
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.tools.constants.default_model_managers import get_best_default_llm_manager_long_context
+from common_resources.tools.state_management.args import Args
 
 
 @dataclass
-class ContradictionsArgs(PipelineArgs):
+class ContradictionsArgs(Args):
     """
      :param llm_manager: The LLM manager to use to make decisions.
     """

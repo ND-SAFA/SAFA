@@ -5,12 +5,12 @@ import numpy as np
 from evaluate import load
 from scipy.special import softmax
 
-from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.dict_util import DictUtil
+from common_resources.tools.constants.metric_constants import THRESHOLD_DEFAULT
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.dict_util import DictUtil
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.tdatasets.trace_matrix import TraceMatrix
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric, get_metric_name, get_metric_path
 
 warnings.filterwarnings('ignore')

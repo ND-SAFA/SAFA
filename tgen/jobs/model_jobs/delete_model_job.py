@@ -1,5 +1,5 @@
 from tgen.jobs.abstract_job import AbstractJob
-from tgen.common.util.file_util import FileUtil
+from common_resources.tools.util.file_util import FileUtil
 
 
 class DeleteModelJob(AbstractJob):

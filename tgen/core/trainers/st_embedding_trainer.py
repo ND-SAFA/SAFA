@@ -1,12 +1,12 @@
 from typing import List
 
 import torch
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
+from common_resources.tools.util.override import overrides
+from common_resources.tools.util.tf_util import TFUtil
 from sentence_transformers import InputExample
 from torch import cosine_similarity
 
-from tgen.common.util.override import overrides
-from tgen.common.util.tf_util import TFUtil
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st_loss_functions import SupportedSTLossFunctions
 from tgen.core.trainers.st_trainer import STTrainer
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager

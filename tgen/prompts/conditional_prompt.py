@@ -1,6 +1,6 @@
 from typing import Callable, List
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
 from tgen.prompts.multi_prompt import MultiPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs

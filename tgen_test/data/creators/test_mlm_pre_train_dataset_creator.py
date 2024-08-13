@@ -1,12 +1,12 @@
 import os
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
+from common_resources.tools.constants.symbol_constants import NEW_LINE
+from common_resources.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from common_resources.data.tdatasets.pre_train_dataset import PreTrainDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
-from tgen.common.util.file_util import FileUtil
+from common_resources.tools.util.file_util import FileUtil
 
 
 class TestMLMPreTrainDatasetCreator(BaseTest):

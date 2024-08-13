@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from typing import Any
 
+from common_resources.tools.state_management.args import Args
+from common_resources.tools.state_management.state import State
+
 from tgen.decision_tree.nodes.abstract_node import AbstractNode
-from tgen.pipeline.pipeline_args import PipelineArgs
-from tgen.pipeline.state import State
 
 
 @dataclass
@@ -17,7 +18,7 @@ class LeafNode(AbstractNode):
         if not self.is_leaf():
             raise Exception("Leaf node cannot have branches.")
 
-    def _make_choice(self, args: PipelineArgs, state: State) -> Any:
+    def _make_choice(self, args: Args, state: State) -> Any:
         """
         Here for node api, should not be used for leaf.
         :param args: The arguments to the node.

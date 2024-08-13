@@ -1,7 +1,7 @@
 from typing import List, Union
 from unittest import TestCase
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from common_resources.tools.constants.symbol_constants import NEW_LINE
 
 
 class ArtifactPromptTestUtil:

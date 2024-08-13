@@ -5,10 +5,10 @@ import torch
 from sentence_transformers import SentenceTransformer
 from typing import Type
 
-from tgen.common.constants import environment_constants
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.param_specs import ParamSpecs
+from common_resources.tools.constants import environment_constants
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.param_specs import ParamSpecs
 
 
 class ModelCache:

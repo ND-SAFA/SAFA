@@ -1,7 +1,7 @@
 import os
 from copy import deepcopy
 
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.summarizer.summary import Summary, SummarySection
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
@@ -68,5 +68,3 @@ class TestSummary(BaseTest):
 
     def get_summary(self):
         return deepcopy(self.SUMMARY)
-
-

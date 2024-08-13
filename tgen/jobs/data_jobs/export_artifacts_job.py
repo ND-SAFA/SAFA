@@ -2,9 +2,9 @@ import os
 
 from typing import Iterable
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
-from tgen.common.util.file_util import FileUtil
-from tgen.data.keys.structure_keys import StructuredKeys
+from common_resources.tools.constants.symbol_constants import NEW_LINE, EMPTY_STRING
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.data.keys.structure_keys import StructuredKeys
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 

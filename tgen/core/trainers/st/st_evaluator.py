@@ -2,12 +2,12 @@ from typing import List
 
 from sentence_transformers.evaluation import SentenceEvaluator
 
-from tgen.common.constants.hugging_face_constants import SEPARATOR_BAR
-from tgen.common.logging.logger_manager import logger
+from common_resources.tools.constants.hugging_face_constants import SEPARATOR_BAR
+from common_resources.tools.t_logging.logger_manager import logger
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.wb.wb_manager import WBManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.dataset_role import DatasetRole
 
 
 class STEvaluator(SentenceEvaluator):

@@ -1,4 +1,4 @@
-from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
+from common_resources.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
 from tgen.testres.base_tests.base_test import BaseTest
 
 

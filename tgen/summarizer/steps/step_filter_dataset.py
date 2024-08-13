@@ -2,9 +2,9 @@ from collections import Counter
 
 from typing import List, Set, Union
 
-from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.util.dataframe_util import DataFrameUtil
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summarizer_state import SummarizerState

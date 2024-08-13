@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.common.constants.deliminator_constants import COMMA
+from common_resources.tools.constants.symbol_constants import COMMA
 
 
 class CustomReprFunc:

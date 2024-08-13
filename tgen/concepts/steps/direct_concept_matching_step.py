@@ -2,13 +2,13 @@ from typing import List, Tuple
 
 from nltk import WordNetLemmatizer
 
-from tgen.common.constants.deliminator_constants import SPACE
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.constants.symbol_constants import SPACE
+from common_resources.tools.util.str_util import StrUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.types.concept_match import ConceptMatch
 from tgen.concepts.util.extract_alt_names import extract_alternate_names
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.keys.structure_keys import ArtifactKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 
 

@@ -1,9 +1,9 @@
 from datetime import datetime
 from enum import Enum
 
-from tgen.common.constants.deliminator_constants import DASH, UNDERSCORE
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.constants.symbol_constants import DASH, UNDERSCORE
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.str_util import StrUtil
 from tgen.models.tokens.token_calculator import TokenCalculator
 
 INPUT_TOKENS = 0

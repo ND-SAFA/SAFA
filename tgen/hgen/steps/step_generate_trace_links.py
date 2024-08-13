@@ -1,14 +1,14 @@
 from typing import Dict, List, Set, Tuple
 
-from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
-from tgen.common.constants.hgen_constants import RELATED_CHILDREN_SCORE, \
-    WEIGHT_OF_PRED_RELATED_CHILDREN
-from tgen.common.logging.logger_manager import logger
+from common_resources.data.keys.structure_keys import TraceKeys
+from common_resources.tools.constants.model_constants import USE_NL_SUMMARY_EMBEDDINGS
+
+from tgen.common.constants.hgen_constants import RELATED_CHILDREN_SCORE, WEIGHT_OF_PRED_RELATED_CHILDREN
+from common_resources.tools.t_logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.math_util import MathUtil
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.math_util import MathUtil
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs

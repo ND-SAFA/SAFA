@@ -1,9 +1,9 @@
-from tgen.data.readers.entity.formats.csv_entity_format import CsvEntityFormat
-from tgen.data.readers.entity.formats.folder_entity_format import FolderEntityFormat
-from tgen.data.readers.entity.formats.json_entity_format import JsonEntityFormat
-from tgen.data.readers.entity.formats.xml_entity_format import XmlEntityFormat
-from tgen.data.readers.entity.supported_entity_formats import SupportedEntityFormats
-from tgen.data.keys.structure_keys import StructuredKeys
+from common_resources.data.readers.entity.formats.csv_entity_format import CsvEntityFormat
+from common_resources.data.readers.entity.formats.folder_entity_format import FolderEntityFormat
+from common_resources.data.readers.entity.formats.json_entity_format import JsonEntityFormat
+from common_resources.data.readers.entity.formats.xml_entity_format import XmlEntityFormat
+from common_resources.data.readers.entity.supported_entity_formats import SupportedEntityFormats
+from common_resources.data.keys.structure_keys import StructuredKeys
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.test_format_paths import CSV_ENTITY_PATH, FOLDER_PROJECT_PATH, JSON_ENTITY_PATH, XML_ENTITY_PATH
 

@@ -1,9 +1,9 @@
 import math
 import string
 
-from tgen.common.util.dict_util import DictUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
 from tgen.hgen.common.duplicate_detector import DuplicateDetector, DuplicateType
 from tgen.testres.base_tests.base_test import BaseTest
 

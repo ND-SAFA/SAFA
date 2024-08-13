@@ -7,8 +7,8 @@ from tgen.concepts.steps.entity_matching_step import EntityMatchingStep
 from tgen.concepts.types.entity_matching_context import EntityMatchingContext
 from tgen.concepts.types.entity_matching_pred import EntityMatchingPred
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 
 
 class TestEntityMatching(BaseTest):

@@ -1,8 +1,8 @@
 import os
 
-from tgen.data.readers.entity.entity_reader import EntityReader
+from common_resources.data.readers.entity.entity_reader import EntityReader
 from tgen_test.data.readers.entity.formats.test_xml_entity_format import TestXmlEntityFormat
-from tgen.data.keys.structure_keys import StructuredKeys
+from common_resources.data.keys.structure_keys import StructuredKeys
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.test_format_paths import XML_ENTITY_PATH
 from tgen.testres.test_assertions import TestAssertions

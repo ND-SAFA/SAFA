@@ -4,13 +4,13 @@ from typing import Dict, List
 from unittest import mock
 from unittest.mock import MagicMock
 
-from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.models.llm.open_ai_manager import OpenAIManager
+from common_resources.tools.util.dataframe_util import DataFrameUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.llm.open_ai_manager import OpenAIManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
@@ -20,9 +20,9 @@ from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from common_resources.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
 from tgen.testres.testprojects.artifact_test_project import ArtifactTestProject

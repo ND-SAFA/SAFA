@@ -1,9 +1,10 @@
 from typing import Dict, List
 
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.tools.constants.model_constants import USE_NL_SUMMARY_EMBEDDINGS
+
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
-from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 

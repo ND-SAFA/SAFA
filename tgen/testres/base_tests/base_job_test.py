@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from unittest import mock
 from unittest.mock import patch
 
-from tgen.common.util.status import Status
+from common_resources.tools.util.status import Status
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.models.model_manager import ModelManager

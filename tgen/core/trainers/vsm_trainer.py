@@ -4,6 +4,18 @@ from typing import Dict, Iterable, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from common_resources.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
+from common_resources.data.processing.cleaning.data_cleaner import DataCleaner
+from common_resources.data.processing.cleaning.lemmatize_words_step import LemmatizeWordStep
+from common_resources.data.processing.cleaning.manual_replace_words_step import ManualReplaceWordsStep
+from common_resources.data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
+from common_resources.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.idataset import iDataset
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from scipy.sparse import csr_matrix
 from sklearn import exceptions
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
@@ -12,29 +24,17 @@ from tqdm import tqdm
 
 from tgen.common.constants.other_constants import VSM_SELECTION_THRESHOLDS
 from tgen.common.constants.ranking_constants import DEFAULT_VSM_SELECT_PREDICTION
-from tgen.common.logging.logger_manager import logger
+from common_resources.tools.t_logging.logger_manager import logger
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
-from tgen.common.util.list_util import ListUtil
-from tgen.common.util.override import overrides
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.util.list_util import ListUtil
+from common_resources.tools.util.override import overrides
+from common_resources.tools.util.str_util import StrUtil
 from tgen.core.trace_output.stage_eval import Metrics
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.abstract_trainer import AbstractTrainer
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
-from tgen.data.processing.cleaning.data_cleaner import DataCleaner
-from tgen.data.processing.cleaning.lemmatize_words_step import LemmatizeWordStep
-from tgen.data.processing.cleaning.manual_replace_words_step import ManualReplaceWordsStep
-from tgen.data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
-from tgen.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.idataset import iDataset
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric
 from tgen.tracing.ranking.common.ranking_util import RankingUtil

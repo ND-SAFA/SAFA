@@ -1,5 +1,5 @@
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.data.tdatasets.data_key import DataKey
+from common_resources.data.tdatasets.data_key import DataKey
 
 
 class TestDataKey(BaseTest):

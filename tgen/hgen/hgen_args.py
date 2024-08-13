@@ -2,21 +2,22 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Dict, List, Union
 
-from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, DEFAULT_LINK_THRESHOLD, \
-    DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, USE_ALL_CODE_LAYERS, USE_ALL_LAYERS, DEFAULT_CLUSTER_MAX_SIZE
-from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context, get_efficient_default_llm_manager, \
-    get_best_default_llm_manager_short_context
-from tgen.common.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.llm.args.open_ai_args import OpenAIArgs
+from common_resources.llm.open_ai_manager import OpenAIManager
+from common_resources.tools.constants.default_model_managers import get_best_default_llm_manager_long_context, \
+    get_best_default_llm_manager_short_context, get_efficient_default_llm_manager
+from common_resources.tools.constants.open_ai_constants import OPEN_AI_MODEL_DEFAULT
+from common_resources.tools.state_management.args import Args
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.dataclass_util import required_field
+from common_resources.tools.util.file_util import FileUtil
+
+from tgen.common.constants.hgen_constants import DEFAULT_CLUSTER_MAX_SIZE, DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD, \
+    DEFAULT_LINK_THRESHOLD, DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS, USE_ALL_CODE_LAYERS, USE_ALL_LAYERS
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
 from tgen.common.constants.ranking_constants import DEFAULT_COMPLETION_TOKENS
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.dataclass_util import required_field
-from tgen.common.util.file_util import FileUtil
-from tgen.core.args.open_ai_args import OpenAIArgs
-from tgen.hgen.common.special_doc_types import DocTypeConstraints, DOC_TYPE2CONSTRAINTS
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.open_ai_manager import OpenAIManager
-from tgen.pipeline.pipeline_args import PipelineArgs
+from tgen.hgen.common.special_doc_types import DOC_TYPE2CONSTRAINTS, DocTypeConstraints
 
 
 class PredictionStep(Enum):
@@ -28,7 +29,7 @@ class PredictionStep(Enum):
 
 
 @dataclass
-class HGenArgs(PipelineArgs, BaseObject):
+class HGenArgs(Args, BaseObject):
     # ================ REQUIRED PARAMS ================
     """
     The layer of the source artifacts for which higher-level artifacts will be generated

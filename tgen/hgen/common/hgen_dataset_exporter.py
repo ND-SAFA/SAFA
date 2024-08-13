@@ -2,16 +2,16 @@ from typing import Dict, List, Set
 
 from tqdm import tqdm
 
-from tgen.common.constants.logging_constants import TQDM_NCOLS
+from common_resources.tools.constants.logging_constants import TQDM_NCOLS
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
-from tgen.common.util.dict_util import DictUtil
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 

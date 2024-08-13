@@ -1,7 +1,7 @@
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
-from tgen.variables.typed_definition_variable import TypedDefinitionVariable
+from common_resources.tools.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class BaseTrainerDatasetsManagerTest(BaseTraceTest):

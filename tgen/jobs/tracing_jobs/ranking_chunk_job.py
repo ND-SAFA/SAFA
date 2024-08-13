@@ -2,13 +2,13 @@ import json
 from copy import deepcopy
 from typing import Dict, Tuple, Union
 
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.status import Status
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.status import Status
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob

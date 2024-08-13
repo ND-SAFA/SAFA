@@ -1,4 +1,4 @@
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.prompts.conditional_prompt import ConditionalPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager

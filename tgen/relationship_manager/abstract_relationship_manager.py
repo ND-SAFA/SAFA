@@ -10,15 +10,15 @@ import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
-from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.common.util.str_util import StrUtil
-from tgen.common.util.supported_enum import SupportedEnum
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.reflection_util import ReflectionUtil
+from common_resources.tools.util.str_util import StrUtil
+from common_resources.tools.util.supported_enum import SupportedEnum
+from common_resources.data.keys.structure_keys import ArtifactKeys
 from tgen.models.model_properties import ModelTask
 from tgen.relationship_manager.embedding_types import IdType
 from tgen.relationship_manager.model_cache import ModelCache

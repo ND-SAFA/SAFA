@@ -1,5 +1,5 @@
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
+from common_resources.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
 
 
 class TestSourceTargetSwapStep(BaseTest):

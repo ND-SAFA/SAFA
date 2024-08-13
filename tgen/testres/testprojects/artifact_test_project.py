@@ -1,9 +1,9 @@
 from typing import List
 
 from tgen.common.objects.artifact import Artifact
-from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
-from tgen.data.readers.artifact_project_reader import ArtifactProjectReader
+from common_resources.data.keys.structure_keys import StructuredKeys
+from common_resources.data.readers.abstract_project_reader import AbstractProjectReader
+from common_resources.data.readers.artifact_project_reader import ArtifactProjectReader
 from tgen.testres.paths.project_paths import SAFA_PROJECT_PATH
 from tgen.testres.testprojects.safa_test_project import SafaTestProject
 

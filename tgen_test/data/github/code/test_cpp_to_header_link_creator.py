@@ -43,7 +43,7 @@ class TestCppHeaderLinkCreator(BaseTest):
         artifacts, links = link_creator.create_links()
         linked_files = set(self.CPP_FILES).difference(self.UNLINKED_FILES)
         self.assertEqual(len(links), len(linked_files))
-        self.assertEqual(len(artifacts), 2*len(linked_files))
+        self.assertEqual(len(artifacts), 2 * len(linked_files))
         for file in linked_files:
             cpp_file_path = os.path.join("source", file)
             hpp_file_path = os.path.join("include", "iceoryx_platform", file.replace("cpp", "hpp"))

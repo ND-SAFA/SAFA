@@ -5,9 +5,9 @@ from typing import List, Dict, Tuple, Set
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
-from tgen.common.util.list_util import ListUtil
-from tgen.common.util.np_util import NpUtil
-from tgen.common.util.override import overrides
+from common_resources.tools.util.list_util import ListUtil
+from common_resources.tools.util.np_util import NpUtil
+from common_resources.tools.util.override import overrides
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.sorters.i_sorter import iSorter

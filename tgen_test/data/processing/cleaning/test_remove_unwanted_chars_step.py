@@ -1,4 +1,4 @@
-from tgen.data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
+from common_resources.data.processing.cleaning.remove_unwanted_chars_step import RemoveUnwantedCharsStep
 from tgen.testres.base_tests.base_test import BaseTest
 
 

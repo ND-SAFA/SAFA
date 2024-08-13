@@ -2,18 +2,19 @@ import os
 from abc import ABC, abstractmethod
 from typing import Generic, List, Optional, Set, Tuple, Type
 
-from tgen.common.constants import environment_constants
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from common_resources.tools.cli.confirm import confirm
+from common_resources.tools.cli.inquirer_selector import inquirer_selection, inquirer_value
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE
+from common_resources.tools.state_management.state import State
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.enum_util import EnumUtil
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.reflection_util import ReflectionUtil
+
+from tgen.common.constants import tgen_constants
 from tgen.common.constants.pipeline_constants import DEFAULT_INTERACTIVE_STATE
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.enum_util import EnumUtil
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.reflection_util import ReflectionUtil
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep, ArgType, StateType, title_format_for_logs
 from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
-from tgen.pipeline.state import State
-from tgen.scripts.toolset.confirm import confirm
-from tgen.scripts.toolset.inquirer_selector import inquirer_selection, inquirer_value
 from tgen.summarizer.summarizer_args import SummarizerArgs
 from tgen.summarizer.summary import Summary
 
@@ -89,7 +90,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         if self.summarizer_args:
             self.summarizer_args: SummarizerArgs
             self.run_summarizations()
-        if self.args.interactive_mode:
+        if tgen_constants.IS_INTERACTIVE:
             self._run_interactive_mode()
 
     def run_summarizations(self) -> Summary:
@@ -116,9 +117,8 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         """
         step_ran = step.run(self.args, self.state, re_run=re_run)
         if step.get_step_name() == self.resume_interactive_mode_step:
-            self.args.interactive_mode = DEFAULT_INTERACTIVE_STATE
-            environment_constants.IS_INTERACTIVE = DEFAULT_INTERACTIVE_STATE
-        if step_ran and self.args.interactive_mode:
+            tgen_constants.IS_INTERACTIVE = DEFAULT_INTERACTIVE_STATE
+        if step_ran and tgen_constants.IS_INTERACTIVE:
             return self._run_interactive_mode()
         return False
 
@@ -177,7 +177,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             else:
                 self.resume_interactive_mode_step = resume_interactive_mode_step
                 self.args.interactive_mode = False
-                environment_constants.IS_INTERACTIVE = False
+                tgen_constants.IS_INTERACTIVE = False
 
         if selected_option is None:
             self._run_interactive_mode(exclude_options=exclude_options)

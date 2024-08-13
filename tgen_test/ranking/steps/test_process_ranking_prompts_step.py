@@ -3,10 +3,10 @@ from unittest import TestCase
 
 from tgen_test.ranking.steps.ranking_pipeline_test import DEFAULT_PARENT_IDS, DEFAULT_CHILDREN_IDS, RankingPipelineTest
 from tgen.common.constants.ranking_constants import RANKING_MAX_SCORE, RANKING_MIN_SCORE
-from tgen.common.util.math_util import MathUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.util.math_util import MathUtil
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState
 from tgen.tracing.ranking.common.ranking_util import RankingUtil

@@ -1,8 +1,8 @@
 from abc import ABC
 from typing import Dict, NamedTuple, Optional
 
-from tgen.common.util.json_util import JsonUtil
-from tgen.common.util.reflection_util import ReflectionUtil
+from common_resources.tools.util.json_util import JsonUtil
+from common_resources.tools.util.reflection_util import ReflectionUtil
 
 
 class AbstractTraceOutput(ABC):

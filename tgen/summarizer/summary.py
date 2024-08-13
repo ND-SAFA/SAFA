@@ -3,12 +3,12 @@ from copy import deepcopy
 from enum import Enum
 from typing import List, Dict, Union
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, EMPTY_STRING
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.json_util import JsonUtil
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.typed_enum_dict import TypedEnumDict
+from common_resources.tools.constants.symbol_constants import NEW_LINE, EMPTY_STRING
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.json_util import JsonUtil
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.tools.util.typed_enum_dict import TypedEnumDict
 
 
 class SummarySectionKeys(Enum):

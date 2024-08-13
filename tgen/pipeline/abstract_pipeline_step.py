@@ -1,14 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from tgen.common.logging.logger_manager import logger
-from tgen.pipeline.pipeline_args import PipelineArgs
-
-from tgen.pipeline.state import State
-
+from common_resources.tools.state_management.args import Args
+from common_resources.tools.state_management.state import State
+from common_resources.tools.t_logging.logger_manager import logger
 
 StateType = TypeVar("StateType", bound=State)
-ArgType = TypeVar("ArgType", bound=PipelineArgs)
+ArgType = TypeVar("ArgType", bound=Args)
 title_format_for_logs = "---{}---"
 
 

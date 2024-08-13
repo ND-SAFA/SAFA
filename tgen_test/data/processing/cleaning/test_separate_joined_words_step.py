@@ -1,6 +1,6 @@
-from tgen.common.constants.deliminator_constants import UNDERSCORE
+from common_resources.tools.constants.symbol_constants import UNDERSCORE
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
+from common_resources.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
 class TestSeparateJoinedWordsStep(BaseTest):

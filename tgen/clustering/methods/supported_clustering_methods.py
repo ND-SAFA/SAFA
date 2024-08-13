@@ -1,7 +1,7 @@
 from hdbscan import HDBSCAN
 from sklearn.cluster import AffinityPropagation, AgglomerativeClustering, Birch, DBSCAN, KMeans, MeanShift, OPTICS, SpectralClustering
 
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.supported_enum import SupportedEnum
 
 
 class SupportedClusteringMethods(SupportedEnum):

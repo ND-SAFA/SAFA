@@ -1,7 +1,7 @@
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 
 
 class CodeTracerTestUtil:

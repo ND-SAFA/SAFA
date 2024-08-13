@@ -3,7 +3,7 @@ from typing import Dict
 import datasets
 import numpy as np
 
-from tgen.data.tdatasets.trace_matrix import TraceMatrix
+from common_resources.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """

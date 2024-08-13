@@ -3,10 +3,10 @@ import subprocess
 from typing import Any, List
 
 import boto3
+from common_resources.tools.cli.confirm import confirm
+from common_resources.tools.util.file_util import FileUtil
 
-from tgen.common.util.file_util import FileUtil
 from tgen.scripts.constants import DATA_PATH, DEFAULT_CONFIG_PATH, DEFAULT_DATA_BUCKET, IGNORE_FILES
-from tgen.scripts.toolset.confirm import confirm
 
 s3 = boto3.resource('s3')
 N_PER_BATCH = 2

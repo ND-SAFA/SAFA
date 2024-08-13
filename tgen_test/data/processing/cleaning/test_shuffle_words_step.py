@@ -1,6 +1,6 @@
 import random
 
-from tgen.data.processing.cleaning.shuffle_words_step import ShuffleWordsStep
+from common_resources.data.processing.cleaning.shuffle_words_step import ShuffleWordsStep
 from tgen.testres.base_tests.base_test import BaseTest
 
 

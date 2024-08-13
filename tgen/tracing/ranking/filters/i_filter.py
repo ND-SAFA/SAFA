@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 from typing import List, Dict
 
-from tgen.common.util.enum_util import EnumDict
+from common_resources.tools.util.enum_util import EnumDict
 
 
 class iFilter:

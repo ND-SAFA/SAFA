@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Tuple
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
 from tgen.common.objects.trace_layer import TraceLayer
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import StructuredKeys
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import StructuredKeys
 from tgen.testres.test_data_manager import TestDataManager
 
 ArtifactInstruction = Tuple[Any, str]

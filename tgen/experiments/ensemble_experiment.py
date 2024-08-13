@@ -3,17 +3,17 @@ from copy import deepcopy
 from typing import Callable, List
 
 import numpy as np
+from common_resources.data.keys.structure_keys import StructuredKeys
+from common_resources.data.tdatasets.dataset_role import DatasetRole
 from sklearn.preprocessing import minmax_scale, scale
 
 from tgen.common.constants.experiment_constants import EXPERIMENT_ID_DEFAULT, OUTPUT_FILENAME
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.json_util import JsonUtil
-from tgen.common.logging.logger_config import LoggerConfig
-from tgen.common.util.status import Status
+from common_resources.tools.t_logging.logger_config import LoggerConfig
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.json_util import JsonUtil
+from common_resources.tools.util.status import Status
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.trainer_task import TrainerTask
-from tgen.data.keys.structure_keys import StructuredKeys
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.experiments.experiment import Experiment
 from tgen.experiments.experiment_step import ExperimentStep
 from tgen.jobs.components.job_result import JobResult

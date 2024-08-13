@@ -2,23 +2,23 @@ import math
 from unittest import mock
 from unittest.mock import MagicMock
 
-from tgen_test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_predictions
+from common_resources.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.keys.structure_keys import ArtifactKeys, LayerKeys
+from common_resources.data.readers.dataframe_project_reader import DataFrameProjectReader
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
+
 from tgen.clustering.base.cluster import Cluster
+from tgen.clustering.base.cluster_dataset_creator import ClusterDatasetCreator
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.add_clusters_to_dataset import AddClustersToDataset
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.status import Status
-from tgen.data.creators.cluster_dataset_creator import ClusterDatasetCreator
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
-from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.status import Status
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_generate_inputs import GenerateInputsStep
@@ -28,11 +28,12 @@ from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
 from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_libraries import mock_libraries
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.mock_libraries import mock_libraries
+from common_resources.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_HGEN_PATH
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep
+from tgen_test.hgen.hgen_test_utils import HGenTestConstants, get_all_responses, get_predictions
 
 
 class TestMultiLayerHGenJob(BaseJobTest):

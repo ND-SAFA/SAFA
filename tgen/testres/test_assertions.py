@@ -3,14 +3,14 @@ from unittest import TestCase
 
 import pandas as pd
 
-from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.json_util import JsonUtil
-from tgen.common.util.status import Status
+from common_resources.tools.util.dataframe_util import DataFrameUtil
+from common_resources.tools.util.json_util import JsonUtil
+from common_resources.tools.util.status import Status
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.common.objects.trace_layer import TraceLayer

@@ -2,10 +2,10 @@ import re
 from unittest import TestCase
 
 from tgen_test.ranking.steps.ranking_pipeline_test import DEFAULT_PARENT_IDS, DEFAULT_CHILDREN_IDS, RankingPipelineTest
-from tgen.common.util.enum_util import EnumDict
+from common_resources.tools.util.enum_util import EnumDict
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.steps.create_explanations_step import CreateExplanationsStep
 

@@ -1,10 +1,11 @@
 from math import floor
 
-from tgen.common.constants.deliminator_constants import L_CARROT, R_CARROT
+from common_resources.tools.constants.symbol_constants import L_CARROT, R_CARROT
+
 from tgen.common.constants.ranking_constants import ARTIFACT_HEADER, DEFAULT_SCORE, PROJECT_SUMMARY_HEADER, RANKING_ARTIFACT_TAG, \
     RANKING_EXPLANATION_TAG, RANKING_ID_TAG, RANKING_MAX_SCORE, RANKING_MIN_SCORE, RANKING_PARENT_SUMMARY_TAG, RANKING_SCORE_TAG
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.tools.util.str_util import StrUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt

@@ -3,13 +3,13 @@ from typing import Callable, Dict, List
 
 import mock
 import pandas as pd
+from common_resources.data.keys.structure_keys import TraceKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.llm.args.open_ai_args import OpenAIArgs
+from common_resources.llm.open_ai_manager import OpenAIManager
+from common_resources.tools.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT
 
-from tgen.common.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT
-from tgen.core.args.open_ai_args import OpenAIArgs
 from tgen.data.chunkers.token_limit_chunkers.abstract_token_limit_chunker import AbstractTokenLimitChunker
-from tgen.data.keys.structure_keys import TraceKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.models.llm.open_ai_manager import OpenAIManager
 from tgen.models.tokens.token_limits import ModelTokenLimits
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt

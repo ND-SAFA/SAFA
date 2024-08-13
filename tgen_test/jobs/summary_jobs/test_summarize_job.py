@@ -1,18 +1,19 @@
 from typing import List
 
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.prompt_util import PromptUtil
+
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
 from tgen.testres.mocking.mock_responses import MockResponses
-from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.generation_test_project import GenerationTestProject
 
 

@@ -3,7 +3,7 @@ import random
 import mock
 from sentence_transformers import CrossEncoder
 
-from tgen.common.constants.hugging_face_constants import SMALL_CROSS_ENCODER
+from common_resources.tools.constants.hugging_face_constants import SMALL_CROSS_ENCODER
 from tgen.relationship_manager.cross_encoder_manager import CrossEncoderManager
 from tgen.testres.base_tests.base_test import BaseTest
 

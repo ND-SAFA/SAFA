@@ -1,10 +1,11 @@
 from typing import Dict, Type
 
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.list_util import ListUtil
+from common_resources.data.exporters.safa_exporter import SafaExporter
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.list_util import ListUtil
+
 from tgen.common.util.pipeline_util import PipelineUtil
-from tgen.data.exporters.safa_exporter import SafaExporter
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_util import SAVE_DATASET_DIRNAME
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState

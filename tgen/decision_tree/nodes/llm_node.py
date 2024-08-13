@@ -1,18 +1,19 @@
 import uuid
 from dataclasses import dataclass, field
-from typing import Dict, Any, Callable
+from typing import Any, Callable, Dict
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context
-from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.common.util.dict_util import DictUtil
-from tgen.data.keys.prompt_keys import PromptKeys
+from common_resources.data.keys.prompt_keys import PromptKeys
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.llm.llm_responses import GenerationResponse
+from common_resources.llm.llm_task import LLMCompletionType
+from common_resources.tools.constants.default_model_managers import get_best_default_llm_manager_long_context
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
+from common_resources.tools.state_management.args import Args
+from common_resources.tools.state_management.state import State
+from common_resources.tools.util.dataclass_util import DataclassUtil
+from common_resources.tools.util.dict_util import DictUtil
+
 from tgen.decision_tree.nodes.abstract_node import AbstractNode
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.llm_responses import GenerationResponse
-from tgen.models.llm.llm_task import LLMCompletionType
-from tgen.pipeline.pipeline_args import PipelineArgs
-from tgen.pipeline.state import State
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager
@@ -30,7 +31,7 @@ class LLMNode(AbstractNode):
     response_tag: str = field(init=False, default=DEFAULT_RESPONSE_TAG)
     default_response: str = None
 
-    def create_prompt_builder(self, args: PipelineArgs, state: State) -> PromptBuilder:
+    def create_prompt_builder(self, args: Args, state: State) -> PromptBuilder:
         """
         Creates the prompt builder for the LLM to make a decision at the current node.
         :param args: The arguments to the node.
@@ -48,7 +49,7 @@ class LLMNode(AbstractNode):
         Creates the prompt used to probe the LLM to make a choice.
         :return: The prompt.
         """
-        self.response_tag = DictUtil.get_kwarg_values(self.response_manager_params, response_tag=self.response_tag, pop=True)
+        self.response_tag = DictUtil.get_dict_values(self.response_manager_params, response_tag=self.response_tag, pop=True)
         if len(self.branches) == 1:
             prompt = Prompt(self.description, response_manager=XMLResponseManager(response_tag=self.response_tag,
                                                                                   **self.response_manager_params))
@@ -68,7 +69,7 @@ class LLMNode(AbstractNode):
         prompt.args.prompt_id = PROMPT_ID
         return prompt
 
-    def _make_choice(self, args: PipelineArgs, state: State) -> Any:
+    def _make_choice(self, args: Args, state: State) -> Any:
         """
         Decides which path to take from the current node.
         :param args: The arguments to the node.
@@ -113,7 +114,7 @@ class LLMNode(AbstractNode):
             question = question.format(**format_vars)
         return question
 
-    def _get_input_variables(self, args: PipelineArgs, state: State) -> Dict[str, Any]:
+    def _get_input_variables(self, args: Args, state: State) -> Dict[str, Any]:
         """
         Gets the input variables needed for the prompt.
         :param args: The arguments to the node.

@@ -1,10 +1,11 @@
 from abc import abstractmethod
 from typing import Dict, List, Type
 
-from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
+from common_resources.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.test_assertions import TestAssertions
 import tgen
+
 
 class AbstractEntityFormatTest(BaseTest):
     """

@@ -1,8 +1,8 @@
 from typing import Any, Dict, List, Set, Tuple
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
-from tgen.common.logging.logger_manager import logger
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE, TAB
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.content_generator import ContentGenerator
 from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs

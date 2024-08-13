@@ -1,7 +1,7 @@
 from typing import List
 
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.util.str_util import StrUtil
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
 
 

@@ -2,7 +2,7 @@ import ast
 from dataclasses import dataclass, field
 from typing import List, Union, Any
 
-from tgen.common.util.dict_util import DictUtil
+from common_resources.tools.util.dict_util import DictUtil
 
 
 @dataclass

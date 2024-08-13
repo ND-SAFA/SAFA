@@ -1,15 +1,16 @@
 from typing import List
 
-from tgen.common.constants.model_constants import get_efficient_default_llm_manager
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.constants.default_model_managers import get_efficient_default_llm_manager
+
 from tgen.common.objects.artifact import Artifact
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
 from tgen.data.chunkers.abstract_chunker import AbstractChunker
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt

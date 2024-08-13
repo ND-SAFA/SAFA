@@ -1,5 +1,5 @@
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs

@@ -6,10 +6,9 @@ import sys
 from typing import Dict, List
 
 import pandas as pd
+from common_resources.tools.constants.env_var_name_constants import OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
+from common_resources.tools.constants.symbol_constants import PERIOD
 from dotenv import load_dotenv
-
-from tgen.common.constants.deliminator_constants import PERIOD
-from tgen.common.constants.path_constants import OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
 
 load_dotenv()
 

@@ -3,7 +3,7 @@ from unittest import TestCase
 from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.common.objects.chunk import Chunk
 from tgen.common.objects.trace import Trace
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.tracing.ranking.steps.calculate_composite_scores_step import CalculateCompositeScoreStep
 
 

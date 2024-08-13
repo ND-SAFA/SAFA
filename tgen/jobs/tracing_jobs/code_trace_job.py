@@ -1,9 +1,9 @@
 import os
 
-from tgen.common.util.file_util import FileUtil
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.exporters.dataframe_exporter import DataFrameExporter
-from tgen.data.exporters.safa_exporter import SafaExporter
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.exporters.dataframe_exporter import DataFrameExporter
+from common_resources.data.exporters.safa_exporter import SafaExporter
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.tracing.code.code_tracer import CodeTracer
 

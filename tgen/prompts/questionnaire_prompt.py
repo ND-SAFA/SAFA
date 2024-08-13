@@ -1,11 +1,12 @@
 from string import ascii_uppercase
 from typing import Dict, List, Union
 
-from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.override import overrides
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.constants.symbol_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.override import overrides
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.tools.util.str_util import StrUtil
+
 from tgen.prompts.multi_prompt import MultiPrompt
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
@@ -60,7 +61,7 @@ class QuestionnairePrompt(MultiPrompt):
             self.enumeration_chars = [self.enumeration_chars[0] for _ in self.child_prompts]
         if self.use_multi_step_task_instructions and TASK_HEADER not in self.value:
             self.value = self._create_multi_step_task_instructions()
-        update_value = DictUtil.get_kwarg_values(kwargs=kwargs, update_value=False, pop=True)
+        update_value = DictUtil.get_dict_values(kwargs=kwargs, update_value=False, pop=True)
         if update_value:
             self.format_value(**kwargs)
         question_format = "{}) {}" if not self.use_bullets_for_enumeration else "{} {}"

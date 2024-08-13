@@ -1,6 +1,6 @@
 from typing import List, Optional, TypedDict
 
-from tgen.common.util.enum_util import EnumDict
+from common_resources.tools.util.enum_util import EnumDict
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
 from tgen.contradictions.contradictions_result import ContradictionsResult
 

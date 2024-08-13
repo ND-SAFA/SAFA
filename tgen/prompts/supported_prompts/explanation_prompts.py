@@ -1,10 +1,9 @@
 from tgen.common.constants.ranking_constants import CHANGE_IMPACT_TAG, DERIVATION_TAG, ENTITIES_TAG, FUNCTIONALITY_TAG, \
-    JUSTIFICATION_TAG, \
-    PROJECT_SUMMARY_HEADER, \
+    JUSTIFICATION_TAG, PROJECT_SUMMARY_HEADER, \
     RANKING_MAX_SCORE, \
     RANKING_MIN_SCORE, \
     SUB_SYSTEMS_TAG
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt

@@ -7,7 +7,7 @@ from tgen.clustering.steps.add_orphans_to_clusters import AddOrphansToClusters
 from tgen.clustering.steps.create_batches import CreateBatches
 from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
 from tgen.clustering.steps.create_embeddings import CreateEmbeddings
-from tgen.common.util.base_object import BaseObject
+from common_resources.tools.util.base_object import BaseObject
 from tgen.pipeline.abstract_pipeline import AbstractPipeline
 
 

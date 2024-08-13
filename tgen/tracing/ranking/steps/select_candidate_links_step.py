@@ -1,4 +1,4 @@
-from tgen.common.logging.logger_manager import logger
+from common_resources.tools.t_logging.logger_manager import logger
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.common.ranking_state import RankingState

@@ -3,8 +3,8 @@ from copy import deepcopy
 from unittest import mock
 from unittest.mock import patch
 
-from tgen.data.readers.definitions.structure_project_definition import StructureProjectDefinition
-from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from common_resources.data.readers.definitions.structure_project_definition import StructureProjectDefinition
+from common_resources.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.experiments.experiment import Experiment
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
 from tgen.testres.base_tests.base_experiment_test import BaseExperimentTest

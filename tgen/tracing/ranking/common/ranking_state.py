@@ -3,8 +3,8 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Union
 
 from tgen.common.objects.trace import Trace
-from tgen.common.util.enum_util import EnumDict
-from tgen.pipeline.state import State
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.state_management.state import State
 
 DEFAULT_EXPERIMENT_DIR = os.path.expanduser("~/desktop/safa/experiments/rankings")
 

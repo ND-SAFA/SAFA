@@ -4,20 +4,21 @@ from typing import Callable, List, Sized, Tuple, Type
 from unittest import TestCase
 
 import mock
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from common_resources.data.processing.cleaning.data_cleaner import DataCleaner
+from common_resources.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+from common_resources.tools.constants import anthropic_constants, environment_constants, open_ai_constants
 from datasets import set_caching_enabled
 from transformers import AutoModelForSequenceClassification
 from transformers.models.bert.configuration_bert import BertConfig
 from transformers.models.bert.tokenization_bert import BertTokenizer
 
-from tgen.common.constants import anthropic_constants, environment_constants, open_ai_constants
-from tgen.common.logging.logger_config import LoggerConfig
-from tgen.common.logging.logger_manager import LoggerManager
-from tgen.common.util.random_util import RandomUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
-from tgen.data.processing.cleaning.data_cleaner import DataCleaner
-from tgen.data.processing.cleaning.supported_data_cleaning_step import SupportedDataCleaningStep
+from tgen.common.constants import tgen_constants
+from common_resources.tools.t_logging.logger_config import LoggerConfig
+from common_resources.tools.t_logging.logger_manager import LoggerManager
+from common_resources.tools.util.random_util import RandomUtil
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
 
 
@@ -71,7 +72,7 @@ class BaseTest(TestCase):
 
     @staticmethod
     def remove_output_dir():
-        if environment_constants.DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
+        if tgen_constants.DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
             if os.path.isdir(TEST_OUTPUT_DIR):
                 shutil.rmtree(TEST_OUTPUT_DIR)
             else:

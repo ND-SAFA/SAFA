@@ -1,5 +1,5 @@
-from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.constants.symbol_constants import NEW_LINE
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt

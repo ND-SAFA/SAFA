@@ -2,14 +2,14 @@ import html
 import logging
 import os
 import re
-from typing import Any, Dict, List, Set, Union, Tuple
+from typing import Any, Dict, List, Set, Tuple, Union
 
 import numpy as np
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
 
-from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE
 from common_resources.llm.llm_responses import GenerationResponse, SupportedLLMResponses
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE
 from common_resources.tools.t_logging.logger_manager import logger
 from common_resources.tools.util.dict_util import DictUtil
 from common_resources.tools.util.file_util import FileUtil
@@ -58,7 +58,7 @@ class LLMResponseUtil:
         :param return_res_on_failure: Whether to return original response on failure.
         :return: Either a list of tags (if nested) or the content inside the tag (not nested)
         """
-        soup = BeautifulSoup(res)
+        soup = BeautifulSoup(res, features="lxml")
 
         try:
             assert tag_name in res, f"Missing expected tag {tag_name}"

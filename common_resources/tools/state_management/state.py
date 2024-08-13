@@ -2,10 +2,10 @@ import os
 from collections.abc import Set
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Union, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from common_resources.data.summarizer.summary import Summary
-from common_resources.tools.constants.symbol_constants import EMPTY_STRING, UNDERSCORE, DASH
+from common_resources.tools.constants.symbol_constants import DASH, EMPTY_STRING, UNDERSCORE
 from common_resources.tools.t_logging.logger_manager import logger
 from common_resources.tools.util.base_object import BaseObject
 from common_resources.tools.util.enum_util import EnumUtil
@@ -285,7 +285,7 @@ class State(BaseObject):
         :param step_num: The number of the step being run
         :return: The filename for the given step
         """
-        step = DASH.join(StrUtil.separate_joined_words(step)).lower()
+        step = DASH.join(StrUtil.separate_joined_words(step).split()).lower()
         if run_num > 1:
             step = f"{step}-{run_num}"
         filename = f"state-{step}"

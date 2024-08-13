@@ -1,4 +1,4 @@
-from typing import Any, Set, Optional, Type, Dict, List
+from typing import Any, Dict, List, Optional, Set, Type
 
 from common_resources.tools.util.param_specs import ParamSpecs
 from common_resources.tools.util.reflection_util import ReflectionUtil
@@ -19,6 +19,7 @@ def is_allowed_to_be_none(param_name: str, allowed_none: Optional[Set]) -> bool:
     if allowed_none is None:
         return False
     return param_name in allowed_none
+
 
 def default_mutable_type(expected_type: Type) -> Set | Dict | List | None:
     """

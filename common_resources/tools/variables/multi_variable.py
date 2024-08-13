@@ -5,6 +5,7 @@ from common_resources.tools.variables.variable import Variable
 
 class MultiVariable(Variable, list):
     SYMBOL = "*"
+    CONCAT = "+"
 
     def __init__(self, values: List[Variable]):
         """

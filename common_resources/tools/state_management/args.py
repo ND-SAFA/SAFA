@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from common_resources.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
 from common_resources.tools.constants.symbol_constants import EMPTY_STRING
 from common_resources.tools.util.base_object import BaseObject
 from common_resources.tools.util.dataclass_util import DataclassUtil
@@ -33,3 +34,12 @@ class Args(BaseObject):
         """
         self.dataset: PromptDataset = DataclassUtil.post_initialize_datasets(self.dataset,
                                                                              self.dataset_creator)
+
+    def update_llm_managers_with_state(self, state: "State") -> None:
+        """
+        Updates all the llm_managers to use the pipeline's state to save token counts
+        :param state: The pipeline state
+        :return: None
+        """
+
+        DataclassUtil.update_attr_of_type_with_vals(self, AbstractLLMManager, state=state)

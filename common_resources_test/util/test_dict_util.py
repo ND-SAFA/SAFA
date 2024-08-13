@@ -71,7 +71,7 @@ class TestDictUtil(TestCase):
         self.assertIn("2", joined)
         self.assertEqual(joined["2"], "what's up")
 
-    def test_get_kwarg_values(self):
+    def test_get_dict_values(self):
         kwargs = {"one": 1, "two": 2, "three": 3}
         values = DictUtil.get_dict_values(kwargs, pop=False, one=None, four=4)
         self.assertEqual(values[0], 1)

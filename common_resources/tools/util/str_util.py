@@ -315,3 +315,16 @@ class StrUtil:
         :return: The string without punctuation.
         """
         return EMPTY_STRING.join(StrUtil.word_replacement(list(input_string), {p: EMPTY_STRING for p in string.punctuation}))
+
+    @staticmethod
+    def contains_unknown_characters(input_string: str) -> bool:
+        """
+        Returns True if the string contains any non english/ unknown characters.
+        :param input_string: The string to check.
+        :return: True if the string contains any non english/ unknown characters.
+        """
+        try:
+            input_string.encode(encoding='utf-8').decode('ascii')
+            return False
+        except UnicodeDecodeError:
+            return True

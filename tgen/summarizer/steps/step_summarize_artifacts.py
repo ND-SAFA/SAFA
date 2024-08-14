@@ -1,9 +1,9 @@
 from trace import Trace
 from typing import Dict, List, Set, Tuple
 
-from tgen.common.util.dict_util import DictUtil
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.summarizer_args import SummarizerArgs

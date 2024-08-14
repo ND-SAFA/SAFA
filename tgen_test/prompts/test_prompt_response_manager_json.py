@@ -1,6 +1,6 @@
 import json
 
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.prompts.response_managers.abstract_response_manager import USE_ALL_TAGS
 from tgen.prompts.response_managers.json_response_manager import JSONResponseManager
 from tgen.testres.base_tests.base_test import BaseTest

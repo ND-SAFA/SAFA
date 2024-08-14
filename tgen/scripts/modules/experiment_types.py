@@ -1,4 +1,4 @@
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.experiments.ensemble_experiment import EnsembleExperiment
 from tgen.experiments.experiment import Experiment
 

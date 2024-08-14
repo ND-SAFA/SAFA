@@ -19,17 +19,17 @@ format_of_artifacts: As a [type of user], I want to [action or goal] so that [re
 generations2sources: null
 id_to_related_children: null
 new_artifact_dataset: null
-original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
-  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
-    ordered_steps: [ ]
-    steps: [ ]
+original_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
   data_export_path: null
   ensure_code_is_summarized: false
   project_file_id: null
-  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
-    overrides: { }
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
+    overrides: {}
     project_path: '[ROOT_PATH]/tgen/testres/data/state/original_dataset'
-    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
       _definition: null
       conversions: { }
       definition_reader: null
@@ -40,13 +40,13 @@ original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.Prom
   project_summary: null
   summarizer: null
   trace_dataset_creator: null
-project_summary: !!python/object/apply:tgen.summarizer.summary.Summary
+project_summary: !!python/object/apply:common_resources.data.summarizer.summary.Summary
   dictitems:
-    overview: !!python/object/apply:tgen.common.util.enum_util.EnumDict
+    overview: !!python/object/apply:common_resources.tools.util.enum_util.EnumDict
       dictitems:
         chunks:
-          - Here is a summary of the key technical details and design aspects of the
-            system based on the provided code
+        - Here is a summary of the key technical details and design aspects of the
+          system based on the provided code
         title: overview
 questions:
   - What are the main classes/functions in the code?
@@ -58,17 +58,17 @@ refined_generations2sources: { }
 seed2artifact_ids: null
 selected_artifacts_dataset: null
 selected_predictions: null
-source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
-  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
-    ordered_steps: [ ]
-    steps: [ ]
+source_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
   data_export_path: null
   ensure_code_is_summarized: false
   project_file_id: null
-  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
-    overrides: { }
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
+    overrides: {}
     project_path: '[ROOT_PATH]/tgen/testres/data/state/source_dataset'
-    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
       _definition: null
       conversions: { }
       definition_reader: null

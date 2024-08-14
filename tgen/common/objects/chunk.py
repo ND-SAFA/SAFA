@@ -1,7 +1,7 @@
 from typing import Optional
 
-from tgen.common.constants.deliminator_constants import UNDERSCORE
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.constants.symbol_constants import UNDERSCORE
+from common_resources.tools.util.str_util import StrUtil
 
 
 class Chunk:

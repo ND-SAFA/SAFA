@@ -2,16 +2,16 @@ import os
 import uuid
 from copy import deepcopy
 from os.path import dirname
+from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from typing import Any, Callable, Dict, Iterable, List, Tuple, Union
+from common_resources.tools.constants.environment_constants import DEFAULT_EMBEDDING_MODEL
 
 from tgen.clustering.methods.supported_clustering_methods import SupportedClusteringMethods
-from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
-from tgen.common.util.list_util import ListUtil
-from tgen.common.util.np_util import NpUtil
-from tgen.common.util.reflection_util import ParamScope, ReflectionUtil
+from common_resources.tools.util.list_util import ListUtil
+from common_resources.tools.util.np_util import NpUtil
+from common_resources.tools.util.reflection_util import ParamScope, ReflectionUtil
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 

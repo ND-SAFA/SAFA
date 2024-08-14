@@ -1,13 +1,14 @@
 from typing import List
 
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.llm.llm_task import LLMCompletionType
+
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
-from tgen.models.llm.llm_task import LLMCompletionType
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 

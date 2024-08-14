@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, Tuple
 
-from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.util.llm_response_util import LLMResponseUtil
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.prompts.response_managers.abstract_response_manager import AbstractResponseManager
 
 

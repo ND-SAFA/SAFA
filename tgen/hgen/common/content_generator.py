@@ -2,15 +2,16 @@ import math
 import uuid
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
-from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.constants.symbol_constants import COMMA, EMPTY_STRING, NEW_LINE
+
 from tgen.common.constants.hgen_constants import DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.math_util import MathUtil
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.math_util import MathUtil
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.common.special_doc_types import DocTypeConstraints
 from tgen.hgen.hgen_args import HGenArgs, PredictionStep

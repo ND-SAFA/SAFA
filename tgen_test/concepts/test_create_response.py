@@ -8,8 +8,8 @@ from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatchi
 from tgen.concepts.steps.entity_matching_step import EntityMatchingStep
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 
 
 class TestCreateResponse(BaseTest):

@@ -1,7 +1,7 @@
 from typing import Dict, List, Type
 
-from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from tgen.data.readers.entity.formats.csv_entity_format import CsvEntityFormat
+from common_resources.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
+from common_resources.data.readers.entity.formats.csv_entity_format import CsvEntityFormat
 from tgen_test.data.readers.entity.formats.abstract_entity_format_test import AbstractEntityFormatTest
 from tgen.testres.paths.test_format_paths import CSV_ENTITY_PATH
 from tgen.testres.testprojects.csv_test_project import CsvTestProject

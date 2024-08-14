@@ -1,12 +1,12 @@
 from typing import Dict, List
 
-from tgen.common.constants.deliminator_constants import DASH, EMPTY_STRING, NEW_LINE
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
-from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.constants.symbol_constants import DASH, EMPTY_STRING, NEW_LINE
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from common_resources.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState

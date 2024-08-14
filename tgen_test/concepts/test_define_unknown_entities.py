@@ -4,15 +4,15 @@ from unittest import TestCase
 from tgen_test.concepts.constants import ConceptData
 from tgen_test.concepts.test_entity_matching import TestEntityMatching
 from tgen_test.concepts.utils import create_concept_args, create_concept_state
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.concepts.steps.create_response_step import CreateResponseStep
 from tgen.concepts.steps.define_unknown_entities import DefineUnknownEntitiesStep
 from tgen.concepts.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from tgen.concepts.steps.entity_matching_step import EntityMatchingStep
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 
 
 class TestDefineUnknownEntities(BaseTest):

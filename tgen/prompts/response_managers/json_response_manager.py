@@ -2,8 +2,8 @@ import json
 from dataclasses import dataclass
 from typing import Any, Dict, List, Type, Tuple
 
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.json_util import JsonUtil
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.json_util import JsonUtil
 from tgen.prompts.response_managers.abstract_response_manager import AbstractResponseManager
 
 RESPONSE_FORMAT = "You should respond using the following JSON format:\n{}"

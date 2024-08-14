@@ -1,12 +1,13 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Set, Union
 
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.state_management.state import State
+
 from tgen.clustering.base.cluster_type import ClusterIdType
 from tgen.common.objects.trace import Trace
 from tgen.common.util.clustering_util import ClusteringUtil
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.pipeline.state import State
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 

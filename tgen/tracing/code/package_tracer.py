@@ -1,14 +1,15 @@
 import os
 from typing import Dict, Iterable, List, Tuple
 
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
+
 from tgen.common.constants.code_tracer_constants import DEFAULT_PACKAGE_ARTIFACT_TYPE, PACKAGE_EXPLANATION
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.logging.logger_manager import logger
+from common_resources.tools.t_logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
-from tgen.common.util.file_util import FileUtil
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.util.file_util import FileUtil
 
 
 class PackageTracer:

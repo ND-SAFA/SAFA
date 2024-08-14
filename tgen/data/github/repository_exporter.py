@@ -2,8 +2,11 @@ import os
 import re
 from typing import Dict, Union
 
-from tgen.common.constants.code_extensions import ALLOWED_CODE_EXTENSIONS
-from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE
+from common_resources.data.processing.cleaning.data_cleaner import DataCleaner
+from common_resources.data.processing.cleaning.regex_replacement_step import RegexReplacementStep
+from common_resources.tools.constants.code_extensions import ALLOWED_CODE_EXTENSIONS
+from common_resources.tools.constants.symbol_constants import NEW_LINE, SPACE
+
 from tgen.data.github.gartifacts.gartifact_set import GArtifactSet
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
 from tgen.data.github.gartifacts.gcode_file import GCodeFile
@@ -17,8 +20,6 @@ from tgen.data.github.github_constants import CODE2CODE_ARTIFACT_FILE, CODE2CODE
 from tgen.data.github.gtraces.glink import GLink
 from tgen.data.github.gtraces.glink_processor import GLinkProcessor
 from tgen.data.github.gtraces.glink_store import GLinkStore
-from tgen.data.processing.cleaning.data_cleaner import DataCleaner
-from tgen.data.processing.cleaning.regex_replacement_step import RegexReplacementStep
 
 GENERIC_COMMIT_HEADERS = ["Merge pull request #.*from.*",
                           "Revert.*of.*",

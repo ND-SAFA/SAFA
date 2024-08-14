@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from typing import List, Dict, Any
 
 from tgen.clustering.base.cluster_type import ClusterMapType
-from tgen.common.util.override import overrides
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.pipeline.state import State
+from common_resources.tools.util.override import overrides
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.state_management.state import State
 from tgen.summarizer.summary import Summary
 
 

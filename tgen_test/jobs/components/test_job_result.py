@@ -1,7 +1,7 @@
 import json
 import uuid
 
-from tgen.common.util.status import Status
+from common_resources.tools.util.status import Status
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.base_tests.base_test import BaseTest
 

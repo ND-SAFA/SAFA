@@ -1,5 +1,5 @@
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
-from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from common_resources.data.readers.abstract_project_reader import AbstractProjectReader
+from common_resources.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.testres.paths.project_paths import SAFA_PROJECT_PATH
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 

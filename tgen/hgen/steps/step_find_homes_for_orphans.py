@@ -1,9 +1,9 @@
 from typing import Any, Dict, List, Set
 
 from tgen.common.objects.trace import Trace
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep

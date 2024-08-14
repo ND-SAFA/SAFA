@@ -10,11 +10,11 @@ from tgen_test.jobs.health_check_jobs.health_check_constants import ARTIFACT_CON
     QUERY_ID, UNDEFINED_CONCEPT
 from tgen.chat.message_meta import MessageMeta
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.supported_prompts.contradiction_prompts import create_contradiction_response
 from tgen.testres.base_tests.base_test import BaseTest
 

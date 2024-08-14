@@ -9,8 +9,8 @@ from tgen.jobs.components.job_result import JobResult
 from tgen.jobs.health_check_jobs.health_check_job import HealthCheckJob
 from tgen.jobs.health_check_jobs.health_check_results import HealthCheckResults
 from tgen.testres.base_tests.base_job_test import BaseJobTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 
 
 class TestHealthCheckJob(BaseJobTest):

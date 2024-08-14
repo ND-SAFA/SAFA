@@ -1,8 +1,8 @@
 from typing import Any, Dict
 
-from tgen.common.util.file_util import FileUtil
-from tgen.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
-from tgen.data.exporters.safa_exporter import SafaExporter
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.data.exporters.prompt_dataset_exporter import PromptDatasetExporter
+from common_resources.data.exporters.safa_exporter import SafaExporter
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.summary_jobs.summary_response import SummaryResponse

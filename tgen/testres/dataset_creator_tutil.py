@@ -1,9 +1,9 @@
 from typing import List
 
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.dataset_role import DatasetRole
 from tgen.testres.object_creator import ObjectCreator
-from tgen.variables.typed_definition_variable import TypedDefinitionVariable
+from common_resources.tools.variables.typed_definition_variable import TypedDefinitionVariable
 
 EVAL_CREATOR_PARAM = "eval_dataset_creator"
 VAL_CREATOR_PARAM = "val_dataset_creator"

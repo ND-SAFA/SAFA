@@ -1,6 +1,7 @@
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from common_resources.tools.constants.symbol_constants import NEW_LINE
+
 from tgen.common.constants.project_summary_constants import PS_NOTES_TAG
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.prompts.conditional_prompt import ConditionalPrompt
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.prompt import Prompt

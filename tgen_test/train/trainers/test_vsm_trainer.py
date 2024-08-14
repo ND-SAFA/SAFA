@@ -3,7 +3,7 @@ from typing import Dict
 
 from tgen.core.trace_output.stage_eval import Metrics
 from tgen.core.trainers.vsm_trainer import VSMTrainer
-from tgen.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.job_result import JobResult
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
 from tgen.testres.dataset_creator_tutil import DatasetCreatorTUtil

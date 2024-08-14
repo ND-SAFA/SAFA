@@ -2,12 +2,12 @@ from typing import List
 from unittest import TestCase
 
 from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest, DEFAULT_PARENT_IDS, DEFAULT_CHILDREN_IDS
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from common_resources.tools.constants.symbol_constants import NEW_LINE
 from tgen.common.constants.ranking_constants import PROJECT_SUMMARY_HEADER
-from tgen.common.util.enum_util import EnumDict
+from common_resources.tools.util.enum_util import EnumDict
 from tgen.summarizer.summary import Summary
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.steps.complete_ranking_prompts_step import CompleteRankingPromptsStep

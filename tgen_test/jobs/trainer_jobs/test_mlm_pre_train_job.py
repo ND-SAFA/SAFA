@@ -1,4 +1,5 @@
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
+
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.components.args.job_args import JobArgs

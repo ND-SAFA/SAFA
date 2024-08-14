@@ -1,5 +1,5 @@
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
-from tgen.data.readers.repository_project_reader import RepositoryProjectReader
+from common_resources.data.readers.abstract_project_reader import AbstractProjectReader
+from common_resources.data.readers.repository_project_reader import RepositoryProjectReader
 from tgen.testres.paths.project_paths import REPO_ONE_PROJECT_PATH
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 

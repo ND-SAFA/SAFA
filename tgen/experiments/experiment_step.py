@@ -3,21 +3,22 @@ import os
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Union
 
-from tgen.common.constants.deliminator_constants import UNDERSCORE
+from common_resources.tools.constants.symbol_constants import UNDERSCORE
+
 from tgen.common.constants.experiment_constants import EXIT_ON_FAILED_JOB, OUTPUT_FILENAME, RUN_ASYNC
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.json_util import JsonUtil
-from tgen.common.util.list_util import ListUtil
-from tgen.common.util.status import Status
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.json_util import JsonUtil
+from common_resources.tools.util.list_util import ListUtil
+from common_resources.tools.util.status import Status
 from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
-from tgen.variables.experimental_variable import ExperimentalVariable
+from common_resources.tools.variables.experimental_variable import ExperimentalVariable
 
 
 class ExperimentStep(BaseObject):

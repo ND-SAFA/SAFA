@@ -2,22 +2,22 @@ import os
 import re
 from typing import Union
 
-from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE, TAB, EMPTY_STRING
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.constants.symbol_constants import NEW_LINE, SPACE, TAB, EMPTY_STRING
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.prompt_keys import PromptKeys
+from common_resources.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from tgen.summarizer.artifact.artifact_summary_types import ArtifactSummaryTypes
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.summarizer.steps.step_summarize_artifacts import StepSummarizeArtifacts
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_DATA_DIR
 
 

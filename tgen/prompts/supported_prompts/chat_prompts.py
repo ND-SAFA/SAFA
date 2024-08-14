@@ -1,5 +1,5 @@
-from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.constants.symbol_constants import NEW_LINE
+from common_resources.tools.util.str_util import StrUtil
 from tgen.prompts.prompt import Prompt
 
 ALL_TYPES_RESPONSE = "all"

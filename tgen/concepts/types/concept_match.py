@@ -1,4 +1,4 @@
-from tgen.common.util.typed_enum_dict import TypedEnumDict
+from common_resources.tools.util.typed_enum_dict import TypedEnumDict
 
 
 class ConceptMatch(TypedEnumDict):

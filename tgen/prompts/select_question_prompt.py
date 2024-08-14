@@ -1,9 +1,9 @@
 from typing import Any, Dict, List, Union
 
-from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.override import overrides
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.constants.symbol_constants import COMMA, EMPTY_STRING, NEW_LINE
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.override import overrides
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.question_prompt import QuestionPrompt
 from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager

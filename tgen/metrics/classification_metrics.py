@@ -3,8 +3,8 @@ from typing import Dict
 import datasets
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 
-from tgen.common.constants.metric_constants import THRESHOLD_DEFAULT
-from tgen.data.tdatasets.trace_matrix import TraceMatrix
+from common_resources.tools.constants.metric_constants import THRESHOLD_DEFAULT
+from common_resources.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """

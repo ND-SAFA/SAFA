@@ -1,14 +1,14 @@
 import mock
 
-from tgen.common.constants.deliminator_constants import SPACE
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.constants.symbol_constants import SPACE
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys, ArtifactKeys, LayerKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState
@@ -18,8 +18,8 @@ from tgen.delta.steps.overview_change_summary_step import OverviewChangeSummaryS
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.summarizer.summary import Summary
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 
 added_file = "new_file.py"
 modified_file = "existing_file.py"

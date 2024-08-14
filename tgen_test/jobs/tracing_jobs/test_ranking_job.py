@@ -1,21 +1,22 @@
 from unittest import mock
 from unittest.mock import MagicMock
 
-from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.common.constants.ranking_constants import DEFAULT_TEST_EMBEDDING_MODEL
-from tgen.common.util.status import Status
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.constants.model_constants import DEFAULT_TEST_EMBEDDING_MODEL
+
+from common_resources.tools.util.status import Status
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.tracing_jobs.ranking_job import RankingJob
 from tgen.summarizer.project.project_summarizer import ProjectSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
+from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 
 
 class TestRankingJob(BaseTest):

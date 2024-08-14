@@ -4,19 +4,20 @@ from unittest.mock import MagicMock
 import mock
 import numpy as np
 import pandas as pd
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.exporters.safa_exporter import SafaExporter
+from common_resources.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
+from common_resources.data.readers.dataframe_project_reader import DataFrameProjectReader
+from common_resources.data.readers.structured_project_reader import StructuredProjectReader
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.mock_libraries import mock_libraries
+from common_resources.mocking.test_response_manager import TestAIManager
+from common_resources.tools.util.dataframe_util import DataFrameUtil
+from common_resources.tools.util.file_util import FileUtil
 
-from tgen_test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args
-from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
-from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.file_util import FileUtil
 from tgen.common.util.pipeline_util import PipelineUtil
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.exporters.safa_exporter import SafaExporter
-from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
-from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
-from tgen.data.readers.structured_project_reader import StructuredProjectReader
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
 from tgen.hgen.steps.step_create_clusters import CreateClustersStep
 from tgen.hgen.steps.step_create_hgen_dataset import CreateHGenDatasetStep
@@ -32,10 +33,9 @@ from tgen.hgen.steps.step_refine_generations import RefineGenerationsStep
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.mock_libraries import mock_libraries
-from tgen.testres.mocking.test_response_manager import TestAIManager
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
+from tgen_test.hgen.hgen_test_utils import HGenTestConstants, get_generated_artifacts_response, get_name_responses, get_test_hgen_args
+from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 
 
 class TestHierarchyGenerator(BaseTest):

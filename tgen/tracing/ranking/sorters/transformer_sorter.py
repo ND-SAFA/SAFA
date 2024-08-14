@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from tgen.common.util.list_util import ListUtil
+from common_resources.tools.util.list_util import ListUtil
 from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.sorters.i_sorter import iSorter

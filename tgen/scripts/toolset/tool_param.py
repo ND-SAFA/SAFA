@@ -1,9 +1,10 @@
 import inspect
 from typing import Any
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from common_resources.tools.cli.inquirer_selector import inquirer_value
+from common_resources.tools.constants.symbol_constants import NEW_LINE
+
 from tgen.scripts.constants import MISSING_PARAM_ERROR, PARAM_DOCSTRING_QUERY
-from tgen.scripts.toolset.inquirer_selector import inquirer_value
 
 
 class ToolParam:

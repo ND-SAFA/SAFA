@@ -4,8 +4,8 @@ import datasets
 import numpy as np
 import pandas as pd
 
-from tgen.common.util.dict_util import DictUtil
-from tgen.data.tdatasets.trace_matrix import TraceMatrix
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.data.tdatasets.trace_matrix import TraceMatrix
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 
 _DESCRIPTION = """

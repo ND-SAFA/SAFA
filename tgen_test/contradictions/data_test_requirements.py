@@ -1,12 +1,12 @@
-from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.constants.symbol_constants import NEW_LINE
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.contradictions.requirement import Requirement, RequirementConstituent
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys, LayerKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.prompts.supported_prompts.contradiction_prompts import CONSTITUENT2TAG
 
 R1 = Requirement(id="1",

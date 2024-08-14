@@ -1,5 +1,5 @@
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.data.processing.cleaning.manual_replace_words_step import ManualReplaceWordsStep
+from common_resources.data.processing.cleaning.manual_replace_words_step import ManualReplaceWordsStep
 
 
 class TestReplaceWordsStep(BaseTest):

@@ -4,17 +4,17 @@ completed_steps:
   Step2: 1
 export_dir: '[ROOT_PATH]/tgen/testres/output'
 final_dataset: null
-original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
-  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+original_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
     steps: []
   data_export_path: null
   ensure_code_is_summarized: false
   project_file_id: null
-  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
     overrides: {}
     project_path: '[ROOT_PATH]/tgen/testres/data/state/original_dataset'
-    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
       _definition: null
       conversions: {}
       definition_reader: null

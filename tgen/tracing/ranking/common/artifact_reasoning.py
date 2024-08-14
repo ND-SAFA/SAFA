@@ -1,13 +1,14 @@
 from typing import Any, Dict, Optional, Tuple
 
-from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, PERIOD, SPACE
-from tgen.common.constants.ranking_constants import JUSTIFICATION_TAG, RANKING_ARTIFACT_TAG, RANKING_ID_TAG, RANKING_MAX_SCORE, \
+from common_resources.tools.constants.symbol_constants import COMMA, EMPTY_STRING, NEW_LINE, PERIOD, SPACE
+from tgen.common.constants.ranking_constants import JUSTIFICATION_TAG, RANKING_ARTIFACT_TAG, RANKING_ID_TAG, \
+    RANKING_MAX_SCORE, \
     RANKING_MIN_SCORE, RANKING_SCORE_TAG
-from tgen.common.util.json_util import JsonUtil
-from tgen.common.util.math_util import MathUtil
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.str_util import StrUtil
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.util.json_util import JsonUtil
+from common_resources.tools.util.math_util import MathUtil
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.tools.util.str_util import StrUtil
+from common_resources.data.keys.structure_keys import ArtifactKeys
 
 
 class ArtifactReasoning:

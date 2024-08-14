@@ -1,4 +1,4 @@
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from common_resources.tools.constants.symbol_constants import NEW_LINE
 from tgen.prompts.select_question_prompt import SelectQuestionPrompt
 from tgen.testres.base_tests.base_test import BaseTest
 

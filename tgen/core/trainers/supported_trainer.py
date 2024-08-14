@@ -1,4 +1,4 @@
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.st_embedding_trainer import STEmbeddingTrainer

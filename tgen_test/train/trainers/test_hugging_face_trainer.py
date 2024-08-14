@@ -3,12 +3,12 @@ from copy import deepcopy
 from typing import Dict
 
 import mock
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
 
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trace_output.stage_eval import Metrics
 from tgen.core.trace_output.trace_prediction_output import TracePredictionOutput
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.job_result import JobResult
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.model_manager import ModelManager

@@ -1,8 +1,9 @@
 from collections import OrderedDict
 from typing import Dict, List
 
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+
 from tgen.clustering.base.cluster_type import ClusterIdType, ClusterMapType
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
 
 
 class ClusteringUtil:

@@ -1,6 +1,6 @@
-from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.keys.structure_keys import LayerKeys
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
+from common_resources.data.keys.structure_keys import LayerKeys
 from tgen.testres.base_tests.base_test import BaseTest
 
 

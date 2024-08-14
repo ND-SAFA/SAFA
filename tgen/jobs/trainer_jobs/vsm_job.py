@@ -1,11 +1,11 @@
 from typing import List, Optional
 
-from tgen.common.util.override import overrides
+from common_resources.tools.util.override import overrides
 from tgen.core.trace_output.trace_train_output import TraceTrainOutput
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.core.trainers.vsm_trainer import VSMTrainer
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.abstract_trainer_job import AbstractTrainerJob
 from tgen.metrics.supported_trace_metric import SupportedTraceMetric

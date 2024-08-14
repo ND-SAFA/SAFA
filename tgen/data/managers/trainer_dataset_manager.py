@@ -5,24 +5,24 @@ from typing import Dict, List, Optional, Union
 import pandas as pd
 from datasets import disable_caching
 
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.enum_util import EnumDict, EnumUtil
-from tgen.common.util.override import overrides
-from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from tgen.data.creators.split_dataset_creator import SplitDatasetCreator
-from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
-from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
-from tgen.data.keys.csv_keys import CSVKeys
-from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
-from tgen.data.splitting.dataset_splitter import DatasetSplitter
-from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.idataset import iDataset
-from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.enum_util import EnumDict, EnumUtil
+from common_resources.tools.util.override import overrides
+from common_resources.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from common_resources.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from common_resources.data.creators.split_dataset_creator import SplitDatasetCreator
+from common_resources.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
+from common_resources.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
+from common_resources.data.keys.csv_keys import CSVKeys
+from common_resources.data.processing.augmentation.data_augmenter import DataAugmenter
+from common_resources.data.splitting.dataset_splitter import DatasetSplitter
+from common_resources.data.splitting.supported_split_strategy import SupportedSplitStrategy
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.idataset import iDataset
+from common_resources.data.tdatasets.pre_train_dataset import PreTrainDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.models.model_manager import ModelManager
-from tgen.variables.undetermined_variable import UndeterminedVariable
+from common_resources.tools.variables.undetermined_variable import UndeterminedVariable
 
 disable_caching()
 

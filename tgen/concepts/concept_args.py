@@ -1,15 +1,16 @@
 from dataclasses import dataclass, field
 from typing import List
 
-from tgen.common.constants.model_constants import get_best_default_llm_manager_long_context
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.tools.constants.default_model_managers import get_best_default_llm_manager_long_context
+from common_resources.tools.state_management.args import Args
+from common_resources.tools.util.dataclass_util import required_field
+
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.dataclass_util import required_field
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.pipeline.pipeline_args import PipelineArgs
 
 
 @dataclass
-class ConceptArgs(PipelineArgs):
+class ConceptArgs(Args):
     """
     DataFrame containing only concepts to match.
     """

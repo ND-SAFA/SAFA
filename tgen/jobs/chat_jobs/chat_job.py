@@ -9,7 +9,7 @@ from tgen.chat.chat_graph import ChatGraph
 from tgen.chat.message_meta import MessageMeta
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
-from tgen.models.llm.abstract_llm_manager import PromptRoles, Message
+from common_resources.llm.abstract_llm_manager import PromptRoles, Message
 
 
 class ChatJob(AbstractJob):

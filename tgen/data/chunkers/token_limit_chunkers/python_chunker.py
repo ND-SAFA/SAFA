@@ -4,8 +4,9 @@ import re
 from copy import deepcopy
 from typing import List, Type, Union
 
-from tgen.common.constants.deliminator_constants import TAB
-from tgen.common.util.override import overrides
+from common_resources.tools.constants.symbol_constants import TAB
+
+from common_resources.tools.util.override import overrides
 from tgen.data.chunkers.token_limit_chunkers.abstract_code_chunker import AbstractCodeChunker
 from tgen.data.chunkers.token_limit_chunkers.chunked_node import ChunkedNode
 

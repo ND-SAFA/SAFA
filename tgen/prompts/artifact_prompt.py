@@ -1,13 +1,14 @@
 from enum import Enum, auto
 from typing import Dict, List, Optional, Union
 
-from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_PROMPT
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, TAB
+from common_resources.data.keys.structure_keys import StructuredKeys, TraceKeys
+from common_resources.tools.constants.model_constants import USE_NL_SUMMARY_PROMPT
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE, TAB
+
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.override import overrides
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.override import overrides
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.response_managers.abstract_response_manager import AbstractResponseManager

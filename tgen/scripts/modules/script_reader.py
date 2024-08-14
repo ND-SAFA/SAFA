@@ -6,9 +6,9 @@ import pandas as pd
 
 from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
 from tgen.common.constants.script_constants import DISPLAY_METRICS, EXPERIMENTAL_VARS_IGNORE, METRIC_NAMES
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.json_util import JsonUtil
-from tgen.common.logging.logger_manager import logger
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.json_util import JsonUtil
 from tgen.jobs.components.job_result import JobResult
 
 pd.set_option('display.max_colwidth', None)

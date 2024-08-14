@@ -1,9 +1,9 @@
 import time
 
 from anthropic import APIConnectionError, InternalServerError, RateLimitError
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.t_threading.threading_state import MultiThreadState
 
-from tgen.common.logging.logger_manager import logger
-from tgen.common.threading.threading_state import MultiThreadState
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_builder import PromptBuilder
 
@@ -54,8 +54,8 @@ def _is_anthropic_online(state: MultiThreadState) -> bool:
     :return: Whether anthropic is currently online.
     """
     try:
-        from tgen.models.llm.anthropic_manager import AnthropicManager
         from tgen.core.trainers.llm_trainer import LLMTrainer
+        from common_resources.llm.anthropic_manager import AnthropicManager
         manager = AnthropicManager()
         builders = [PromptBuilder([Prompt("Hi, what is your name?")])]
         response = LLMTrainer.predict_from_prompts(llm_manager=manager, prompt_builders=builders)

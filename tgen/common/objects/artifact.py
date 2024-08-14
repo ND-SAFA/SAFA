@@ -1,12 +1,12 @@
 from typing import Optional, List
 
-from tgen.common.constants.deliminator_constants import UNDERSCORE
+from common_resources.tools.constants.symbol_constants import UNDERSCORE
 from tgen.common.objects.chunk import Chunk
-from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.typed_enum_dict import TypedEnumDict
-from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys
+from common_resources.tools.util.dataframe_util import DataFrameUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.typed_enum_dict import TypedEnumDict
+from common_resources.data.keys.structure_keys import ArtifactKeys, StructuredKeys
 
 
 class Artifact(TypedEnumDict, keys=ArtifactKeys):

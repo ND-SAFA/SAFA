@@ -1,7 +1,7 @@
 from typing import List, Optional
 
-from tgen.common.constants.deliminator_constants import COMMA
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.constants.symbol_constants import COMMA
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.contradictions.common_choices import CommonChoices
 from tgen.contradictions.requirement import RequirementConstituent
 from tgen.prompts.prompt import Prompt

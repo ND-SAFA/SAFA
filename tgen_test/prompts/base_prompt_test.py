@@ -1,4 +1,4 @@
-from tgen.data.keys.prompt_keys import PromptKeys
+from common_resources.data.keys.prompt_keys import PromptKeys
 from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from tgen.testres.base_tests.base_test import BaseTest
 

@@ -1,10 +1,12 @@
 from copy import deepcopy
 from typing import Dict, List
 
-from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
+from common_resources.data.keys.structure_keys import TraceKeys
+from common_resources.tools.constants.model_constants import USE_NL_SUMMARY_EMBEDDINGS
+from common_resources.tools.util.enum_util import EnumDict
+
 from tgen.common.constants.ranking_constants import PRE_SORTED_SCORE
-from tgen.common.util.enum_util import EnumDict
-from tgen.data.keys.structure_keys import TraceKeys
+from tgen.common.util.artifact_df_util import chunk_artifact_df
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
@@ -25,7 +27,8 @@ class SortChildrenStep(AbstractPipelineStep[RankingArgs, RankingState]):
         """
         children_ids = deepcopy(args.children_ids)
         if args.use_chunks:
-            args.dataset.artifact_df.chunk()
+            chunk_artifact_df(args.dataset.artifact_df)
+            args.dataset.artifact_df.chunk_artifact_df()
             chunk_ids = list(args.dataset.artifact_df.get_chunk_map(orig_artifact_ids=set(args.children_ids)).keys())
             children_ids += chunk_ids
         state.artifact_map = args.dataset.artifact_df.to_map(use_code_summary_only=not USE_NL_SUMMARY_EMBEDDINGS,

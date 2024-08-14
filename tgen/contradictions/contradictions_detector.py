@@ -2,19 +2,19 @@ from typing import Dict, List, Tuple
 
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.contradictions.contradictions_result import ContradictionsResult
 from tgen.core.trainers.llm_trainer import LLMTrainer
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys, TraceRelationshipType
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.prompt_keys import PromptKeys
+from common_resources.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys, TraceRelationshipType
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.llm_prompt_build_args import LLMPromptBuildArgs

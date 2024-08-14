@@ -3,9 +3,9 @@ from typing import Any, Dict, List, Tuple
 
 import wandb
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.logging.logger_manager import logger
-from tgen.data.tdatasets.dataset_role import DatasetRole
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.data.tdatasets.dataset_role import DatasetRole
 
 GROUP_EXCLUDE = ["random_seed"]
 ARGS_PARAMS = ["num_train_epochs",

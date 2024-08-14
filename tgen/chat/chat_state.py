@@ -2,13 +2,14 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import List, Set
 
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.prompt_keys import PromptKeys
+from common_resources.tools.util.dataclass_util import required_field
+from common_resources.tools.util.pythonisms_util import default_mutable
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager, CONTENT_KEY, Message, PromptRoles
+
 from tgen.chat.message_meta import MessageMeta
-from tgen.common.util.dataclass_util import required_field
-from tgen.common.util.pythonisms_util import default_mutable
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager, PromptRoles, Message, CONTENT_KEY
-from tgen.pipeline.state import State
+from common_resources.tools.state_management.state import State
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.prompt_builder import PromptBuilder

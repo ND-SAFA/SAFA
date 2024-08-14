@@ -1,10 +1,10 @@
 from typing import Dict, List
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from common_resources.tools.constants.symbol_constants import NEW_LINE
 from tgen.common.constants.ranking_constants import RANKING_PARENT_SUMMARY_TAG, RANKING_ARTIFACT_TAG, RANKING_ID_TAG, \
     RANKING_SCORE_TAG
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.prompts.questionnaire_prompt import QuestionnairePrompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.summarizer.summary import Summary

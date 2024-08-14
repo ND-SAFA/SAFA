@@ -6,8 +6,8 @@ from tgen_test.concepts.test_entity_matching import TestEntityMatching
 from tgen_test.concepts.utils import create_concept_args
 from tgen.concepts.concept_pipeline import ConceptPipeline
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 
 
 class TestConceptPipeline(BaseTest):

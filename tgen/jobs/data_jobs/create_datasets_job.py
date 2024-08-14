@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
+from common_resources.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs

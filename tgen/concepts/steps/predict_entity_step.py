@@ -1,17 +1,18 @@
 from typing import Dict, List, Set
 
 import stanza
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, F_SLASH, SPACE
+from common_resources.tools.util.str_util import StrUtil
 
 from tgen.common.constants.concept_pipeline_constants import ENTITY_NAME_TAG, ENTITY_TAG
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH, SPACE
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.str_util import StrUtil
+from tgen.common.util.word_util import remove_common_words
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.core.trainers.llm_trainer import LLMTrainer
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
@@ -125,5 +126,5 @@ class PredictEntityStep(AbstractPipelineStep):
         """
         processed_entity = entity.replace(F_SLASH, SPACE)
         processed_entity = StrUtil.remove_stop_words(processed_entity)
-        processed_entity = StrUtil.remove_common_words(processed_entity)
+        processed_entity = remove_common_words(processed_entity)
         return processed_entity

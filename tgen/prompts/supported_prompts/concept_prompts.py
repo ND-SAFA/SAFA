@@ -1,5 +1,6 @@
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
+
 from tgen.common.constants.concept_pipeline_constants import ENTITY_NAME_TAG, ENTITY_TAG
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.response_managers.xml_response_manager import XMLResponseManager

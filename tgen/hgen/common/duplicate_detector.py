@@ -1,20 +1,21 @@
 from enum import Enum
+from typing import Dict, List, Set, Tuple
 
 import numpy as np
-from typing import Dict, List, Set, Tuple
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.constants.symbol_constants import DASH
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.np_util import NpUtil
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType
 from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.clustering_pipeline import ClusteringPipeline
-from tgen.common.constants.deliminator_constants import DASH
-from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_CLUSTER_MIN_SIM_THRESHOLD, DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.np_util import NpUtil
+from tgen.common.constants.hgen_constants import DEFAULT_DUPLICATE_CLUSTER_MIN_SIM_THRESHOLD, \
+    DEFAULT_DUPLICATE_SIMILARITY_THRESHOLD
 from tgen.common.util.pipeline_util import nested_pipeline
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_types import ArtifactPair, CountMap, MatrixIndex
 from tgen.hgen.hgen_state import HGenState
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager

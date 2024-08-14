@@ -3,11 +3,11 @@ from typing import List, Tuple
 from tgen_test.contradictions.data_test_requirements import EXPECTED_CONTRADICTIONS, get_contradictions_dataset
 from tgen.contradictions.contradictions_args import ContradictionsArgs
 from tgen.contradictions.contradictions_detector import ContradictionsDetector
-from tgen.data.keys.structure_keys import TraceKeys, TraceRelationshipType
+from common_resources.data.keys.structure_keys import TraceKeys, TraceRelationshipType
 from tgen.prompts.supported_prompts.contradiction_prompts import create_contradiction_response
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 
 
 class TestContradictionsDetector(BaseTest):

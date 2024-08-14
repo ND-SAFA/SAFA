@@ -1,13 +1,14 @@
 from collections import Counter
 from typing import Dict, List, Set, Tuple
 
-from tgen.common.constants.artifact_summary_constants import USE_NL_SUMMARY_EMBEDDINGS
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.constants.model_constants import USE_NL_SUMMARY_EMBEDDINGS
+
 from tgen.common.constants.hgen_constants import FIRST_PASS_LINK_THRESHOLD
 from tgen.common.objects.trace import Trace
-from tgen.common.util.dict_util import DictUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.util.dict_util import DictUtil
 from tgen.hgen.common.duplicate_detector import DuplicateDetector, DuplicateType
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState

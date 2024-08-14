@@ -6,9 +6,9 @@ from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
 
 import bs4
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.str_util import StrUtil
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.str_util import StrUtil
 
 RESPONSE_FORMAT = "Enclose your answer inside of {}"
 USE_ALL_TAGS = str(uuid.uuid4())

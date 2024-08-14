@@ -4,11 +4,11 @@ from typing import Dict, Generic, List, Tuple, Type, TypeVar
 
 import pandas as pd
 
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.file_util import FileUtil
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
 from tgen.data.github.gartifacts.supported_gartifacts import SupportedGArtifacts
-from tgen.common.util.file_util import FileUtil
-from tgen.common.logging.logger_manager import logger
 
 T = TypeVar('T', bound="AbstractArtifact")
 

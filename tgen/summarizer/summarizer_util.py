@@ -1,8 +1,8 @@
 from typing import Any, Dict, Set
 
 from tgen.common.constants.project_summary_constants import MAX_NL_SIZE_BEFORE_SUMMARIZATION
-from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.common.util.reflection_util import ReflectionUtil
+from common_resources.tools.util.dataclass_util import DataclassUtil
+from common_resources.tools.util.reflection_util import ReflectionUtil
 from tgen.models.tokens.token_calculator import TokenCalculator
 
 

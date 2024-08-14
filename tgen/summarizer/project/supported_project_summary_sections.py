@@ -1,5 +1,5 @@
-from tgen.common.constants.project_summary_constants import PS_OVERVIEW_TITLE, PS_FEATURE_TITLE, \
-    PS_ENTITIES_TITLE, PS_SUBSYSTEM_TITLE, PS_DATA_FLOW_TITLE
+from tgen.common.constants.project_summary_constants import PS_DATA_FLOW_TITLE, PS_ENTITIES_TITLE, PS_FEATURE_TITLE, PS_OVERVIEW_TITLE, \
+    PS_SUBSYSTEM_TITLE
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 
 PROJECT_SUMMARY_MAP = {

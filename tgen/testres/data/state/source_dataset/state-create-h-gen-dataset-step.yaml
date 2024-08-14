@@ -54,30 +54,30 @@ description_of_artifact: A User story is a concise, informal description of a so
   collaboration and communication between the development team and stakeholders, rather
   than serving as a detailed technical specification.
 export_dir: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230
-final_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
-  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+final_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
     steps: []
   data_export_path: null
   project_file_id: null
   project_reader: null
   summarizer: null
-  trace_dataset_creator: !!python/object:tgen.data.creators.trace_dataset_creator.TraceDatasetCreator
+  trace_dataset_creator: !!python/object:common_resources.data.creators.trace_dataset_creator.TraceDatasetCreator
     allowed_missing_sources: -1
     allowed_missing_targets: -1
     allowed_orphans: -1
     artifact_df: null
-    data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+    data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
       ordered_steps: []
       steps: []
     layer_mapping_df: null
     linked_artifact_ids: null
     orphan_artifact_ids: null
-    project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+    project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
       _AbstractProjectReader__processed_project_path: true
       _definition: null
       conversions: {}
-      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      definition_reader: !!python/object:common_resources.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
       overrides: {}
       project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/final_dataset
       summarizer: null
@@ -87,21 +87,21 @@ format_of_artifacts: As a [type of user], I want to [action or goal] so that [re
   or benefit].
 generations2sources: *id001
 n_generations: 1
-original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
-  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+original_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
     steps: []
   data_export_path: null
   project_file_id: null
-  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
     _AbstractProjectReader__processed_project_path: false
     overrides: {}
     project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/original_dataset
-    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
       _AbstractProjectReader__processed_project_path: true
       _definition: null
       conversions: {}
-      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      definition_reader: !!python/object:common_resources.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
       overrides: {}
       project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/original_dataset
       summarizer: null
@@ -120,21 +120,21 @@ questions:
 - What algorithms or business logic can be inferred from the code?
 - What user needs might the code address based on its capabilities?
 refined_content: *id001
-source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
-  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+source_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
     steps: []
   data_export_path: null
   project_file_id: null
-  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
     _AbstractProjectReader__processed_project_path: false
     overrides: {}
     project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/source_dataset
-    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
       _AbstractProjectReader__processed_project_path: true
       _definition: null
       conversions: {}
-      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      definition_reader: !!python/object:common_resources.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
       overrides: {}
       project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/source_dataset
       summarizer: null

@@ -3,19 +3,18 @@ from unittest import mock
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
+from common_resources.tools.constants.model_constants import DEFAULT_TEST_EMBEDDING_MODEL
+from common_resources.tools.constants.symbol_constants import NEW_LINE, SPACE
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.prompt_util import PromptUtil
 
-from tgen_test.hgen.hgen_test_utils import HGEN_PROJECT_SUMMARY, HGenTestConstants, get_name_responses, \
-    get_test_hgen_args
-from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 from tgen.clustering.base.cluster import Cluster
-from tgen.common.constants.deliminator_constants import NEW_LINE, SPACE
-from tgen.common.constants.ranking_constants import DEFAULT_TEST_EMBEDDING_MODEL
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.content_generator import ContentGenerator
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator
@@ -32,8 +31,9 @@ from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from tgen_test.hgen.hgen_test_utils import HGEN_PROJECT_SUMMARY, HGenTestConstants, get_name_responses, \
+    get_test_hgen_args
+from tgen_test.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 
 
 class TestHierarchyGeneratorWithClustering(BaseTest):
@@ -178,7 +178,7 @@ class TestHierarchyGeneratorWithClustering(BaseTest):
         avg_file_size = sum([len(a[ArtifactKeys.CONTENT].splitlines())
                              for a in source_artifacts]) / len(source_artifacts)
         if refinement:
-            artifact2n_targets = DictUtil.get_kwarg_values(kwargs, artifact2n_targets=None)
+            artifact2n_targets = DictUtil.get_dict_values(kwargs, artifact2n_targets=None)
             expected_value = artifact2n_targets[artifacts[0][ArtifactKeys.ID]]
         else:
             expected_value = ContentGenerator._calculate_n_targets_for_cluster(artifacts,

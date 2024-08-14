@@ -1,10 +1,10 @@
 from tgen_test.data.creators.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
-from tgen.data.readers.pre_train_project_reader import PreTrainProjectReader
+from common_resources.data.readers.pre_train_project_reader import PreTrainProjectReader
 from tgen.summarizer.artifact.artifacts_summarizer import ArtifactsSummarizer
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_open_ai_responses import SUMMARY_FORMAT
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_open_ai_responses import SUMMARY_FORMAT
+from common_resources.mocking.test_response_manager import TestAIManager
 from tgen.testres.test_assertions import TestAssertions
 
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Dict, List, Union, Any
 
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.supported_enum import SupportedEnum
 
 
 class RequirementConstituent(SupportedEnum):

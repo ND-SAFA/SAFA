@@ -1,15 +1,15 @@
 import os
 from typing import Dict, Tuple
 
-from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
+from common_resources.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from common_resources.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
-from tgen.data.readers.csv_project_reader import CsvProjectReader
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.idataset import iDataset
+from common_resources.data.processing.augmentation.data_augmenter import DataAugmenter
+from common_resources.data.readers.csv_project_reader import CsvProjectReader
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.idataset import iDataset
 
 
 class DeterministicTrainerDatasetManager(TrainerDatasetManager):

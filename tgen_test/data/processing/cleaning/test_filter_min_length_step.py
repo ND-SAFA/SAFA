@@ -1,4 +1,4 @@
-from tgen.data.processing.cleaning.filter_min_length_step import FilterMinLengthStep
+from common_resources.data.processing.cleaning.filter_min_length_step import FilterMinLengthStep
 from tgen.testres.base_tests.base_test import BaseTest
 
 

@@ -4,7 +4,7 @@ from tgen.chat.chat_args import ChatArgs
 from tgen.chat.chat_state import ChatState
 from tgen.chat.chat_tree_definition import ChatTreeDefinition
 from tgen.core.trainers.llm_trainer import LLMTrainer
-from tgen.data.keys.prompt_keys import PromptKeys
+from common_resources.data.keys.prompt_keys import PromptKeys
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.decision_tree.path import Path
 

@@ -4,8 +4,8 @@ from typing import List
 from tgen.concepts.types.concept_match import ConceptMatch
 from tgen.concepts.types.concept_pipeline_response import ConceptPipelineResponse
 from tgen.concepts.types.entity_matching_pred import EntityMatchingPred
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.pipeline.state import State
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.tools.state_management.state import State
 
 
 @dataclass

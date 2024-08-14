@@ -3,7 +3,7 @@ from typing import List, Set, Type
 
 from datasets import Metric, list_metrics
 
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.metrics.abstract_trace_metric import AbstractTraceMetric
 from tgen.metrics.average_true_links_metrics import AverageTrueLinksMetric
 from tgen.metrics.classification_metrics import ClassificationMetrics

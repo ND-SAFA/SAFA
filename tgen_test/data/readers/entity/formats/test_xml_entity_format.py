@@ -1,8 +1,8 @@
 from typing import Dict, List, Type
 
-from tgen.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
+from common_resources.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from tgen_test.data.readers.entity.formats.abstract_entity_format_test import AbstractEntityFormatTest
-from tgen.data.readers.entity.formats.xml_entity_format import XmlEntityFormat
+from common_resources.data.readers.entity.formats.xml_entity_format import XmlEntityFormat
 from tgen.testres.paths.test_format_paths import XML_ENTITY_PATH
 
 

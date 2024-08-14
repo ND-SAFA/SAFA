@@ -1,11 +1,12 @@
 from copy import deepcopy
 
-from tgen.common.constants.deliminator_constants import COMMA
+from common_resources.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.readers.dataframe_project_reader import DataFrameProjectReader
+from common_resources.tools.constants.symbol_constants import COMMA
+from common_resources.tools.util.prompt_util import PromptUtil
+
 from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.readers.dataframe_project_reader import DataFrameProjectReader
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hierarchy_generator import HierarchyGenerator

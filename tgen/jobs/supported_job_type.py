@@ -1,4 +1,4 @@
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.jobs.chat_jobs.chat_job import ChatJob
 from tgen.jobs.clustering_job.clustering_job import ClusteringJob
 from tgen.jobs.data_jobs.create_datasets_job import CreateDatasetsJob

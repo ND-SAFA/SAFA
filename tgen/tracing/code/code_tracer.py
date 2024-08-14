@@ -1,12 +1,13 @@
 from typing import Dict, List
 
-from tgen.common.constants.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, \
-    DEFAULT_RENAME_CHILDREN, HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION
-from tgen.common.logging.logger_manager import logger
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
+
+from tgen.common.constants.code_tracer_constants import C_IMPLEMENTATION_EXTENSIONS, DEFAULT_CHILD_LAYER_ID, DEFAULT_RENAME_CHILDREN, \
+    HEADER_EXTENSIONS, HEADER_FILE_EXPLANATION
+from common_resources.tools.t_logging.logger_manager import logger
 from tgen.common.objects.trace import Trace
-from tgen.common.util.file_util import FileUtil
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.util.file_util import FileUtil
 from tgen.tracing.code.package_tracer import PackageTracer
 
 

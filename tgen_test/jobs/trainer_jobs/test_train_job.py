@@ -2,14 +2,16 @@ import os
 from unittest import mock
 from unittest.mock import patch
 
-from tgen.common.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
-from tgen.common.constants.deliminator_constants import UNDERSCORE
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
+from common_resources.tools.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
+from common_resources.tools.constants.symbol_constants import UNDERSCORE
+from common_resources.tools.variables.typed_definition_variable import TypedDefinitionVariable
+
 from tgen.core.trainers.hugging_face_trainer import HuggingFaceTrainer
 from tgen.core.trainers.trainer_task import TrainerTask
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 from tgen.jobs.trainer_jobs.hugging_face_job import HuggingFaceJob
@@ -18,7 +20,6 @@ from tgen.testres.base_tests.base_job_test import BaseJobTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions
-from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestTrainJob(BaseJobTest):

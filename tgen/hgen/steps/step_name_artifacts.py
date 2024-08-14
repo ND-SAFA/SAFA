@@ -1,5 +1,5 @@
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.common.hgen_util import HGenUtil
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState

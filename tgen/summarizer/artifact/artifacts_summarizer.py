@@ -2,22 +2,22 @@ import uuid
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import pandas as pd
+from common_resources.data.keys.prompt_keys import PromptKeys
+from common_resources.data.keys.structure_keys import ArtifactKeys, StructuredKeys
+from common_resources.llm.llm_task import LLMCompletionType
+from common_resources.tools.constants.default_model_managers import get_efficient_default_llm_manager
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.model_constants import get_efficient_default_llm_manager
 from tgen.common.constants.project_summary_constants import PS_ENTITIES_TITLE
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.common.util.unique_id_manager import DeterministicUniqueIDManager
-from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.llm_responses import GenerationResponse
-from tgen.models.llm.llm_task import LLMCompletionType
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.llm_response_util import LLMResponseUtil
+from common_resources.tools.util.unique_id_manager import DeterministicUniqueIDManager
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.llm.llm_responses import GenerationResponse
 from tgen.models.tokens.token_calculator import TokenCalculator
 from tgen.prompts.context_prompt import ContextPrompt
 from tgen.prompts.prompt import Prompt

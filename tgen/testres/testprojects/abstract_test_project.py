@@ -5,9 +5,9 @@ import numpy as np
 
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.trace import Trace
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import StructuredKeys, TraceKeys
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import StructuredKeys, TraceKeys
+from common_resources.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.common.objects.trace_layer import TraceLayer
 
 

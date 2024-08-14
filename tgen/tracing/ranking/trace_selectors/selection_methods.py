@@ -1,4 +1,4 @@
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.tracing.ranking.trace_selectors.select_by_threshold import SelectByThreshold
 from tgen.tracing.ranking.trace_selectors.select_by_top_parents import SelectByTopParents
 from tgen.tracing.ranking.trace_selectors.selection_by_threshold_scaled_by_artifact import SelectByThresholdScaledByArtifacts

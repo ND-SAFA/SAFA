@@ -1,7 +1,8 @@
 from typing import Dict, Union
 
-from tgen.common.constants.path_constants import USER_SYM
-from tgen.common.util.override import overrides
+from common_resources.tools.constants.symbol_constants import USER_SYM
+
+from common_resources.tools.util.override import overrides
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 
 

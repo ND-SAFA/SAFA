@@ -1,13 +1,13 @@
 from tgen_test.ranking.steps.ranking_pipeline_test import PARENT_ID, CHILD_ID, RankingPipelineTest
 from tgen.common.constants.ranking_constants import RANKING_MAX_SCORE, RANKING_MIN_SCORE
-from tgen.common.util.math_util import MathUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.util.math_util import MathUtil
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.prompts.supported_prompts.supported_prompts import SupportedPrompts
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 from tgen.tracing.ranking.common.ranking_args import RankingArgs
 from tgen.tracing.ranking.llm_ranking_pipeline import LLMRankingPipeline
 from tgen.tracing.ranking.trace_selectors.selection_methods import SupportedSelectionMethod

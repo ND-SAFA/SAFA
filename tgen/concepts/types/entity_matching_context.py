@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 from typing import Dict, List, Set
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
+from common_resources.tools.constants.symbol_constants import NEW_LINE
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
 from tgen.concepts.types.entity_matching_pred import EntityMatchingPred
 from tgen.core.trainers.llm_trainer import LLMTrainer
-from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.keys.prompt_keys import PromptKeys
+from common_resources.data.keys.structure_keys import ArtifactKeys
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt

@@ -1,17 +1,17 @@
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from tgen.common.util.dataclass_util import required_field
+from common_resources.tools.state_management.state import State
+from common_resources.tools.util.dataclass_util import required_field
+
 from tgen.decision_tree.nodes.abstract_node import AbstractNode
-from tgen.pipeline.pipeline_args import PipelineArgs
-from tgen.pipeline.state import State
 
 
 @dataclass
 class ConditionalNode(AbstractNode):
-    conditional_statement: Callable[[PipelineArgs, State], Any] = required_field(field_name="conditional_statement")
+    conditional_statement: Callable[[Args, State], Any] = required_field(field_name="conditional_statement")
 
-    def _make_choice(self, args: PipelineArgs, state: State) -> Any:
+    def _make_choice(self, args: Args, state: State) -> Any:
         """
         Decides which path to take from the current node.
         :param args: The arguments to the node.

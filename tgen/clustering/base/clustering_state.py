@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from typing import List, Dict
 
 from tgen.clustering.base.cluster_type import ClusterIdType, ClusterMapType
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.pipeline.state import State
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.state_management.state import State
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 

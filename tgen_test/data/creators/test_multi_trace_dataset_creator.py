@@ -1,11 +1,11 @@
-from tgen.data.creators.multi_trace_dataset_creator import MultiTraceDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.creators.multi_trace_dataset_creator import MultiTraceDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.testres.base_tests.base_trace_test import BaseTraceTest
 from tgen.testres.definition_creator import DefinitionCreator
 from tgen.testres.paths.project_paths import CSV_PROJECT_PATH, STRUCTURE_PROJECT_PATH
 from tgen.testres.testprojects.csv_test_project import CsvTestProject
 from tgen.testres.testprojects.structured_test_project import StructuredTestProject
-from tgen.variables.typed_definition_variable import TypedDefinitionVariable
+from common_resources.tools.variables.typed_definition_variable import TypedDefinitionVariable
 
 
 class TestMultiTraceDatasetCreator(BaseTraceTest):

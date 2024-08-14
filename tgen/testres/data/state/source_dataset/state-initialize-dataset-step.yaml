@@ -8,21 +8,21 @@ final_dataset: null
 format_of_artifacts: null
 generations2sources: null
 n_generations: 0
-original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
-  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+original_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
     steps: []
   data_export_path: null
   project_file_id: null
-  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
     _AbstractProjectReader__processed_project_path: false
     overrides: {}
     project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/original_dataset
-    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
       _AbstractProjectReader__processed_project_path: true
       _definition: null
       conversions: {}
-      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      definition_reader: !!python/object:common_resources.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
       overrides: {}
       project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/original_dataset
       summarizer: null
@@ -31,21 +31,21 @@ original_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.Prom
   trace_dataset_creator: null
 questions: null
 refined_content: null
-source_dataset: !!python/object:tgen.data.creators.prompt_dataset_creator.PromptDatasetCreator
-  data_cleaner: !!python/object:tgen.data.processing.cleaning.data_cleaner.DataCleaner
+source_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
     steps: []
   data_export_path: null
   project_file_id: null
-  project_reader: !!python/object:tgen.data.readers.artifact_project_reader.ArtifactProjectReader
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
     _AbstractProjectReader__processed_project_path: false
     overrides: {}
     project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/source_dataset
-    structured_project_reader: !!python/object:tgen.data.readers.structured_project_reader.StructuredProjectReader
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
       _AbstractProjectReader__processed_project_path: true
       _definition: null
       conversions: {}
-      definition_reader: !!python/object:tgen.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      definition_reader: !!python/object:common_resources.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
       overrides: {}
       project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/source_dataset
       summarizer: null

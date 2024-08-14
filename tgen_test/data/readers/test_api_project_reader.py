@@ -1,6 +1,6 @@
 from tgen.testres.base_tests.abstract_project_reader_test import AbstractProjectReaderTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 from tgen.testres.testprojects.api_test_project import ApiTestProject
 
 

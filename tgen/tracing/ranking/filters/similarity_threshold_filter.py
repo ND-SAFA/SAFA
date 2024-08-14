@@ -1,11 +1,11 @@
 from copy import deepcopy
 from typing import Dict, List
 
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.list_util import ListUtil
-from tgen.common.util.np_util import NpUtil
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.list_util import ListUtil
+from common_resources.tools.util.np_util import NpUtil
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.filters.i_filter import iFilter
 

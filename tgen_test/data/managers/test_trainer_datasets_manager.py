@@ -2,19 +2,19 @@ import os
 from typing import List
 from unittest.mock import patch
 
-from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
-from tgen.data.processing.augmentation.resample_step import ResampleStep
-from tgen.data.splitting.supported_split_strategy import SupportedSplitStrategy
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.pre_train_dataset import PreTrainDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.data.processing.augmentation.data_augmenter import DataAugmenter
+from common_resources.data.processing.augmentation.resample_step import ResampleStep
+from common_resources.data.splitting.supported_split_strategy import SupportedSplitStrategy
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.pre_train_dataset import PreTrainDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.testres.base_tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.variables.experimental_variable import ExperimentalVariable
+from common_resources.tools.variables.experimental_variable import ExperimentalVariable
 
 
 class TestTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):

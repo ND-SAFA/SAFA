@@ -1,13 +1,14 @@
 import os
 from typing import List
 
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+
 from tgen.data.managers.deterministic_trainer_dataset_manager import DeterministicTrainerDatasetManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.testres.base_tests.base_trainer_datasets_manager_test import BaseTrainerDatasetsManagerTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
-from tgen.variables.experimental_variable import ExperimentalVariable
+from common_resources.tools.variables.experimental_variable import ExperimentalVariable
 
 
 class TestDeterministicTrainerDatasetsManager(BaseTrainerDatasetsManagerTest):

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from tgen.common.util.base_object import BaseObject
+from common_resources.tools.util.base_object import BaseObject
 
 
 @dataclass

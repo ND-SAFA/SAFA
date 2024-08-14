@@ -1,7 +1,7 @@
 from typing import List
 
 from tgen.common.objects.trace import Trace
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.tracing.ranking.common.ranking_util import RankingUtil
 from tgen.tracing.ranking.trace_selectors.i_selection_method import iSelector
 

@@ -7,7 +7,7 @@ from tgen.clustering.base.clustering_args import ClusteringArgs
 from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.methods.supported_seed_clustering_methods import SupportedSeedClusteringMethods
 from tgen.common.constants.hgen_constants import MIN_SEED_SIMILARITY_QUANTILE, UPPER_SEED_SIMILARITY_QUANTILE
-from tgen.common.util.np_util import NpUtil
+from common_resources.tools.util.np_util import NpUtil
 from tgen.pipeline.abstract_pipeline import AbstractPipelineStep
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 

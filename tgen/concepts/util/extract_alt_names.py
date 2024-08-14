@@ -1,6 +1,6 @@
 from typing import List
 
-from tgen.common.constants.deliminator_constants import CLOSE_PAREN, EMPTY_STRING, OPEN_PAREN, SPACE
+from common_resources.tools.constants.symbol_constants import CLOSE_PAREN, EMPTY_STRING, OPEN_PAREN, SPACE
 
 
 def extract_alternate_names(string_list: List[str]) -> List[List[str]]:

@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from tgen.data.readers.abstract_project_reader import AbstractProjectReader
+from common_resources.data.readers.abstract_project_reader import AbstractProjectReader
 from tgen.testres.test_data_manager import TestDataManager
 from tgen.testres.testprojects.abstract_test_project import AbstractTestProject
 

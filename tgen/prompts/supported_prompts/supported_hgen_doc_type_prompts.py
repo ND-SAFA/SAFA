@@ -1,9 +1,9 @@
 from copy import deepcopy
 from types import DynamicClassAttribute
 
-from tgen.common.constants.deliminator_constants import UNDERSCORE
-from tgen.common.util.enum_util import EnumUtil
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.constants.symbol_constants import UNDERSCORE
+from common_resources.tools.util.enum_util import EnumUtil
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.supported_prompts.hgen_prompts import CLUSTERING_QUESTIONNAIRE, API_DATAFLOW_QUESTIONNAIRE, \
     DB_ENTITY_SPEC_QUESTIONNAIRE

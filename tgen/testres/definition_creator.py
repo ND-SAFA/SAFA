@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
-from tgen.experiments.experiment_serializer import ExperimentSerializer
-from tgen.variables.definition_variable import DefinitionVariable
+from common_resources.tools.experiment_serializer import ExperimentSerializer
+from common_resources.tools.variables.definition_variable import DefinitionVariable
 
 
 class DefinitionCreator:

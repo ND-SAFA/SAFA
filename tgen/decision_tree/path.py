@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 from typing import List, Optional, Any
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.list_util import ListUtil
+from common_resources.tools.constants.symbol_constants import NEW_LINE
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.list_util import ListUtil
 from tgen.decision_tree.nodes.abstract_node import AbstractNode, DEFAULT_BRANCH
-from tgen.pipeline.state import State
+from common_resources.tools.state_management.state import State
 
 
 @dataclass

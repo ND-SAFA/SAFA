@@ -1,12 +1,13 @@
 import abc
 from typing import Tuple
 
+from common_resources.tools.state_management.args import Args
+from common_resources.tools.state_management.state import State
+
 from tgen.decision_tree.nodes.abstract_node import AbstractNode
 from tgen.decision_tree.nodes.leaf_node import LeafNode
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.decision_tree.path import Path
-from tgen.pipeline.pipeline_args import PipelineArgs
-from tgen.pipeline.state import State
 from tgen.prompts.prompt_builder import PromptBuilder
 
 
@@ -19,7 +20,7 @@ class Tree(abc.ABC):
         """
         self.starting_node = starting_node
 
-    def traverse(self, args: PipelineArgs, current_state: State) -> Path:
+    def traverse(self, args: Args, current_state: State) -> Path:
         """
         Travels through the decision tree until a leaf node is reached.
         :param args: The arguments to the node.
@@ -32,7 +33,7 @@ class Tree(abc.ABC):
             node = self._take_step(args, current_state, node, path_taken)
         return path_taken
 
-    def next_step(self, args: PipelineArgs, current_state: State, current_path_taken: Path = None) -> Tuple[PromptBuilder, Path]:
+    def next_step(self, args: Args, current_state: State, current_path_taken: Path = None) -> Tuple[PromptBuilder, Path]:
         """
         Take the next step from the last node in the current path.
         :param args: The arguments to the node.
@@ -52,7 +53,7 @@ class Tree(abc.ABC):
         return prompt_builder, path
 
     @staticmethod
-    def _take_step(args: PipelineArgs, current_state: State, current_node: AbstractNode, path_taken: Path) -> AbstractNode:
+    def _take_step(args: Args, current_state: State, current_node: AbstractNode, path_taken: Path) -> AbstractNode:
         """
         Takes the next step through the tree.
         :param args: The arguments to the node.

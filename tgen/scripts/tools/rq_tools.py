@@ -1,13 +1,14 @@
 import os
 from typing import List, Optional
 
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.file_util import FileUtil
+from common_resources.tools.cli.inquirer_selector import inquirer_selection
+from common_resources.tools.rq.rq_definition import RQDefinition
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.file_util import FileUtil
+
 from tgen.scripts.constants import FOLDER_NAV_MESSAGE, PARENT_FOLDER, RQ_PATH_PARAM
 from tgen.scripts.modules.script_definition import ScriptDefinition
 from tgen.scripts.modules.script_runner import ScriptRunner
-from tgen.scripts.toolset.inquirer_selector import inquirer_selection
-from tgen.scripts.toolset.rq_definition import RQDefinition
 from tgen.testres.object_creator import ObjectCreator
 
 

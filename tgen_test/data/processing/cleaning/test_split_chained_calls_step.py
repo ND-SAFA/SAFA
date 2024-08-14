@@ -1,4 +1,4 @@
-from tgen.data.processing.cleaning.split_chained_calls_tep import SplitChainedCallsStep
+from common_resources.data.processing.cleaning.split_chained_calls_tep import SplitChainedCallsStep
 from tgen.testres.base_tests.base_test import BaseTest
 
 

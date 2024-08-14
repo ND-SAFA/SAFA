@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Type
 
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.override import overrides
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.override import overrides
 from tgen.models.tokens.token_calculator import TokenCalculator
 
 

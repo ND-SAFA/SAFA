@@ -1,13 +1,13 @@
 from collections import OrderedDict
 from typing import Any, Dict, List
 
-from tgen.common.constants.deliminator_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.constants.symbol_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.dataframe_util import DataFrameUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
 from tgen.delta.change_type import ChangeType
 from tgen.delta.delta_args import DeltaArgs
 from tgen.delta.delta_state import DeltaState

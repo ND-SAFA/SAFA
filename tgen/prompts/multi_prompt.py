@@ -1,10 +1,10 @@
 from copy import deepcopy
 from typing import Any, Dict, List, Union
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.common.util.override import overrides
-from tgen.common.util.prompt_util import PromptUtil
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
+from common_resources.tools.util.dataclass_util import DataclassUtil
+from common_resources.tools.util.override import overrides
+from common_resources.tools.util.prompt_util import PromptUtil
 from tgen.prompts.prompt import Prompt
 from tgen.prompts.prompt_args import PromptArgs
 from tgen.prompts.response_managers.abstract_response_manager import AbstractResponseManager

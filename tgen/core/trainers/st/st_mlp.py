@@ -3,7 +3,7 @@ from typing import List, Type, Union
 import torch.nn as nn
 from sentence_transformers import SentenceTransformer
 
-from tgen.common.util.override import overrides
+from common_resources.tools.util.override import overrides
 
 
 class STMLP(nn.Module):

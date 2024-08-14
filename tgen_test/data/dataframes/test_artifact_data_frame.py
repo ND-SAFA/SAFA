@@ -1,12 +1,14 @@
-from tgen.common.constants.deliminator_constants import PERIOD
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.constants.symbol_constants import PERIOD
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.tools.util.list_util import ListUtil
+
 from tgen.common.objects.artifact import Artifact
 from tgen.common.objects.chunk import Chunk
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.list_util import ListUtil
+from tgen.common.util.artifact_df_util import chunk_artifact_df
 from tgen.data.chunkers.sentence_chunker import SentenceChunker
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.testres.base_tests.base_test import BaseTest
 
 
@@ -51,7 +53,7 @@ class TestArtifactDataFrame(BaseTest):
         all_summarized.update_values(ArtifactKeys.SUMMARY, list(all_summarized.index), ["summary" for i in all_summarized.index])
         self.assertTrue(all_summarized.is_summarized())
 
-    def test_chunk(self):
+    def test_chunk_artifact_df(self):
         a_dataframe = self.get_artifact_data_frame()
         unchunked_id, unchunked_content = "unchunked", "One sentence. Two sentence. This is multiple sentences."
         chunked_id, chunked_content = "chunked", "This one is already chunked. But it has two sentences."
@@ -62,11 +64,11 @@ class TestArtifactDataFrame(BaseTest):
         a_dataframe.add_artifact(ignored_id, ignored_content)
         artifact_ids = {a_id for a_id in a_dataframe.index if a_id != "ignored"}
 
-        chunk_map = a_dataframe.chunk(SentenceChunker(), artifact_ids=artifact_ids,
+        chunk_map = chunk_artifact_df(a_dataframe, SentenceChunker(), artifact_ids=artifact_ids,
                                       unchunked_only=False)
         expected_chunked_artifacts = {unchunked_id: unchunked_content, chunked_id: chunked_content}
         self._assert_chunking(chunk_map, expected_chunked_artifacts)
-        chunk_map = a_dataframe.chunk(SentenceChunker(), unchunked_only=True)
+        chunk_map = chunk_artifact_df(a_dataframe, SentenceChunker(), unchunked_only=True)
         expected_chunked_artifacts = {ignored_id: ignored_content}
         self._assert_chunking(chunk_map, expected_chunked_artifacts)
         for chunk_id in expected_chunked_artifacts:

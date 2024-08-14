@@ -1,15 +1,16 @@
-from tgen_test.hgen.hgen_test_utils import HGenTestConstants, get_test_hgen_args
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from common_resources.tools.constants.model_constants import DEFAULT_TEST_EMBEDDING_MODEL
+
 from tgen.clustering.base.cluster import Cluster
-from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
-from tgen.common.constants.ranking_constants import DEFAULT_TEST_EMBEDDING_MODEL
-from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.util.enum_util import EnumDict
 from tgen.hgen.common.content_refiner import ContentRefiner
 from tgen.hgen.common.duplicate_detector import DuplicateType
 from tgen.hgen.hgen_state import HGenState
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 from tgen.testres.base_tests.base_test import BaseTest
+from tgen_test.hgen.hgen_test_utils import HGenTestConstants, get_test_hgen_args
 
 
 class TestContentRefiner(BaseTest):

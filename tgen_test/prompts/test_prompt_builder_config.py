@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from tgen.common.util.reflection_util import ReflectionUtil
+from common_resources.tools.util.reflection_util import ReflectionUtil
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt

@@ -1,25 +1,26 @@
 import uuid
 from collections.abc import Generator
 from copy import deepcopy
-from typing import List, Tuple, Dict, Union
+from typing import Dict, List, Tuple, Union
 
-from tgen.common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE, UNDERSCORE
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE, UNDERSCORE
+
 from tgen.common.constants.project_summary_constants import CUSTOM_TITLE_TAG, MULTI_LINE_ITEMS, PS_QUESTIONS_HEADER, \
     USE_PROJECT_SUMMARY_SECTIONS
-from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, DEFAULT_COMPLETION_TOKENS, BODY_VERSION_TITLE
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.common.util.unique_id_manager import DeterministicUniqueIDManager
+from tgen.common.constants.ranking_constants import BODY_ARTIFACT_TITLE, BODY_VERSION_TITLE, DEFAULT_COMPLETION_TOKENS
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.base_object import BaseObject
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.tools.util.unique_id_manager import DeterministicUniqueIDManager
 from tgen.core.trainers.llm_trainer import LLMTrainer
 from tgen.core.trainers.llm_trainer_state import LLMTrainerState
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.llm.abstract_llm_manager import AbstractLLMManager
 from tgen.prompts.artifact_prompt import ArtifactPrompt
 from tgen.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from tgen.prompts.prompt import Prompt

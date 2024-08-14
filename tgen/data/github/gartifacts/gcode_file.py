@@ -1,9 +1,10 @@
 import os
 from typing import Callable, Dict, Iterable, Set, Union
 
-from tgen.common.constants.code_extensions import ALLOWED_CODE_EXTENSIONS
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.override import overrides
+from common_resources.tools.constants.code_extensions import ALLOWED_CODE_EXTENSIONS
+
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.override import overrides
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 
 

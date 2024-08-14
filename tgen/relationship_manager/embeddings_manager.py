@@ -1,17 +1,17 @@
 from typing import Any, Dict, List, Union
 
 import numpy as np
+from common_resources.tools.constants.environment_constants import DEFAULT_EMBEDDING_MODEL
+from common_resources.tools.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
-from tgen.common.constants.ranking_constants import DEFAULT_EMBEDDING_MODEL
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.override import overrides
-from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.common.util.str_util import StrUtil
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.override import overrides
+from common_resources.tools.util.reflection_util import ReflectionUtil
+from common_resources.tools.util.str_util import StrUtil
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
 from tgen.relationship_manager.embedding_types import EmbeddingType, IdType
 

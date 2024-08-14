@@ -1,4 +1,4 @@
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.testprojects.prompt_test_project import PromptTestProject
 

@@ -1,9 +1,9 @@
 from typing import Callable, Dict, List, Union
 
+from common_resources.tools.constants.symbol_constants import NEW_LINE
 from git import Commit
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
-from tgen.common.util.override import overrides
+from common_resources.tools.util.override import overrides
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 
 EMPTY_TREE_SHA = "4b825dc642cb6eb9a060e54bf8d69288fbee4904"

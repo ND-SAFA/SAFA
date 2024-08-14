@@ -11,7 +11,7 @@ sys.path.append(root_path)
 from tgen.scripts.tools.find_missing_docs import print_complex_functions, print_missing_headers
 from tgen.scripts.tools.rq_tools import RQ_TOOLS
 from tgen.scripts.toolset.tool import Tool
-from tgen.scripts.toolset.inquirer_selector import inquirer_selection
+from common_resources.tools.cli.inquirer_selector import inquirer_selection
 from tgen.scripts.toolset.tool_set import ToolSet
 from tgen.scripts.tools.s3_tools import S3_TOOLS
 

@@ -7,9 +7,9 @@ from tgen.clustering.base.clustering_state import ClusteringState
 from tgen.clustering.steps.create_clusters_from_embeddings import CreateClustersFromEmbeddings
 from tgen.common.constants.hgen_constants import ALLOWED_ORPHAN_CLUSTER_SIZE_DELTA, ALLOWED_ORPHAN_SIMILARITY_DELTA, \
     MIN_ORPHAN_HOME_SIMILARITY
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.dataclass_util import DataclassUtil
-from tgen.common.util.list_util import ListUtil
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.dataclass_util import DataclassUtil
+from common_resources.tools.util.list_util import ListUtil
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 

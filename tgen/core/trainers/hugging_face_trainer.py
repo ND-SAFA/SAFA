@@ -2,18 +2,22 @@ import os
 from typing import Any, Dict, List, Optional, Union
 
 import torch
+from common_resources.data.tdatasets.data_key import DataKey
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.idataset import iDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
+from common_resources.tools.constants.symbol_constants import NEW_LINE
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.override import overrides
 from datasets import Dataset
 from transformers.integrations import WandbCallback
 from transformers.trainer import Trainer
 from transformers.trainer_utils import EvalPrediction, PredictionOutput
 
-from tgen.common.constants.deliminator_constants import NEW_LINE
 from tgen.common.constants.script_constants import DISPLAY_METRICS
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.override import overrides
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.save_strategy.abstract_save_strategy import AbstractSaveStrategy
 from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.core.save_strategy.metric_save_strategy import MetricSaveStrategy
@@ -23,10 +27,6 @@ from tgen.core.trainers.abstract_trainer import AbstractTrainer
 from tgen.core.wb.trace_callback import TraceCallback
 from tgen.core.wb.wb_manager import WBManager
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.tdatasets.data_key import DataKey
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.idataset import iDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
 from tgen.metrics.metrics_manager import MetricsManager
 from tgen.models.model_manager import ModelManager
 
@@ -213,7 +213,7 @@ class HuggingFaceTrainer(AbstractTrainer, Trainer):
         if n_labels == 0:
             logger.info("Could not evaluate predictions because no true labels are present.")
             return {}
-        
+
         metrics_manager = MetricsManager(trace_df=trace_dataset.trace_df,
                                          link_ids=trace_dataset.get_ordered_link_ids(),
                                          trace_predictions=output.predictions)

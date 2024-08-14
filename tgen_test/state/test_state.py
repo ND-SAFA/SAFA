@@ -2,15 +2,15 @@ import os
 from dataclasses import dataclass
 from typing import Union
 
-from tgen.common.util.param_specs import ParamSpecs
-from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.common.util.yaml_util import YamlUtil
-from tgen.data.creators.abstract_dataset_creator import AbstractDatasetCreator
-from tgen.data.tdatasets.idataset import iDataset
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.util.param_specs import ParamSpecs
+from common_resources.tools.util.reflection_util import ReflectionUtil
+from common_resources.tools.util.yaml_util import YamlUtil
+from common_resources.data.creators.abstract_dataset_creator import AbstractDatasetCreator
+from common_resources.data.tdatasets.idataset import iDataset
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.hgen.hgen_state import HGenState
-from tgen.pipeline.state import State
+from common_resources.tools.state_management.state import State
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR, TEST_STATE_PATH
 

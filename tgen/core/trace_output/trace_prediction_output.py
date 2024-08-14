@@ -4,8 +4,8 @@ import numpy as np
 from transformers.trainer_utils import PredictionOutput
 
 from tgen.common.objects.trace import Trace
-from tgen.common.util.reflection_util import ReflectionUtil
-from tgen.common.util.uncased_dict import UncasedDict
+from common_resources.tools.util.reflection_util import ReflectionUtil
+from common_resources.tools.util.uncased_dict import UncasedDict
 from tgen.core.save_strategy.comparison_criteria import ComparisonCriterion
 from tgen.core.trace_output.abstract_trace_output import AbstractTraceOutput
 from tgen.core.trace_output.stage_eval import Metrics, TracePredictions

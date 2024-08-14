@@ -1,6 +1,6 @@
-from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.prompt_dataframe import PromptDataFrame
-from tgen.data.keys.prompt_keys import PromptKeys
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.data.dataframes.prompt_dataframe import PromptDataFrame
+from common_resources.data.keys.prompt_keys import PromptKeys
 from tgen.testres.base_tests.base_test import BaseTest
 
 

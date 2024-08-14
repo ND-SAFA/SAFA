@@ -1,9 +1,10 @@
 from typing import List
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, NEW_LINE
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE
+
 from tgen.common.objects.artifact import Artifact
 from tgen.common.util.pipeline_util import PipelineUtil
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
 from tgen.hgen.hgen_args import HGenArgs
 from tgen.hgen.hgen_state import HGenState
 from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep

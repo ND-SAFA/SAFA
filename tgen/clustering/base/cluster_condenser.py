@@ -1,16 +1,16 @@
 from collections import Counter
+from typing import List, Optional, Set
 
 import numpy as np
-from typing import List, Optional, Set
 
 from tgen.clustering.base.cluster import Cluster
 from tgen.clustering.base.cluster_type import ClusterMapType, ClusterType
 from tgen.common.constants.clustering_constants import DEFAULT_ALLOW_OVERLAPPING_CLUSTERS, DEFAULT_CLUSTERING_MIN_NEW_ARTIFACTS_RATION, \
     DEFAULT_CLUSTER_MIN_VOTES, DEFAULT_CLUSTER_SIMILARITY_THRESHOLD, DEFAULT_FILTER_BY_COHESIVENESS, DEFAULT_MAX_CLUSTER_SIZE, \
-    DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_SORT_METRIC, MIN_PAIRWISE_AVG_PERCENTILE, MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING, \
-    MIN_CLUSTER_SIM_TO_MERGE, MIN_ARTIFACT_SIM_TO_MERGE
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.list_util import ListUtil
+    DEFAULT_MIN_CLUSTER_SIZE, DEFAULT_SORT_METRIC, MIN_ARTIFACT_SIM_TO_MERGE, MIN_CLUSTER_SIM_TO_MERGE, MIN_PAIRWISE_AVG_PERCENTILE, \
+    MIN_PAIRWISE_SIMILARITY_FOR_CLUSTERING
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.list_util import ListUtil
 from tgen.relationship_manager.embeddings_manager import EmbeddingsManager
 
 

@@ -4,16 +4,16 @@ from typing import List
 import pandas as pd
 
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.json_util import JsonUtil
+from common_resources.tools.util.file_util import FileUtil
+from common_resources.tools.util.json_util import JsonUtil
 from tgen.common.objects.trace import Trace
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.exporters.safa_exporter import SafaExporter
-from tgen.data.readers.api_project_reader import ApiProjectReader
-from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.data.readers.structured_project_reader import StructuredProjectReader
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.exporters.safa_exporter import SafaExporter
+from common_resources.data.readers.api_project_reader import ApiProjectReader
+from common_resources.data.readers.definitions.api_definition import ApiDefinition
+from common_resources.data.readers.structured_project_reader import StructuredProjectReader
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.object_creator import ObjectCreator
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR

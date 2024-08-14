@@ -1,7 +1,7 @@
 import math
 
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep, \
+from common_resources.data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep, \
     WordRepresentation
 from nltk.corpus import wordnet as wn
 

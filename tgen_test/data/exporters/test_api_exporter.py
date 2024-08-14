@@ -1,11 +1,11 @@
 import os
 from typing import List
 
-from tgen.common.util.dict_util import DictUtil
-from tgen.common.util.json_util import JsonUtil
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.exporters.api_exporter import ApiExporter
-from tgen.data.readers.api_project_reader import ApiProjectReader
+from common_resources.tools.util.dict_util import DictUtil
+from common_resources.tools.util.json_util import JsonUtil
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.exporters.api_exporter import ApiExporter
+from common_resources.data.readers.api_project_reader import ApiProjectReader
 from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.paths.paths import TEST_OUTPUT_DIR
 from tgen.testres.test_assertions import TestAssertions

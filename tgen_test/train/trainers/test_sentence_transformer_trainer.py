@@ -3,13 +3,13 @@ from typing import Dict, List
 from unittest import TestCase, skip
 
 import numpy as np
+from common_resources.data.keys.structure_keys import TraceKeys
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
+from common_resources.tools.constants.hugging_face_constants import POS_LINK, SMALL_EMBEDDING_MODEL
 
-from tgen.common.constants.hugging_face_constants import POS_LINK, SMALL_EMBEDDING_MODEL
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
 from tgen.core.trainers.st_embedding_trainer import STEmbeddingTrainer, STTrainer
 from tgen.core.trainers.st_loss_functions import SupportedSTLossFunctions
-from tgen.data.keys.structure_keys import TraceKeys
-from tgen.data.tdatasets.dataset_role import DatasetRole
 from tgen.models.model_manager import ModelManager
 from tgen.testres.dataset_creator_tutil import DatasetCreatorTUtil
 from tgen.testres.paths.paths import TEST_DATA_DIR, TEST_OUTPUT_DIR

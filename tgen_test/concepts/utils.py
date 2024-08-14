@@ -7,9 +7,9 @@ from tgen_test.concepts.constants import CONCEPT_ARTIFACT_PATH, CONCEPT_DF_PATH,
 from tgen.common.objects.artifact import Artifact
 from tgen.concepts.concept_args import ConceptArgs
 from tgen.concepts.concept_state import ConceptState
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.keys.structure_keys import ArtifactKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
 
 
 def create_concept_args() -> ConceptArgs:

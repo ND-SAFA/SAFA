@@ -1,14 +1,16 @@
 from copy import deepcopy
 from typing import Dict, Type, TypeVar
 
-from tgen.common.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
-from tgen.core.args.hugging_face_args import HuggingFaceArgs
+from common_resources.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
+from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
+from common_resources.data.processing.augmentation.data_augmenter import DataAugmenter
+from common_resources.data.readers.api_project_reader import ApiProjectReader
+from common_resources.llm.args.hugging_face_args import HuggingFaceArgs
+from common_resources.tools.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
+from common_resources.tools.variables.typed_definition_variable import TypedDefinitionVariable
+
 from tgen.core.trainers.trainer_task import TrainerTask
-from tgen.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
 from tgen.data.managers.trainer_dataset_manager import TrainerDatasetManager
-from tgen.data.processing.augmentation.data_augmenter import DataAugmenter
-from tgen.data.readers.api_project_reader import ApiProjectReader
 from tgen.experiments.experiment import Experiment
 from tgen.experiments.experiment_step import ExperimentStep
 from tgen.jobs.components.args.job_args import JobArgs
@@ -18,7 +20,6 @@ from tgen.testres.base_tests.base_test import BaseTest
 from tgen.testres.definition_creator import DefinitionCreator
 from tgen.testres.paths.paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from tgen.testres.test_data_manager import TestDataManager
-from tgen.variables.typed_definition_variable import TypedDefinitionVariable
 
 ObjectType = TypeVar("ObjectType")
 

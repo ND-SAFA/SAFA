@@ -1,4 +1,4 @@
-from tgen.common.util.supported_enum import SupportedEnum
+from common_resources.tools.util.supported_enum import SupportedEnum
 from tgen.data.github.abstract_github_entity import AbstractGithubArtifact
 from tgen.data.github.gartifacts.gartifact_type import GArtifactType
 from tgen.data.github.gartifacts.gcode_file import GCodeFile

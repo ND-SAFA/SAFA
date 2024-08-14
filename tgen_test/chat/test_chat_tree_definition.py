@@ -5,16 +5,16 @@ from tgen.chat.chat_node_ids import ChatNodeIDs
 from tgen.chat.chat_state import ChatState
 from tgen.chat.chat_tree_definition import ChatTreeDefinition
 from tgen.chat.message_meta import MessageMeta
-from tgen.common.util.prompt_util import PromptUtil
-from tgen.data.keys.prompt_keys import PromptKeys
-from tgen.data.keys.structure_keys import ArtifactKeys
+from common_resources.tools.util.prompt_util import PromptUtil
+from common_resources.data.keys.prompt_keys import PromptKeys
+from common_resources.data.keys.structure_keys import ArtifactKeys
 from tgen.decision_tree.nodes.action_node import ActionNode
 from tgen.decision_tree.nodes.llm_node import LLMNode
 from tgen.decision_tree.path import Path
 from tgen.prompts.prompt_builder import PromptBuilder
 from tgen.testres.base_tests.base_test import BaseTest
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from common_resources.mocking.mock_anthropic import mock_anthropic
+from common_resources.mocking.test_response_manager import TestAIManager
 
 
 class TestChatTreeDefinition(BaseTest):

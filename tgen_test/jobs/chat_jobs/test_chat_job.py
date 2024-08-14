@@ -8,13 +8,13 @@ from common_resources.mocking.langchain.test_chat_model import TestResponseManag
 
 from tgen.chat.message_meta import MessageMeta
 from tgen.common.objects.artifact import Artifact
-from tgen.common.util.status import Status
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys, LayerKeys
-from tgen.data.tdatasets.prompt_dataset import PromptDataset
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.util.status import Status
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys, LayerKeys
+from common_resources.data.tdatasets.prompt_dataset import PromptDataset
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.chat_jobs.chat_job import ChatJob
 from tgen.jobs.components.args.job_args import JobArgs

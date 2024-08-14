@@ -5,16 +5,16 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
-from tgen.common.util.dataframe_util import DataFrameUtil
-from tgen.common.util.list_util import ListUtil
-from tgen.common.logging.logger_manager import logger
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.dataframes.layer_dataframe import LayerDataFrame
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
-from tgen.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
-from tgen.data.tdatasets.dataset_role import DatasetRole
-from tgen.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.util.dataframe_util import DataFrameUtil
+from common_resources.tools.util.list_util import ListUtil
+from common_resources.tools.t_logging.logger_manager import logger
+from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
+from common_resources.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
+from common_resources.data.tdatasets.dataset_role import DatasetRole
+from common_resources.data.tdatasets.trace_dataset import TraceDataset
 from tgen.jobs.abstract_job import AbstractJob
 from tgen.jobs.components.args.job_args import JobArgs
 

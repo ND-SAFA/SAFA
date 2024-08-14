@@ -1,6 +1,6 @@
-from tgen.common.util.enum_util import EnumDict
-from tgen.data.dataframes.trace_dataframe import TraceDataFrame
-from tgen.data.keys.structure_keys import TraceKeys
+from common_resources.tools.util.enum_util import EnumDict
+from common_resources.data.dataframes.trace_dataframe import TraceDataFrame
+from common_resources.data.keys.structure_keys import TraceKeys
 from tgen.testres.base_tests.base_test import BaseTest
 
 

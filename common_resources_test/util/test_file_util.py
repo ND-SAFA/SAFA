@@ -1,18 +1,15 @@
 import os
-from os.path import dirname
-from unittest import skip
 
-from common_resources.tools.constants.env_var_name_constants import PROJ_PATH_PARAM
-from common_resources.tools.constants.environment_constants import PROJ_PATH
 from common_resources.tools.constants.symbol_constants import USER_SYM
 from common_resources.tools.util.file_util import FileUtil
 from common_resources_test.base_tests.base_test import BaseTest
 from common_resources_test.data.creators.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
 from common_resources_test.paths.base_paths import TEST_DIR_PATH, TEST_OUTPUT_DIR
-from common_resources_test.test_constants import TEST_DIR_NAME
 
 
 class TestFileUtil(BaseTest):
+    PARENT_DIR = os.path.dirname(__file__)
+
     def test_get_file_list(self):
         """
         Tests that pre-training data creator is able to retrieve relevant files in pre-training directory.
@@ -108,33 +105,38 @@ class TestFileUtil(BaseTest):
         self.assertEqual(dirname, expected_dirname)
 
     def test_expand_paths(self):
-        os.environ[PROJ_PATH_PARAM] = os.path.join(dirname(dirname(__file__)), "common_resources")
+        starting_path = FileUtil.get_starting_path()
         expected_path = f"{TEST_DIR_PATH}/util/test_file_util.py"
         self.assertTrue(os.path.exists(expected_path))
 
-        replacement_var = "[replacement]"
-        replacements_relative = {replacement_var: "."}
-        relative_path = f"{replacement_var}/{TEST_DIR_NAME}/util/test_file_util.py"
-        expanded_path_relative = FileUtil.expand_paths(relative_path, replacements_relative)
-        self.assertEqual(expected_path, expanded_path_relative)
+        # Test 1 - Test that relative path to test file can be correctly assumed to starting path.
+        r_var1 = "[replacement]"
+        replacements_1 = {r_var1: "."}
+        p1 = f"{r_var1}/test_file_util.py"
+        output1 = FileUtil.expand_paths(p1, replacements_1)
+        self.assertEqual(output1, os.path.join(starting_path, "test_file_util.py"))
 
-        user_path = os.path.expanduser('~')
-        without_user_path = expected_path.replace(user_path, USER_SYM)
-        expanded_path_user = FileUtil.expand_paths(without_user_path)
-        self.assertEqual(expanded_path_user, expected_path)
+        # Test 2 - Test that user path is correctly assumed.
+        p2 = expected_path.replace(os.path.expanduser('~'), USER_SYM)
+        output2 = FileUtil.expand_paths(p2)
+        self.assertEqual(output2, expected_path)
 
-        replacements = {"[replacement1]": "./hi", "[replacement2]": "./hola"}
-        path_list = ["[replacement1]/one.txt", "[replacement2]/two.txt"]
-        paths_dict = {i: path for i, path in enumerate(path_list)}
-        for iterable_paths in [path_list, paths_dict]:
-            expanded_path_iter = FileUtil.expand_paths(iterable_paths, replacements)
-            self.assertTrue(expanded_path_iter[0].startswith(os.path.join(PROJ_PATH, "hi")))
-            self.assertTrue(expanded_path_iter[1].startswith(os.path.join(PROJ_PATH, "hola")))
+        # Test 3 - test multiple assignments with relative paths
+        replacements_3 = {"[replacement1]": "./hi", "[replacement2]": "./hola"}
+        p3 = ["[replacement1]/one.txt", "[replacement2]/two.txt"]
+        p3_dict = {i: path for i, path in enumerate(p3)}
+        for iterable_paths in [p3, p3_dict]:
+            expanded_path_iter = FileUtil.expand_paths(iterable_paths, replacements_3)
+            self.assertTrue(expanded_path_iter[0].startswith(os.path.join(starting_path, "hi")))
+            self.assertTrue(expanded_path_iter[1].startswith(os.path.join(starting_path, "hola")))
+
+        # Tset 4 - Test that expanded path will not longer be modified.
         self.assertEqual(expected_path, FileUtil.expand_paths(expected_path))
 
-        replacements = {"[replacement1]": "hi", "[replacement2]": None}
-        paths_dict = {1: "[replacement1]/one.txt", 2: "[replacement2]"}
-        expanded_path_without_none = FileUtil.expand_paths(paths_dict, replacements, remove_none_vals=True)
+        # Test 5 - Test that none replacements are not included in final output.
+        replacements_3 = {"[replacement1]": "hi", "[replacement2]": None}
+        p3_dict = {1: "[replacement1]/one.txt", 2: "[replacement2]"}
+        expanded_path_without_none = FileUtil.expand_paths(p3_dict, replacements_3, remove_none_vals=True)
         self.assertEqual(len(expanded_path_without_none), 1)
         self.assertIn(1, expanded_path_without_none)
 
@@ -151,12 +153,12 @@ class TestFileUtil(BaseTest):
         orderings = FileUtil.order_paths_by_overlap(paths)
         self.assertListEqual(expected_order, orderings)
 
-    @skip("Need feedback on why this is the expected behavior")
     def test_collapse_paths(self):
-        expanded_path = f"{os.path.dirname(PROJ_PATH)}/test/util/test_file_util.py"
-        relative_path = f"../test/util/test_file_util.py"
-        collapsed_path_relative = FileUtil.collapse_paths(expanded_path)
-        self.assertEqual(relative_path, collapsed_path_relative)
+        p = f"{self.PARENT_DIR}/test_file_util.py"
+        starting_path = FileUtil.get_starting_path()
+        expected_path = os.path.relpath(p, starting_path)
+        collapsed_path_relative = FileUtil.collapse_paths(p)
+        self.assertEqual(expected_path, collapsed_path_relative)
 
         replacements = {"[path1]": "root/path1",
                         "[path2]": "unrelated/path1",

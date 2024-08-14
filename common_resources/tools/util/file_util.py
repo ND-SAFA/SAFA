@@ -1,4 +1,4 @@
-import logging
+import os
 import os
 import pickle
 import shutil
@@ -13,8 +13,8 @@ from yaml.loader import Loader, SafeLoader
 
 from common_resources.tools.constants.code_extensions import CODE_EXTENSIONS, CODE_FILENAMES
 from common_resources.tools.constants.env_var_name_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, OUTPUT_PATH_PARAM, \
-    PROJ_PATH_PARAM, ROOT_PATH_PARAM
-from common_resources.tools.constants.environment_constants import PROJ_PATH, get_environment_variable
+    ROOT_PATH_PARAM
+from common_resources.tools.constants.environment_constants import get_environment_variable
 from common_resources.tools.constants.symbol_constants import EMPTY_STRING, F_SLASH, PERIOD, SPACE, USER_SYM
 from common_resources.tools.t_logging.logger_manager import logger
 from common_resources.tools.util.dict_util import DictUtil
@@ -198,7 +198,7 @@ class FileUtil:
                         path = path.replace(k, v)
             path = os.path.expanduser(path)
             if (USER_SYM in path or path.startswith(F_SLASH) or path.startswith(PERIOD)) and use_abs_paths:
-                path = FileUtil.get_path_relative_to_proj_path(path)
+                path = FileUtil.expand_relative_path(path)
             return path
 
         return FileUtil.perform_function_on_paths(paths, expand, replacements=replacements, remove_none_vals=remove_none_vals)
@@ -224,8 +224,9 @@ class FileUtil:
                 ordered_paths = FileUtil.order_paths_by_overlap(list(replacements.values()), reverse=True)
                 for path2replace in ordered_paths:
                     path = path.replace(path2replace, path2var[path2replace])
-            if os.path.isabs(path) and PROJ_PATH:
-                path = os.path.relpath(path, PROJ_PATH)
+            if os.path.isabs(path):
+                starting_path = os.path.abspath("")
+                path = os.path.relpath(path, starting_path)
             return path
 
         return FileUtil.perform_function_on_paths(paths, collapse, replacements=replacements)
@@ -267,17 +268,22 @@ class FileUtil:
         return paths
 
     @staticmethod
-    def get_path_relative_to_proj_path(abspath: str) -> str:
+    def expand_relative_path(p: str) -> str:
         """
-        Gets the path relative to the proj path
-        :param abspath: The absolute path
+        Expands a relative path according to:
+        1. paths starting with curr dir (`./some/path`) will be expanded from where the script was called.
+        2. paths starting with user symbol (`~/some/path`) will be expanded to absolute paths.
+        3. All other paths are normalized.
+        :param p: The absolute path
         :return: The path relative to the proj path
         """
-        if not PROJ_PATH:
-            logger.log_without_spam(level=logging.WARNING,
-                                    msg=f"{PROJ_PATH_PARAM} is not provided in .env so relative path cannot be found.")
-            return abspath
-        return os.path.normpath(os.path.join(PROJ_PATH, abspath))
+        if p.startswith(PERIOD):
+            starting_path = os.path.abspath("")  # gets path to where execution was started.
+            p = os.path.join(starting_path, p)
+        if p.startswith(USER_SYM):
+            p = os.path.expanduser(p)
+        p = os.path.normpath(p)
+        return p
 
     @staticmethod
     def get_user_path() -> str:
@@ -700,3 +706,10 @@ class FileUtil:
         path_parts[-1] = FileUtil.get_file_base_name(path_parts[-1])
         path_parts = [StrUtil.separate_joined_words(part) for part in path_parts]
         return SPACE.join(path_parts)
+
+    @staticmethod
+    def get_starting_path() -> str:
+        """
+        :returns: Returns path to where execution was started.
+        """
+        return os.path.abspath("")

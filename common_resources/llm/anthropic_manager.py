@@ -2,20 +2,22 @@ from typing import Dict, List, Optional, Set, Tuple, TypedDict, Union
 
 import anthropic
 
-from common_resources.tools.constants import anthropic_constants, environment_constants
-from common_resources.tools.constants.environment_constants import ANTHROPIC_KEY
-from common_resources.tools.constants.symbol_constants import EMPTY_STRING
 from common_resources.llm.abstract_llm_manager import AbstractLLMManager
+from common_resources.llm.anthropic_exception_handler import anthropic_exception_handler
 from common_resources.llm.args.anthropic_args import AnthropicArgs, AnthropicParams
 from common_resources.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, \
     SupportedLLMResponses
 from common_resources.llm.llm_task import LLMCompletionType
 from common_resources.llm.prompts.llm_prompt_build_args import LLMPromptBuildArgs
+from common_resources.tools.constants import anthropic_constants, environment_constants
+from common_resources.tools.constants.environment_constants import ANTHROPIC_KEY
+from common_resources.tools.constants.symbol_constants import EMPTY_STRING
 from common_resources.tools.t_logging.logger_manager import logger
 from common_resources.tools.t_threading.threading_state import MultiThreadState
 from common_resources.tools.util.attr_dict import AttrDict
 from common_resources.tools.util.dict_util import DictUtil
 from common_resources.tools.util.thread_util import ThreadUtil
+
 
 class AnthropicResponse(TypedDict):
     """
@@ -89,9 +91,16 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         """
         assert AnthropicParams.PROMPT in params, f"Expected {params} to include `prompt`"
         prompts = params.pop(AnthropicParams.PROMPT)
+        if isinstance(prompts, str):
+            prompts = self.format_prompts(prompts)
         system_prompts = DictUtil.get_dict_values(params, pop=True, system=[None] * len(prompts))
         if not isinstance(system_prompts, list):
             system_prompts = [system_prompts]
+        if AnthropicParams.MODEL not in params:
+            params[AnthropicParams.MODEL] = self.llm_args.model
+        else:
+            assert params[
+                       AnthropicParams.MODEL] == self.llm_args.model, f"Expected model to be {self.llm_args.model} but got {params[AnthropicParams.MODEL]}"
         logger.info(f"Starting Anthropic batch ({len(prompts)}): {params['model']}")
 
         anthropic_client = get_client()
@@ -117,7 +126,8 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
                                                                          n_threads=anthropic_constants.ANTHROPIC_MAX_THREADS,
                                                                          max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS,
                                                                          raise_exception=raise_exception,
-                                                                         rpm=anthropic_constants.ANTHROPIC_MAX_RPM)
+                                                                         rpm=anthropic_constants.ANTHROPIC_MAX_RPM,
+                                                                         exception_handlers=[anthropic_exception_handler])
         close_client(anthropic_client)
         if raise_exception and global_state.exception:
             raise global_state.exception

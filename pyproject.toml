@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gen-common-resources"
-version = "0.0.19"
+version = "0.0.20"
 description = "SAFA.ai common utilities for python / generative workloads."
 readme = "README.md"
 keywords = ["traceability"]

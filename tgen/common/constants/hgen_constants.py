@@ -1,6 +1,6 @@
 import os
 
-from common_resources.tools.constants.environment_constants import PROJ_PATH
+from tgen.common.constants.tgen_constants import TGEN_PATH
 
 TEMPERATURE_ON_RERUNS = 0.4
 WEIGHT_OF_PRED_RELATED_CHILDREN = 0.5
@@ -20,7 +20,8 @@ ALLOWED_ORPHAN_SIMILARITY_DELTA = 0.1
 ALLOWED_ORPHAN_CLUSTER_SIZE_DELTA = 2
 DEFAULT_CLUSTER_MAX_SIZE = 5
 
-INPUTS_FOR_GENERATION_PATH = os.path.join(PROJ_PATH, "hgen", "inputs_for_generation")
+INPUTS_FOR_GENERATION_PATH = os.path.join(TGEN_PATH, "hgen", "inputs_for_generation")
+
 # Seeds
 CLUSTER_SEEDS_PARAM = "cluster_seeds"
 CLUSTER_ARTIFACT_TYPE_PARAM = "cluster_artifact_type"

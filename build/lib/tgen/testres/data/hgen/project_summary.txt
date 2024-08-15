@@ -1,0 +1,30 @@
+﻿# Entities\n\n\nArtifact: Software component like document, code module,
+   or model managed in the system\nProject: Collection of artifacts that forms a\
+   software project\nUser: Person interacting with the system to manage artifacts\
+   \nPermission: Access level that determines what a user can do within a project\n\
+  Version: Specific iteration of a project's artifacts\nTrace Link: Relationship between\
+   two artifacts that models traceability\nTrace Model: Graph of all trace links\
+   between artifacts in a project\nSummary: Condensed overview and key points extracted\
+   from an artifact\nWarning: Issue detected with an artifact based on validation\
+   rules\nWarning Rule: Criteria for identifying an issue with an artifact\n\n\n\
+  # \nKey System Capabilities for Managing Software Artifacts\n\n\nThe software system\
+   provides extensive capabilities for users to create, organize, and manage software\
+   artifacts. Artifacts represent documents, code, models, and other software components,
+   containing attributes like name, type, content body, summary, associated documents,
+   and custom fields. Artifacts can be linked together into traceability relationships\
+   that model dependencies between components. \n\nArtifacts are organized within\
+   software projects, which group related artifacts and provide access permissions\
+   to users. Projects also contain versions to manage changes to artifacts over time.
+   Users can initialize new projects by uploading existing files, which are processed\
+   into artifact records.\n\nThe system assists users by extracting entities from\
+   artifact content using natural language processing techniques. It can also auto-generate\
+   summaries of artifact content to provide overviews. Additionally, the system identifies\
+   issues and warnings with artifacts based on configurable validation rules.\n\n\
+  The system provides specialized interfaces to support common artifact management\
+   tasks. These include interfaces for creating projects, uploading artifact files,
+   viewing and inspecting artifact details, editing artifact metadata and content,
+   linking artifacts to model traceability, and deleting artifacts. \n\nOverall,
+   the system focuses on providing robust capabilities for users to create, organize,
+   analyze, and manage software artifacts within the context of projects and traceability\
+   models. The functional requirements will build upon these key system capabilities\
+   related to artifact and project management.

@@ -1,0 +1,1708 @@
+{
+    "traces": [
+        {
+            "sourceName": "/World/World.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "Provides complete world representation composed of chunks. Needed to check for collisions and place/remove blocks."
+        },
+        {
+            "sourceName": "/Rendering/RenderEngine.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Unrelated rendering setup"
+        },
+        {
+            "sourceName": "/Graphics/Components/Text.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "Reusable text rendering component."
+        },
+        {
+            "sourceName": "/Game.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Indirectly related - renders the game, but not specifically the debug options"
+        },
+        {
+            "sourceName": "/Utils/AABB.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "Core for collision detection relevant to hitboxes"
+        },
+        {
+            "sourceName": "/Graphics/Components/Text.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Could be used in color selection UI"
+        },
+        {
+            "sourceName": "/Graphics/Menu/skeleton/menu_skeleton.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Provides skeleton for generated menus. Enables reuse."
+        },
+        {
+            "sourceName": "/main.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Starts game running. Needed but not core functionality."
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Initializes essential systems like world, player, and rendering."
+        },
+        {
+            "sourceName": "/Exception/Exception.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Unrelated to menu functionality"
+        },
+        {
+            "sourceName": "/World/BlockFace.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Represents block faces for rendering. Will need updates to use new shaders/textures."
+        },
+        {
+            "sourceName": "/Rendering/CMakeLists.txt",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Shaders needed for rendering stack traces"
+        },
+        {
+            "sourceName": "/Debug/CMakeLists.txt",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Directly enables debug features like hitboxes"
+        },
+        {
+            "sourceName": "/Graphics/Components/CMakeLists.txt",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Needed for UI and text rendering"
+        },
+        {
+            "sourceName": "/Graphics/Components/Button.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "Provides reusable component for menus but does not directly implement save/load/quit functionality"
+        },
+        {
+            "sourceName": "/CMakeLists.txt",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Unrelated CMake file"
+        },
+        {
+            "sourceName": "/Rendering/Shader.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Loads and compiles shaders. Needed for rendering."
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Not directly related"
+        },
+        {
+            "sourceName": "/Graphics/Menu/ColorSelectorMenu.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Partially related as an example menu, but does not provide save/load/quit functionality"
+        },
+        {
+            "sourceName": "/Rendering/Renderable.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "Core rendering setup for debug visuals"
+        },
+        {
+            "sourceName": "/Utils/Font.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Provides default font for UI text. Enables reuse."
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Unrelated to menu functionality"
+        },
+        {
+            "sourceName": "/Utils/AABB.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Represents a box for collision detection. Used in player movement."
+        },
+        {
+            "sourceName": "/World/World.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Menu class unrelated"
+        },
+        {
+            "sourceName": "/Rendering/ShaderProgram.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Needed for debug rendering features"
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Rendering/stb_image.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Provides image loading implementation used for textures. Directly involved in texture functionality."
+        },
+        {
+            "sourceName": "/Rendering/Shader.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Needed for rendering. Indirectly related."
+        },
+        {
+            "sourceName": "/World/World.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Provides necessary functionality for getting and setting block colors and types in the world."
+        },
+        {
+            "sourceName": "/Game.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "Starts game running and processes input events. Needed to handle player input."
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Unrelated UI framework."
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Rendering/CMakeLists.txt",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Needed for rendering FPS text"
+        },
+        {
+            "sourceName": "/main.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Sets up core game loop. Indirectly needed for UI to work."
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "Provides foundation for creating specific menu types but does not contain save/load/quit functionality"
+        },
+        {
+            "sourceName": "/Game.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "Indirectly related by providing rendering each frame"
+        },
+        {
+            "sourceName": "/Graphics/Menu/ColorSelectorMenu.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Allows selecting a color, but doesn't provide copying."
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Forwards input events for player movement and controls."
+        },
+        {
+            "sourceName": "/Debug/DebugOptions.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Rendering/AABBRenderer.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Renders bounding boxes. Unrelated to core rendering functionality."
+        },
+        {
+            "sourceName": "/Exception/CMakeLists.txt",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "Needed for stack traces"
+        },
+        {
+            "sourceName": "/Utils/AABB.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Utility class used in collision detection."
+        },
+        {
+            "sourceName": "/Graphics/Components/Rectangle.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Reusable rectangle rendering component."
+        },
+        {
+            "sourceName": "/World/World.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Handles world creation and representation. Some updates needed for new rendering system."
+        },
+        {
+            "sourceName": "/Exception/Exception_Linux.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Platform-specific exception handling. Indirectly related."
+        },
+        {
+            "sourceName": "/Graphics/Components/Rectangle.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Provides reusable component for menus but does not directly implement save/load/quit functionality"
+        },
+        {
+            "sourceName": "/Debug/Graphics/CMakeLists.txt",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Related to debugging but not logging"
+        },
+        {
+            "sourceName": "/Graphics/Components/Rectangle.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Lower level component used in rendering."
+        },
+        {
+            "sourceName": "/Exception/Exception.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Rendering/Renderable.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Base rendering functionality."
+        },
+        {
+            "sourceName": "/Debug/Graphics/FPSCounter.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Provides shader and texture loading. Needed for rendering."
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Graphics/Screen/CMakeLists.txt",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Unrelated CMake file"
+        },
+        {
+            "sourceName": "/Rendering/BlockSelection.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Renders outline around selected block. Minor relation to player looking direction."
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "Enables efficient rendering"
+        },
+        {
+            "sourceName": "/Debug/DebugOptions.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Allows enabling debug info overlay. Related to debugging but does not log."
+        },
+        {
+            "sourceName": "/Debug/Graphics/FPSCounter.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "Unrelated debugging info"
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Required for the player to look around and select blocks."
+        },
+        {
+            "sourceName": "/Rendering/stb_image.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Provides image loading used for textures."
+        },
+        {
+            "sourceName": "/Graphics/Components/Text.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "Needed to display FPS text"
+        },
+        {
+            "sourceName": "/Rendering/CMakeLists.txt",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Provides base rendering that menus will overlay but does not directly implement menu functionality"
+        },
+        {
+            "sourceName": "/Graphics/CMakeLists.txt",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Adds the reusable UI component files to the build."
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/World/BlockFace.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "BlockFace represents a single face of a block used in the selection system."
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Provides structure for UI"
+        },
+        {
+            "sourceName": "/Graphics/Components/Rectangle.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Could be used in color selection UI"
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Needed to display FPS text"
+        },
+        {
+            "sourceName": "/World/Block.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Blocks are the units modified and rendered. Directly relevant."
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "The player selection determines the block to color."
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "The Component class provides core functionality like rendering, event handling, and children management that components build on top of. This enables reusability."
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "The world is divided into chunks holding blocks. Adding/removing blocks will need to interface with the appropriate chunk."
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Could handle color selection input and setting logic."
+        },
+        {
+            "sourceName": "/Game.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Starts up the game but doesn't contribute directly."
+        },
+        {
+            "sourceName": "/World/Block.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Unrelated block class"
+        },
+        {
+            "sourceName": "/Rendering/BlockSelection.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Graphics/Screen/CMakeLists.txt",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Provides base rendering that menus will overlay but does not directly implement menu functionality"
+        },
+        {
+            "sourceName": "/Rendering/stb_image.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "Decodes image files into pixels. Required for texture loading."
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Divides world into chunks for efficient rendering. Provides interface for getting blocks and block types at world positions. Enables collision detection by checking for solid blocks."
+        },
+        {
+            "sourceName": "/World/Block.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Manages block data needed for rendering"
+        },
+        {
+            "sourceName": "/CMakeLists.txt",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Adds exception handling registration, indirectly related"
+        },
+        {
+            "sourceName": "/Debug/CMakeLists.txt",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Adds debug options, indirectly related"
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "Provides base component class."
+        },
+        {
+            "sourceName": "/Exception/Exception_Linux.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "Directly enables stack traces for exceptions on Linux. Essential for fulfilling query."
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "Core part of chunk implementation"
+        },
+        {
+            "sourceName": "/World/BlockFace.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Graphics/Components/Rectangle.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Unrelated GUI class"
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Manages world representation as chunks of blocks. Some updates needed to utilize new shaders when rendering."
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Uses chunks for storage"
+        },
+        {
+            "sourceName": "/main.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Registers segfault handler needed to throw exceptions with stack traces on crashes"
+        },
+        {
+            "sourceName": "/Rendering/Shader.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Needed for debug rendering features"
+        },
+        {
+            "sourceName": "/World/World.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "Gets/sets block colors in the world."
+        },
+        {
+            "sourceName": "/Utils/ICollidable.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Defines collision interface used by player and blocks. Enables collision detection."
+        },
+        {
+            "sourceName": "/Exception/Exception.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Provides stack traces on crashes. Unrelated to core query functionality."
+        },
+        {
+            "sourceName": "/Utils/CMakeLists.txt",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "Font used in logging"
+        },
+        {
+            "sourceName": "/Debug/DebugOptions.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "Directly enables the query's requested functionality"
+        },
+        {
+            "sourceName": "/Rendering/Renderable.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Needed for rendering textures on blocks."
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "Saves block colors to allow persistence."
+        },
+        {
+            "sourceName": "/Game.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Manages game state and loop. Unrelated to new rendering functionality."
+        },
+        {
+            "sourceName": "/World/CMakeLists.txt",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.7173913043478262,
+            "explanation": "Build system file unrelated to functionality."
+        },
+        {
+            "sourceName": "/Graphics/Components/Button.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Could be used for color selection"
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Provides building blocks for creating menus but does not directly implement save/load/quit functionality"
+        },
+        {
+            "sourceName": "/Rendering/Renderable.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Provides base rendering that menus will overlay but does not directly implement menu functionality"
+        },
+        {
+            "sourceName": "/Game.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Provides base rendering that menus will overlay but does not directly implement menu functionality"
+        },
+        {
+            "sourceName": "/Rendering/ShaderProgram.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Encapsulates vertex and fragment shader pair and provides uniform setting functions. Core part of shader system."
+        },
+        {
+            "sourceName": "/Graphics/Components/Button.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Reusable button UI component."
+        },
+        {
+            "sourceName": "/Exception/Exception.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Avoids render artifacts across chunks"
+        },
+        {
+            "sourceName": "/Rendering/RenderEngine.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Indirectly related to game rendering"
+        },
+        {
+            "sourceName": "/Graphics/Components/HBox.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "Could be used to layout color selection"
+        },
+        {
+            "sourceName": "/Game.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Unrelated to core block placing/removing."
+        },
+        {
+            "sourceName": "/Rendering/Image.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Needed for textures. Indirectly related."
+        },
+        {
+            "sourceName": "/Game.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "Uses chunk system"
+        },
+        {
+            "sourceName": "/World/World.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Game.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Sets up game loop needed to run UI."
+        },
+        {
+            "sourceName": "/main.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Starts the game but doesn't contribute directly."
+        },
+        {
+            "sourceName": "/Rendering/BlockSelection.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Renders the selection box around the selected block."
+        },
+        {
+            "sourceName": "/Exception/Exception.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "General exception handling is indirectly related."
+        },
+        {
+            "sourceName": "/Graphics/Menu/EscapeMenu.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Partially related as an example menu, but does not provide save/load/quit functionality"
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/main.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Unrelated main file"
+        },
+        {
+            "sourceName": "/Exception/Exception_Windows.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Platform-specific exception handling. Indirectly related."
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "Unrelated GUI class"
+        },
+        {
+            "sourceName": "/Debug/Graphics/FPSCounter.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Debug UI component. Reusable but not critical."
+        },
+        {
+            "sourceName": "/Utils/Font.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Needed to display FPS text"
+        },
+        {
+            "sourceName": "/Graphics/Components/HBox.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "Lays out child components horizontally. Enables reusable responsive UIs."
+        },
+        {
+            "sourceName": "/Graphics/Components/CMakeLists.txt",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Adds UI component files."
+        },
+        {
+            "sourceName": "/Rendering/RenderEngine.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Provides base rendering that menus will overlay but does not directly implement menu functionality"
+        },
+        {
+            "sourceName": "/Exception/Exception_Linux.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Rendering/stb_image.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Needed for textures. Indirectly related."
+        },
+        {
+            "sourceName": "/Graphics/Menu/CMakeLists.txt",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Adds menu files."
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Indirectly related to rendering the world"
+        },
+        {
+            "sourceName": "/Utils/ICollidable.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Core for collision detection relevant to hitboxes"
+        },
+        {
+            "sourceName": "/World/CMakeLists.txt",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.7065217391304348,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Exception/Exception.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Graphics/Components/VBox.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Could be used to layout color selection"
+        },
+        {
+            "sourceName": "/Rendering/BlockSelection.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Renders the current selection for user feedback."
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Rendering placed/removed blocks is essential for the player to see the results."
+        },
+        {
+            "sourceName": "/Exception/Exception_Windows.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Enables stack traces on Windows. Essential like #2"
+        },
+        {
+            "sourceName": "/Debug/Graphics/FPSCounter.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Provides reusable component for menus but does not directly implement save/load/quit functionality"
+        },
+        {
+            "sourceName": "/World/CMakeLists.txt",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.7282608695652174,
+            "explanation": "Manages world data needed for rendering"
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "Implements the core player controller functionality including position, velocity, looking direction, selection raycasting, and basic collision detection. Provides key interfaces needed for moving the player in 3D space."
+        },
+        {
+            "sourceName": "/Rendering/Renderable.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Needed for rendering FPS text"
+        },
+        {
+            "sourceName": "/World/Block.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Blocks store color data to be persisted."
+        },
+        {
+            "sourceName": "/Rendering/RenderEngine.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Sets up OpenGL, handles rendering of world. Needed to render updated player view."
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Needed to add new debug rendering capabilities"
+        },
+        {
+            "sourceName": "/Rendering/RenderEngine.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Sets up OpenGL context, manages rendering loop. Related but not directly involved in new shader/texture functionality."
+        },
+        {
+            "sourceName": "/Rendering/BlockSelection.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Directly renders the selected block like a hitbox"
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Indirectly sets up systems needed for menus but does not contribute directly to menu functionality"
+        },
+        {
+            "sourceName": "/Rendering/Renderable.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Provides reusable rendering logic used by UI components."
+        },
+        {
+            "sourceName": "/Graphics/Components/HBox.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Provides reusable component for menus but does not directly implement save/load/quit functionality"
+        },
+        {
+            "sourceName": "/Rendering/ShaderProgram.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Links vertex and fragment shaders. Needed for rendering."
+        },
+        {
+            "sourceName": "/Exception/Exception_Linux.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Blocks make up the world structure. Core to adding/removing."
+        },
+        {
+            "sourceName": "/Rendering/Renderable.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Provides reusable rendering functionality like vertex buffers, texturing. Required to render world."
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Provides base menu class inherited by other menus."
+        },
+        {
+            "sourceName": "/Rendering/Image.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Loads image files for textures. Needed for rendering."
+        },
+        {
+            "sourceName": "/Graphics/Menu/new_menu.sh",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "Generates menu class files. Helps create reusable menus."
+        },
+        {
+            "sourceName": "/World/World.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Indirectly related to rendering the world"
+        },
+        {
+            "sourceName": "/Graphics/Components/VBox.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Provides reusable component for menus but does not directly implement save/load/quit functionality"
+        },
+        {
+            "sourceName": "/Rendering/Renderable.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Base for objects that can be rendered. Will likely need updates to support shaders/textures."
+        },
+        {
+            "sourceName": "/Rendering/AABBRenderer.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Unrelated debug functionality."
+        },
+        {
+            "sourceName": "/Graphics/CMakeLists.txt",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Needed for UI and text rendering"
+        },
+        {
+            "sourceName": "/World/Block.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "Represents world blocks. Will likely need updates to support new rendering functionality."
+        },
+        {
+            "sourceName": "/World/Block.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Represents a single voxel/block with position, color, and solid/air type. Collision detection checks if player intersects a solid block."
+        },
+        {
+            "sourceName": "/World/World.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Doesn't create chunks so not directly related"
+        },
+        {
+            "sourceName": "/World/World.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "World coordinates will need to be translated to chunks for modifications."
+        },
+        {
+            "sourceName": "/Graphics/Menu/SettingsMenu.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8913043478260869,
+            "explanation": "Partially related as an example menu, but does not provide save/load/quit functionality"
+        },
+        {
+            "sourceName": "/Graphics/Components/VBox.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Lays out child components vertically. Enables reusable responsive UIs."
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "Directly uses collision boxes relevant to hitbox debugging"
+        },
+        {
+            "sourceName": "/Exception/Exception.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Does not directly contribute to logging functionality"
+        },
+        {
+            "sourceName": "/Rendering/AABBRenderer.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Directly renders debug bounding boxes"
+        },
+        {
+            "sourceName": "/World/BlockFace.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Represents a single face of a block with normal, color, etc. Not directly needed for query."
+        },
+        {
+            "sourceName": "/Rendering/Image.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "Loads image files from disk. Directly involved in providing texture data."
+        },
+        {
+            "sourceName": "/Debug/Graphics/CMakeLists.txt",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Directly related"
+        },
+        {
+            "sourceName": "/Graphics/Components/Text.cpp",
+            "targetName": "Access game menus US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "Provides reusable component for menus but does not directly implement save/load/quit functionality"
+        },
+        {
+            "sourceName": "/Exception/Exception_Linux.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Graphics/Components/Text.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Unrelated GUI class"
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8586956521739131,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Exception/Exception.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Provides exception handling fundamentals. Indirectly related."
+        },
+        {
+            "sourceName": "/Rendering/RenderEngine.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Renders 3D world. Indirectly needed for UI."
+        },
+        {
+            "sourceName": "/Rendering/Shader.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "Implements loading and compiling OpenGL shader programs. Directly enables shader functionality."
+        },
+        {
+            "sourceName": "/Exception/Exception_Linux.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9891304347826086,
+            "explanation": "Essential translation for chunks"
+        },
+        {
+            "sourceName": "/Player.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9456521739130435,
+            "explanation": "Handles player controls, movement, and rendering. Will likely need to be updated to use new shaders."
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9239130434782609,
+            "explanation": "Provides reusable functionality like background rendering and event handling for menus."
+        },
+        {
+            "sourceName": "/Rendering/CMakeLists.txt",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9021739130434783,
+            "explanation": "Needed for debug rendering features"
+        },
+        {
+            "sourceName": "/Debug/Graphics/FPSCounter.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "Directly implements FPS counter functionality"
+        },
+        {
+            "sourceName": "/Rendering/Image.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Needed for texture loading."
+        },
+        {
+            "sourceName": "/Rendering/RenderEngine.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9347826086956522,
+            "explanation": "Needed to add new debug rendering"
+        },
+        {
+            "sourceName": "/World/CMakeLists.txt",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.7065217391304348,
+            "explanation": "Build system configuration. Unrelated."
+        },
+        {
+            "sourceName": "/Rendering/ShaderProgram.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8478260869565217,
+            "explanation": "Needed for rendering. Indirectly related."
+        },
+        {
+            "sourceName": "/Graphics/Menu/ColorSelectorMenu.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Directly enables color selection"
+        },
+        {
+            "sourceName": "/World/Block.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "This implements the core functionality of selecting a block in the world based on the player's view. It raycasts to find the first block in view and returns it."
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9565217391304348,
+            "explanation": "Needed to display the world and selected block."
+        },
+        {
+            "sourceName": "/World/BlockFace.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Unrelated to block placing/removing."
+        },
+        {
+            "sourceName": "/World/Chunk.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 1.0,
+            "explanation": "The player selection raycasting detects the block the player is looking at. This is directly used to determine block placement/removal position."
+        },
+        {
+            "sourceName": "/Game.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Unrelated to logging"
+        },
+        {
+            "sourceName": "/Graphics/Menu/Menu.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Manages basic menu rendering and input. Unrelated to shaders/textures."
+        },
+        {
+            "sourceName": "/Utils/AABB.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8695652173913043,
+            "explanation": "Unrelated collision class"
+        },
+        {
+            "sourceName": "/Graphics/Menu/EscapeMenu.cpp",
+            "targetName": "Reusable UI components US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8369565217391304,
+            "explanation": "Concrete menu implementation. Not reusable."
+        },
+        {
+            "sourceName": "/Utils/Font.cpp",
+            "targetName": "Assign colors to blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Debug/Graphics/FPSCounter.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Unrelated debug options"
+        },
+        {
+            "sourceName": "/Rendering/RenderEngine.cpp",
+            "targetName": "Copy colors from blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "Core rendering system, needed to display world and selection."
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Renders world and handles input. Will need updates to use new shader and texture functionality."
+        },
+        {
+            "sourceName": "/Graphics/Screen/WorldScreen.cpp",
+            "targetName": "Player move around 3D world US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9782608695652174,
+            "explanation": "Sets up camera transform based on player position and looking direction. Renders world chunks from this viewpoint. Needed to smoothly update rendering as player view changes."
+        },
+        {
+            "sourceName": "/Utils/Font.cpp",
+            "targetName": "Chunks divide world efficiently US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Unrelated util file"
+        },
+        {
+            "sourceName": "/main.cpp",
+            "targetName": "Use shaders textures rendering US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8152173913043479,
+            "explanation": "Program entry point and main loop. Initializes systems. Not directly related."
+        },
+        {
+            "sourceName": "/Rendering/RenderEngine.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.9130434782608696,
+            "explanation": "Renders the world and changes."
+        },
+        {
+            "sourceName": "/main.cpp",
+            "targetName": "Place and remove blocks US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8804347826086957,
+            "explanation": "Sets up systems like world, player, rendering. Indirectly needed."
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Log errors with stack traces US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8043478260869565,
+            "explanation": "Unrelated"
+        },
+        {
+            "sourceName": "/Rendering/RenderEngine.cpp",
+            "targetName": "Display current FPS US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.967391304347826,
+            "explanation": "Needed to display FPS text"
+        },
+        {
+            "sourceName": "/Graphics/Components/Component.cpp",
+            "targetName": "Show debug hitboxes US",
+            "traceType": "GENERATED",
+            "approvalStatus": "UNREVIEWED",
+            "score": 0.8260869565217391,
+            "explanation": "Could be used for debug HUD but indirect"
+        }
+    ]
+}

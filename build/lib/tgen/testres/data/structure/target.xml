@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<artifacts>
+    <project_id>1</project_id>
+    <artifact_type>VistaPlus Data</artifact_type>
+    <artifact>
+        <art_id>80</art_id>
+        <art_title>The system shall provide protection to maintain the integrity of clinical data during concurrent access.
+        </art_title>
+        <art_parent/>
+        <art_content></art_content>
+        <art_type/>
+    </artifact>
+
+    <artifact>
+        <art_id>85</art_id>
+        <art_title>The system shall provide the ability for a user to whom a result is presented to acknowledge the result.
+        </art_title>
+        <art_parent/>
+        <art_content></art_content>
+        <art_type/>
+    </artifact>
+
+    <artifact>
+        <art_id>142</art_id>
+        <art_title>The system shall provide the ability to create hardcopy and electronic report summary information (procedures, medications, labs, immunizations, allergies, and vital signs).
+        </art_title>
+        <art_parent/>
+        <art_content></art_content>
+        <art_type/>
+    </artifact>
+
+    <artifact>
+        <art_id>205</art_id>
+        <art_title>The system shall provide the ability to generate reports consisting of all or part of an individual patient?s medical record (e.g. patient summary).
+        </art_title>
+        <art_parent/>
+        <art_content></art_content>
+        <art_type/>
+    </artifact>
+</artifacts>

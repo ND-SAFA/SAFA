@@ -1,0 +1,2 @@
+[console_scripts]
+tgen_download_static = tgen.scripts.tools.download_static:main

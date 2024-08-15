@@ -1,0 +1,21 @@
+# Entities
+
+RenderEngine: Handles window creation, OpenGL context, and scene rendering.
+Shader: Loads and compiles shader programs.
+ShaderProgram: Manages shader program compilation and linking. 
+Image: Loads image files.
+BlockSelection: Renders selection highlight around blocks.
+Block: Represents a single block with position, color, type.
+Chunk: Manages a chunk of blocks and builds render data.
+World: Contains all chunks that make up the world.
+Player: Stores player state and handles movement and rendering.
+AABB: Axis aligned bounding box for collision detection.
+ICollidable: Interface for objects that can collide.
+Component: Base UI component class.
+Button: Clickable UI element.
+Menu: Base menu class.
+ColorSelectorMenu: Menu for selecting colors.
+EscapeMenu: In-game pause menu.
+SettingsMenu: Sample settings menu.
+DebugOptions: Stores options for debugging aids.
+FPSCounter: Displays frames per second.

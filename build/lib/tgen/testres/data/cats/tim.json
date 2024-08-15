@@ -1,0 +1,19 @@
+{
+  "artifacts": [
+    {
+      "fileName": "cats.csv",
+      "type": "Cat"
+    },
+    {
+      "fileName": "doggo.csv",
+      "type": "Doggo"
+    }
+  ],
+  "traces": [
+    {
+      "fileName": "traces.csv",
+      "sourceType": "Cat",
+      "targetType": "Doggo"
+    }
+  ]
+}

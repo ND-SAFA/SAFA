@@ -1,0 +1,97 @@
+Metadata-Version: 2.1
+Name: tgen
+Version: 0.0.14
+Summary: SAFA.ai generative server.
+Author-email: Katherine Dearstyne <kat@safa.ai>, Alberto Rodriguez <alberto@safa.ai>
+Project-URL: homepage, https://safa.ai
+Keywords: traceability
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: GitPython==3.1.41
+Requires-Dist: PyGithub==1.58.0
+Requires-Dist: accelerate==0.27.2
+Requires-Dist: anthropic==0.28.0
+Requires-Dist: beautifulsoup4~=4.12.3
+Requires-Dist: chinese-whispers==0.5
+Requires-Dist: comment-parser==1.2.4
+Requires-Dist: datasets==2.19.2
+Requires-Dist: evaluate==0.4.2
+Requires-Dist: hdbscan==0.8.33
+Requires-Dist: itypes==1.2.0
+Requires-Dist: javac-parser==1.0.0
+Requires-Dist: javalang==0.13.0
+Requires-Dist: langchain-core==0.2.27
+Requires-Dist: langchain-text-splitters==0.2.1
+Requires-Dist: langchain==0.2.12
+Requires-Dist: lxml==5.2.2
+Requires-Dist: nltk==3.8.1
+Requires-Dist: numpy==1.26.4
+Requires-Dist: openai==1.40.2
+Requires-Dist: pandas==2.0.0
+Requires-Dist: pypdf==4.2.0
+Requires-Dist: python-dotenv==1.0.1
+Requires-Dist: ruamel.yaml==0.17.21
+Requires-Dist: scikit-learn==1.5.0
+Requires-Dist: scipy==1.13.1
+Requires-Dist: sentence-transformers==3.0.1
+Requires-Dist: sentencepiece==0.1.97
+Requires-Dist: sentry-sdk==1.41.0
+Requires-Dist: setproctitle==1.3.3
+Requires-Dist: six==1.16.0
+Requires-Dist: smmap==5.0.1
+Requires-Dist: sniffio==1.3.1
+Requires-Dist: soupsieve==2.5
+Requires-Dist: stanza==1.8.2
+Requires-Dist: sympy==1.12
+Requires-Dist: threadpoolctl==3.3.0
+Requires-Dist: tiktoken==0.7.0
+Requires-Dist: tokenizers==0.19.1
+Requires-Dist: tqdm==4.66.4
+Requires-Dist: transformers==4.41.2
+Requires-Dist: typeguard==4.3.0
+Requires-Dist: typing==3.7.4.3
+Requires-Dist: typing_extensions==4.11.0
+Requires-Dist: wandb==0.13.10
+Requires-Dist: whitenoise==6.4.0
+
+The following project encompasses all jobs relating to generating trace links.
+
+# Structure
+
+- rqs: Contains JSON definition for research questions
+- src: Source code
+    - data: The tools for reading and transforming data between input and outputs.
+    - experiments: The code that allows experiment definitions to be written.
+    - jobs: The infrastructure for running operations within TGEN (e.g. training, prediction).
+    - models: The code for reading and using different models.
+    - scripts: The scripts for running tgen on the server.
+    - testres: The testing resources.
+    - train: Responsible for training models
+    - util: Series of utilities for files, json, data frames and other external data structures.
+    - variables: The different types of variable used in experiments.
+- all other files in this scope are deployment related files.
+
+# Installation
+
+1. Install conda, then run:
+    - conda create -n tgen
+    - conda activate tgen
+    - pip3 install -r requirements.txt
+    - conda install -c nvidia cudatoolkit
+2. Setup .env file:
+
+```commandline
+ROOT_PATH=~/tgen/src
+DATA_PATH=~/data
+OUTPUT_PATH=~/output
+DJANGO_SETTINGS_MODULE=server.settings
+PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:256
+RQ_PATH=~/tgen/rqs
+BUCKET=s3://safa-datasets-open/results
+```
+
+3. Use `run.py` to run different research questions!
+
+```commandline
+$ (tgen) python3 src/scripts/run.py test_rq.json
+```

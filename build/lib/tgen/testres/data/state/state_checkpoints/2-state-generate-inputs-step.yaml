@@ -1,0 +1,84 @@
+_CHECKPOINT_DIRNAME: state_checkpoints
+all_artifacts_dataset: null
+cluster2artifacts: null
+cluster2cohesion: null
+cluster2generations: null
+cluster_dataset: null
+cluster_id2seeds: null
+completed_steps:
+  GenerateInputsStep: 1
+  InitializeDatasetStep: 1
+description_of_artifact: A User story is a concise, informal description of a software
+  feature or functionality, written from the perspective of the end user
+embedding_manager: null
+example_artifact: null
+export_dir: '[ROOT_PATH]/tgen/testres/output'
+final_dataset: null
+format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
+  or benefit].
+generations2sources: null
+id_to_related_children: null
+new_artifact_dataset: null
+original_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  ensure_code_is_summarized: false
+  project_file_id: null
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
+    overrides: {}
+    project_path: '[ROOT_PATH]/tgen/testres/data/state/original_dataset'
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
+      _definition: null
+      conversions: { }
+      definition_reader: null
+      overrides: { }
+      project_path: '[ROOT_PATH]/tgen/testres/data/state/original_dataset'
+      summarizer: null
+    summarizer: null
+  project_summary: null
+  summarizer: null
+  trace_dataset_creator: null
+project_summary: !!python/object/apply:common_resources.data.summarizer.summary.Summary
+  dictitems:
+    overview: !!python/object/apply:common_resources.tools.util.enum_util.EnumDict
+      dictitems:
+        chunks:
+        - Here is a summary of the key technical details and design aspects of the
+          system based on the provided code
+        title: overview
+questions:
+  - What are the main classes/functions in the code?
+  - What are the inputs and outputs of the main functions?
+  - Is there any user interface code and what does it do?
+refined_cluster2artifacts: { }
+refined_cluster2generation: { }
+refined_generations2sources: { }
+seed2artifact_ids: null
+selected_artifacts_dataset: null
+selected_predictions: null
+source_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  ensure_code_is_summarized: false
+  project_file_id: null
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
+    overrides: {}
+    project_path: '[ROOT_PATH]/tgen/testres/data/state/source_dataset'
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
+      _definition: null
+      conversions: { }
+      definition_reader: null
+      overrides: { }
+      project_path: '[ROOT_PATH]/tgen/testres/data/state/source_dataset'
+      summarizer: null
+    summarizer: null
+  project_summary: null
+  summarizer: null
+  trace_dataset_creator: null
+total_input_cost: 0
+total_output_cost: 0
+trace_predictions: null

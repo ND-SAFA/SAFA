@@ -1,0 +1,28 @@
+id,content
+Ground Station (GS),Ground Station
+GS,Ground Speed
+Ancillary Data Relay System (ADRS),Originates at the NSOF facility and provides the ancillary data necessary for the GOES-R ground system to generate the Level-2+ products.
+Lightning Flashes,Lightning appearing at discrete time and space continuity.
+Distress Beacons,Devices activated by persons in distress are part of the Search and Rescue Satellite (SARSAT) service. The beacon’s distress signal is transmitted via the GOES-R satellites to the SARSAT Control Center where rescue organizations are then notified and emergency responders can begin rescue operations.
+Level 0,Unprocessed instrument data at full resolution
+Data Collection Platforms (DCPs),Autonomous data collection platforms for monitoring of weather data which is relayed through GOES-R to the DCS system at WCDAS. These platforms can be controlled through commands relayed via the GOES-R satellites.
+PDA Users,These real-time watch/warning/forecast users receive GOES-R data from the ESPC.
+Spacecraft,"The GOES-R series spacecraft bus is 3-axis stabilized and designed for an on-orbit lifetime of 15 years: 5 years of on-orbit storage, 10 years of operational life, and additionally, may be stored on the ground for up to five years. The spacecraft bus provides mechanical support and alignment of the various instrument payloads, communications payloads, and other bus components. Sun-pointing instruments will be mounted on a solar array platform with an orthogonal axis gimbal to track the Sun in elevation."
+Command,"Commands are sent to the GOES-R series satellites via direct RF communication from antennas at the WCDAS or the CBU. Commands are also sent to the spacecraft at the factory via a landline during integration and testing. During launch and orbit raising, commands are routed through the NASA Launch Services."
+Search and Rescue (SAR) Terminals,These devices receive the SAR distress beacon signals via the GOES-R satellites.
+Telemetry (TLM),"Telemetry is received from the GOES-R series satellites during nominal operations via direct RF communication from antennas at the WCDAS or the CBU. Additionally, telemetry is received from the spacecraft at the factory via a landline during integration and testing. During launch and orbit raising, telemetry is primarily received from the Launch Services network."
+Level 1b,"Level 0 data with radiometric and geometric correction applied to produce parameters
+in physical units"
+Atmosphere,Earth's Atmosphere
+DCS Remote Ground Stations (DRGSs),These stations are recipients of the DCS data originating from the DCS platforms and rebroadcast via the GOES-R satellites.
+Data Collection System (DCS),"DCS commands are received from the DCS facility at the WCDAS and transmitted via GOES-R antennas to the GOES-R satellites for broadcast to DCS platforms and remote ground stations. Data from the DCS platforms is uplinked to the GOES-R satellites, transmitted to the ground segment, and sent to the DCS facilities at WCDAS for distribution."
+HRIT/EMWIN Terminals,These terminals receive the HRIT/EMWIN data broadcast by the GOES-R satellites. The HRIT/EMWIN data originates at the NSOF.
+High Rate Information Transmission/Emergency Managers Weather Information Network (HRIT/EMWIN) ,This data originates from either the NSOF facility or the CBU facility and is transferred to the Ground Segment for uplink to the satellites and broadcast to remote users with HRIT/EMWIN terminals.
+Level 2+,Derived environmental variables with spatial and temporal resolution comparable to Level 1 data
+Lightning Groups,Contiguous Lightning Events
+GRB Terminals,These terminals receive the GOES Rebroadcast data that has been rebroadcast from the space segment.
+Product Distribution and Access (PDA) within ESPC,Receives GOES-R data and supporting products for distribution to users through a portal and to the Comprehensive Large Array-data Stewardship System (CLASS). CLASS receives GOES-R data and supporting products from PDA for long-term archive and distribution.
+Advanced Weather Interactive Processing System (AWIPS),Receives GOES-R imagery data for use by the National Weather Service (NWS).
+GOES-R Rebroadcast (GRB),Level 1b processed instrument data is uplinked to the GOES-R satellites from the WCDAS or CBU facilities for broadcast to direct readout users for further processing.
+Launch Services,Pre-launch processing includes communication to the GOES-R satellites during launch and orbit raising before they reach an orbital position where the GOES-R Ground System can communicate with them.
+Data Collection Platforms (DCP),"Autonomous data collection platforms are used for monitoring weather data, which is relayed through the GOES-R satellites to the Data Collection System (DCS) at the Wallops Command and Data Acquisition Station (WCDAS). These platforms can be controlled through commands that are transmitted via the GOES-R satellites."

@@ -1,0 +1,155 @@
+_checkpoint_dir: state_checkpoints
+all_generated_content: &id001
+  ? As a game developer, I want DebugOptions and FPSCounter classes to display debugging
+    information like FPS, so that I can analyze performance and diagnose issues.
+  : []
+  ? As a game developer, I want Shader and ShaderProgram classes to handle loading,
+    compiling, linking, and managing shader programs, so that I can render graphics
+    using modern shader-based OpenGL.
+  : - /Rendering/Shader.cpp
+    - /Rendering/ShaderProgram.cpp
+  ? As a game developer, I want UI Component classes like Button and Menu to implement
+    reusable UI elements, so that I can create an in-game user interface.
+  : []
+  ? As a game developer, I want a Player class to store player state, apply movement,
+    handle collisions, perform raycasting for block selection, and render the player,
+    so that I can implement a controllable character that interacts with the 3D world.
+  : - /Player.cpp
+  ? As a game developer, I want a RenderEngine class to handle window creation, OpenGL
+    context, camera view, and scene rendering, so that I have a reusable graphics
+    engine for displaying 3D scenes.
+  : - /Rendering/RenderEngine.cpp
+  ? As a game developer, I want an AABB class for collision detection using axis-aligned
+    bounding boxes, so that I can implement basic collision between game objects.
+  : - /Utils/AABB.cpp
+  ? As a game developer, I want an Image class to load image files as textures using
+    STB Image, so that I can apply detailed textures to 3D models.
+  : - /Rendering/Image.cpp
+    - /Rendering/stb_image.cpp
+  ? As a game developer, I want classes to represent in-game entities like Block,
+    Chunk, and World to manage individual blocks, chunks of blocks, and the entire
+    world, so that I can structure the 3D game world in a modular way.
+  : - /World/Block.cpp
+    - /World/Chunk.cpp
+    - /World/World.cpp
+  As a game developer, I want exception handling with call stack traces, so that I can properly handle and debug crashes.: []
+  ? As a game developer, I want to initialize a game engine by constructing a Game
+    object that initializes a RenderEngine for handling window creation and 2D/3D
+    rendering, loads a WorldScreen representing the main game screen, and runs a main
+    loop for event handling, updating, and rendering, so that I have a reusable game
+    engine framework.
+  : - /Game.cpp
+completed_steps:
+  CreateHGenDatasetStep: 1
+  GenerateArtifactContentStep: 1
+  GenerateInputsStep: 1
+  InitializeDatasetStep: 1
+  RefineGenerationsStep: 1
+description_of_artifact: A User story is a concise, informal description of a software
+  feature or functionality, written from the perspective of the end user. It is a
+  key artifact in Agile software development, used to capture and prioritize requirements.
+  User stories differ from other software artifacts, such as use cases or functional
+  specifications, in that they are intentionally brief, focusing on the user's needs
+  and goals, and are typically written in everyday language. They are meant to foster
+  collaboration and communication between the development team and stakeholders, rather
+  than serving as a detailed technical specification.
+export_dir: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230
+final_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  project_file_id: null
+  project_reader: null
+  summarizer: null
+  trace_dataset_creator: !!python/object:common_resources.data.creators.trace_dataset_creator.TraceDatasetCreator
+    allowed_missing_sources: -1
+    allowed_missing_targets: -1
+    allowed_orphans: -1
+    artifact_df: null
+    data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
+      ordered_steps: []
+      steps: []
+    layer_mapping_df: null
+    linked_artifact_ids: null
+    orphan_artifact_ids: null
+    project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
+      _AbstractProjectReader__processed_project_path: true
+      _definition: null
+      conversions: {}
+      definition_reader: !!python/object:common_resources.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      overrides: {}
+      project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/final_dataset
+      summarizer: null
+    remove_orphans: false
+    trace_df: null
+format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
+  or benefit].
+generations2sources: *id001
+n_generations: 1
+original_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  project_file_id: null
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
+    _AbstractProjectReader__processed_project_path: false
+    overrides: {}
+    project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/original_dataset
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
+      _AbstractProjectReader__processed_project_path: true
+      _definition: null
+      conversions: {}
+      definition_reader: !!python/object:common_resources.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      overrides: {}
+      project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/original_dataset
+      summarizer: null
+    summarizer: null
+  summarizer: null
+  trace_dataset_creator: null
+questions:
+- What are the main classes/functions in the code?
+- What are the inputs and outputs of the main functions?
+- Is there any user interface code and what does it do?
+- Is there any database or file access code and what does it access?
+- Are there any configuration or settings files and what do they configure?
+- Is there logging or error handling code and what does it log/handle?
+- Does the code appear to follow an MVC or layered architecture pattern?
+- What external services, APIs, or libraries does the code use and why?
+- What algorithms or business logic can be inferred from the code?
+- What user needs might the code address based on its capabilities?
+refined_content: *id001
+source_dataset: !!python/object:common_resources.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:common_resources.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  project_file_id: null
+  project_reader: !!python/object:common_resources.data.readers.artifact_project_reader.ArtifactProjectReader
+    _AbstractProjectReader__processed_project_path: false
+    overrides: {}
+    project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/source_dataset
+    structured_project_reader: !!python/object:common_resources.data.readers.structured_project_reader.StructuredProjectReader
+      _AbstractProjectReader__processed_project_path: true
+      _definition: null
+      conversions: {}
+      definition_reader: !!python/object:common_resources.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      overrides: {}
+      project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/source_dataset
+      summarizer: null
+    summarizer: null
+  summarizer: null
+  trace_dataset_creator: null
+summary: "# Entities\n\nRenderEngine: Handles window creation, OpenGL context, and\
+  \ scene rendering.\nShader: Loads and compiles shader programs.\nShaderProgram:\
+  \ Manages shader program compilation and linking. \nImage: Loads image files.\n\
+  BlockSelection: Renders selection highlight around blocks.\nBlock: Represents a\
+  \ single block with position, color, type.\nChunk: Manages a chunk of blocks and\
+  \ builds render data.\nWorld: Contains all chunks that make up the world.\nPlayer:\
+  \ Stores player state and handles movement and rendering.\nAABB: Axis aligned bounding\
+  \ box for collision detection.\nICollidable: Interface for objects that can collide.\n\
+  Component: Base UI component class.\nButton: Clickable UI element.\nMenu: Base menu\
+  \ class.\nColorSelectorMenu: Menu for selecting colors.\nEscapeMenu: In-game pause\
+  \ menu.\nSettingsMenu: Sample settings menu.\nDebugOptions: Stores options for debugging\
+  \ aids.\nFPSCounter: Displays frames per second."

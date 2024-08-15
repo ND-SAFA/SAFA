@@ -107,7 +107,10 @@ class PredictEntityStep(AbstractPipelineStep):
 
             query_existing_concepts = artifact2match[query_artifact[ArtifactKeys.ID]]
             query_concepts = [c for c in args.get_concept_artifacts() if c[ArtifactKeys.ID] not in query_existing_concepts]
-            query_concepts = PredictEntityStep.get_similar_concepts(embeddings_manager, query_artifact, query_concepts)
+            query_concepts = PredictEntityStep.get_similar_concepts(embeddings_manager,
+                                                                    query_artifact,
+                                                                    query_concepts,
+                                                                    args.n_concepts_in_prompt)
             prompt = builder.build(llm_args, artifacts=query_concepts, artifact=query_artifact)
             prompt[PromptKeys.SYSTEM] = system_prompt
             builders.append(builder)
@@ -120,7 +123,7 @@ class PredictEntityStep(AbstractPipelineStep):
             embeddings_manager: EmbeddingsManager,
             query_artifact: Artifact,
             concept_artifacts: List[Artifact],
-            n_top: int = 50
+            n_top: int
     ) -> List[Artifact]:
         query_id = query_artifact[ArtifactKeys.ID]
         concept_ids = [c[ArtifactKeys.ID] for c in concept_artifacts]

@@ -29,3 +29,6 @@ application-credentials.json
 wandb/**
 wandb/**
 */wandb
+
+build
+build/**

@@ -21,6 +21,7 @@ class ConceptArgs(Args):
     query_ids: List[str] = required_field(field_name="Query ids")
     concept_layer_id: str = CONCEPT_TYPE
     llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
+    n_concepts_in_prompt: int = 30
 
     _query_artifacts: List[Artifact] = None
     _concept_artifacts: List[Artifact] = None

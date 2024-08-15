@@ -6,8 +6,8 @@ from common_resources.llm.response_managers.abstract_response_manager import Abs
 from common_resources.tools.util.dict_util import DictUtil
 from common_resources.tools.util.json_util import JsonUtil
 
-RESPONSE_FORMAT = "You should respond using the following JSON format:\n{}"
-JSON_CONTENT_START = "```json"
+RESPONSE_FORMAT = "\n# Format Instructions\nYou should respond using the following JSON format:\n```\n{}\n```"
+JSON_CONTENT_START = "```"
 JSON_CONTENT_END = "```"
 
 

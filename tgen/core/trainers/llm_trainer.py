@@ -254,8 +254,14 @@ class LLMTrainer(AbstractTrainer):
             prompt_builder_id_to_response = {p_id: r for r, p_id in zip(responses, prompt_builder_ids)}
             responses = [prompt_builder_id_to_response[p_id] for p_id in prompt_builder_ids]
             prompt_builder_ids = prompt_builder_map.keys()
-        predictions = [(prompt_builder_map[p_id].parse_responses(r) if not isinstance(r, Exception) else r)
-                       for i, (r, p_id) in enumerate(zip(responses, prompt_builder_ids))]
+        predictions = []
+        for i, (r, p_id) in enumerate(zip(responses, prompt_builder_ids)):
+            try:
+                pred = prompt_builder_map[p_id].parse_responses(r) if not isinstance(r, Exception) else r
+            except Exception as e:
+                print("Unable to parse response: r:")
+                pred = None
+            predictions.append(pred)
         return TracePredictionOutput(predictions=predictions,
                                      original_response=responses)  #
 

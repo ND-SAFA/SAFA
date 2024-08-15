@@ -11,6 +11,7 @@ from common_resources.llm.prompts.multi_artifact_prompt import MultiArtifactProm
 from common_resources.llm.prompts.prompt import Prompt
 from common_resources.llm.prompts.prompt_builder import PromptBuilder
 from common_resources.llm.response_managers.json_response_manager import JSONResponseManager
+from common_resources.tools.t_logging.logger_manager import logger
 from common_resources.traceability.relationship_manager.embeddings_manager import EmbeddingsManager
 from pydantic.v1 import BaseModel, Field
 
@@ -150,6 +151,9 @@ class PredictEntityStep(AbstractPipelineStep):
         traces = []
         text2concept = {c[ArtifactKeys.ID].lower(): c[ArtifactKeys.ID] for c in args.get_concept_artifacts()}
         for artifact, builder, prediction in zip(args.get_query_artifacts(), builders, output.predictions):
+            if prediction is None:
+                logger.info(f"Unable to parse response for artifact: {artifact}")
+                continue
             prompt_id = builder.prompts[-1].args.prompt_id
             builder_output = prediction[prompt_id]
             previous_matches = artifact2match[artifact[ArtifactKeys.ID]]

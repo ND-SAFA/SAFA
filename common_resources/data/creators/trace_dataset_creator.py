@@ -4,10 +4,6 @@ from typing import Any, Dict, List, Optional, Set
 
 import pandas as pd
 
-from common_resources.tools.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, \
-    ALLOWED_ORPHANS_DEFAULT, \
-    NO_CHECK, REMOVE_ORPHANS_DEFAULT
-from common_resources.tools.constants.symbol_constants import COMMA, NEW_LINE
 from common_resources.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from common_resources.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from common_resources.data.dataframes.layer_dataframe import LayerDataFrame
@@ -16,6 +12,10 @@ from common_resources.data.keys.structure_keys import StructuredKeys, TraceKeys
 from common_resources.data.processing.cleaning.data_cleaner import DataCleaner
 from common_resources.data.readers.abstract_project_reader import AbstractProjectReader
 from common_resources.data.tdatasets.trace_dataset import TraceDataset
+from common_resources.tools.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, \
+    ALLOWED_ORPHANS_DEFAULT, \
+    NO_CHECK, REMOVE_ORPHANS_DEFAULT
+from common_resources.tools.constants.symbol_constants import COMMA, NEW_LINE
 from common_resources.tools.t_logging.logger_manager import logger
 from common_resources.tools.util.dataframe_util import DataFrameUtil
 from common_resources.tools.util.list_util import ListUtil
@@ -32,7 +32,8 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
                  remove_orphans: bool = REMOVE_ORPHANS_DEFAULT,
                  allowed_missing_sources: int = ALLOWED_MISSING_SOURCES_DEFAULT,
                  allowed_missing_targets: int = ALLOWED_MISSING_TARGETS_DEFAULT,
-                 allowed_orphans: int = ALLOWED_ORPHANS_DEFAULT):
+                 allowed_orphans: int = ALLOWED_ORPHANS_DEFAULT,
+                 should_generate_negative_links: bool = True):
         """
         Initializes creator with entities extracted from reader.
         :param project_reader: Project reader responsible for extracting project entities.
@@ -53,6 +54,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         self.remove_orphans = remove_orphans
         self.linked_artifact_ids = None
         self.orphan_artifact_ids = None
+        self.should_generate_negative_links = should_generate_negative_links
 
     def create(self) -> TraceDataset:
         """
@@ -132,7 +134,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         Creates trace links from trace DataFrame using artifacts for references.
         :return: Mapping of trace link ids to the link.
         """
-        if self.trace_df.get_label_count(0) < 1:
+        if self.trace_df.get_label_count(0) < 1 and self.should_generate_negative_links:
             self.trace_df = self.generate_negative_links(self.layer_mapping_df, self.artifact_df, self.trace_df)
         self._log_artifact_types(self.artifact_df)
         trace_dataset = TraceDataset(artifact_df=self.artifact_df, trace_df=self.trace_df, layer_df=self.layer_mapping_df)

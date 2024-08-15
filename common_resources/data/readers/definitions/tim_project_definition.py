@@ -1,12 +1,12 @@
 import os
 from typing import Dict
 
-from common_resources.tools.constants.dataset_constants import NO_CHECK
-from common_resources.tools.constants.symbol_constants import PERIOD
-from common_resources.tools.util.json_util import JsonUtil
 from common_resources.data.keys.safa_keys import SafaKeys
 from common_resources.data.keys.structure_keys import StructuredKeys
 from common_resources.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition
+from common_resources.tools.constants.dataset_constants import NO_CHECK
+from common_resources.tools.constants.symbol_constants import PERIOD
+from common_resources.tools.util.json_util import JsonUtil
 
 
 class TimProjectDefinition(AbstractProjectDefinition):
@@ -39,7 +39,7 @@ class TimProjectDefinition(AbstractProjectDefinition):
                 "source": StructuredKeys.Trace.SOURCE.value,
                 "target": StructuredKeys.Trace.TARGET.value,
                 "label": StructuredKeys.Trace.LABEL.value,
-                "score": StructuredKeys.Trace.SOURCE.value,
+                "score": StructuredKeys.Trace.SCORE.value,
                 "explanation": StructuredKeys.Trace.EXPLANATION.value
             }
         }

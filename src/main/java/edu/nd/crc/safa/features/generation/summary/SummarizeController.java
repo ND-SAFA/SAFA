@@ -3,13 +3,12 @@ package edu.nd.crc.safa.features.generation.summary;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.authentication.builders.ResourceBuilder;
 import edu.nd.crc.safa.config.AppRoutes;
+import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.BaseController;
 import edu.nd.crc.safa.features.common.ServiceProvider;
-import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
 import edu.nd.crc.safa.features.jobs.builders.ProjectSummaryJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
@@ -42,15 +41,13 @@ public class SummarizeController extends BaseController {
      * @return List of summaries.
      */
     @PostMapping(AppRoutes.Summarize.SUMMARIZE_ARTIFACTS)
-    public List<String> summarizeArtifacts(@PathVariable UUID versionId,
-                                           @RequestBody @Valid SummarizeArtifactRequestDTO request) {
+    public List<ArtifactAppEntity> summarizeArtifacts(@PathVariable UUID versionId,
+                                                      @RequestBody @Valid SummarizeArtifactRequestDTO request) {
         SafaUser user = getServiceProvider().getSafaUserService().getCurrentUser();
         ProjectVersion projectVersion = getProjectVersion(versionId, user, request);
         request.setProjectVersion(projectVersion);
         request.setProjectSummary(projectVersion.getProject().getSpecification());
-        List<GenerationArtifact> summarizedArtifacts =
-            getServiceProvider().getSummaryService().generateArtifactSummaries(request);
-        return summarizedArtifacts.stream().map(GenerationArtifact::getSummary).collect(Collectors.toList());
+        return getServiceProvider().getSummaryService().generateArtifactSummaries(request);
     }
 
     @PostMapping(AppRoutes.Summarize.SUMMARIZE_PROJECT)
@@ -69,11 +66,11 @@ public class SummarizeController extends BaseController {
         }
 
         return getResourceBuilder()
-           .fetchVersion(versionId)
-           .asUser(user)
-           .withPermissions(Set.of(ProjectPermission.GENERATE, ProjectPermission.EDIT_DATA))
-           .withAdditionalCheck(new HasUnlimitedCreditsCheck())
-           .withAdditionalCheck(maxSizeCheck)
-           .get();
+            .fetchVersion(versionId)
+            .asUser(user)
+            .withPermissions(Set.of(ProjectPermission.GENERATE, ProjectPermission.EDIT_DATA))
+            .withAdditionalCheck(new HasUnlimitedCreditsCheck())
+            .withAdditionalCheck(maxSizeCheck)
+            .get();
     }
 }

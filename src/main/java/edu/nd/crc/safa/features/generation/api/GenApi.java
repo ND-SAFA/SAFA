@@ -120,7 +120,7 @@ public class GenApi implements ITraceGenerationController {
      * @return TGen response.
      */
     public SummaryResponse generateArtifactSummaries(SummaryRequest request, JobLogger logger) {
-        return artifactSummaryApi.sendSummarizeRequest(request, logger);
+        return artifactSummaryApi.sendArtifactSummarizeRequest(request, logger);
     }
 
     /**

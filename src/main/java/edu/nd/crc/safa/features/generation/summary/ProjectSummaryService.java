@@ -97,8 +97,13 @@ public class ProjectSummaryService {
         int nSummaries = hasSummaries ? summarizedArtifacts.size() : 0;
         if (hasSummaries) {
             for (GenerationArtifact summarizedArtifact : summarizedArtifacts) {
+                String summary = summarizedArtifact.getSummary();
+                if (summary == null || summary.isBlank()) {
+                    logger.log("Artifact " + summarizedArtifact.getId() + " came back without summary.");
+                    continue;
+                }
                 ArtifactAppEntity artifact = artifactMap.get(summarizedArtifact.getId());
-                artifact.setSummary(summarizedArtifact.getSummary());
+                artifact.setSummary(summary);
             }
             commitService.saveArtifacts(user, projectVersion, artifacts, ModificationType.MODIFIED);
 

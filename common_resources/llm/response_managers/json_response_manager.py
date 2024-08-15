@@ -92,10 +92,11 @@ class JSONResponseManager(AbstractResponseManager):
 
     @staticmethod
     def _remove_extra_text(r: str) -> str:
-
         if JSON_CONTENT_START in r:
             start_idx = r.find(JSON_CONTENT_START)
             end_idx = r.find(JSON_CONTENT_END, start_idx)
+            if end_idx == 1:
+                end_idx = len(r)
             return r[start_idx + len(JSON_CONTENT_START):end_idx].strip()
         return r
 

@@ -1,10 +1,10 @@
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, List, Type, Tuple
+from typing import Any, Dict, List, Tuple, Type
 
+from common_resources.llm.response_managers.abstract_response_manager import AbstractResponseManager
 from common_resources.tools.util.dict_util import DictUtil
 from common_resources.tools.util.json_util import JsonUtil
-from common_resources.llm.response_managers.abstract_response_manager import AbstractResponseManager
 
 RESPONSE_FORMAT = "You should respond using the following JSON format:\n{}"
 
@@ -92,6 +92,6 @@ class JSONResponseManager(AbstractResponseManager):
 
         :return: The args and kwargs needed for the response instructions format.
         """
-        args = [self.response_tag]
-        kwargs = self.response_tag
+        args = [JsonUtil.dict_to_json(self.response_tag)]
+        kwargs = {}
         return args, kwargs

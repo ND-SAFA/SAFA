@@ -29,7 +29,6 @@ class ConceptPredictionJob(AbstractJob):
         self.concept_layer_id = concept_layer_id
         self.additional_args = additional_args
 
-    @property
     def _run(self) -> ConceptPipelineResponse:
         """
         Runs health checks on the query artifact.

@@ -7,6 +7,8 @@ from common_resources.tools.util.dict_util import DictUtil
 from common_resources.tools.util.json_util import JsonUtil
 
 RESPONSE_FORMAT = "You should respond using the following JSON format:\n{}"
+JSON_CONTENT_START = "```json"
+JSON_CONTENT_END = "```"
 
 
 @dataclass
@@ -34,6 +36,7 @@ class JSONResponseManager(AbstractResponseManager):
         """
         if not self.response_tag:
             return {}
+        response = self._remove_extra_text(response)
         response_dict = json.loads(response)
         output = self._parse_response_helper(response_dict)
         return self._format_response(output)
@@ -86,6 +89,15 @@ class JSONResponseManager(AbstractResponseManager):
         :return: None
         """
         assert isinstance(response, expected_type), f"Response not in correct format: \nexpected {expected}, \nreceived {response}"
+
+    @staticmethod
+    def _remove_extra_text(r: str) -> str:
+
+        if JSON_CONTENT_START in r:
+            start_idx = r.find(JSON_CONTENT_START)
+            end_idx = r.find(JSON_CONTENT_END, start_idx)
+            return r[start_idx + len(JSON_CONTENT_START):end_idx].strip()
+        return r
 
     def _get_response_instructions_format_params(self) -> Tuple[List, Dict]:
         """

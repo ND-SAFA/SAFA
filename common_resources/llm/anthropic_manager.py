@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, List, Optional, Set, Tuple, TypedDict, Union
 
 import anthropic
@@ -42,6 +43,9 @@ def response_with_defaults(**params) -> AnthropicResponse:
     all_params = {attr: params[attr] if attr in params else defaults[type_]
                   for attr, type_ in AnthropicResponse.__annotations__.items()}
     return AnthropicResponse(**all_params)
+
+
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 
 class AnthropicManager(AbstractLLMManager[AnthropicResponse]):

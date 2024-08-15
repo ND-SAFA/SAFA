@@ -25,10 +25,11 @@ from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep
 # TODO : I don't like needing to pass around the triplet of (prompt, builder, artifact)
 
 system_prompt = (
-    "You are working on a project containing a list of project-specific concepts and terminology "
+    "You will be given a list of project-specific concepts and terminology "
     "alongside a specific target artifact from the project. "
-    "Your job is to predict which concepts are cited in the artifact. "
-    "Each artifact has an ID and some content, predict only the IDs contained within the target artifact. "
+    "Your job is to note which artifact IDs are referenced in the target artifact text. "
+    "Only include predictions which have a direct reference to the concept/terminology in the target artifact text. "
+    "Only provide the IDs of the concepts / terminology that are referenced in the target artifact text. "
     "Only provide the content specified in the format instructions."
 )
 

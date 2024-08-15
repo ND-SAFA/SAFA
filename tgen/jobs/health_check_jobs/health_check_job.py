@@ -50,7 +50,8 @@ class HealthCheckJob(AbstractJob):
                                                                           artifact_key=TraceKeys.child_label())
         context_traces = [trace for trace in related_traces if trace[TraceKeys.RELATIONSHIP_TYPE] == TraceRelationshipType.CONTEXT]
         results = HealthCheckResults(context_traces=context_traces,
-                                     contradictions=contradictions_result)
+                                     contradictions=contradictions_result,
+                                     undefined_concepts=[])
         return results
 
     def _run_contradictions_detector(self, **kwargs) -> List[ContradictionsResult]:

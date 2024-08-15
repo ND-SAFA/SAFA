@@ -111,12 +111,12 @@ class MultiThreadState:
                 self.result_list[index] = e
         self.item_queue.unpause()
 
-    def reduce_rpm(self, amount: float) -> None:
+    def add_time(self, seconds: float) -> None:
         """
         Increases the interval to wait between items in queue.
         :return: None
         """
-        self.item_queue.change_time_per_request(amount)
+        self.item_queue.change_time_per_request(seconds)
         logger.info(f"Reduced time-between-requests to {self.item_queue.time_between_requests} seconds.")
 
     def _init_progress_bar(self) -> None:

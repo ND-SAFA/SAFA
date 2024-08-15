@@ -25,7 +25,7 @@ def anthropic_exception_handler(state: MultiThreadState, e: Exception,
     if any([isinstance(e, error_type) for error_type in ANTHROPIC_ERRORS]):
         logger.info(f"Received anthropic error: {e}")
         logger.info("Anthropic is currently overloaded. Resuming once anthropic comes back online.")
-        state.reduce_rpm(1)
+        state.add_time(.1)
         _wait_until_online(state, timeout=timeout, sleep_time=sleep_time)
         return True
     return False

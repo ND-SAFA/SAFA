@@ -28,6 +28,7 @@ system_prompt = (
     "alongside a specific target artifact from the project. "
     "Your job is to predict which concepts are cited in the artifact. "
     "Each artifact has an ID and some content, predict only the IDs contained within the target artifact. "
+    "Only provide the content specified in the format instructions."
 )
 
 
@@ -97,11 +98,11 @@ class PredictEntityStep(AbstractPipelineStep):
             builder = PromptBuilder(
                 prompts=[
                     MultiArtifactPrompt("Project Concepts and Terminology", build_method=MultiArtifactPrompt.BuildMethod.XML),
-                    ArtifactPrompt("# Target Artifact\n\n---"),
-                    Prompt("\nFormat your answer using the following format:",
-                           response_manager=JSONResponseManager.from_langgraph_model(
-                               ExpectedResponse
-                           ))
+                    ArtifactPrompt("# Target Artifact\n"),
+                    Prompt(
+                        response_manager=JSONResponseManager.from_langgraph_model(
+                            ExpectedResponse
+                        ))
                 ],
             )
 

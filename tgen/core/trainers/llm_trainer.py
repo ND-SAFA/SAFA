@@ -259,7 +259,7 @@ class LLMTrainer(AbstractTrainer):
             try:
                 pred = prompt_builder_map[p_id].parse_responses(r) if not isinstance(r, Exception) else r
             except Exception as e:
-                print("Unable to parse response: r:")
+                print(f"Unable to parse response: r:{r}")
                 pred = None
             predictions.append(pred)
         return TracePredictionOutput(predictions=predictions,

@@ -1,6 +1,6 @@
 # Include the specific .txt file
-recursive-include common_resources *
-recursive-include common_resources_test *
+recursive-include gen_common *
+recursive-include gen_common_test *
 
 # Exclude __pycache__ and .pyc files
 global-exclude __pycache__/

@@ -3,8 +3,8 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "gen-common-resources"
-version = "0.0.30"
+name = "gen-common"
+version = "0.0.1"
 description = "SAFA.ai common utilities for python / generative workloads."
 readme = "README.md"
 keywords = ["traceability"]
@@ -19,4 +19,4 @@ homepage = "https://safa.ai"  # Replace with your actual homepage URL if needed
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["common_resources", "common_resources_test"]
+include = ["gen_common", "gen_common_test"]

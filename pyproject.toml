@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gen-common-resources"
-version = "0.0.28"
+version = "0.0.29"
 description = "SAFA.ai common utilities for python / generative workloads."
 readme = "README.md"
 keywords = ["traceability"]
@@ -18,4 +18,5 @@ dependencies = ['anthropic==0.28.0', 'beautifulsoup4==4.12.3', 'chromadb==0.5.5'
 homepage = "https://safa.ai"  # Replace with your actual homepage URL if needed
 
 [tool.setuptools.packages.find]
-exclude = ["common_resources_test*"]
+where = ["."]
+include = ["common_resources", "common_resources_test"]

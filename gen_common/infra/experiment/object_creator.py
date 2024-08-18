@@ -3,6 +3,7 @@ from typing import Dict, Type, TypeVar
 
 from gen_common.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
+from gen_common.data.managers.trainer_dataset_manager import TrainerDatasetManager
 from gen_common.data.processing.augmentation.data_augmenter import DataAugmenter
 from gen_common.data.readers.api_project_reader import ApiProjectReader
 from gen_common.infra.experiment.definition_creator import DefinitionCreator
@@ -47,10 +48,18 @@ class ObjectCreator:
         }
     }
 
+    trainer_dataset_manager_definition = {
+        "train_dataset_creator": {
+            TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
+            **dataset_creator_definition
+        }
+    }
+
     SUPPORTED_OBJECTS = {
         HuggingFaceArgs: trainer_args_definition,
         JobArgs: job_args_definition,
         TraceDatasetCreator: dataset_creator_definition,
+        TrainerDatasetManager: trainer_dataset_manager_definition,
         DataAugmenter: augmenter_definition,
         ApiProjectReader: api_project_reader
     }

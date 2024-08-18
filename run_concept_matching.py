@@ -1,11 +1,11 @@
 import os.path
 
-from common_resources.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from common_resources.data.creators.trace_dataset_creator import TraceDatasetCreator
-from common_resources.data.readers.structured_project_reader import StructuredProjectReader
+from gen_common.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
+from gen_common.data.readers.structured_project_reader import StructuredProjectReader
+from gen_common.jobs.job_args import JobArgs
 
-from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.health_check_jobs.concept_prediction_job import ConceptPredictionJob
+from gen.health.jobs.concept_prediction_job import ConceptPredictionJob
 
 
 def main():

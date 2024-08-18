@@ -1,6 +1,6 @@
 # Include the specific .txt file
-recursive-include tgen *
-recursive-include tgen_test *
+recursive-include gen *
+recursive-include gen_test *
 
 # Exclude __pycache__ and .pyc files
 global-exclude __pycache__/

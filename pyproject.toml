@@ -3,8 +3,8 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tgen"
-version = "0.0.14"
+name = "gen"
+version = "0.0.1"
 description = "SAFA.ai generative server."
 readme = "README.md"
 keywords = ["traceability"]
@@ -22,7 +22,7 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["tgen", "tgen_test"]
+include = ["gen", "gen_test"]
 
 [project.scripts]
-tgen_download_static = "tgen.scripts.tools.download_static:main"
+tgen_download_static = "gen.scripts.tools.download_static:main"

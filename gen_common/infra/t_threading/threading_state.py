@@ -3,8 +3,8 @@ from typing import Any, Callable, Iterable, List, Optional, Set
 
 from tqdm import tqdm
 
-from gen_common.constants import TQDM_NCOLS
-from gen_common.constants import THREAD_SLEEP
+from gen_common.constants.logging_constants import TQDM_NCOLS
+from gen_common.constants.threading_constants import THREAD_SLEEP
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.infra.t_threading.rate_limited_queue import RateLimitedQueue
 

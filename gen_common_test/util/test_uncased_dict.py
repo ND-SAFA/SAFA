@@ -1,5 +1,5 @@
-from gen_common.util import UncasedDict
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.uncased_dict import UncasedDict
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestUncasedDict(BaseTest):

@@ -4,7 +4,7 @@ from gen_common.data.readers.entity.formats.json_entity_format import JsonEntity
 from gen_common.data.readers.entity.formats.xml_entity_format import XmlEntityFormat
 from gen_common.data.readers.entity.supported_entity_formats import SupportedEntityFormats
 from gen_common.data.keys.structure_keys import StructuredKeys
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.test_format_paths import CSV_ENTITY_PATH, FOLDER_PROJECT_PATH, JSON_ENTITY_PATH, XML_ENTITY_PATH
 
 

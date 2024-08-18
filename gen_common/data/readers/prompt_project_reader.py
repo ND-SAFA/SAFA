@@ -1,7 +1,7 @@
 from gen_common.data.dataframes.prompt_dataframe import PromptDataFrame
 from gen_common.data.keys.prompt_keys import PromptKeys
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
-from gen_common.util import FileUtil
+from gen_common.util.file_util import FileUtil
 from gen_common.util.json_util import JsonUtil
 
 

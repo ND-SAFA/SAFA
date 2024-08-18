@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from gen_common.tools.state_management.args import Args
-from gen_common.tools.state_management.state import State
-from gen_common.tools.t_logging.logger_manager import logger
+from gen_common.infra.t_logging.logger_manager import logger
+from gen_common.pipeline.args import Args
+from gen_common.pipeline.state import State
 
 StateType = TypeVar("StateType", bound=State)
 ArgType = TypeVar("ArgType", bound=Args)

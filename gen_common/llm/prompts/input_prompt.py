@@ -1,6 +1,6 @@
 from gen_common.llm.prompts.prompt import Prompt
 from gen_common.llm.prompts.prompt_args import PromptArgs
-from gen_common.util import StrUtil
+from gen_common.util.str_util import StrUtil
 
 
 class InputPrompt(Prompt):

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from gen_common.util import BaseObject
+from gen_common.infra.base_object import BaseObject
 
 
 @dataclass

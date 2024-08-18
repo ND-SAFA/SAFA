@@ -1,7 +1,7 @@
 import uuid
 
 from gen_common.util.llm_response_util import LLMResponseUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestLLMResponseUtil(BaseTest):

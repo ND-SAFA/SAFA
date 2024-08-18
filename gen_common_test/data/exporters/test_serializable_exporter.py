@@ -1,9 +1,9 @@
 from gen_common.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from gen_common.data.creators.serialized_dataset_creator import SerializedDatasetCreator
 from gen_common.data.exporters.serializable_exporter import SerializableExporter
-from gen_common.data.summarizer.summary import Summary
-from gen_common.util import EnumDict
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.summarize.summary import Summary
+from gen_common.util.enum_util import EnumDict
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.testprojects.prompt_test_project import PromptTestProject
 
 

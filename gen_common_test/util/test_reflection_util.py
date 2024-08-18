@@ -3,8 +3,8 @@ from enum import Enum
 from typing import Dict, List, Optional, Tuple, Union
 
 from gen_common.util.reflection_util import ParamScope, ReflectionUtil
-from gen_common_test.base_tests.base_test import BaseTest
-from gen_common_test.test_constants import TEST_DIR_NAME
+from gen_common_test.base.constants import PACKAGE_DIR_NAME, TEST_DIR_NAME
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.test_data.test_data_manager import TestDataManager
 
 
@@ -85,7 +85,7 @@ class TestReflectionUtil(BaseTest):
         self.assertFalse(ReflectionUtil.is_type((True, False), Union[Tuple[int, str], Dict], "name"))
 
     def test_get_cls_from_path(self):
-        cls = ReflectionUtil.get_cls_from_path("common_resources.tools.util.reflection_util.ReflectionUtil")
+        cls = ReflectionUtil.get_cls_from_path(f"{PACKAGE_DIR_NAME}.util.reflection_util.ReflectionUtil")
         self.assertEqual(cls.__name__, ReflectionUtil.__name__)
 
         cls = ReflectionUtil.get_cls_from_path("bad.path")

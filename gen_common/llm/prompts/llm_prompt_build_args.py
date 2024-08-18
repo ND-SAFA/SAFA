@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from gen_common.constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING
 
 
 @dataclass

@@ -3,18 +3,21 @@ from typing import Dict, List, Optional, Set, Tuple, TypedDict, Union
 
 import anthropic
 
-from gen_common.constants import ANTHROPIC_KEY, EMPTY_STRING, anthropic_constants, environment_constants
+from gen_common.constants import anthropic_constants, environment_constants
+from gen_common.constants.environment_constants import ANTHROPIC_KEY
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.infra.t_threading.threading_state import MultiThreadState
 from gen_common.llm.abstract_llm_manager import AbstractLLMManager
 from gen_common.llm.anthropic_exception_handler import anthropic_exception_handler
 from gen_common.llm.args.anthropic_args import AnthropicArgs, AnthropicParams
-from gen_common.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, \
+from gen_common.llm.llm_responses import GenerationResponse, \
     SupportedLLMResponses
 from gen_common.llm.llm_task import LLMCompletionType
 from gen_common.llm.prompts.llm_prompt_build_args import LLMPromptBuildArgs
-from gen_common.util import DictUtil, ThreadUtil
 from gen_common.util.attr_dict import AttrDict
+from gen_common.util.dict_util import DictUtil
+from gen_common.util.thread_util import ThreadUtil
 
 
 class AnthropicResponse(TypedDict):
@@ -63,22 +66,6 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
             llm_args = AnthropicArgs()
         assert isinstance(llm_args, AnthropicArgs), "Must use Anthropic args with Anthropic manager"
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
-
-    def _make_fine_tune_request_impl(self, **kwargs) -> AnthropicResponse:
-        """
-        Raises exception noting that anthropic has not implemented this feature.
-        :param kwargs: Ignored.
-        :return: None
-        """
-        raise NotImplementedError(NotImplementedError)
-
-    def retrieve_fine_tune_request(self, **kwargs) -> AnthropicResponse:
-        """
-        Raises exception noting that anthropic has not implemented this feature.
-        :param kwargs: Ignored.
-        :return: None
-        """
-        raise NotImplementedError(NotImplementedError)
 
     def make_completion_request_impl(self, raise_exception: bool = True, original_responses: List = None,
                                      retries: Set[int] = None, **params) -> MultiThreadState:
@@ -145,15 +132,6 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         global_state.results = [res for res in global_responses]
         return global_state
 
-    @staticmethod
-    def extract_all_text_from_response(res: AnthropicResponse) -> str:
-        """
-        Extracts all text across all batches from the response
-        :param res: The response
-        :return: All text across all batches from the response
-        """
-        return EMPTY_STRING.join([AnthropicManager._extract_response(res) for res in res if "content" in res])
-
     def translate_to_response(self, task: LLMCompletionType, res: List[AnthropicResponse],
                               **params) -> Optional[SupportedLLMResponses]:
         """
@@ -164,22 +142,7 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         :return: A task-specific response.
         """
         texts = [self._extract_response(r) for r in res]
-        if task == LLMCompletionType.GENERATION:
-            return GenerationResponse(texts)
-        if task == LLMCompletionType.CLASSIFICATION:
-            classification_items = [ClassificationItemResponse(t) for t in texts]
-            return ClassificationResponse(classification_items)
-        else:
-            raise ValueError(f"Response is not supported by anthropic manager: {task}")
-
-    @staticmethod
-    def upload_file(**params) -> AnthropicResponse:
-        """
-        Raises exception noting that anthropic has not implemented this feature.
-        :param params: Ignored.
-        :return: None
-        """
-        raise NotImplementedError(NotImplementedError)
+        return GenerationResponse(texts)
 
     @classmethod
     def format_response(cls, response_text: str = None, exception: Exception = None) -> AttrDict:
@@ -208,24 +171,6 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
         else:
             return Exception(res["error"])
 
-    @staticmethod
-    def _get_log_prob(completion: str) -> Dict[str, float]:
-        """
-        Gets the log probabilities for a classification completion
-        :param completion: The completion
-        :return: The log probabilities for each class
-        """
-        completion = completion.lower()
-        log_probs = {"yes": 0, "no": 0}  # TODO get the neg and pos clas from the prompt creator
-        response_2_index = {ans: completion.find(ans) for ans in log_probs.keys()}
-        response_2_index = {k: v for k, v in response_2_index.items() if v != -1}  # remove if response not in completion
-        first_response = min(response_2_index, key=response_2_index.get) if len(response_2_index) > 0 else None
-        if first_response in log_probs:
-            log_probs[first_response] = 1
-        else:
-            log_probs = {k: 0.5 for k in log_probs.keys()}
-        return log_probs
-
 
 def get_client():
     """
@@ -233,7 +178,7 @@ def get_client():
     :return:  Returns the singleton anthropic client.
     """
     if environment_constants.IS_TEST:
-        from gen_common_test.mocking import MockAnthropicClient
+        from gen_common.infra.mock.anthropic import MockAnthropicClient
         return MockAnthropicClient()
     else:
         assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "

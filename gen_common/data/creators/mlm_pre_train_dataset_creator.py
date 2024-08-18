@@ -3,13 +3,14 @@ import uuid
 from os.path import dirname
 from typing import List
 
-from gen_common.constants import BLOCK_SIZE_DEFAULT, NEW_LINE
+from gen_common.constants.dataset_constants import BLOCK_SIZE_DEFAULT
+from gen_common.constants.symbol_constants import NEW_LINE
 from gen_common.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from gen_common.data.processing.cleaning.data_cleaner import DataCleaner
 from gen_common.data.readers.pre_train_project_reader import PreTrainProjectReader
 from gen_common.data.tdatasets.pre_train_dataset import PreTrainDataset
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import FileUtil
+from gen_common.util.file_util import FileUtil
 
 
 class MLMPreTrainDatasetCreator(AbstractDatasetCreator[PreTrainDataset]):

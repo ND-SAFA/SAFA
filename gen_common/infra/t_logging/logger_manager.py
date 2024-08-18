@@ -4,7 +4,7 @@ import sys
 from os.path import dirname
 from typing import Any, Optional
 
-from gen_common.constants import LOG_FORMAT
+from gen_common.constants.logging_constants import LOG_FORMAT
 from gen_common.infra.t_logging.logger_config import LoggerConfig
 from gen_common.infra.t_logging.the_logger import TheLogger
 

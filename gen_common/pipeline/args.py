@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 
-from gen_common.constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.llm.abstract_llm_manager import AbstractLLMManager
-from gen_common.util.base_object import BaseObject
+from gen_common.infra.base_object import BaseObject
 from gen_common.util.dataclass_util import DataclassUtil
 
 

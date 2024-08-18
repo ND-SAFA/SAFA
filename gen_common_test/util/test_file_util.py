@@ -1,8 +1,9 @@
 import os
+from os.path import dirname
 
-from gen_common.constants import USER_SYM
-from gen_common.util import FileUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.constants.symbol_constants import USER_SYM
+from gen_common.util.file_util import FileUtil
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.data.creators.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
 from gen_common_test.paths.base_paths import TEST_DIR_PATH, TEST_OUTPUT_DIR
 
@@ -154,11 +155,12 @@ class TestFileUtil(BaseTest):
         self.assertListEqual(expected_order, orderings)
 
     def test_collapse_paths(self):
+        root_path = dirname(TEST_DIR_PATH)
+        os.environ["ROOT_PATH"] = root_path
         p = f"{self.PARENT_DIR}/test_file_util.py"
-        starting_path = FileUtil.get_starting_path()
-        expected_path = os.path.relpath(p, starting_path)
-        collapsed_path_relative = FileUtil.collapse_paths(p)
-        self.assertEqual(expected_path, collapsed_path_relative)
+        expected_path = os.path.relpath(p, root_path)
+        collapsed_path_relative = FileUtil.collapse_paths(p, replacements={"[ROOT_PATH]": dirname(TEST_DIR_PATH)})
+        self.assertEqual(collapsed_path_relative, f"[ROOT_PATH]/{expected_path}")
 
         replacements = {"[path1]": "root/path1",
                         "[path2]": "unrelated/path1",

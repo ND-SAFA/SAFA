@@ -1,7 +1,7 @@
 import numpy as np
 
 from gen_common.util.np_util import NpUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestNpUtil(BaseTest):

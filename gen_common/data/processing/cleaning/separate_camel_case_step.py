@@ -1,7 +1,7 @@
 from typing import List
 
 from gen_common.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
-from gen_common.util import StrUtil
+from gen_common.util.str_util import StrUtil
 
 
 class SeparateCamelCaseStep(AbstractDataProcessingStep):

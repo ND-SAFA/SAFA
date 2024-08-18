@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from gen_common.constants import RESAMPLE_RATE_DEFAULT
+from gen_common.constants.dataset_constants import RESAMPLE_RATE_DEFAULT
 from gen_common.data.processing.augmentation.abstract_data_augmentation_step import AbstractDataAugmentationStep
 from gen_common.util.override import overrides
 

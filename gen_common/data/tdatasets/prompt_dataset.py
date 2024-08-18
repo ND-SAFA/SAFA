@@ -5,7 +5,6 @@ from typing import Any, Callable, List, Optional, Tuple, Union
 import pandas as pd
 from tqdm import tqdm
 
-from gen_common.constants import TRAIN_TASK
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.prompt_dataframe import PromptDataFrame
@@ -13,14 +12,14 @@ from gen_common.data.exporters.safa_exporter import SafaExporter
 from gen_common.data.keys.structure_keys import TraceKeys
 from gen_common.data.readers.prompt_project_reader import PromptProjectReader
 from gen_common.data.readers.structured_project_reader import StructuredProjectReader
-from gen_common.data.summarizer.summary import Summary
 from gen_common.data.tdatasets.idataset import iDataset
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
-from gen_common.llm.abstract_llm_manager import AbstractLLMManager
 from gen_common.llm.model_manager import ModelManager
 from gen_common.llm.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from gen_common.llm.prompts.prompt_builder import PromptBuilder
-from gen_common.util import EnumDict, FileUtil
+from gen_common.summarize.summary import Summary
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.file_util import FileUtil
 
 
 class PromptDataset(iDataset):
@@ -91,22 +90,6 @@ class PromptDataset(iDataset):
             export_path = os.path.join(os.getcwd(), default_filename)
         prompt_df.to_json(export_path, orient='records', lines=True)
         return export_path, should_delete
-
-    def get_project_file_id(self, llm_manager: AbstractLLMManager, prompt_builder: PromptBuilder = None) -> str:
-        """
-        Gets the project file id used by open_ai
-        :param llm_manager: The manager of the model that will use the prompts dataset
-        :param prompt_builder: The generator of prompts for the dataset
-        :return: The project file id used by open_ai
-        """
-        if not self.project_file_id:
-            prompt_df = self.get_prompt_dataframe(prompt_builders=prompt_builder, prompt_args=llm_manager.prompt_args)
-            export_path, should_delete_path = self.export_prompt_dataframe(prompt_df)
-            res = llm_manager.upload_file(file=open(export_path), purpose=TRAIN_TASK)
-            self.project_file_id = res.id
-            if should_delete_path:
-                os.remove(export_path)
-        return self.project_file_id
 
     def get_prompt_dataframe(self, prompt_builders: Union[List[PromptBuilder], PromptBuilder] = None,
                              prompt_args: LLMPromptBuildArgs = None) -> PromptDataFrame:

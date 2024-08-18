@@ -5,8 +5,8 @@ from unittest.mock import MagicMock
 
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.infra.t_logging.the_logger import TheLogger
-from gen_common.util import FileUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.file_util import FileUtil
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestLogging(BaseTest):

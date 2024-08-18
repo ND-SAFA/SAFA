@@ -13,7 +13,7 @@ from gen_common.llm.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from gen_common.llm.prompts.prompt_builder import PromptBuilder
 from gen_common.llm.prompts.question_prompt import QuestionPrompt
 from gen_common.llm.tokens.token_limits import ModelTokenLimits
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 from gen_common_test.testprojects.prompt_test_project import PromptTestProject
 
@@ -84,28 +84,6 @@ class TestPromptDataset(BaseTest):
         )
         for type_, output in outputs.items():
             self.assertIsInstance(output, pd.DataFrame)
-
-    @mock.patch("openai.File.create")
-    def test_get_data_file_id(self, openai_file_create_mock: mock.MagicMock):
-        openai_file_create_mock.return_value = TestResponse()
-        llm_manager = OpenAIManager(OpenAIArgs())
-        prompt = QuestionPrompt("Tell me about this artifact: {target_content}")
-        prompt_builder = PromptBuilder([prompt])
-        outputs = self.run_dataset_tests(
-            lambda dataset: dataset.get_project_file_id(
-                llm_manager,
-                prompt_builder=prompt_builder if dataset._has_trace_data else None),
-        )
-        dataset = self.get_dataset_from_prompt_df()
-        dataset.data_export_path = TEST_OUTPUT_DIR
-        llm_manager = OpenAIManager(OpenAIArgs())
-        outputs["with_output_path"] = dataset.get_project_file_id(llm_manager, prompt_builder)
-        for type_, file_id in outputs.items():
-            fail_msg = self.DATASET_FAIL_MSG.format(type_)
-            if type_ == "id":
-                self.assertEqual("id", file_id, msg=fail_msg)
-            else:
-                self.assertEqual("id_from_res", file_id, msg=fail_msg)
 
     @staticmethod
     def run_dataset_tests(func_to_test: Callable, expected_exceptions: List[str] = None):

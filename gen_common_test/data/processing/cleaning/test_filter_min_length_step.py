@@ -1,5 +1,5 @@
 from gen_common.data.processing.cleaning.filter_min_length_step import FilterMinLengthStep
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestFilterMinLengthStep(BaseTest):

@@ -5,7 +5,8 @@ from typing import Type
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
 from gen_common.data.tdatasets.idataset import iDataset
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
-from gen_common.util import BaseObject, FileUtil
+from gen_common.infra.base_object import BaseObject
+from gen_common.util.file_util import FileUtil
 from gen_common.util.override import overrides
 
 

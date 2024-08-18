@@ -1,12 +1,12 @@
 from copy import deepcopy
 from unittest.mock import patch
 
-from gen_common.constants import NO_CHECK
+from gen_common.constants.dataset_constants import NO_CHECK
 from gen_common.data.keys.safa_keys import SafaKeys
 from gen_common.data.keys.structure_keys import StructuredKeys
 from gen_common.data.readers.definitions.tim_project_definition import TimProjectDefinition
 from gen_common.util.json_util import JsonUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestTimProjectDefinition(BaseTest):

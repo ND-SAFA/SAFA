@@ -6,7 +6,7 @@ from typing import Any, Iterable, List, Tuple
 from typing_extensions import Type
 
 from gen_common.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
-from gen_common.util import BaseObject
+from gen_common.infra.base_object import BaseObject
 from gen_common.util.override import overrides
 
 

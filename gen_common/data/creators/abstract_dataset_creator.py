@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import Generic, Type, TypeVar
+from typing import Generic, Optional, Type, TypeVar
 
 from gen_common.data.processing.cleaning.data_cleaner import DataCleaner
 from gen_common.data.tdatasets.idataset import iDataset
-from gen_common.util import BaseObject
+from gen_common.infra.base_object import BaseObject
 from gen_common.util.override import overrides
 
 DatasetType = TypeVar("DatasetType", bound=iDataset)
@@ -11,7 +11,7 @@ DatasetType = TypeVar("DatasetType", bound=iDataset)
 
 class AbstractDatasetCreator(BaseObject, ABC, Generic[DatasetType]):
 
-    def __init__(self, data_cleaner: DataCleaner = None):
+    def __init__(self, data_cleaner: Optional[DataCleaner] = None):
         """
         Responsible for creating data in format for defined models.
         :param data_cleaner: the data cleaner to use on the data
@@ -41,3 +41,11 @@ class AbstractDatasetCreator(BaseObject, ABC, Generic[DatasetType]):
         """
         :return: Returns the name of the dataset.
         """
+
+    def from_yaml(self) -> DatasetType:
+        """
+        Creates a dataset from the yaml representation (dataset creator)
+        :param self: The yaml representation (dataset creator)
+        :return: The dataset created
+        """
+        return self.create()

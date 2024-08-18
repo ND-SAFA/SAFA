@@ -1,15 +1,17 @@
 from typing import Any, Dict, Iterable, List, Set, Tuple, Type, Union
 
-from gen_common.constants import ANTHROPIC_MAX_MODEL_TOKENS
+from gen_common.constants.anthropic_constants import ANTHROPIC_MAX_MODEL_TOKENS
 from gen_common.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from gen_common.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 from gen_common.data.objects.artifact import Artifact
 from gen_common.data.objects.chunk import Chunk
-from gen_common.data.summarizer.artifacts_summarizer import ArtifactsSummarizer
-from gen_common.data.summarizer.summarizer_util import SummarizerUtil
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.llm.tokens.token_calculator import TokenCalculator
-from gen_common.util import DataFrameUtil, EnumDict, FileUtil
+from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
+from gen_common.summarize.summarizer_util import SummarizerUtil
+from gen_common.util.dataframe_util import DataFrameUtil
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.file_util import FileUtil
 
 
 class ArtifactDataFrame(AbstractProjectDataFrame):

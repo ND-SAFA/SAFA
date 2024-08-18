@@ -1,9 +1,9 @@
 from typing import Type
 
-from gen_common.constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from gen_common.data.keys.prompt_keys import PromptKeys
-from gen_common.util import EnumDict
+from gen_common.util.enum_util import EnumDict
 
 
 class PromptDataFrame(AbstractProjectDataFrame):

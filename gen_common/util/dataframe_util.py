@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import numpy as np
 import pandas as pd
 
-from gen_common.constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING
 
 
 class DataFrameUtil:

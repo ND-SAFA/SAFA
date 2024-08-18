@@ -2,12 +2,12 @@ import os
 
 import pandas as pd
 
-from gen_common.constants import ARTIFACT_FILE_NAME
+from gen_common.constants.dataset_constants import ARTIFACT_FILE_NAME
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.layer_dataframe import LayerDataFrame
 from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
-from gen_common.util import DictUtil
+from gen_common.util.dict_util import DictUtil
 
 
 class DataFrameProjectReader(AbstractProjectReader[TraceDataFramesTypes]):

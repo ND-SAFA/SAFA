@@ -3,10 +3,10 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Union
 from uuid import UUID
 
+from gen_common.infra.base_object import BaseObject
 from gen_common.llm.args.hugging_face_args import HuggingFaceArgs
-from gen_common.tools.util.base_object import BaseObject
-from gen_common.tools.util.json_util import JsonUtil
-from gen_common.tools.util.status import Status
+from gen_common.util.json_util import JsonUtil
+from gen_common.util.status import Status
 
 
 @dataclass
@@ -70,7 +70,7 @@ class JobResult(BaseObject):
             return "No experimental vars."
         printable = {}
         for name, val in self.experimental_vars.items():
-            from gen_common.tools.util.base_object import BaseObject
+            from gen_common.infra.base_object import BaseObject
             if not isinstance(val, BaseObject) and not isinstance(val, HuggingFaceArgs):
                 printable[name] = val
         return repr(printable)

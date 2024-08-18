@@ -3,7 +3,7 @@ import os
 from gen_common.data.readers.entity.entity_reader import EntityReader
 from gen_common_test.data.readers.entity.formats.test_xml_entity_format import TestXmlEntityFormat
 from gen_common.data.keys.structure_keys import StructuredKeys
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.test_format_paths import XML_ENTITY_PATH
 
 

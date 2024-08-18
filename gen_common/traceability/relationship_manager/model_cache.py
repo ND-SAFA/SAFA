@@ -5,9 +5,11 @@ from typing import Type
 import torch
 from sentence_transformers import SentenceTransformer
 
-from gen_common.constants import HF_DATASETS_CACHE, environment_constants
+from gen_common.constants import environment_constants
+from gen_common.constants.environment_constants import HF_DATASETS_CACHE
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import DictUtil, ParamSpecs
+from gen_common.util.dict_util import DictUtil
+from gen_common.util.param_specs import ParamSpecs
 
 
 class ModelCache:

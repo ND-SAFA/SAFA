@@ -1,6 +1,6 @@
 from gen_common.data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
-from gen_common.util import FileUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.file_util import FileUtil
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.base_paths import TEST_FILE_PATH
 
 

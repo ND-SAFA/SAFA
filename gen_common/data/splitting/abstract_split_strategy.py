@@ -4,7 +4,7 @@ from typing import List, Tuple, Type, TypeVar
 from sklearn.model_selection import train_test_split
 
 from gen_common.data.creators.abstract_dataset_creator import DatasetType
-from gen_common.util import BaseObject
+from gen_common.infra.base_object import BaseObject
 from gen_common.util.override import overrides
 from gen_common.util.random_util import RandomUtil
 

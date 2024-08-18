@@ -3,11 +3,11 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Type, Union
 
-from gen_common.constants import TEMPERATURE_DEFAULT
+from gen_common.constants.open_ai_constants import TEMPERATURE_DEFAULT
+from gen_common.infra.base_object import BaseObject
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.llm.llm_task import LLMCompletionType
 from gen_common.traceability.metrics.supported_trace_metric import SupportedTraceMetric
-from gen_common.util import BaseObject
 
 
 @dataclass

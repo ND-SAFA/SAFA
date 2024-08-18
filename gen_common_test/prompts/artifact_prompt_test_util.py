@@ -1,7 +1,7 @@
 from typing import List, Union
 from unittest import TestCase
 
-from gen_common.constants import NEW_LINE
+from gen_common.constants.symbol_constants import NEW_LINE
 
 
 class ArtifactPromptTestUtil:

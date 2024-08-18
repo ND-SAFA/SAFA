@@ -9,7 +9,7 @@ from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
 from gen_common.data.keys.structure_keys import TraceKeys
 from gen_common.data.objects.trace import Trace
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import EnumDict
+from gen_common.util.enum_util import EnumDict
 
 Query = namedtuple('Query', ['links', 'preds'])
 

@@ -5,8 +5,9 @@ from pydantic.v1.main import BaseModel, Field
 
 from gen_common.llm.response_managers.abstract_response_manager import USE_ALL_TAGS
 from gen_common.llm.response_managers.json_response_manager import JSONResponseManager
-from gen_common.util import DataclassUtil, PromptUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.dataclass_util import DataclassUtil
+from gen_common.util.prompt_util import PromptUtil
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class FakeResponseModel(BaseModel):

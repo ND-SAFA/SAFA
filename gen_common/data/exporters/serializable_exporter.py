@@ -1,14 +1,14 @@
 import json
 from typing import Any, Dict, List
 
-from gen_common.constants import EMPTY_STRING, UNDERSCORE
+from gen_common.constants.symbol_constants import EMPTY_STRING, UNDERSCORE
 from gen_common.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from gen_common.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from gen_common.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
-from gen_common.data.summarizer.summary import Summary
 from gen_common.data.tdatasets.idataset import iDataset
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
+from gen_common.summarize.summary import Summary
 from gen_common.util.json_util import JsonUtil
 
 

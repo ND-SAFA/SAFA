@@ -1,5 +1,5 @@
 from gen_common.llm.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestBinaryChoiceQuestionPrompt(BaseTest):

@@ -1,4 +1,4 @@
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common.data.tdatasets.data_key import DataKey
 
 

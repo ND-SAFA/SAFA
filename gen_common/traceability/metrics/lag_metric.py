@@ -3,7 +3,7 @@ from typing import Dict, List
 import datasets
 import numpy as np
 
-from gen_common.constants import LAG_KEY, THRESHOLD_DEFAULT
+from gen_common.constants.metric_constants import LAG_KEY, THRESHOLD_DEFAULT
 from gen_common.data.tdatasets.trace_matrix import TraceMatrix
 from gen_common.traceability.metrics.abstract_trace_metric import AbstractTraceMetric
 

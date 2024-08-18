@@ -3,7 +3,7 @@ from typing import List, Tuple, Type, Union
 from gen_common.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from gen_common.data.keys.structure_keys import LayerKeys
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import EnumDict
+from gen_common.util.enum_util import EnumDict
 
 
 class LayerDataFrame(AbstractProjectDataFrame):

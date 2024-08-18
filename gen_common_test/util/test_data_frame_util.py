@@ -3,8 +3,8 @@ from typing import Any, Dict, List
 import numpy as np
 import pandas as pd
 
-from gen_common.util import DataFrameUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.dataframe_util import DataFrameUtil
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestDataFrameUtil(BaseTest):

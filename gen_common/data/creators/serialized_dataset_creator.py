@@ -1,16 +1,16 @@
 import json
 from typing import Dict, Type
 
-from gen_common.constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from gen_common.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
-from gen_common.data.summarizer.artifacts_summarizer import ArtifactsSummarizer
-from gen_common.data.summarizer.summary import Summary
 from gen_common.data.tdatasets.idataset import iDataset
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
-from gen_common.util import ParamSpecs
+from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
+from gen_common.summarize.summary import Summary
 from gen_common.util.json_util import JsonUtil
+from gen_common.util.param_specs import ParamSpecs
 from gen_common.util.reflection_util import ReflectionUtil
 
 

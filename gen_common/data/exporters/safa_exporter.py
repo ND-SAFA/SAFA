@@ -11,7 +11,8 @@ from gen_common.data.keys.safa_keys import SafaKeys
 from gen_common.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import DataFrameUtil, FileUtil
+from gen_common.util.dataframe_util import DataFrameUtil
+from gen_common.util.file_util import FileUtil
 from gen_common.util.override import overrides
 
 

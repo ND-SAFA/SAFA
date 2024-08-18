@@ -14,7 +14,8 @@ from gen_common.data.readers.definitions.structure_project_definition import Str
 from gen_common.data.readers.definitions.tim_project_definition import TimProjectDefinition
 from gen_common.data.readers.entity.entity_reader import EntityReader
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import EnumDict, FileUtil
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.file_util import FileUtil
 from gen_common.util.json_util import JsonUtil
 
 

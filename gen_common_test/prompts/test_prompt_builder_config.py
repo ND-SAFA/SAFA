@@ -6,7 +6,7 @@ from gen_common.llm.prompts.prompt import Prompt
 from gen_common.llm.prompts.prompt_builder import PromptBuilder
 from gen_common.llm.prompts.question_prompt import QuestionPrompt
 from gen_common.util.reflection_util import ReflectionUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestResponse:

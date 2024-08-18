@@ -3,7 +3,7 @@ from typing import List
 
 from tqdm import tqdm
 
-from gen_common.constants import TQDM_NCOLS
+from gen_common.constants.logging_constants import TQDM_NCOLS
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
 from gen_common.data.keys.structure_keys import ArtifactKeys, TraceKeys

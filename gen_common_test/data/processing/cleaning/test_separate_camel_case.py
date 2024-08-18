@@ -1,5 +1,5 @@
 from gen_common.data.processing.cleaning.separate_camel_case_step import SeparateCamelCaseStep
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestSeparateCamelCase(BaseTest):

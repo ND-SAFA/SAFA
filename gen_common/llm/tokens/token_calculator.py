@@ -1,8 +1,8 @@
 import tiktoken
-from gen_common.llm.tokens.token_limits import ModelTokenLimits
 
-from gen_common.constants import MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
-    TOKENS_2_WORDS_CONVERSION, MAX_TOKENS_BUFFER
+from gen_common.constants.open_ai_constants import MAX_TOKENS_BUFFER, MAX_TOKENS_DEFAULT, OPEN_AI_MODEL_DEFAULT, \
+    TOKENS_2_WORDS_CONVERSION
+from gen_common.llm.tokens.token_limits import ModelTokenLimits
 
 TRUNCATE_BUFFER_WEIGHT = .25
 

@@ -1,9 +1,9 @@
 import os
-from typing import Any, Type, Tuple
+from typing import Any, Tuple, Type
 
+from gen_common.constants.rq_constants import OPTIONAL_KEY, SUPPORTED_TYPES_RQ
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.infra.cli.inquirer_selector import inquirer_value
-from gen_common.constants import OPTIONAL_KEY, SUPPORTED_TYPES_RQ
-from gen_common.constants import EMPTY_STRING
 from gen_common.infra.t_logging.logger_manager import logger
 
 

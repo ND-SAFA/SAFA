@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from gen_common.constants import LOG_FILE_DEFAULT, LOG_LEVEL_DEFAULT, LOG_TO_CONSOLE_DEFAULT, VERBOSE_DEFAULT
+from gen_common.constants.logging_constants import LOG_FILE_DEFAULT, LOG_LEVEL_DEFAULT, LOG_TO_CONSOLE_DEFAULT, VERBOSE_DEFAULT
 
 
 @dataclass

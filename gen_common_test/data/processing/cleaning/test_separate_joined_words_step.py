@@ -1,6 +1,6 @@
-from gen_common.constants import UNDERSCORE
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.constants.symbol_constants import UNDERSCORE
 from gen_common.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestSeparateJoinedWordsStep(BaseTest):

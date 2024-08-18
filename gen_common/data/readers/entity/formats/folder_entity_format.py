@@ -3,12 +3,13 @@ from typing import List, Tuple
 
 import pandas as pd
 
-from gen_common.constants import EXCLUDED_FILES
+from gen_common.constants.dataset_constants import EXCLUDED_FILES
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from gen_common.data.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import EnumDict, FileUtil
+from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.file_util import FileUtil
 
 
 class FolderEntityFormat(AbstractEntityFormat):

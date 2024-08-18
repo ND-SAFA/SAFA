@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Any
 
 from gen_common.llm.model_manager import ModelManager
-from gen_common.util import BaseObject
+from gen_common.infra.base_object import BaseObject
 
 
 class iDataset(BaseObject):

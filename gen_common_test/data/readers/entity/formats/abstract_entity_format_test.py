@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Dict, List, Type
 
 from gen_common.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class AbstractEntityFormatTest(BaseTest):

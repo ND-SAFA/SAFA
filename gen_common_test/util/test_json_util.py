@@ -3,9 +3,9 @@ import os
 
 from gen_common.infra.experiment.variables.experimental_variable import ExperimentalVariable
 from gen_common.llm.response_managers.xml_response_manager import XMLResponseManager
-from gen_common.util import DataclassUtil
+from gen_common.util.dataclass_util import DataclassUtil
 from gen_common.util.json_util import JsonUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.base_paths import TEST_DATA_DIR
 
 

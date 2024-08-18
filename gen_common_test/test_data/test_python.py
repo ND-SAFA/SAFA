@@ -6,7 +6,7 @@ from inspect import getfullargspec
 from os.path import splitext
 from typing import Callable, Dict, IO, List, Set, Tuple, Type, Union, get_type_hints
 
-from gen_common.constants import USER_SYM
+from gen_common.constants.symbol_constants import USER_SYM
 from gen_common.util.json_util import JsonUtil
 
 

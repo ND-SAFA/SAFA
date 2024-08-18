@@ -9,8 +9,8 @@ from gen_common.llm.prompts.question_prompt import QuestionPrompt
 from gen_common.llm.prompts.questionnaire_prompt import QuestionnairePrompt
 from gen_common.llm.prompts.select_question_prompt import SelectQuestionPrompt
 from gen_common.llm.response_managers.xml_response_manager import XMLResponseManager
-from gen_common.util import EnumDict
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.enum_util import EnumDict
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestPromptBuilder(BaseTest):

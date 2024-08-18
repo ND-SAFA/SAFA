@@ -2,13 +2,13 @@ import os
 
 import pandas as pd
 
-from gen_common.constants import ARTIFACT_FILE_NAME
+from gen_common.constants.dataset_constants import ARTIFACT_FILE_NAME
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
 from gen_common.data.readers.structured_project_reader import StructuredProjectReader
-from gen_common.data.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import FileUtil
+from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
+from gen_common.util.file_util import FileUtil
 from gen_common.util.override import overrides
 
 

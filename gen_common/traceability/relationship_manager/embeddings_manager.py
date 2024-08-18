@@ -4,12 +4,16 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from gen_common.constants import DEFAULT_EMBEDDING_MODEL, DEFAULT_ENCODING_BATCH_SIZE, EMPTY_STRING
+from gen_common.constants.environment_constants import DEFAULT_EMBEDDING_MODEL
+from gen_common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.traceability.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
 from gen_common.traceability.relationship_manager.embedding_types import EmbeddingType, IdType
-from gen_common.util import EnumDict, FileUtil, StrUtil
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.file_util import FileUtil
 from gen_common.util.override import overrides
 from gen_common.util.reflection_util import ReflectionUtil
+from gen_common.util.str_util import StrUtil
 from gen_common.util.supported_enum import SupportedEnum
 
 

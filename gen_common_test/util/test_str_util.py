@@ -1,7 +1,7 @@
 import uuid
 
-from gen_common.util import StrUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.str_util import StrUtil
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestStrUtil(BaseTest):

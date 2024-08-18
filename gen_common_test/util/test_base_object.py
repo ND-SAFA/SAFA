@@ -1,14 +1,14 @@
 from typing import Dict, List, Optional, Union
 
 from gen_common.data.tdatasets.idataset import iDataset
+from gen_common.infra.base_object import BaseObject
 from gen_common.infra.experiment.experiment_serializer import ExperimentSerializer
 from gen_common.infra.experiment.variables.definition_variable import DefinitionVariable
 from gen_common.infra.experiment.variables.experimental_variable import ExperimentalVariable
 from gen_common.infra.experiment.variables.variable import Variable
-from gen_common.util import BaseObject
 from gen_common.util.reflection_util import ReflectionUtil
-from gen_common_test.base_tests.base_test import BaseTest
-from gen_common_test.test_object_definitions import TestObjectDefinitions
+from gen_common_test.base.object_definitions import TestObjectDefinitions
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestWithOptional(BaseObject):

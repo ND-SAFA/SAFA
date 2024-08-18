@@ -10,15 +10,18 @@ import numpy as np
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
-from gen_common.constants import DEFAULT_ENCODING_BATCH_SIZE
+from gen_common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.data.objects.artifact import Artifact
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.llm.model_properties import ModelTask
 from gen_common.traceability.relationship_manager.embedding_types import IdType
 from gen_common.traceability.relationship_manager.model_cache import ModelCache
-from gen_common.util import DictUtil, EnumDict, FileUtil, StrUtil
+from gen_common.util.dict_util import DictUtil
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.file_util import FileUtil
 from gen_common.util.reflection_util import ReflectionUtil
+from gen_common.util.str_util import StrUtil
 from gen_common.util.supported_enum import SupportedEnum
 
 

@@ -13,11 +13,11 @@ from gen_common.data.objects.trace_layer import TraceLayer
 from gen_common.data.readers.api_project_reader import ApiProjectReader
 from gen_common.data.readers.definitions.api_definition import ApiDefinition
 from gen_common.data.readers.structured_project_reader import StructuredProjectReader
-from gen_common.util import FileUtil
+from gen_common.util.file_util import FileUtil
 from gen_common.util.json_util import JsonUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.object_definitions import TestObjectDefinitions
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
-from gen_common_test.test_object_definitions import TestObjectDefinitions
 
 
 class TestSafaExporter(BaseTest):

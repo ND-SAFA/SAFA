@@ -1,9 +1,8 @@
-from gen_common_test.definition_creator import DefinitionCreator
-
 from gen_common.data.creators.multi_trace_dataset_creator import MultiTraceDatasetCreator
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
-from gen_common.infra.experiment.variables import TypedDefinitionVariable
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.infra.experiment.definition_creator import DefinitionCreator
+from gen_common.infra.experiment.variables.typed_definition_variable import TypedDefinitionVariable
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.project_paths import CSV_PROJECT_PATH, STRUCTURE_PROJECT_PATH
 from gen_common_test.testprojects.csv_test_project import CsvTestProject
 from gen_common_test.testprojects.structured_test_project import StructuredTestProject

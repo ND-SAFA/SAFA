@@ -8,8 +8,8 @@ from gen_common.data.splitting.dataset_splitter import DatasetSplitter
 from gen_common.data.tdatasets.dataset_role import DatasetRole
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
 from gen_common.llm.model_manager import ModelManager
-from gen_common_test.base_tests.base_split_test import BaseSplitTest
-from gen_common_test.base_tests.base_trace_test import BaseTraceTest
+from gen_common_test.base.tests.base_split_test import BaseSplitTest
+from gen_common_test.base.tests.base_trace_test import BaseTraceTest
 
 
 class TestTraceDatasetSplitter(BaseSplitTest):

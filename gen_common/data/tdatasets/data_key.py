@@ -1,6 +1,6 @@
 from typing import List
 
-from gen_common.constants import UNDERSCORE
+from gen_common.constants.symbol_constants import UNDERSCORE
 
 
 class DataKey:

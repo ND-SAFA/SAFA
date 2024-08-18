@@ -3,7 +3,7 @@ from typing import List
 import pandas as pd
 
 from gen_common.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from gen_common.data.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
 
 
 class CsvEntityFormat(AbstractEntityFormat):

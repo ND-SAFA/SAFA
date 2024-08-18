@@ -1,0 +1,66 @@
+_checkpoint_dir: state_checkpoints
+all_generated_content: null
+completed_steps:
+  InitializeDatasetStep: 1
+description_of_artifact: null
+export_dir: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230
+final_dataset: null
+format_of_artifacts: null
+generations2sources: null
+n_generations: 0
+original_dataset: !!python/object:gen_common.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:gen_common.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  project_file_id: null
+  project_reader: !!python/object:gen_common.data.readers.artifact_project_reader.ArtifactProjectReader
+    _AbstractProjectReader__processed_project_path: false
+    overrides: {}
+    project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/original_dataset
+    structured_project_reader: !!python/object:gen_common.data.readers.structured_project_reader.StructuredProjectReader
+      _AbstractProjectReader__processed_project_path: true
+      _definition: null
+      conversions: {}
+      definition_reader: !!python/object:gen_common.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      overrides: {}
+      project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/original_dataset
+      summarizer: null
+    summarizer: null
+  summarizer: null
+  trace_dataset_creator: null
+questions: null
+refined_content: null
+source_dataset: !!python/object:gen_common.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:gen_common.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  project_file_id: null
+  project_reader: !!python/object:gen_common.data.readers.artifact_project_reader.ArtifactProjectReader
+    _AbstractProjectReader__processed_project_path: false
+    overrides: {}
+    project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/source_dataset
+    structured_project_reader: !!python/object:gen_common.data.readers.structured_project_reader.StructuredProjectReader
+      _AbstractProjectReader__processed_project_path: true
+      _definition: null
+      conversions: {}
+      definition_reader: !!python/object:gen_common.data.readers.definitions.tim_project_definition.TimProjectDefinition {}
+      overrides: {}
+      project_path: /home/kat/git-repos/safa/tgen/output/hgen/jackofclubs/fe69a3d4-da98-4ce2-86b3-0f9db8ee1230/state_checkpoints/source_dataset
+      summarizer: null
+    summarizer: null
+  summarizer: null
+  trace_dataset_creator: null
+summary: "# Entities\n\nRenderEngine: Handles window creation, OpenGL context, and\
+  \ scene rendering.\nShader: Loads and compiles shader programs.\nShaderProgram:\
+  \ Manages shader program compilation and linking. \nImage: Loads image files.\n\
+  BlockSelection: Renders selection highlight around blocks.\nBlock: Represents a\
+  \ single block with position, color, type.\nChunk: Manages a chunk of blocks and\
+  \ builds render data.\nWorld: Contains all chunks that make up the world.\nPlayer:\
+  \ Stores player state and handles movement and rendering.\nAABB: Axis aligned bounding\
+  \ box for collision detection.\nICollidable: Interface for objects that can collide.\n\
+  Component: Base UI component class.\nButton: Clickable UI element.\nMenu: Base menu\
+  \ class.\nColorSelectorMenu: Menu for selecting colors.\nEscapeMenu: In-game pause\
+  \ menu.\nSettingsMenu: Sample settings menu.\nDebugOptions: Stores options for debugging\
+  \ aids.\nFPSCounter: Displays frames per second."

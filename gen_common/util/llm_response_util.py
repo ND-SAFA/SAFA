@@ -8,7 +8,7 @@ import numpy as np
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
 
-from gen_common.constants import EMPTY_STRING, NEW_LINE
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.llm.llm_responses import GenerationResponse, SupportedLLMResponses
 from gen_common.util.dict_util import DictUtil

@@ -1,6 +1,6 @@
 from typing import Callable, Iterable, List
 
-from gen_common.constants import UNDERSCORE
+from gen_common.constants.symbol_constants import UNDERSCORE
 from gen_common.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 

@@ -1,6 +1,6 @@
 from typing import List
 
-from gen_common.constants import MIN_LENGTH_DEFAULT
+from gen_common.constants.hugging_face_constants import MIN_LENGTH_DEFAULT
 from gen_common.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
 
 

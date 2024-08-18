@@ -2,10 +2,11 @@ from collections import Counter
 from trace import Trace
 from typing import Any, Dict, List, Optional, Set
 
-import pandas as pd
+import pandas as pd  # type: ignore
 
-from gen_common.constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, ALLOWED_ORPHANS_DEFAULT, \
-    COMMA, NEW_LINE, NO_CHECK, REMOVE_ORPHANS_DEFAULT
+from gen_common.constants.dataset_constants import ALLOWED_MISSING_SOURCES_DEFAULT, ALLOWED_MISSING_TARGETS_DEFAULT, \
+    ALLOWED_ORPHANS_DEFAULT, NO_CHECK, REMOVE_ORPHANS_DEFAULT
+from gen_common.constants.symbol_constants import COMMA, NEW_LINE
 from gen_common.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.layer_dataframe import LayerDataFrame
@@ -15,7 +16,8 @@ from gen_common.data.processing.cleaning.data_cleaner import DataCleaner
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import DataFrameUtil, ListUtil
+from gen_common.util.dataframe_util import DataFrameUtil
+from gen_common.util.list_util import ListUtil
 from gen_common.util.reflection_util import ReflectionUtil
 
 

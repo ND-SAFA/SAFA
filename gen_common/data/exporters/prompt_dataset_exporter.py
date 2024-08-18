@@ -1,12 +1,12 @@
 import os
 from typing import Type, Union
 
-from gen_common.constants import ARTIFACT_FILE_NAME, PROJECT_SUMMARY_FILENAME
+from gen_common.constants.dataset_constants import ARTIFACT_FILE_NAME, PROJECT_SUMMARY_FILENAME
 from gen_common.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from gen_common.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter
 from gen_common.data.exporters.supported_dataset_exporters import SupportedDatasetExporter
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
-from gen_common.util import FileUtil
+from gen_common.util.file_util import FileUtil
 
 
 class PromptDatasetExporter(AbstractDatasetExporter):

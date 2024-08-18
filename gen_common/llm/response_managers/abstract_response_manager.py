@@ -7,9 +7,9 @@ from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
 import bs4
 from langchain_core.pydantic_v1 import BaseModel, Field
 
-from gen_common.constants import DASH, EMPTY_STRING
+from gen_common.constants.symbol_constants import DASH, EMPTY_STRING
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import StrUtil
+from gen_common.util.str_util import StrUtil
 
 RESPONSE_FORMAT = "Enclose your answer inside of {}"
 USE_ALL_TAGS = str(uuid.uuid4())

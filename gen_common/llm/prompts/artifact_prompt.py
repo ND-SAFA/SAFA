@@ -1,13 +1,15 @@
 from enum import Enum, auto
 from typing import Dict, List, Optional, Union
 
-from gen_common.constants import EMPTY_STRING, NEW_LINE, TAB, USE_NL_SUMMARY_PROMPT
+from gen_common.constants.model_constants import USE_NL_SUMMARY_PROMPT
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE, TAB
 from gen_common.data.keys.structure_keys import ArtifactKeys, StructuredKeys, TraceKeys
 from gen_common.data.objects.artifact import Artifact
 from gen_common.llm.prompts.prompt import Prompt
 from gen_common.llm.prompts.prompt_args import PromptArgs
-from gen_common.util import EnumDict, PromptUtil
+from gen_common.util.enum_util import EnumDict
 from gen_common.util.override import overrides
+from gen_common.util.prompt_util import PromptUtil
 
 
 class ArtifactPrompt(Prompt):

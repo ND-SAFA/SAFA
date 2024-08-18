@@ -3,7 +3,7 @@ from typing import Callable, Dict, List
 from torch.nn.functional import cross_entropy
 from transformers.training_args import TrainingArguments
 
-from gen_common.constants import DEFAULT_SAVE_BEST_MODEL, EVALUATION_STRATEGY_DEFAULT, \
+from gen_common.constants.hugging_face_constants import DEFAULT_SAVE_BEST_MODEL, EVALUATION_STRATEGY_DEFAULT, \
     EVAL_ON_EPOCH_DEFAULT, \
     EVAL_STEPS_DEFAULT, \
     GRADIENT_ACCUMULATION_DEFAULT, \
@@ -12,8 +12,10 @@ from gen_common.constants import DEFAULT_SAVE_BEST_MODEL, EVALUATION_STRATEGY_DE
     MULTI_GPU_DEFAULT, N_EPOCHS_DEFAULT, \
     SAVE_RANDOM_MODEL_DEFAULT, SAVE_STEPS_DEFAULT, SAVE_STRATEGY_DEFAULT, SAVE_TOTAL_LIMIT_DEFAULT, \
     TRAIN_BATCH_SIZE_DEFAULT, USE_BALANCED_BATCHES_DEFAULT
+from gen_common.infra.base_object import BaseObject
 from gen_common.traceability.metrics.supported_trace_metric import SupportedTraceMetric
-from gen_common.util import BaseObject, DataclassUtil, FunctionalWrapper
+from gen_common.util.dataclass_util import DataclassUtil
+from gen_common.util.enum_util import FunctionalWrapper
 
 
 class HuggingFaceArgs(TrainingArguments, BaseObject):

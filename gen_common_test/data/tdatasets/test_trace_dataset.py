@@ -14,7 +14,7 @@ from gen_common.data.processing.augmentation.source_target_swap_step import Sour
 from gen_common.data.tdatasets.data_key import DataKey
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
 from gen_common.llm.model_properties import ModelArchitectureType
-from gen_common_test.base_tests.base_trace_test import BaseTraceTest
+from gen_common_test.base.tests.base_trace_test import BaseTraceTest
 from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 from gen_common_test.test_data.test_data_manager import TestDataManager
 from gen_common_test.testprojects.api_test_project import ApiTestProject

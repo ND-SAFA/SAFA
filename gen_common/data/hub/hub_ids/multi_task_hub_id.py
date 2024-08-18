@@ -2,7 +2,7 @@ import os
 from abc import ABC
 from typing import List
 
-from gen_common.constants import STAGES
+from gen_common.constants.model_constants import STAGES
 from gen_common.data.hub.abstract_hub_id import AbstractHubId
 
 

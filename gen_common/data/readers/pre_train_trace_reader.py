@@ -8,7 +8,7 @@ from gen_common.data.dataframes.layer_dataframe import LayerDataFrame
 from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
 from gen_common.data.keys.structure_keys import ArtifactKeys, LayerKeys, TraceKeys
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
-from gen_common.util import FileUtil
+from gen_common.util.file_util import FileUtil
 
 
 class PreTrainTraceReader(AbstractProjectReader[TraceDataFramesTypes]):

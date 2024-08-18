@@ -5,7 +5,7 @@ from typing import Dict, List, Set, Tuple, Union
 
 from nltk.corpus import stopwords
 
-from gen_common.constants import DASH, EMPTY_STRING, PERIOD, SPACE, UNDERSCORE
+from gen_common.constants.symbol_constants import DASH, EMPTY_STRING, PERIOD, SPACE, UNDERSCORE
 from gen_common.infra.t_logging.logger_manager import logger
 
 

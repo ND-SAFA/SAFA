@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple
 
 from langchain_core.prompts import ChatPromptTemplate
 
-from gen_common.constants import EMPTY_STRING, NEW_LINE
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE
 from gen_common.data.keys.prompt_keys import PromptKeys
 from gen_common.llm.abstract_llm_manager import PromptRoles
 from gen_common.llm.prompts.artifact_prompt import ArtifactPrompt
@@ -12,7 +12,9 @@ from gen_common.llm.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from gen_common.llm.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from gen_common.llm.prompts.prompt import Prompt
 from gen_common.llm.prompts.prompt_config import PromptConfig
-from gen_common.util import EnumDict, StrUtil, default_mutable
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.pythonisms_util import default_mutable
+from gen_common.util.str_util import StrUtil
 
 
 class PromptBuilder:

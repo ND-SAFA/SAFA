@@ -1,7 +1,7 @@
 import random
 
 from gen_common.data.processing.cleaning.shuffle_words_step import ShuffleWordsStep
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestShuffleWordsStep(BaseTest):

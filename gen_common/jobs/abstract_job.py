@@ -6,27 +6,23 @@ import uuid
 from abc import abstractmethod
 from copy import deepcopy
 from inspect import getfullargspec
-from typing import Any, Dict, Type
+from typing import Any, Dict
 
-from gen_common.tools.t_logging.logger_manager import logger
-from gen_common.tools.util.base_object import BaseObject
-from gen_common.tools.util.file_util import FileUtil
-from gen_common.tools.util.override import overrides
-from gen_common.tools.util.random_util import RandomUtil
-from gen_common.tools.util.reflection_util import ParamScope, ReflectionUtil
-from gen_common.tools.util.status import Status
+from gen_common.constants.experiment_constants import OUTPUT_FILENAME
+from gen_common.infra.base_object import BaseObject
+from gen_common.infra.t_logging.logger_manager import logger
+from gen_common.jobs.job_args import JobArgs
+from gen_common.jobs.job_result import JobResult
 from gen_common.traceability.relationship_manager.model_cache import ModelCache
-
-from tgen.common.constants.experiment_constants import OUTPUT_FILENAME
-from tgen.core.wb.wb_manager import WBManager
-from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.components.job_result import JobResult
-from tgen.models.model_manager import ModelManager
+from gen_common.util.file_util import FileUtil
+from gen_common.util.random_util import RandomUtil
+from gen_common.util.reflection_util import ParamScope, ReflectionUtil
+from gen_common.util.status import Status
 
 
 class AbstractJob(threading.Thread, BaseObject):
 
-    def __init__(self, job_args: JobArgs = None, model_manager: ModelManager = None, require_data: bool = False):
+    def __init__(self, job_args: JobArgs = None, require_data: bool = False):
         """
         The base job class
         :param job_args: The arguments to the job.
@@ -36,7 +32,6 @@ class AbstractJob(threading.Thread, BaseObject):
         super().__init__()
         self.require_data = require_data
         self.job_args = job_args if job_args else JobArgs()
-        self.model_manager = model_manager
         self.id = uuid.uuid4()
         self.result = JobResult(job_id=self.id)
         self.save_job_output = self.job_args.save_job_output
@@ -64,7 +59,6 @@ class AbstractJob(threading.Thread, BaseObject):
         if self.save_job_output and self.job_args.output_dir:
             logger.info(f"Saving job output: {self.job_args.output_dir}")
             self.save(self.job_args.output_dir)
-            WBManager.finish()
         self.cleanup()
         return self.result
 
@@ -74,8 +68,6 @@ class AbstractJob(threading.Thread, BaseObject):
         :return: None
         """
         ModelCache.clear()
-        if self.model_manager:
-            self.model_manager.clear_model()
         gc.collect()
 
     def get_output_filepath(self, output_dir: str = None) -> str:
@@ -118,17 +110,6 @@ class AbstractJob(threading.Thread, BaseObject):
         :return: The job name
         """
         return self.__class__.__name__.split("Job")[0]
-
-    @classmethod
-    @overrides(BaseObject)
-    def _get_enum_class(cls, child_class_name: str) -> Type:
-        """
-        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
-        :param child_class_name: the name of the child class
-        :return: the enum class mapping name to class
-        """
-        from tgen.jobs.supported_job_type import SupportedJobType
-        return SupportedJobType
 
     def __deepcopy__(self, memodict: Dict = {}) -> "AbstractJob":
         """

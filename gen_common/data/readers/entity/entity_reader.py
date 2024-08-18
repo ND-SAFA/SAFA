@@ -6,9 +6,9 @@ import pandas as pd
 from gen_common.data.keys.structure_keys import StructuredKeys
 from gen_common.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from gen_common.data.readers.entity.supported_entity_formats import SupportedEntityFormats
-from gen_common.data.summarizer.artifacts_summarizer import ArtifactsSummarizer
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import DataFrameUtil
+from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
+from gen_common.util.dataframe_util import DataFrameUtil
 from gen_common.util.json_util import JsonUtil
 
 EntityType = TypeVar("EntityType")

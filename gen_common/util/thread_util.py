@@ -1,6 +1,6 @@
 from typing import Callable, List, Set
 
-from gen_common.constants import THREAD_SLEEP
+from gen_common.constants.threading_constants import THREAD_SLEEP
 from gen_common.infra.t_threading.child_thread import ChildThread
 from gen_common.infra.t_threading.threading_state import MultiThreadState
 

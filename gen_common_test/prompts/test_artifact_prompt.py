@@ -2,8 +2,8 @@ from copy import deepcopy
 
 from gen_common.data.keys.structure_keys import ArtifactKeys, TraceKeys
 from gen_common.llm.prompts.artifact_prompt import ArtifactPrompt
-from gen_common.util import EnumDict
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.enum_util import EnumDict
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.prompts.artifact_prompt_test_util import ArtifactPromptTestUtil
 
 

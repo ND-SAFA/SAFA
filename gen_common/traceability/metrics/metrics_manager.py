@@ -10,7 +10,7 @@ from gen_common.data.objects.trace import Trace
 from gen_common.data.tdatasets.trace_matrix import TraceMatrix
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.traceability.metrics.supported_trace_metric import SupportedTraceMetric, get_metric_name, get_metric_path
-from gen_common.util import DictUtil
+from gen_common.util.dict_util import DictUtil
 
 warnings.filterwarnings('ignore')
 ArtifactQuery = Dict[str, List[TraceDataFrame]]

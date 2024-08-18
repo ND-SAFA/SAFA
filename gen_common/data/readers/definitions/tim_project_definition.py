@@ -1,7 +1,8 @@
 import os
 from typing import Dict
 
-from gen_common.constants import NO_CHECK, PERIOD
+from gen_common.constants.dataset_constants import NO_CHECK
+from gen_common.constants.symbol_constants import PERIOD
 from gen_common.data.keys.safa_keys import SafaKeys
 from gen_common.data.keys.structure_keys import StructuredKeys
 from gen_common.data.readers.definitions.abstract_project_definition import AbstractProjectDefinition

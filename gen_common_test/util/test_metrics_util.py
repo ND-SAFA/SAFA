@@ -1,5 +1,5 @@
-from gen_common.util import MetricsUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.metrics_util import MetricsUtil
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestMetricsUtil(BaseTest):

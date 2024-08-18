@@ -1,7 +1,7 @@
 import logging
 from typing import List
 
-from gen_common.constants import NEW_LINE, EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE
 
 global tqdm_log_capture
 

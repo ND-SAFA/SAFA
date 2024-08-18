@@ -1,6 +1,6 @@
 from typing import List
 
-from gen_common.constants import REMOVE_ORPHANS_DEFAULT
+from gen_common.constants.dataset_constants import REMOVE_ORPHANS_DEFAULT
 from gen_common.data.creators.abstract_dataset_creator import AbstractDatasetCreator, DatasetType
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
 from gen_common.data.processing.cleaning.data_cleaner import DataCleaner

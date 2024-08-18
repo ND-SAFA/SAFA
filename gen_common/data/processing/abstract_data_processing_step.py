@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from functools import total_ordering
 from typing import List, Type
 
-from gen_common.constants import SPACE
-from gen_common.util import BaseObject
+from gen_common.constants.symbol_constants import SPACE
+from gen_common.infra.base_object import BaseObject
 from gen_common.util.override import overrides
 
 

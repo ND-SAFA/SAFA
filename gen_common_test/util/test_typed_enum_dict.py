@@ -1,6 +1,6 @@
 from gen_common.data.objects.trace import Trace
 from gen_common.data.keys.structure_keys import TraceKeys
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestTypedEnumDict(BaseTest):

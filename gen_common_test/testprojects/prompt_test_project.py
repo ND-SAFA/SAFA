@@ -16,7 +16,7 @@ from gen_common.llm.open_ai_manager import OpenAIManager
 from gen_common.llm.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from gen_common.llm.prompts.prompt_builder import PromptBuilder
 from gen_common.llm.prompts.question_prompt import QuestionPrompt
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.base_paths import TEST_DATA_DIR
 from gen_common_test.testprojects.artifact_test_project import ArtifactTestProject
 from gen_common_test.testprojects.safa_test_project import SafaTestProject

@@ -1,11 +1,12 @@
 from typing import Any, Dict, List, Union
 
-from gen_common.constants import COMMA, EMPTY_STRING, NEW_LINE
+from gen_common.constants.symbol_constants import COMMA, EMPTY_STRING, NEW_LINE
 from gen_common.llm.prompts.prompt_args import PromptArgs
 from gen_common.llm.prompts.question_prompt import QuestionPrompt
 from gen_common.llm.response_managers.xml_response_manager import XMLResponseManager
-from gen_common.util import DictUtil, PromptUtil
+from gen_common.util.dict_util import DictUtil
 from gen_common.util.override import overrides
+from gen_common.util.prompt_util import PromptUtil
 
 
 class SelectQuestionPrompt(QuestionPrompt):

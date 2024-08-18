@@ -1,7 +1,7 @@
 from gen_common.data.dataframes.prompt_dataframe import PromptDataFrame
 from gen_common.data.keys.prompt_keys import PromptKeys
-from gen_common.util import EnumDict
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.enum_util import EnumDict
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestPromptDataFrame(BaseTest):

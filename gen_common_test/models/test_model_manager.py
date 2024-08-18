@@ -6,7 +6,7 @@ from transformers.models.auto import AutoModelForSequenceClassification
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 
 from gen_common.llm.model_manager import ModelManager
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestTokenizer:

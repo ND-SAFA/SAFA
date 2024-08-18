@@ -1,13 +1,15 @@
 from string import ascii_uppercase
 from typing import Dict, List, Union
 
-from gen_common.constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
+from gen_common.constants.symbol_constants import COMMA, EMPTY_STRING, NEW_LINE, SPACE
 from gen_common.llm.prompts.multi_prompt import MultiPrompt
 from gen_common.llm.prompts.prompt import Prompt
 from gen_common.llm.prompts.prompt_args import PromptArgs
 from gen_common.llm.response_managers.abstract_response_manager import AbstractResponseManager
-from gen_common.util import DictUtil, PromptUtil, StrUtil
+from gen_common.util.dict_util import DictUtil
 from gen_common.util.override import overrides
+from gen_common.util.prompt_util import PromptUtil
+from gen_common.util.str_util import StrUtil
 
 TASK_HEADER = 'TASKS:'
 

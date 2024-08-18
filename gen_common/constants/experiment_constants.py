@@ -1,0 +1,7 @@
+MAX_JOBS = 1
+RUN_ASYNC = False
+EXIT_ON_FAILED_JOB = True
+BASE_EXPERIMENT_NAME = "base_experiment"
+BEST_MODEL_NAME = "best"
+EXPERIMENT_ID_DEFAULT = 0
+OUTPUT_FILENAME = "output.json"

@@ -1,6 +1,6 @@
 from typing import Callable, List
 
-from gen_common.constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.llm.prompts.multi_prompt import MultiPrompt
 from gen_common.llm.prompts.prompt import Prompt
 from gen_common.llm.prompts.prompt_args import PromptArgs

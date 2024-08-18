@@ -5,7 +5,9 @@ import numpy as np
 from gen_common.data.dataframes.abstract_project_dataframe import AbstractProjectDataFrame
 from gen_common.data.keys.structure_keys import StructuredKeys, TraceKeys, TraceRelationshipType
 from gen_common.data.objects.trace import Trace
-from gen_common.util import DataFrameUtil, DictUtil, EnumDict
+from gen_common.util.dataframe_util import DataFrameUtil
+from gen_common.util.dict_util import DictUtil
+from gen_common.util.enum_util import EnumDict
 
 
 class TraceDataFrame(AbstractProjectDataFrame):

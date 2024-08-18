@@ -4,17 +4,18 @@ from unittest.mock import MagicMock
 
 import openai
 
-from gen_common.constants import EMPTY_STRING, IS_TEST, OPEN_AI_KEY, OPEN_AI_ORG, open_ai_constants
+from gen_common.constants import environment_constants, open_ai_constants
+from gen_common.constants.environment_constants import OPEN_AI_KEY, OPEN_AI_ORG
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.infra.t_threading.threading_state import MultiThreadState
 from gen_common.llm.abstract_llm_manager import AIObject, AbstractLLMManager
 from gen_common.llm.args.open_ai_args import OpenAIArgs, OpenAIParams
-from gen_common.llm.llm_responses import ClassificationItemResponse, ClassificationResponse, GenerationResponse, \
+from gen_common.llm.llm_responses import GenerationResponse, \
     SupportedLLMResponses
 from gen_common.llm.llm_task import LLMCompletionType
 from gen_common.llm.prompts.llm_prompt_build_args import LLMPromptBuildArgs
-from gen_common.util import ThreadUtil
 from gen_common.util.attr_dict import AttrDict
+from gen_common.util.thread_util import ThreadUtil
 
 Res = namedtuple('Res', ['choices'])
 
@@ -34,24 +35,6 @@ class OpenAIManager(AbstractLLMManager[AttrDict]):
         llm_args.prompt_args = self.prompt_args
         super().__init__(llm_args=llm_args, prompt_args=self.prompt_args)
         logger.info(f"Created OpenAI manager with Model: {self.llm_args.model}")
-
-    def _make_fine_tune_request_impl(self, **kwargs) -> AttrDict:
-        """
-        Makes a request to fine-tune a model
-        :param kwargs: Params necessary for request
-        :return: The response from open  ai
-        """
-        result = openai.FineTune.create(**kwargs)
-        if result is None:  # retry if failed.
-            result = openai.FineTune.create(**kwargs)
-        return result
-
-    def retrieve_fine_tune_request(self, **params) -> AttrDict:
-        """
-        Retrieves s a request to fine-tune a model
-        :return: The response from open  ai
-        """
-        return openai.FineTune.retrieve(**params)
 
     def make_completion_request_impl(self, raise_exception: bool = True, original_responses: List = None,
                                      retries: Set[int] = None, **params) -> AIObject:
@@ -95,15 +78,6 @@ class OpenAIManager(AbstractLLMManager[AttrDict]):
         return global_state
 
     @staticmethod
-    def extract_all_text_from_response(res: AttrDict) -> str:
-        """
-        Extracts all text across all batches from the response
-        :param res: The response
-        :return: All text across all batches from the response
-        """
-        return EMPTY_STRING.join([res.message["content"] for res in res.choices if res.message])
-
-    @staticmethod
     def translate_to_response(task: LLMCompletionType, res: AttrDict, **params) -> SupportedLLMResponses:
         """
         Translates the response to the response for task.
@@ -114,14 +88,7 @@ class OpenAIManager(AbstractLLMManager[AttrDict]):
         """
         text_responses = [choice.message["content"].strip() if choice.message else choice.exception
                           for choice in res.choices]
-        if task == LLMCompletionType.GENERATION:
-            return GenerationResponse(text_responses)
-        elif task == LLMCompletionType.CLASSIFICATION:
-            probs = [r.logprobs.top_logprobs[0] if r.logprobs else None for r in res.choices]
-            classification_items = [ClassificationItemResponse(t, probs=p) for t, p in zip(text_responses, probs)]
-            return ClassificationResponse(classification_items)
-        else:
-            raise NotImplementedError(f"No handler for {task.name} is implemented")
+        return GenerationResponse(text_responses)
 
     def upload_file(self, **params) -> AttrDict:
         """
@@ -153,7 +120,7 @@ class OpenAIManager(AbstractLLMManager[AttrDict]):
         :param params: Parameters for the request.
         :return: The response from open ai.
         """
-        if not IS_TEST:
+        if not environment_constants.IS_TEST:
             assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
                                                 f"and {f'{OPEN_AI_KEY=}'.split('=')[0]} in .env"
             openai.organization = OPEN_AI_ORG

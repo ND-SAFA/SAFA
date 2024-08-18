@@ -8,7 +8,9 @@ import pandas as pd
 from datasets import Dataset
 from tqdm import tqdm
 
-from gen_common.constants import EMPTY_STRING, TQDM_NCOLS, USE_NL_SUMMARY_EMBEDDINGS
+from gen_common.constants.logging_constants import TQDM_NCOLS
+from gen_common.constants.model_constants import USE_NL_SUMMARY_EMBEDDINGS
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.layer_dataframe import LayerDataFrame
 from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
@@ -24,7 +26,11 @@ from gen_common.data.tdatasets.trace_matrix import TraceMatrix
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.llm.model_manager import ModelManager
 from gen_common.llm.model_properties import ModelArchitectureType
-from gen_common.util import DataFrameUtil, DictUtil, EnumDict, FileUtil, RankingUtil
+from gen_common.util.dataframe_util import DataFrameUtil
+from gen_common.util.dict_util import DictUtil
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.file_util import FileUtil
+from gen_common.util.ranking_util import RankingUtil
 
 
 class TraceDataset(iDataset):

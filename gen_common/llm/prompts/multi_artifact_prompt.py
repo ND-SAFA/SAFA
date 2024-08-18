@@ -2,13 +2,15 @@ from copy import deepcopy
 from enum import Enum, auto
 from typing import Dict, List
 
-from gen_common.constants import EMPTY_STRING, MAX_TOKENS_FOR_NO_SUMMARIES, NEW_LINE
+from gen_common.constants.model_constants import MAX_TOKENS_FOR_NO_SUMMARIES
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.llm.prompts.artifact_prompt import ArtifactPrompt
 from gen_common.llm.prompts.prompt import Prompt
 from gen_common.llm.prompts.prompt_args import PromptArgs
 from gen_common.llm.tokens.token_calculator import TokenCalculator
-from gen_common.util import DictUtil, EnumDict
+from gen_common.util.dict_util import DictUtil
+from gen_common.util.enum_util import EnumDict
 from gen_common.util.override import overrides
 
 

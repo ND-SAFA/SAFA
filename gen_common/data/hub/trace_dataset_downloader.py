@@ -2,10 +2,11 @@ import os
 
 from datasets import DownloadConfig, DownloadManager
 
-from gen_common.constants import CACHE_DIR_NAME, DATA_PATH
+from gen_common.constants.dataset_constants import CACHE_DIR_NAME
+from gen_common.constants.environment_constants import DATA_PATH
 from gen_common.data.hub.abstract_hub_id import AbstractHubId
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import FileUtil
+from gen_common.util.file_util import FileUtil
 
 
 class TraceDatasetDownloader:

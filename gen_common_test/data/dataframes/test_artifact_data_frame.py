@@ -1,9 +1,11 @@
-from gen_common.constants import PERIOD
+from gen_common.constants.symbol_constants import PERIOD
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.data.objects.artifact import Artifact
-from gen_common.util import DictUtil, EnumDict, ListUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.dict_util import DictUtil
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.list_util import ListUtil
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestArtifactDataFrame(BaseTest):

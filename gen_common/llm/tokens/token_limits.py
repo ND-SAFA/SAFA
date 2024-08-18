@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Set
 
-from gen_common.util import StrUtil
+from gen_common.util.str_util import StrUtil
 
 
 class ModelTokenLimits(Enum):

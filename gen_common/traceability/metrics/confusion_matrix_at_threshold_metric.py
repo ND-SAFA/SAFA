@@ -2,9 +2,10 @@ from typing import Dict, List
 
 import datasets
 
-from gen_common.constants import THRESHOLD_DEFAULT
+from gen_common.constants.metric_constants import THRESHOLD_DEFAULT
 from gen_common.traceability.metrics.abstract_trace_metric import AbstractTraceMetric
-from gen_common.util import EnumDict, MetricsUtil
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.metrics_util import MetricsUtil
 from gen_common.util.supported_enum import SupportedEnum
 
 _DESCRIPTION = """

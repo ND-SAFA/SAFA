@@ -3,10 +3,12 @@ from typing import List, Optional
 
 from langchain_core.documents.base import Document
 
-from gen_common.constants import UNDERSCORE
+from gen_common.constants.symbol_constants import UNDERSCORE
 from gen_common.data.keys.structure_keys import ArtifactKeys, StructuredKeys
 from gen_common.data.objects.chunk import Chunk
-from gen_common.util import DataFrameUtil, EnumDict, FileUtil
+from gen_common.util.dataframe_util import DataFrameUtil
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.file_util import FileUtil
 from gen_common.util.typed_enum_dict import TypedEnumDict
 
 

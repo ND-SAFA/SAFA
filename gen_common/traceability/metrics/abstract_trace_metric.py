@@ -4,7 +4,7 @@ import datasets
 from datasets import MetricInfo
 from evaluate import EvaluationModule
 
-from gen_common.util import BaseObject
+from gen_common.infra.base_object import BaseObject
 
 
 class AbstractTraceMetric(EvaluationModule, BaseObject, ABC):

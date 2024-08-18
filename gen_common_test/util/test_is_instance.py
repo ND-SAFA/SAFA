@@ -1,7 +1,7 @@
 from typing import Callable, List, Optional
 
-from gen_common.util import BaseObject
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.infra.base_object import BaseObject
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class Parent:

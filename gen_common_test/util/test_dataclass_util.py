@@ -1,8 +1,8 @@
 import uuid
 
 from gen_common.llm.prompts.prompt_args import PromptArgs
-from gen_common.util import DataclassUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.dataclass_util import DataclassUtil
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestDataclasssUtil(BaseTest):

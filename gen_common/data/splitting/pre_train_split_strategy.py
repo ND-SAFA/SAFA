@@ -4,7 +4,7 @@ from typing import Tuple
 from gen_common.data.readers.pre_train_project_reader import PreTrainProjectReader
 from gen_common.data.splitting.abstract_split_strategy import AbstractSplitStrategy
 from gen_common.data.tdatasets.pre_train_dataset import PreTrainDataset
-from gen_common.util import FileUtil
+from gen_common.util.file_util import FileUtil
 from gen_common.util.override import overrides
 
 

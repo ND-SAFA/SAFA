@@ -3,7 +3,7 @@ from typing import Type
 from gen_common.data.hub.hub_ids.multi_task_hub_id import MultiStageHubId
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
 from gen_common.data.readers.csv_project_reader import CsvProjectReader
-from gen_common.util import DictUtil
+from gen_common.util.dict_util import DictUtil
 
 
 class GitHubId(MultiStageHubId):

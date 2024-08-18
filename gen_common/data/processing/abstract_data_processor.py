@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Any, List
 
 from gen_common.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
-from gen_common.util import BaseObject
+from gen_common.infra.base_object import BaseObject
 
 
 class AbstractDataProcessor(BaseObject):

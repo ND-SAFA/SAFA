@@ -1,8 +1,8 @@
 from unittest import skip
 
 from gen_common.data.processing.cleaning.extract_code_identifiers import ExtractCodeIdentifiersStep
-from gen_common.util import FileUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.file_util import FileUtil
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.base_paths import TEST_JAVA_PATH
 
 

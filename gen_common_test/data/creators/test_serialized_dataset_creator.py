@@ -2,7 +2,7 @@ from gen_common.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from gen_common.llm.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from gen_common.llm.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from gen_common.llm.prompts.prompt_builder import PromptBuilder
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.testprojects.prompt_test_project import PromptTestProject
 
 

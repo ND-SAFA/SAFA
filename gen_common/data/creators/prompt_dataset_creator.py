@@ -1,7 +1,8 @@
 import os
 from typing import Optional, Union
 
-from gen_common.constants import EMPTY_STRING, PROJECT_SUMMARY_FILENAME
+from gen_common.constants.dataset_constants import PROJECT_SUMMARY_FILENAME
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
@@ -9,10 +10,10 @@ from gen_common.data.dataframes.prompt_dataframe import PromptDataFrame
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
 from gen_common.data.readers.artifact_project_reader import ArtifactProjectReader
-from gen_common.data.summarizer.artifacts_summarizer import ArtifactsSummarizer
-from gen_common.data.summarizer.summary import Summary
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
-from gen_common.util import FileUtil
+from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
+from gen_common.summarize.summary import Summary
+from gen_common.util.file_util import FileUtil
 
 
 class PromptDatasetCreator(AbstractDatasetCreator[PromptDataset]):

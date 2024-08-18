@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from gen_common.util import BaseObject
+from gen_common.infra.base_object import BaseObject
 
 
 class AbstractProjectDefinition(BaseObject, ABC):

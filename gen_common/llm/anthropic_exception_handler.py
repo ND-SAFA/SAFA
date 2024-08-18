@@ -54,7 +54,7 @@ def _is_anthropic_online(state: MultiThreadState) -> bool:
     try:
 
         from gen_common.llm.anthropic_manager import AnthropicManager
-        from gen_common.constants import DefaultLLMManager
+        from gen_common.constants.default_model_managers import DefaultLLMManager
         manager = DefaultLLMManager.EFFICIENT()
         response = manager.make_completion_request_impl(prompt="Hi, what is your name?")
         logger.info("Anthropic is online.")

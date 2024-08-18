@@ -1,3 +1,5 @@
+from typing import Dict, List, Tuple, Union
+
 import numpy as np
 
 MAX_SEQ_LENGTH_DEFAULT = 512
@@ -32,3 +34,5 @@ DEFAULT_EVAL_METRIC = "f2"
 DEFAULT_MAX_STEPS_BEFORE_EVAL = 50
 DEFAULT_SAVE_BEST_MODEL = True
 DEFAULT_ENCODING_BATCH_SIZE = 32
+TracePredictions = Union[np.ndarray, Tuple[np.ndarray], List]
+Metrics = Dict[str, float]

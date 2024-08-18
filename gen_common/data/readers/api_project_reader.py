@@ -1,11 +1,12 @@
-from gen_common.constants import EMPTY_STRING, NO_CHECK
+from gen_common.constants.dataset_constants import NO_CHECK
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.layer_dataframe import LayerDataFrame
 from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
 from gen_common.data.keys.structure_keys import StructuredKeys
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from gen_common.data.readers.definitions.api_definition import ApiDefinition
-from gen_common.util import DictUtil, EnumDict
+from gen_common.util.dict_util import DictUtil, EnumDict
 from gen_common.util.json_util import JsonUtil
 
 

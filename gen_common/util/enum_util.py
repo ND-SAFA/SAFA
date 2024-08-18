@@ -1,8 +1,8 @@
 from collections import OrderedDict
 from enum import Enum
-from typing import Any, Callable, Dict, Type, Union, Optional
+from typing import Any, Callable, Dict, Optional, Type, Union
 
-from gen_common.constants import UNDERSCORE, EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING, UNDERSCORE
 
 SEP_SYM = UNDERSCORE
 

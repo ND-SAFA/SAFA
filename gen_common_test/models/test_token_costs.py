@@ -2,7 +2,7 @@ import mock
 
 from gen_common.llm.tokens.token_calculator import TokenCalculator
 from gen_common.llm.tokens.token_costs import ModelTokenCost, INPUT_TOKENS
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestTokenCosts(BaseTest):

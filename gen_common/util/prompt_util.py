@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from gen_common.constants import EMPTY_STRING, NEW_LINE, SPACE, TAB
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE, SPACE, TAB
 from gen_common.util.str_util import StrUtil
 
 

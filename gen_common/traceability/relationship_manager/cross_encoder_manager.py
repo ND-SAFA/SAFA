@@ -3,10 +3,11 @@ from typing import Dict, List, Tuple
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from gen_common.constants import DEFAULT_CROSS_ENCODER_MODEL, DEFAULT_ENCODING_BATCH_SIZE
+from gen_common.constants.environment_constants import DEFAULT_CROSS_ENCODER_MODEL
+from gen_common.constants.hugging_face_constants import DEFAULT_ENCODING_BATCH_SIZE
 from gen_common.llm.model_properties import ModelTask
 from gen_common.traceability.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
-from gen_common.util import ListUtil
+from gen_common.util.list_util import ListUtil
 
 
 class CrossEncoderManager(AbstractRelationshipManager):

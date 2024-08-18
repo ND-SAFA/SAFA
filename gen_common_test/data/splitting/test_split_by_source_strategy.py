@@ -1,5 +1,5 @@
 from gen_common.data.splitting.supported_split_strategy import SupportedSplitStrategy
-from gen_common_test.base_tests.base_split_test import BaseSplitTest
+from gen_common_test.base.tests.base_split_test import BaseSplitTest
 
 
 class TestRandomAllSourcesSplit(BaseSplitTest):

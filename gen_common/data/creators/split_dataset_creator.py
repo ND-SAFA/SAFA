@@ -1,7 +1,7 @@
 from typing import Optional, Union
 
-from gen_common.constants import VALIDATION_PERCENTAGE_DEFAULT
-from gen_common.constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING
+from gen_common.constants.dataset_constants import VALIDATION_PERCENTAGE_DEFAULT
 from gen_common.data.creators.abstract_dataset_creator import AbstractDatasetCreator
 from gen_common.data.processing.cleaning.data_cleaner import DataCleaner
 from gen_common.data.splitting.supported_split_strategy import SupportedSplitStrategy

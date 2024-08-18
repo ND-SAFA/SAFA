@@ -1,5 +1,5 @@
-from gen_common.util import PromptUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.prompt_util import PromptUtil
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestPromptUtil(BaseTest):

@@ -3,7 +3,7 @@ from typing import Dict, List
 
 import pandas as pd
 
-from gen_common.constants import NO_CHECK
+from gen_common.constants.dataset_constants import NO_CHECK
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.layer_dataframe import LayerDataFrame
 from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
@@ -11,7 +11,11 @@ from gen_common.data.keys.csv_keys import CSVKeys
 from gen_common.data.keys.structure_keys import StructuredKeys
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader, TraceDataFramesTypes
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import DataFrameUtil, EnumDict, FileUtil, ListUtil, ThreadUtil
+from gen_common.util.dataframe_util import DataFrameUtil
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.file_util import FileUtil
+from gen_common.util.list_util import ListUtil
+from gen_common.util.thread_util import ThreadUtil
 
 
 class CsvProjectReader(AbstractProjectReader[TraceDataFramesTypes]):

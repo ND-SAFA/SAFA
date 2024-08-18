@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Generic, Optional, Tuple, Type, TypeVar
 
-from gen_common.constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.layer_dataframe import LayerDataFrame
 from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
-from gen_common.data.summarizer.artifacts_summarizer import ArtifactsSummarizer
-from gen_common.util import BaseObject, FileUtil
+from gen_common.infra.base_object import BaseObject
+from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
+from gen_common.util.file_util import FileUtil
 from gen_common.util.override import overrides
 
 ProjectData = TypeVar("ProjectData")
@@ -35,7 +36,9 @@ class AbstractProjectReader(BaseObject, ABC, Generic[ProjectData]):
         :return: the project path
         """
         if self.project_path:
-            return FileUtil.expand_paths(self.project_path)
+            env_replacements = FileUtil.get_env_replacements()
+            full_path = FileUtil.expand_paths(self.project_path, replacements=env_replacements)
+            return full_path
         return self.project_path
 
     @abstractmethod

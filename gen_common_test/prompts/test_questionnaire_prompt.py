@@ -1,10 +1,10 @@
-from gen_common.constants import NEW_LINE
+from gen_common.constants.symbol_constants import NEW_LINE
 from gen_common.llm.prompts.binary_choice_question_prompt import BinaryChoiceQuestionPrompt
 from gen_common.llm.prompts.question_prompt import QuestionPrompt
 from gen_common.llm.prompts.questionnaire_prompt import QuestionnairePrompt
 from gen_common.llm.response_managers.xml_response_manager import XMLResponseManager
-from gen_common.util import PromptUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.prompt_util import PromptUtil
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestQuestionnairePrompt(BaseTest):

@@ -13,9 +13,9 @@ from gen_common.data.readers.csv_project_reader import CsvProjectReader
 from gen_common.data.readers.dataframe_project_reader import DataFrameProjectReader
 from gen_common.data.readers.prompt_project_reader import PromptProjectReader
 from gen_common.data.readers.structured_project_reader import StructuredProjectReader
-from gen_common.data.summarizer.summary import Summary
-from gen_common.util import EnumDict
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.summarize.summary import Summary
+from gen_common.util.enum_util import EnumDict
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 from gen_common_test.testprojects.prompt_test_project import PromptTestProject
 

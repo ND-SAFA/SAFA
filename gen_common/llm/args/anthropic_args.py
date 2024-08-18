@@ -1,8 +1,11 @@
 from typing import Dict
 
-from gen_common.constants import ANTHROPIC_MODEL_DEFAULT, MAX_TOKENS_DEFAULT, PREDICT_TASK, TRAIN_TASK
+from gen_common.constants.anthropic_constants import ANTHROPIC_MODEL_DEFAULT
+from gen_common.constants.model_constants import PREDICT_TASK, TRAIN_TASK
+from gen_common.constants.open_ai_constants import MAX_TOKENS_DEFAULT
 from gen_common.llm.args.abstract_llm_args import AbstractLLMArgs
-from gen_common.util import DataclassUtil, DictUtil
+from gen_common.util.dataclass_util import DataclassUtil
+from gen_common.util.dict_util import DictUtil
 
 
 class AnthropicParams:

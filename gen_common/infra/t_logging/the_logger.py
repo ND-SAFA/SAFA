@@ -2,7 +2,7 @@ from functools import lru_cache
 from logging import Logger
 from typing import Type
 
-from gen_common.constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING
 
 
 class TheLogger(Logger):

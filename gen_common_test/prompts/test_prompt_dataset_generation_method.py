@@ -1,5 +1,5 @@
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.testprojects.prompt_test_project import PromptTestProject
 
 

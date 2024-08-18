@@ -3,8 +3,8 @@ from copy import deepcopy
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.llm.prompts.context_prompt import ContextPrompt
 from gen_common.llm.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from gen_common.util import EnumDict
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.enum_util import EnumDict
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestContextPrompt(BaseTest):

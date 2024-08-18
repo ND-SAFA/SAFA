@@ -1,7 +1,7 @@
 from typing import Dict, List
 
 from gen_common.data.processing.abstract_data_processing_step import AbstractDataProcessingStep, ProcessingOrder
-from gen_common.util import UncasedDict
+from gen_common.util.uncased_dict import UncasedDict
 
 
 class ManualReplaceWordsStep(AbstractDataProcessingStep):

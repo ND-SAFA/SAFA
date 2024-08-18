@@ -29,7 +29,7 @@ class NpEncoder(json.JSONEncoder):
         if isinstance(obj, TrainingArguments):
             obj_vars = {k: self.default(v) for k, v in vars(obj.__class__).items() if not k.startswith("_")}
             return obj_vars
-        from gen_common.util.base_object import BaseObject
+        from gen_common.infra.base_object import BaseObject
         if isinstance(obj, BaseObject):
             obj_fields = ReflectionUtil.get_fields(obj)
             new_fields = {}

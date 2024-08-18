@@ -2,14 +2,16 @@ import os
 import re
 from typing import Any, Dict, List, Optional
 
-from gen_common.constants import EMPTY_STRING, MISSING_DEFINITION_ERROR, NEW_LINE, NONE, RQ_INQUIRER_CONFIRM_MESSAGE, \
-    RQ_VARIABLE_REGEX, RQ_VARIABLE_START
+from gen_common.constants.rq_constants import MISSING_DEFINITION_ERROR, RQ_INQUIRER_CONFIRM_MESSAGE, RQ_VARIABLE_REGEX, \
+    RQ_VARIABLE_START
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE, NONE
 from gen_common.infra.cli import confirm
 from gen_common.infra.experiment.rq.rq_variable import RQVariable
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import FileUtil, YamlUtil
+from gen_common.util.file_util import FileUtil
 from gen_common.util.json_util import JsonUtil
 from gen_common.util.reflection_util import ReflectionUtil
+from gen_common.util.yaml_util import YamlUtil
 
 
 class RQDefinition:

@@ -3,10 +3,10 @@ from typing import Any, Dict
 from datasets import load_dataset
 from transformers import PreTrainedTokenizer
 
-from gen_common.constants import INPUT_IDS_PARAM, TEXT_PARAM, TRAIN_PARAM
+from gen_common.constants.hugging_face_constants import INPUT_IDS_PARAM, TEXT_PARAM, TRAIN_PARAM
 from gen_common.data.tdatasets.idataset import iDataset
 from gen_common.llm.model_manager import ModelManager
-from gen_common.util import ListUtil
+from gen_common.util.list_util import ListUtil
 
 
 class PreTrainDataset(iDataset):

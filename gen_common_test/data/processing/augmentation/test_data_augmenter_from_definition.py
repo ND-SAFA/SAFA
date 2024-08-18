@@ -1,7 +1,7 @@
 from gen_common.data.processing.augmentation.data_augmenter import DataAugmenter
-from gen_common_test.base_tests.base_test import BaseTest
 from gen_common.infra.experiment.variables.experimental_variable import ExperimentalVariable
-from gen_common_test.test_object_definitions import TestObjectDefinitions
+from gen_common_test.base.object_definitions import TestObjectDefinitions
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestDataAugmenterFromDefinition(BaseTest):

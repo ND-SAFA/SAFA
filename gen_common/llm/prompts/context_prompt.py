@@ -2,11 +2,13 @@ from typing import Any, Dict, List
 
 from langchain_core.documents.base import Document
 
-from gen_common.constants import EMPTY_STRING, NEW_LINE
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.data.objects.artifact import Artifact
 from gen_common.llm.prompts.multi_artifact_prompt import MultiArtifactPrompt
-from gen_common.util import EnumDict, ListUtil, default_mutable
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.list_util import ListUtil
+from gen_common.util.pythonisms_util import default_mutable
 
 DocumentType = str | Document
 

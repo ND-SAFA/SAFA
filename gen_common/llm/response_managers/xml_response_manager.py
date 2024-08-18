@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Tuple
 
 from gen_common.llm.response_managers.abstract_response_manager import AbstractResponseManager
-from gen_common.util import PromptUtil
 from gen_common.util.llm_response_util import LLMResponseUtil
+from gen_common.util.prompt_util import PromptUtil
 
 
 @dataclass

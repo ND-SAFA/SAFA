@@ -1,6 +1,6 @@
-from gen_common.constants import NEW_LINE
+from gen_common.constants.symbol_constants import NEW_LINE
 from gen_common.llm.prompts.select_question_prompt import SelectQuestionPrompt
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestSelectQuestionPrompt(BaseTest):

@@ -2,21 +2,20 @@ import os
 from abc import ABC, abstractmethod
 from typing import Generic, List, Optional, Set, Tuple, Type
 
-from gen_common.tools.cli.confirm import confirm
-from gen_common.tools.cli.inquirer_selector import inquirer_selection, inquirer_value
-from gen_common.tools.constants.symbol_constants import EMPTY_STRING, NEW_LINE
-from gen_common.tools.state_management.state import State
-from gen_common.tools.t_logging.logger_manager import logger
-from gen_common.tools.util.enum_util import EnumUtil
-from gen_common.tools.util.file_util import FileUtil
-from gen_common.tools.util.reflection_util import ReflectionUtil
-
-from tgen.common.constants import tgen_constants
-from tgen.common.constants.pipeline_constants import DEFAULT_INTERACTIVE_STATE
-from tgen.pipeline.abstract_pipeline_step import AbstractPipelineStep, ArgType, StateType, title_format_for_logs
-from tgen.pipeline.interactive_mode_options import InteractiveModeOptions
-from tgen.summarizer.summarizer_args import SummarizerArgs
-from tgen.summarizer.summary import Summary
+from gen_common.constants import environment_constants
+from gen_common.constants.pipeline_constants import DEFAULT_INTERACTIVE_STATE
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE
+from gen_common.infra.cli.confirm import confirm
+from gen_common.infra.cli.inquirer_selector import inquirer_selection, inquirer_value
+from gen_common.infra.t_logging.logger_manager import logger
+from gen_common.pipeline.abstract_pipeline_step import AbstractPipelineStep, ArgType, StateType, title_format_for_logs
+from gen_common.pipeline.interactive_mode_options import InteractiveModeOptions
+from gen_common.pipeline.state import State
+from gen_common.summarize.summarizer_args import SummarizerArgs
+from gen_common.summarize.summary import Summary
+from gen_common.util.enum_util import EnumUtil
+from gen_common.util.file_util import FileUtil
+from gen_common.util.reflection_util import ReflectionUtil
 
 
 class AbstractPipeline(ABC, Generic[ArgType, StateType]):
@@ -90,7 +89,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         if self.summarizer_args:
             self.summarizer_args: SummarizerArgs
             self.run_summarizations()
-        if tgen_constants.IS_INTERACTIVE:
+        if environment_constants.IS_INTERACTIVE:
             self._run_interactive_mode()
 
     def run_summarizations(self) -> Summary:
@@ -98,7 +97,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         Runs the summarizer to create pipeline project summary and summarize artifacts
         :return: The project summary
         """
-        from tgen.summarizer.summarizer import Summarizer
+        from gen_common.summarize.summarizer import Summarizer
         self.summarizer_args.update_export_dir(self.state.export_dir)
         dataset = Summarizer(self.summarizer_args, dataset=self.args.dataset).summarize()
         if not self.args.dataset.project_summary:
@@ -117,8 +116,8 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
         """
         step_ran = step.run(self.args, self.state, re_run=re_run)
         if step.get_step_name() == self.resume_interactive_mode_step:
-            tgen_constants.IS_INTERACTIVE = DEFAULT_INTERACTIVE_STATE
-        if step_ran and tgen_constants.IS_INTERACTIVE:
+            environment_constants.IS_INTERACTIVE = DEFAULT_INTERACTIVE_STATE
+        if step_ran and environment_constants.IS_INTERACTIVE:
             return self._run_interactive_mode()
         return False
 
@@ -177,7 +176,7 @@ class AbstractPipeline(ABC, Generic[ArgType, StateType]):
             else:
                 self.resume_interactive_mode_step = resume_interactive_mode_step
                 self.args.interactive_mode = False
-                tgen_constants.IS_INTERACTIVE = False
+                environment_constants.IS_INTERACTIVE = False
 
         if selected_option is None:
             self._run_interactive_mode(exclude_options=exclude_options)

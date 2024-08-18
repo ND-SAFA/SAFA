@@ -1,6 +1,6 @@
 from typing import List
 
-from gen_common.constants import SPACE, PERIOD
+from gen_common.constants.symbol_constants import PERIOD, SPACE
 from gen_common.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 
 

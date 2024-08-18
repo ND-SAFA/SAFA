@@ -3,7 +3,7 @@ from typing import List, Tuple
 from comment_parser import comment_parser
 from comment_parser.comment_parser import UnsupportedError
 
-from gen_common.constants import NEW_LINE, SPACE
+from gen_common.constants.symbol_constants import NEW_LINE, SPACE
 from gen_common.data.processing.abstract_data_processing_step import AbstractDataProcessingStep
 from gen_common.infra.t_logging.logger_manager import logger
 

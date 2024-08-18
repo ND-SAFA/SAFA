@@ -8,7 +8,7 @@ from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
 from gen_common.data.keys.structure_keys import TraceKeys
 from gen_common.data.tdatasets.trace_matrix import Query, TraceMatrix
 from gen_common.traceability.metrics.metrics_manager import MetricsManager
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestTraceMatrix(BaseTest):

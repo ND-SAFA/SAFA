@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Tuple, Type
 
 from gen_common.llm.response_managers.abstract_response_manager import AbstractResponseManager
-from gen_common.util import DictUtil
+from gen_common.util.dict_util import DictUtil
 from gen_common.util.json_util import JsonUtil
 
 RESPONSE_FORMAT = "\n# Format Instructions\nYou should respond using the following JSON format:\n```\n{}\n```"

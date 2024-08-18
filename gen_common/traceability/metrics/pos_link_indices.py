@@ -6,7 +6,7 @@ import pandas as pd
 
 from gen_common.data.tdatasets.trace_matrix import TraceMatrix
 from gen_common.traceability.metrics.abstract_trace_metric import AbstractTraceMetric
-from gen_common.util import DictUtil
+from gen_common.util.dict_util import DictUtil
 
 _DESCRIPTION = """
 The True Link Indices metric measures the index at which true links in a software traceability 

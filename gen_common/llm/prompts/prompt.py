@@ -1,10 +1,12 @@
 from typing import Any, Dict, List
 
-from gen_common.constants import EMPTY_STRING, NEW_LINE, SPACE
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE, SPACE
 from gen_common.llm.prompts.prompt_args import PromptArgs
 from gen_common.llm.response_managers.abstract_response_manager import AbstractResponseManager
 from gen_common.llm.response_managers.xml_response_manager import XMLResponseManager
-from gen_common.util import DictUtil, PromptUtil, StrUtil
+from gen_common.util.dict_util import DictUtil
+from gen_common.util.prompt_util import PromptUtil
+from gen_common.util.str_util import StrUtil
 
 
 class Prompt:

@@ -1,6 +1,6 @@
 from gen_common.data.keys.prompt_keys import PromptKeys
 from gen_common.llm.prompts.llm_prompt_build_args import LLMPromptBuildArgs
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class BasePromptTest(BaseTest):

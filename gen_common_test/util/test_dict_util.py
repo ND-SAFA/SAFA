@@ -2,7 +2,7 @@ import math
 import string
 from unittest import TestCase
 
-from gen_common.util import DictUtil
+from gen_common.util.dict_util import DictUtil
 
 
 class TestDictUtil(TestCase):

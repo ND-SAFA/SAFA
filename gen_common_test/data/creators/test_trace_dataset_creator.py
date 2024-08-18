@@ -1,5 +1,5 @@
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.testprojects.abstract_test_project import AbstractTestProject
 from gen_common_test.testprojects.api_test_project import ApiTestProject
 from gen_common_test.testprojects.csv_test_project import CsvTestProject

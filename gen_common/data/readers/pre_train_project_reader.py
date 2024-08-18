@@ -1,7 +1,7 @@
 import os
 from typing import List
 
-from gen_common.constants import NEW_LINE
+from gen_common.constants.symbol_constants import NEW_LINE
 from gen_common.data.keys.structure_keys import StructuredKeys
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
 from gen_common.data.readers.entity.entity_reader import EntityReader

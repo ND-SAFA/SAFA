@@ -5,11 +5,12 @@ from unittest.mock import MagicMock
 import numpy as np
 from sentence_transformers.SentenceTransformer import SentenceTransformer
 
-from gen_common.constants import SMALL_EMBEDDING_MODEL
+from gen_common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.traceability.relationship_manager.embeddings_manager import EmbeddingsManager
-from gen_common.util import ListUtil, YamlUtil
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common.util.list_util import ListUtil
+from gen_common.util.yaml_util import YamlUtil
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 from gen_common_test.testprojects.safa_test_project import SafaTestProject
 

@@ -3,7 +3,7 @@ from typing import Dict
 import datasets
 from sklearn.metrics import average_precision_score
 
-from gen_common.constants import AP_KEY, MAP_KEY, THRESHOLD_DEFAULT
+from gen_common.constants.metric_constants import AP_KEY, MAP_KEY, THRESHOLD_DEFAULT
 from gen_common.data.tdatasets.trace_matrix import TraceMatrix
 from gen_common.traceability.metrics.abstract_trace_metric import AbstractTraceMetric
 

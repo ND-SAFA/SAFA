@@ -4,10 +4,10 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Union
 
-from gen_common.constants import DASH, EMPTY_STRING, UNDERSCORE
-from gen_common.data.summarizer.summary import Summary
+from gen_common.constants.symbol_constants import DASH, EMPTY_STRING, UNDERSCORE
+from gen_common.infra.base_object import BaseObject
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util.base_object import BaseObject
+from gen_common.summarize.summary import Summary
 from gen_common.util.enum_util import EnumUtil
 from gen_common.util.file_util import FileUtil
 from gen_common.util.param_specs import ParamSpecs
@@ -153,7 +153,7 @@ class State(BaseObject):
                 if os.path.exists(path):
                     state = cls.load_state_from_path(path, raise_exception=True)
                     return state
-            raise FileNotFoundError(f"Unable to find a previous state to load from {load_dir}")
+            raise FileNotFoundError(f"Unable to find a previous state to load from {path}")
         except FileNotFoundError as f:
             if log_exception:
                 logger.info(str(f))

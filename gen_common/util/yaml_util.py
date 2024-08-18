@@ -9,7 +9,7 @@ from yaml.dumper import Dumper
 from yaml.loader import SafeLoader
 from yaml.nodes import MappingNode, Node
 
-from gen_common.constants import COLON
+from gen_common.constants.symbol_constants import COLON
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.util.file_util import FileUtil
 from gen_common.util.param_specs import ParamSpecs

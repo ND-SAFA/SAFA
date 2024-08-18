@@ -3,9 +3,9 @@ import random
 import mock
 from sentence_transformers import CrossEncoder
 
-from gen_common.constants import SMALL_CROSS_ENCODER
+from gen_common.constants.hugging_face_constants import SMALL_CROSS_ENCODER
 from gen_common.traceability.relationship_manager.cross_encoder_manager import CrossEncoderManager
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestCrossEncoderManager(BaseTest):

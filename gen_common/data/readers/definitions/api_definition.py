@@ -4,7 +4,7 @@ from typing import Dict, List
 from gen_common.data.objects.artifact import Artifact
 from gen_common.data.objects.trace import Trace
 from gen_common.data.objects.trace_layer import TraceLayer
-from gen_common.util import BaseObject
+from gen_common.infra.base_object import BaseObject
 
 
 @dataclass

@@ -7,11 +7,12 @@ from transformers import AutoConfig, PreTrainedModel, PretrainedConfig
 from transformers.models.auto.tokenization_auto import AutoTokenizer
 from transformers.tokenization_utils import PreTrainedTokenizer
 
-from gen_common.constants import MAX_SEQ_LENGTH_DEFAULT, PERIOD
+from gen_common.constants.hugging_face_constants import MAX_SEQ_LENGTH_DEFAULT
+from gen_common.constants.symbol_constants import PERIOD
+from gen_common.infra.base_object import BaseObject
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.llm \
     .model_properties import ModelArchitectureType, ModelSize, ModelTask
-from gen_common.util import BaseObject
 from gen_common.util.override import overrides
 
 LAYER = List[Parameter]

@@ -9,7 +9,8 @@ from pandas._typing import Axes, Dtype
 from pandas.core.internals.construction import dict_to_mgr
 
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.util import DataFrameUtil, EnumDict, EnumUtil
+from gen_common.util.dataframe_util import DataFrameUtil
+from gen_common.util.enum_util import EnumDict, EnumUtil
 from gen_common.util.override import overrides
 
 

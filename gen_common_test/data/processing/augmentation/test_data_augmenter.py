@@ -2,7 +2,7 @@ from gen_common.data.processing.augmentation.data_augmenter import DataAugmenter
 from gen_common.data.processing.augmentation.resample_step import ResampleStep
 from gen_common.data.processing.augmentation.simple_word_replacement_step import SimpleWordReplacementStep
 from gen_common.data.processing.augmentation.source_target_swap_step import SourceTargetSwapStep
-from gen_common_test.base_tests.base_test import BaseTest
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestDataAugmenter(BaseTest):

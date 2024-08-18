@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List
+
 import pandas as pd
 
-from gen_common.data.summarizer.artifacts_summarizer import ArtifactsSummarizer
+from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
 
 
 class AbstractEntityFormat(ABC):

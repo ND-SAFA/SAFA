@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import pandas as pd
 
-from gen_common.constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
 from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
 from gen_common.data.exporters.abstract_dataset_exporter import AbstractDatasetExporter

@@ -1,7 +1,7 @@
 from typing import Dict
 
 from gen_common.infra.experiment.variables.variable import Variable
-from gen_common.util import UncasedDict
+from gen_common.util.uncased_dict import UncasedDict
 
 
 class DefinitionVariable(UncasedDict, Variable):

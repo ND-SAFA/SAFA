@@ -26,9 +26,9 @@ from gen_common.llm.response_managers.xml_response_manager import XMLResponseMan
 from gen_common.util.file_util import FileUtil
 from gen_common.util.prompt_util import PromptUtil
 from gen_common.util.yaml_util import YamlUtil
-from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.base.mock.decorators.mock_anthropic import mock_anthropic
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.testprojects.prompt_test_project import PromptTestProject
 
 Res = namedtuple("Res", ["id"])

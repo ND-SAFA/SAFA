@@ -10,7 +10,7 @@ from gen_common.graph.io.graph_state_vars import GraphStateVars
 from gen_common.graph.io.state_var import StateVar
 from gen_common.llm.response_managers.json_response_manager import JSONResponseManager
 from gen_common.util.dict_util import DictUtil
-from gen_common_test.base.mock.decorators.mock_chat_model import mock_chat_model
+from gen_common_test.base.mock.decorators.chat import mock_chat_model
 from gen_common_test.base.mock.langchain.prompt_assertion import AssertInPrompt, AssertToolAvailable, PromptAssertion
 from gen_common_test.base.mock.langchain.test_chat_model import TestResponseManager
 from gen_common_test.base.tests.base_test import BaseTest

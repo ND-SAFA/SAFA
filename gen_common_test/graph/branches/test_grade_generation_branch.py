@@ -1,6 +1,6 @@
 from gen_common.graph.branches.grade_generation_branch import GradeGenerationBranch
 from gen_common.graph.nodes.supported_nodes import SupportedNodes
-from gen_common_test.base.mock.decorators.mock_chat_model import mock_chat_model
+from gen_common_test.base.mock.decorators.chat import mock_chat_model
 from gen_common_test.base.mock.langchain.test_chat_model import TestResponseManager
 from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.graph.graph_test_util import get_io_without_data

@@ -14,9 +14,9 @@ from gen_common.summarize.artifact.artifact_summary_types import ArtifactSummary
 from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
 from gen_common.util.file_util import FileUtil
 from gen_common.util.prompt_util import PromptUtil
-from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.base.mock.decorators.mock_anthropic import mock_anthropic
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
+from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.paths.base_paths import TEST_DATA_DIR
 
 

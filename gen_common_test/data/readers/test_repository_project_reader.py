@@ -1,4 +1,4 @@
-from gen_common_test.base.mock.decorators.mock_anthropic import mock_anthropic
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.abstract_project_reader_test import AbstractProjectReaderTest
 from gen_common_test.testprojects.repo_one_test_project import RepositoryOneTestProject

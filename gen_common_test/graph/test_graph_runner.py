@@ -16,7 +16,7 @@ from gen_common.graph.io.graph_state import GraphState
 from gen_common.graph.llm_tools.tool_models import ExploreArtifactNeighborhood, RequestAssistance, RetrieveAdditionalInformation
 from gen_common.graph.nodes.generate_node import AnswerUser, GenerateNode
 from gen_common.graph.nodes.supported_nodes import SupportedNodes
-from gen_common_test.base.mock.decorators.mock_chat_model import mock_chat_model
+from gen_common_test.base.mock.decorators.chat import mock_chat_model
 from gen_common_test.base.mock.langchain.test_chat_model import TestResponseManager
 
 

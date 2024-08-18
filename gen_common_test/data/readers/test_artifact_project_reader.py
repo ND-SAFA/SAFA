@@ -3,7 +3,7 @@ from gen_common.data.readers.abstract_project_reader import AbstractProjectReade
 from gen_common.data.readers.artifact_project_reader import ArtifactProjectReader
 from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
 from gen_common_test.base.constants import SUMMARY_FORMAT
-from gen_common_test.base.mock.decorators.mock_anthropic import mock_anthropic
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.testprojects.artifact_test_project import ArtifactTestProject

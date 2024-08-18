@@ -15,7 +15,7 @@ from gen_common.summarize.summarizer_state import SummarizerState
 from gen_common.summarize.summary import Summary
 from gen_common.util.dataframe_util import DataFrameUtil
 from gen_common.util.str_util import StrUtil
-from gen_common_test.base.mock.decorators.mock_anthropic import mock_anthropic
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.responses.summary import PROJECT_SUMMARY_RESPONSES, SECTION_TAG_TO_TILE, TEST_PROJECT_SUMMARY, create
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_test import BaseTest

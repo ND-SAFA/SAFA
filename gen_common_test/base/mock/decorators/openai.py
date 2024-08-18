@@ -1,4 +1,4 @@
-from gen_common_test.base.mock.decorators.mock_ai import mock_ai
+from gen_common_test.base.mock.decorators.ai import mock_ai
 
 
 def mock_openai(func=None, *args, **kwargs):

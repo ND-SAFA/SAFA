@@ -1,6 +1,6 @@
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
 from gen_common.data.readers.structured_project_reader import StructuredProjectReader
-from gen_common_test.base.mock.decorators.mock_anthropic import mock_anthropic
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.abstract_project_reader_test import AbstractProjectReaderTest
 from gen_common_test.paths.project_paths import STRUCTURE_PROJECT_PATH

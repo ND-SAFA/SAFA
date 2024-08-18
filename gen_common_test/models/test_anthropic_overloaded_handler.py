@@ -5,9 +5,9 @@ from anthropic import InternalServerError
 
 from gen_common.llm.anthropic_exception_handler import anthropic_exception_handler
 from gen_common.util.thread_util import ThreadUtil
-from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.base.mock.decorators.mock_anthropic import mock_anthropic
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
+from gen_common_test.base.tests.base_test import BaseTest
 
 MOCK_ANTHROPIC_OVERLOADED_RESPONSE = {
     "type": "error",

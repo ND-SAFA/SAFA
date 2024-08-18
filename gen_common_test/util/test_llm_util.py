@@ -1,9 +1,9 @@
 from gen_common.llm.anthropic_manager import AnthropicManager
 from gen_common.llm.llm_responses import GenerationResponse
 from gen_common.llm.llm_task import LLMCompletionType
-from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.base.mock.decorators.mock_anthropic import mock_anthropic
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
+from gen_common_test.base.tests.base_test import BaseTest
 
 
 class TestLLMUtil(BaseTest):

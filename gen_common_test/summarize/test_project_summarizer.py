@@ -13,7 +13,7 @@ from gen_common.summarize.summarizer_args import SummarizerArgs
 from gen_common.summarize.summary import Summary, SummarySectionKeys
 from gen_common.util.enum_util import EnumDict
 from gen_common.util.prompt_util import PromptUtil
-from gen_common_test.base.mock.decorators.mock_anthropic import mock_anthropic
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.responses.summary import PROJECT_TITLE_TO_RESPONSE, TEST_PROJECT_SUMMARY, create
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_test import BaseTest

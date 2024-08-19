@@ -40,7 +40,7 @@ original_dataset: !!python/object:gen_common.data.creators.prompt_dataset_creato
   project_summary: null
   summarizer: null
   trace_dataset_creator: null
-project_summary: !!python/object/apply:gen_common.data.summarizer.summary.Summary
+project_summary: !!python/object/apply:gen_common.summarize.summary.Summary
   dictitems:
     overview: !!python/object/apply:gen_common.util.enum_util.EnumDict
       dictitems:

@@ -2,9 +2,11 @@ from typing import Dict
 
 from gen_common.constants.ranking_constants import CLUSTERING_LINK_THRESHOLD
 from gen_common.pipeline.abstract_pipeline import AbstractPipeline
-from gen_common.traceability.ranking import ClusterAndSortArtifactsStep, CreateExplanationsStep, RankingArgs, RankingUtil, \
-    SelectCandidateLinksStep
+from gen_common.traceability.ranking.common.ranking_args import RankingArgs
 from gen_common.traceability.ranking.common.ranking_state import RankingState
+from gen_common.traceability.ranking.steps.cluster_and_sort_artifacts_step import ClusterAndSortArtifactsStep
+from gen_common.traceability.ranking.steps.create_explanations_step import CreateExplanationsStep
+from gen_common.traceability.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
 
 
 class ClusteringRankingPipeline(AbstractPipeline[RankingArgs, RankingState]):

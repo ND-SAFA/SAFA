@@ -90,7 +90,7 @@ class AbstractRelationshipManager:
         """
         if artifact:
             a_id, content = artifact[ArtifactKeys.ID], artifact[ArtifactKeys.CONTENT]
-        assert a_id and content, "Must supply either an artifact id AND content or the artifact itself"
+        assert a_id is not None and content is not None, "Must supply either an artifact id AND content or the artifact itself"
         update_artifact = a_id not in self._content_map or self._content_map[a_id] != content
         if a_id in self._content_map and update_artifact:
             self.__state_changed_since_last_save = True

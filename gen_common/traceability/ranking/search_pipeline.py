@@ -2,8 +2,11 @@ from typing import Dict
 
 from gen_common.pipeline.abstract_pipeline import AbstractPipeline
 from gen_common.summarize.summarizer_args import SummarizerArgs
-from gen_common.traceability.ranking.common.ranking_args import RankingArgs, RankingUtil, SelectCandidateLinksStep, SortChildrenStep
+from gen_common.traceability.ranking.common.ranking_args import RankingArgs
 from gen_common.traceability.ranking.common.ranking_state import RankingState
+from gen_common.traceability.ranking.steps.select_candidate_links_step import SelectCandidateLinksStep
+from gen_common.traceability.ranking.steps.sort_children_step import SortChildrenStep
+from gen_common.util.ranking_util import RankingUtil
 
 
 class SearchPipeline(AbstractPipeline[RankingArgs, RankingState]):

@@ -14,8 +14,8 @@ from gen_common.data.processing.augmentation.source_target_swap_step import Sour
 from gen_common.data.tdatasets.data_key import DataKey
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
 from gen_common.llm.model_properties import ModelArchitectureType
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_trace_test import BaseTraceTest
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 from gen_common_test.test_data.test_data_manager import TestDataManager
 from gen_common_test.testprojects.api_test_project import ApiTestProject
 
@@ -262,7 +262,7 @@ class TestTraceDataset(BaseTraceTest):
 
     def test_as_creator(self):
         trace_dataset = self.get_trace_dataset()
-        creator = trace_dataset.as_creator(os.path.join(TEST_OUTPUT_DIR, "dir1"))
+        creator = trace_dataset.as_creator(os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "dir1"))
         recreated_dataset = creator.create()
         self.assertEqual(set(recreated_dataset.artifact_df.index), set(trace_dataset.artifact_df.index))
         for i, link in trace_dataset.trace_df.itertuples():

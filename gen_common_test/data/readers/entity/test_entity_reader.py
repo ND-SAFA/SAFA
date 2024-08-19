@@ -1,10 +1,10 @@
 import os
 
-from gen_common.data.readers.entity.entity_reader import EntityReader
-from gen_common_test.data.readers.entity.formats.test_xml_entity_format import TestXmlEntityFormat
 from gen_common.data.keys.structure_keys import StructuredKeys
+from gen_common.data.readers.entity.entity_reader import EntityReader
+from gen_common_test.base.paths.format_paths import GEN_COMMON_TEST_FORMAT_XML_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.test_format_paths import XML_ENTITY_PATH
+from gen_common_test.data.readers.entity.formats.test_xml_entity_format import TestXmlEntityFormat
 
 
 class TestEntityReader(BaseTest):
@@ -16,7 +16,7 @@ class TestEntityReader(BaseTest):
         """
         Tests that source entities are read in and conversions are applied.
         """
-        project_path, file = os.path.split(XML_ENTITY_PATH)
+        project_path, file = os.path.split(GEN_COMMON_TEST_FORMAT_XML_PATH)
         new_col = "new_name"
         conversion_id = "conversion-id"
         conversions = {conversion_id: {"name": new_col}}
@@ -33,7 +33,7 @@ class TestEntityReader(BaseTest):
         """
         Tests that source entities are read in and all entries are present.
         """
-        project_path, file = os.path.split(XML_ENTITY_PATH)
+        project_path, file = os.path.split(GEN_COMMON_TEST_FORMAT_XML_PATH)
         definition = self.create_definition(file, **{StructuredKeys.PARAMS: {"xpath": TestXmlEntityFormat.get_xpath()}})
         entity_reader = EntityReader(project_path, definition)
         parser, parser_params = entity_reader.get_parser()

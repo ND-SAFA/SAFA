@@ -4,12 +4,12 @@ from gen_common.constants.symbol_constants import NEW_LINE
 from gen_common.data.creators.mlm_pre_train_dataset_creator import MLMPreTrainDatasetCreator
 from gen_common.data.tdatasets.pre_train_dataset import PreTrainDataset
 from gen_common.util.file_util import FileUtil
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_DATA_PATH, GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 
 
 class TestMLMPreTrainDatasetCreator(BaseTest):
-    PRETRAIN_DIR = os.path.join(TEST_DATA_DIR, "pre_train")
+    PRETRAIN_DIR = os.path.join(GEN_COMMON_TEST_DATA_PATH, "pre_train")
     FILENAMES = ["file1.txt", "file2.txt"]
     DATAFILE = os.path.join(PRETRAIN_DIR, FILENAMES[0])
     FILE1_LINES = ["south bend is very cold",
@@ -42,5 +42,5 @@ class TestMLMPreTrainDatasetCreator(BaseTest):
 
     def get_mlm_pre_train_dataset_creator(self):
         return MLMPreTrainDatasetCreator(self.PRETRAIN_DIR,
-                                         TEST_OUTPUT_DIR,
+                                         GEN_COMMON_TEST_OUTPUT_PATH,
                                          data_cleaner=self.DATA_CLEANER)

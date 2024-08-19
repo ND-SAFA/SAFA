@@ -1,14 +1,13 @@
-import os
 from typing import Any, Dict, List, Union
 
-from gen_common.data.objects.artifact import Artifact
 from gen_common.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.prompt_dataframe import PromptDataFrame
 from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
-from gen_common.data.keys.structure_keys import TraceKeys, ArtifactKeys
 from gen_common.data.keys.prompt_keys import PromptKeys
+from gen_common.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from gen_common.data.objects.artifact import Artifact
 from gen_common.data.readers.artifact_project_reader import ArtifactProjectReader
 from gen_common.data.readers.prompt_project_reader import PromptProjectReader
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
@@ -16,15 +15,14 @@ from gen_common.llm.open_ai_manager import OpenAIManager
 from gen_common.llm.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from gen_common.llm.prompts.prompt_builder import PromptBuilder
 from gen_common.llm.prompts.question_prompt import QuestionPrompt
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROMPT_SAFA_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_DATA_DIR
 from gen_common_test.testprojects.artifact_test_project import ArtifactTestProject
 from gen_common_test.testprojects.safa_test_project import SafaTestProject
 
 
 class PromptTestProject:
-    DATA_PATH = os.path.join(TEST_DATA_DIR, "prompt", "safa_proj.jsonl")
-
+    DATA_PATH = GEN_COMMON_TEST_PROMPT_SAFA_PATH
     SAFA_PROJECT = SafaTestProject()
 
     @staticmethod

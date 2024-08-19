@@ -2,7 +2,7 @@ from typing import List
 
 from gen_common.data.objects.artifact import Artifact
 from gen_common.data.readers.dataframe_project_reader import DataFrameProjectReader
-from gen_common_test.paths.project_paths import DATAFRAME_PROJECT_PATH
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_DATAFRAME_PATH
 from gen_common_test.testprojects.abstract_test_project import AbstractTestProject
 from gen_common_test.testprojects.safa_test_project import SafaTestProject
 
@@ -33,7 +33,7 @@ class DataFrameTestProject(AbstractTestProject):
         """
         :return: Returns path to safa project.
         """
-        return DATAFRAME_PROJECT_PATH
+        return GEN_COMMON_TEST_PROJECT_DATAFRAME_PATH
 
     @classmethod
     def get_project_reader(cls) -> DataFrameProjectReader:

@@ -1,10 +1,10 @@
 from typing import Dict, List, Type
 
+from gen_common.data.keys.structure_keys import StructuredKeys
 from gen_common.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from gen_common.data.readers.entity.formats.folder_entity_format import FolderEntityFormat
+from gen_common_test.base.paths.format_paths import GEN_COMMON_TEST_FORMAT_FOLDER_PATH
 from gen_common_test.data.readers.entity.formats.abstract_entity_format_test import AbstractEntityFormatTest
-from gen_common.data.keys.structure_keys import StructuredKeys
-from gen_common_test.paths.test_format_paths import FOLDER_PROJECT_PATH
 
 
 class TestFolderEntityFormat(AbstractEntityFormatTest):
@@ -20,7 +20,7 @@ class TestFolderEntityFormat(AbstractEntityFormatTest):
 
     @property
     def data_path(self) -> str:
-        return FOLDER_PROJECT_PATH
+        return GEN_COMMON_TEST_FORMAT_FOLDER_PATH
 
     @staticmethod
     def get_entities() -> List[Dict]:

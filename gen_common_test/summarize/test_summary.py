@@ -3,8 +3,8 @@ from copy import deepcopy
 
 from gen_common.summarize.summary import Summary, SummarySection
 from gen_common.util.prompt_util import PromptUtil
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 
 
 class TestSummary(BaseTest):
@@ -44,7 +44,7 @@ class TestSummary(BaseTest):
             pass
 
     def test_load_and_save(self):
-        filepath = os.path.join(TEST_OUTPUT_DIR, "summary.json")
+        filepath = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "summary.json")
         self.get_summary().save(filepath)
         summary = Summary.load_from_file(filepath)
         self.assertEqual(self.SUMMARY, summary)

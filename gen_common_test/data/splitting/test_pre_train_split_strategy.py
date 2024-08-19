@@ -7,9 +7,9 @@ from gen_common.data.splitting.dataset_splitter import DatasetSplitter
 from gen_common.data.splitting.pre_train_split_strategy import PreTrainSplitStrategy
 from gen_common.data.tdatasets.dataset_role import DatasetRole
 from gen_common.util.file_util import FileUtil
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_trace_test import BaseTraceTest
 from gen_common_test.data.creators.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 
 
 class TestPreTrainSplitStrategy(BaseTraceTest):
@@ -46,7 +46,7 @@ class TestPreTrainSplitStrategy(BaseTraceTest):
 
     def get_dataset(self):
         return MLMPreTrainDatasetCreator(orig_data_path=TestMLMPreTrainDatasetCreator.PRETRAIN_DIR,
-                                         training_data_dir=TEST_OUTPUT_DIR).create()
+                                         training_data_dir=GEN_COMMON_TEST_OUTPUT_PATH).create()
 
     def get_pre_train_split_strategy(self):
         return PreTrainSplitStrategy()

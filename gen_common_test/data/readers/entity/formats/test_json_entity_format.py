@@ -2,8 +2,8 @@ from typing import Dict, List, Type
 
 from gen_common.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
 from gen_common.data.readers.entity.formats.json_entity_format import JsonEntityFormat
+from gen_common_test.base.paths.format_paths import GEN_COMMON_TEST_FORMAT_JSON_PATH
 from gen_common_test.data.readers.entity.formats.abstract_entity_format_test import AbstractEntityFormatTest
-from gen_common_test.paths.test_format_paths import JSON_ENTITY_PATH
 
 
 class TestJsonEntityFormat(AbstractEntityFormatTest):
@@ -23,7 +23,7 @@ class TestJsonEntityFormat(AbstractEntityFormatTest):
 
     @property
     def data_path(self) -> str:
-        return JSON_ENTITY_PATH
+        return GEN_COMMON_TEST_FORMAT_JSON_PATH
 
     @staticmethod
     def get_entities() -> List[Dict]:

@@ -21,7 +21,7 @@ from gen_common.infra.t_logging.logger_config import LoggerConfig
 from gen_common.infra.t_logging.logger_manager import LoggerManager
 from gen_common.util.dataframe_util import DataFrameUtil
 from gen_common.util.random_util import RandomUtil
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR, TEST_VOCAB_FILE
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH, GEN_COMMON_TEST_VOCAB_PATH
 
 DELETE_TEST_OUTPUT = True
 
@@ -61,11 +61,11 @@ class BaseTest(TestCase):
         if cache_dir is None:
             set_caching_enabled(False)
         if BaseTest.configure_logging:
-            config = LoggerConfig(output_dir=TEST_OUTPUT_DIR)
+            config = LoggerConfig(output_dir=GEN_COMMON_TEST_OUTPUT_PATH)
             LoggerManager.configure_logger(config)
             BaseTest.configure_logging = False
-            os.makedirs(TEST_OUTPUT_DIR, exist_ok=True)
-            wandb_output_path = os.path.join(TEST_OUTPUT_DIR, "wandb")
+            os.makedirs(GEN_COMMON_TEST_OUTPUT_PATH, exist_ok=True)
+            wandb_output_path = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "wandb")
             os.environ["WANDB_MODE"] = "offline"
             os.environ["WANDB_DIR"] = wandb_output_path
 
@@ -76,11 +76,11 @@ class BaseTest(TestCase):
 
     @staticmethod
     def remove_output_dir():
-        if DELETE_TEST_OUTPUT and os.path.exists(TEST_OUTPUT_DIR):
-            if os.path.isdir(TEST_OUTPUT_DIR):
-                shutil.rmtree(TEST_OUTPUT_DIR)
+        if DELETE_TEST_OUTPUT and os.path.exists(GEN_COMMON_TEST_OUTPUT_PATH):
+            if os.path.isdir(GEN_COMMON_TEST_OUTPUT_PATH):
+                shutil.rmtree(GEN_COMMON_TEST_OUTPUT_PATH)
             else:
-                os.remove(TEST_OUTPUT_DIR)
+                os.remove(GEN_COMMON_TEST_OUTPUT_PATH)
 
     @staticmethod
     def get_test_model():
@@ -108,7 +108,7 @@ class BaseTest(TestCase):
 
     @staticmethod
     def get_test_tokenizer():
-        tokenizer = BertTokenizer(vocab_file=TEST_VOCAB_FILE)
+        tokenizer = BertTokenizer(vocab_file=GEN_COMMON_TEST_VOCAB_PATH)
         tokenizer._convert_token_to_id = mock.MagicMock(return_value=24)
         return tokenizer
 

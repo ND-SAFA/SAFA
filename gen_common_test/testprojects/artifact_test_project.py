@@ -1,10 +1,10 @@
 from typing import List
 
-from gen_common.data.objects.artifact import Artifact
 from gen_common.data.keys.structure_keys import StructuredKeys
+from gen_common.data.objects.artifact import Artifact
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
 from gen_common.data.readers.artifact_project_reader import ArtifactProjectReader
-from gen_common_test.paths.project_paths import SAFA_PROJECT_PATH
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_SAFA_PATH
 from gen_common_test.testprojects.safa_test_project import SafaTestProject
 
 
@@ -18,7 +18,7 @@ class ArtifactTestProject(SafaTestProject):
         """
         :return: Returns structured project reader for project
         """
-        return ArtifactProjectReader(SAFA_PROJECT_PATH, overrides={"allowed_orphans": 2, "remove_orphans": True})
+        return ArtifactProjectReader(GEN_COMMON_TEST_PROJECT_SAFA_PATH, overrides={"allowed_orphans": 2, "remove_orphans": True})
 
     @classmethod
     def get_artifact_entries(cls) -> List[Artifact]:

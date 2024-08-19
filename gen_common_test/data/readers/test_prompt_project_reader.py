@@ -7,15 +7,15 @@ from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummariz
 from gen_common_test.base.constants import SUMMARY_FORMAT
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROMPT_LHP_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_DATA_DIR
 
 
 class TestPromptProjectReader(BaseTest):
     """
     Tests that csv project is correctly parsed.
     """
-    PROJECT_PATH = os.path.join(TEST_DATA_DIR, "prompt", "lhp.jsonl")
+    DATASET_PATH = GEN_COMMON_TEST_PROMPT_LHP_PATH
 
     @mock_anthropic
     def test_summarization(self, ai_manager: TestAIManager):
@@ -27,7 +27,7 @@ class TestPromptProjectReader(BaseTest):
         project_reader.set_summarizer(ArtifactsSummarizer(summarize_code_only=False))
         prompts_df = project_reader.read_project()
         expected_prompts = []
-        with open(self.PROJECT_PATH) as file:
+        with open(self.DATASET_PATH) as file:
             for line in file.readlines():
                 prompt_dict = json.loads(line)
                 prompt_dict[PromptKeys.PROMPT.value] = SUMMARY_FORMAT.format(prompt_dict[PromptKeys.PROMPT.value]) \
@@ -43,7 +43,7 @@ class TestPromptProjectReader(BaseTest):
         project_reader = self.get_project_reader()
         prompts_df = project_reader.read_project()
         expected_prompts = []
-        with open(self.PROJECT_PATH) as file:
+        with open(self.DATASET_PATH) as file:
             for line in file.readlines():
                 expected_prompts.append(json.loads(line))
         self.verify_entities_in_df(expected_prompts, prompts_df)
@@ -53,4 +53,4 @@ class TestPromptProjectReader(BaseTest):
         Gets the prompt project reader for the project
         :return: The prompt project reader for the project
         """
-        return PromptProjectReader(self.PROJECT_PATH)
+        return PromptProjectReader(self.DATASET_PATH)

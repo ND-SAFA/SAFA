@@ -10,7 +10,7 @@ from gen_common.infra.experiment.definition_creator import DefinitionCreator
 from gen_common.infra.experiment.variables.typed_definition_variable import TypedDefinitionVariable
 from gen_common.jobs.job_args import JobArgs
 from gen_common.llm.args.hugging_face_args import HuggingFaceArgs
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.test_data.test_data_manager import TestDataManager
 
 ObjectType = TypeVar("ObjectType")
@@ -26,11 +26,11 @@ class ObjectCreator:
                             }
 
     trainer_args_definition = {
-        "output_dir": TEST_OUTPUT_DIR,
+        "output_dir": GEN_COMMON_TEST_OUTPUT_PATH,
         "num_train_epochs": 1,
         "metrics": ["classification", "map"]
     }
-    job_args_definition = {"output_dir": TEST_OUTPUT_DIR}
+    job_args_definition = {"output_dir": GEN_COMMON_TEST_OUTPUT_PATH}
     api_project_reader = {
         "api_definition": {
             "artifacts": TestDataManager.get_artifacts(),

@@ -8,8 +8,8 @@ from gen_common.util.file_util import FileUtil
 from gen_common_test.base.constants import SUMMARY_FORMAT
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_PRETRAIN_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.project_paths import PRE_TRAIN_TRACE_PATH
 
 
 class TestPreTrainingTraceReader(BaseTest):
@@ -45,7 +45,7 @@ class TestPreTrainingTraceReader(BaseTest):
         """
         :return: Returns path to CSV test project.
         """
-        return PRE_TRAIN_TRACE_PATH
+        return GEN_COMMON_TEST_PROJECT_PRETRAIN_PATH
 
     @classmethod
     def get_project_reader(cls) -> PreTrainTraceReader:

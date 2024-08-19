@@ -16,8 +16,8 @@ from gen_common.data.readers.structured_project_reader import StructuredProjectR
 from gen_common.util.file_util import FileUtil
 from gen_common.util.json_util import JsonUtil
 from gen_common_test.base.object_definitions import TestObjectDefinitions
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 
 
 class TestSafaExporter(BaseTest):
@@ -31,10 +31,10 @@ class TestSafaExporter(BaseTest):
         """
 
         trace_dataset_creator = TestObjectDefinitions.create(TraceDatasetCreator)
-        safa_exporter = SafaExporter(TEST_OUTPUT_DIR, trace_dataset_creator)
+        safa_exporter = SafaExporter(GEN_COMMON_TEST_OUTPUT_PATH, trace_dataset_creator)
         safa_exporter.export()
 
-        project_creator = TraceDatasetCreator(StructuredProjectReader(TEST_OUTPUT_DIR))
+        project_creator = TraceDatasetCreator(StructuredProjectReader(GEN_COMMON_TEST_OUTPUT_PATH))
         other_dataset = project_creator.create()
 
         self.assertEqual(len(safa_exporter._dataset.artifact_df), len(other_dataset.artifact_df))
@@ -62,10 +62,10 @@ class TestSafaExporter(BaseTest):
         api_definition = ApiDefinition(artifacts=artifacts, layers=layers, links=links)
         api_project_reader = ApiProjectReader(api_definition=api_definition)
         trace_dataset_creator = TraceDatasetCreator(project_reader=api_project_reader)
-        safa_exporter = SafaExporter(TEST_OUTPUT_DIR, dataset_creator=trace_dataset_creator)
+        safa_exporter = SafaExporter(GEN_COMMON_TEST_OUTPUT_PATH, dataset_creator=trace_dataset_creator)
         safa_exporter.export()
 
-        trace_file_path = os.path.join(TEST_OUTPUT_DIR, trace_file_name)
+        trace_file_path = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, trace_file_name)
         trace_file = JsonUtil.read_json_file(trace_file_path)
         traces = trace_file["traces"]
 
@@ -88,7 +88,7 @@ class TestSafaExporter(BaseTest):
         artifact_summary = "This is a summary"
         artifact_type_file_name = f"{artifact_type}.csv"
 
-        artifact_export_path = os.path.join(TEST_OUTPUT_DIR, "source.csv")
+        artifact_export_path = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "source.csv")
         entries = [{"id": artifact_id, "content": artifact_content, "layer_id": artifact_type, "summary": artifact_summary}]
         artifact_df = ArtifactDataFrame(entries)
         artifact_df.to_csv(artifact_export_path)
@@ -96,10 +96,10 @@ class TestSafaExporter(BaseTest):
             "fileName": artifact_type_file_name,
             "type": artifact_type
         }], "traces": []}
-        FileUtil.write(tim_json, os.path.join(TEST_OUTPUT_DIR, "tim.json"))
+        FileUtil.write(tim_json, os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "tim.json"))
 
-        export_dir = os.path.join(TEST_OUTPUT_DIR, "export")
-        project_reader = StructuredProjectReader(project_path=TEST_OUTPUT_DIR)
+        export_dir = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "export")
+        project_reader = StructuredProjectReader(project_path=GEN_COMMON_TEST_OUTPUT_PATH)
         trace_dataset_creator = TraceDatasetCreator(project_reader=project_reader)
         safa_exporter = SafaExporter(export_dir, trace_dataset_creator)
         safa_exporter.export()

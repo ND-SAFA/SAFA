@@ -13,8 +13,8 @@ from gen_common.llm.prompts.multi_artifact_prompt import MultiArtifactPrompt
 from gen_common.llm.prompts.prompt_builder import PromptBuilder
 from gen_common.llm.prompts.question_prompt import QuestionPrompt
 from gen_common.llm.tokens.token_limits import ModelTokenLimits
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 from gen_common_test.testprojects.prompt_test_project import PromptTestProject
 
 
@@ -41,11 +41,11 @@ class TestPromptDataset(BaseTest):
     def test_as_creator(self):
         datasets = self.get_prompt_datasets()
         artifact_dataset = datasets["artifact"]
-        creator = artifact_dataset.as_creator(os.path.join(TEST_OUTPUT_DIR, "dir1"))
+        creator = artifact_dataset.as_creator(os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "dir1"))
         recreated_dataset = creator.create()
         self.assertEqual(set(recreated_dataset.artifact_df.index), set(artifact_dataset.artifact_df.index))
         trace_dataset = datasets["dataset"]
-        creator = trace_dataset.as_creator(os.path.join(TEST_OUTPUT_DIR, "dir2"))
+        creator = trace_dataset.as_creator(os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "dir2"))
         recreated_dataset = creator.create()
         self.assertEqual(set(recreated_dataset.artifact_df.index), set(trace_dataset.artifact_df.index))
         for i, link in trace_dataset.trace_dataset.trace_df.itertuples():

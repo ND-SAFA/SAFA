@@ -5,13 +5,13 @@ from gen_common.data.managers.trainer_dataset_manager import TrainerDatasetManag
 from gen_common.data.tdatasets.dataset_role import DatasetRole
 from gen_common.infra.experiment.object_creator import ObjectCreator
 from gen_common.infra.experiment.variables.typed_definition_variable import TypedDefinitionVariable
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_DATA_PATH, GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_DATA_DIR, TEST_OUTPUT_DIR
 
 
 class TestDefinitionCreator(BaseTest):
     JOB_ARGS_DEFINITION = {
-        "output_dir": TEST_OUTPUT_DIR
+        "output_dir": GEN_COMMON_TEST_OUTPUT_PATH
     }
     MODEL_MANAGER_DEFINITION = {
         "model_path": "roberta-base"
@@ -20,7 +20,7 @@ class TestDefinitionCreator(BaseTest):
         TypedDefinitionVariable.OBJECT_TYPE_KEY: "TRACE",
         "project_reader": {
             TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
-            "project_path": os.path.join(TEST_DATA_DIR, "structure")
+            "project_path": os.path.join(GEN_COMMON_TEST_DATA_PATH, "structure")
         }
     }
     DATASET_MANAGER_DEFINITION = {
@@ -29,7 +29,7 @@ class TestDefinitionCreator(BaseTest):
             **DATASET_CREATOR_DEFINITION
         }
     }
-    TRAINER_ARGS_DEFINITION = {"output_dir": TEST_OUTPUT_DIR}
+    TRAINER_ARGS_DEFINITION = {"output_dir": GEN_COMMON_TEST_OUTPUT_PATH}
     DEFINITION = {
         "task": "PREDICT",
         "job_args": JOB_ARGS_DEFINITION,

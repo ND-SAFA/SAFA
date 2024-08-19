@@ -1,4 +1,3 @@
-import os
 import re
 from typing import Union
 
@@ -16,14 +15,14 @@ from gen_common.util.file_util import FileUtil
 from gen_common.util.prompt_util import PromptUtil
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_TESTPYTHON_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_DATA_DIR
 
 
 class TestSummarizer(BaseTest):
     CHUNKS = ["The cat in the hat sat", "on a log with a frog and a hog."]
     CONTENT = " ".join(CHUNKS)
-    CODE_FILE_PATH = os.path.join(TEST_DATA_DIR, "test_python.py")
+    CODE_FILE_PATH = GEN_COMMON_TEST_TESTPYTHON_PATH
     CODE_CONTENT = FileUtil.read_file(CODE_FILE_PATH)
     MODEL_NAME = "gpt-4"
     MAX_COMPLETION_TOKENS = 500

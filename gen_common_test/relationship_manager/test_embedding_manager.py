@@ -10,8 +10,8 @@ from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.traceability.relationship_manager.embeddings_manager import EmbeddingsManager
 from gen_common.util.list_util import ListUtil
 from gen_common.util.yaml_util import YamlUtil
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 from gen_common_test.testprojects.safa_test_project import SafaTestProject
 
 
@@ -31,7 +31,7 @@ class TestEmbeddingManager(BaseTest):
     def test_saving_and_loading_from_yaml(self):
         content_map, embedding_manager = self.create_test_embedding_manager()
         original_embeddings = embedding_manager.create_embedding_map()
-        path = os.path.join(TEST_OUTPUT_DIR, "test.yaml")
+        path = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "test.yaml")
         key = "embedding_manager"
         YamlUtil.write({key: embedding_manager}, path)  # test to_yaml
         loaded_manager: EmbeddingsManager = YamlUtil.read(path)[key]  # test from_yaml
@@ -40,9 +40,9 @@ class TestEmbeddingManager(BaseTest):
         for a_id, embedding in original_embeddings.items():
             self.assertIn(a_id, loaded_embeddings)
             self.assertEqual(list(embedding), list(loaded_embeddings[a_id]))
-        self.assertFalse(loaded_manager.need_saved(os.path.join(TEST_OUTPUT_DIR, key)))
+        self.assertFalse(loaded_manager.need_saved(os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, key)))
         loaded_manager.update_or_add_content("s1", "something new")
-        self.assertTrue(loaded_manager.need_saved(os.path.join(TEST_OUTPUT_DIR, key)))
+        self.assertTrue(loaded_manager.need_saved(os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, key)))
 
     @mock.patch.object(SentenceTransformer, "encode")
     def test_update_or_add_contents(self, encode_mock: MagicMock):

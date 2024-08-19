@@ -12,8 +12,9 @@ from gen_common.pipeline.state import State
 from gen_common.util.param_specs import ParamSpecs
 from gen_common.util.reflection_util import ReflectionUtil
 from gen_common.util.yaml_util import YamlUtil
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_DIR_PATH, GEN_COMMON_TEST_OUTPUT_PATH
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_STATE_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_DIR_PATH, TEST_OUTPUT_DIR, TEST_STATE_PATH
 
 
 @dataclass
@@ -27,29 +28,29 @@ class FakeState(State):
 class TestState(BaseTest):
 
     def test_get_path_to_state_checkpoint(self):
-        with_checkpoint = os.path.join(TEST_OUTPUT_DIR, "state_checkpoints")
+        with_checkpoint = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "state_checkpoints")
         self.assertEqual(State.get_path_to_state_checkpoint(with_checkpoint), with_checkpoint)
 
-        without_checkpoint = TEST_OUTPUT_DIR
+        without_checkpoint = GEN_COMMON_TEST_OUTPUT_PATH
         self.assertEqual(State.get_path_to_state_checkpoint(without_checkpoint), with_checkpoint)
 
         self.assertEqual(State.get_path_to_state_checkpoint(without_checkpoint, "StepName"),
                          os.path.join(with_checkpoint, "state-step-name.yaml"))
 
     def test_load_latest(self):
-        os.environ["ROOT_PATH"] = dirname(TEST_DIR_PATH)
+        os.environ["ROOT_PATH"] = dirname(GEN_COMMON_TEST_DIR_PATH)
         steps = ["Step1", "Step2", "Step3"]
-        state = FakeState.load_latest(TEST_STATE_PATH, steps)
-        self.assertEqual(state.export_dir, TEST_OUTPUT_DIR)
+        state = FakeState.load_latest(GEN_COMMON_TEST_STATE_PATH, steps)
+        self.assertEqual(state.export_dir, GEN_COMMON_TEST_OUTPUT_PATH)
         self.assertSetEqual(set(steps), set(state.completed_steps.keys()))
         self.assertIsInstance(state.original_dataset, PromptDataset)
         self.assertIsInstance(state.final_dataset, PromptDataset)
 
         # failed to find a state so initialize empty
-        file_not_found_state = FakeState.load_latest(TEST_STATE_PATH, ["UnknownStep"])
+        file_not_found_state = FakeState.load_latest(GEN_COMMON_TEST_STATE_PATH, ["UnknownStep"])
         self.assertSize(0, file_not_found_state.completed_steps)
 
-        failed_state = FakeState.load_latest(TEST_STATE_PATH, ["BadFile"])
+        failed_state = FakeState.load_latest(GEN_COMMON_TEST_STATE_PATH, ["BadFile"])
         self.assertSize(0, failed_state.completed_steps)
 
     @skip
@@ -63,16 +64,16 @@ class TestState(BaseTest):
 
         state_name = "Step2"
         step_num = 2
-        orig_path = State.get_path_to_state_checkpoint(TEST_STATE_PATH, state_name, step_num=step_num)
+        orig_path = State.get_path_to_state_checkpoint(GEN_COMMON_TEST_STATE_PATH, state_name, step_num=step_num)
         attrs = YamlUtil.read(orig_path)
         param_specs = ParamSpecs.create_from_method(HGenState.__init__)
         checked_attrs = {}
         for name, val in attrs.items():
             checked_attrs[name] = assert_check_type(name, val)
         orig_state = FakeState(**checked_attrs)
-        orig_state.export_dir = TEST_OUTPUT_DIR
+        orig_state.export_dir = GEN_COMMON_TEST_OUTPUT_PATH
         orig_state.save(state_name)
-        save_path = State.get_path_to_state_checkpoint(TEST_OUTPUT_DIR, state_name, step_num=step_num)
+        save_path = State.get_path_to_state_checkpoint(GEN_COMMON_TEST_OUTPUT_PATH, state_name, step_num=step_num)
         reloaded_attrs = YamlUtil.read(save_path)
         self.assertEqual(reloaded_attrs["export_dir"], '[ROOT_PATH]/gen_common_test/test_data/output')
         self.assertDictEqual(orig_state.completed_steps, reloaded_attrs["completed_steps"])

@@ -10,8 +10,9 @@ from gen_common.infra.experiment.definition_creator import DefinitionCreator
 from gen_common.infra.experiment.variables.typed_definition_variable import TypedDefinitionVariable
 from gen_common.llm.args.hugging_face_args import HuggingFaceArgs
 from gen_common.llm.model_manager import ModelManager
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PRE_TRAIN_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import PRETRAIN_DIR, TEST_OUTPUT_DIR
 from gen_common_test.test_data.test_data_manager import TestDataManager
 
 ObjectType = TypeVar("ObjectType")
@@ -27,11 +28,11 @@ class TestObjectDefinitions:
                             }
 
     trainer_args_definition = {
-        "output_dir": TEST_OUTPUT_DIR,
+        "output_dir": GEN_COMMON_TEST_OUTPUT_PATH,
         "num_train_epochs": 1,
         "metrics": ["classification", "map"]
     }
-    job_args_definition = {"output_dir": TEST_OUTPUT_DIR}
+    job_args_definition = {"output_dir": GEN_COMMON_TEST_OUTPUT_PATH}
     api_project_reader = {
         "api_definition": {
             "artifacts": TestDataManager.get_artifacts(),
@@ -51,8 +52,8 @@ class TestObjectDefinitions:
 
     pretrain_dataset_definition = {
         TypedDefinitionVariable.OBJECT_TYPE_KEY: "MLM_PRE_TRAIN",
-        "orig_data_path": PRETRAIN_DIR,
-        "training_data_dir": TEST_OUTPUT_DIR
+        "orig_data_path": GEN_COMMON_TEST_PRE_TRAIN_PATH,
+        "training_data_dir": GEN_COMMON_TEST_OUTPUT_PATH
     }
 
     trainer_dataset_manager_definition = {
@@ -64,7 +65,7 @@ class TestObjectDefinitions:
 
     model_manager_definition = {
         "model_path": BaseTest.BASE_TEST_MODEL,
-        "model_output_path": TEST_OUTPUT_DIR
+        "model_output_path": GEN_COMMON_TEST_OUTPUT_PATH
     }
 
     SUPPORTED_OBJECTS = {

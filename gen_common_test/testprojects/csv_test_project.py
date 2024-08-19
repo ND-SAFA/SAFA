@@ -1,11 +1,11 @@
 from typing import Dict, List, Tuple
 
 from gen_common.data.keys.csv_keys import CSVKeys
+from gen_common.data.objects.trace_layer import TraceLayer
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
 from gen_common.data.readers.csv_project_reader import CsvProjectReader
-from gen_common_test.paths.project_paths import CSV_PROJECT_PATH
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_CSV_PATH
 from gen_common_test.testprojects.abstract_test_project import AbstractTestProject
-from gen_common.data.objects.trace_layer import TraceLayer
 
 
 class CsvTestProject(AbstractTestProject):
@@ -23,7 +23,7 @@ class CsvTestProject(AbstractTestProject):
         """
         :return: Returns path to CSV test project.
         """
-        return CSV_PROJECT_PATH
+        return GEN_COMMON_TEST_PROJECT_CSV_PATH
 
     @classmethod
     def get_project_reader(cls) -> AbstractProjectReader:

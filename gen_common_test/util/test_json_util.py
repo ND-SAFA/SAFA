@@ -5,8 +5,8 @@ from gen_common.infra.experiment.variables.experimental_variable import Experime
 from gen_common.llm.response_managers.xml_response_manager import XMLResponseManager
 from gen_common.util.dataclass_util import DataclassUtil
 from gen_common.util.json_util import JsonUtil
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_DATA_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_DATA_DIR
 
 
 class TestJsonUtil(BaseTest):
@@ -18,7 +18,7 @@ class TestJsonUtil(BaseTest):
         """
         Tests the ability to read a file of .jsonl format
         """
-        jsonl_file_path = os.path.join(TEST_DATA_DIR, "prompt", "lhp.jsonl")
+        jsonl_file_path = os.path.join(GEN_COMMON_TEST_DATA_PATH, "prompt", "lhp.jsonl")
         jsonl_dict = JsonUtil.read_jsonl_file(jsonl_file_path)
         with open(jsonl_file_path) as file:
             expected_prompts = file.readlines()

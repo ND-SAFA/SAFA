@@ -2,8 +2,8 @@ from gen_common.data.creators.multi_trace_dataset_creator import MultiTraceDatas
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
 from gen_common.infra.experiment.definition_creator import DefinitionCreator
 from gen_common.infra.experiment.variables.typed_definition_variable import TypedDefinitionVariable
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_CSV_PATH, GEN_COMMON_TEST_PROJECT_STRUCTURE_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.project_paths import CSV_PROJECT_PATH, STRUCTURE_PROJECT_PATH
 from gen_common_test.testprojects.csv_test_project import CsvTestProject
 from gen_common_test.testprojects.structured_test_project import StructuredTestProject
 
@@ -31,10 +31,10 @@ class TestMultiTraceDatasetCreator(BaseTest):
         dataset_creator_definition_multi = {
             "project_readers": [{
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "STRUCTURE",
-                "project_path": STRUCTURE_PROJECT_PATH
+                "project_path": GEN_COMMON_TEST_PROJECT_STRUCTURE_PATH
             }, {
                 TypedDefinitionVariable.OBJECT_TYPE_KEY: "CSV",
-                "project_path": CSV_PROJECT_PATH,
+                "project_path": GEN_COMMON_TEST_PROJECT_CSV_PATH,
                 "overrides": {
                     "allowed_orphans": 2
                 }

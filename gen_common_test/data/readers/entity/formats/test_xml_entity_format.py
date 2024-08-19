@@ -1,9 +1,9 @@
 from typing import Dict, List, Type
 
 from gen_common.data.readers.entity.formats.abstract_entity_format import AbstractEntityFormat
-from gen_common_test.data.readers.entity.formats.abstract_entity_format_test import AbstractEntityFormatTest
 from gen_common.data.readers.entity.formats.xml_entity_format import XmlEntityFormat
-from gen_common_test.paths.test_format_paths import XML_ENTITY_PATH
+from gen_common_test.base.paths.format_paths import GEN_COMMON_TEST_FORMAT_XML_PATH
+from gen_common_test.data.readers.entity.formats.abstract_entity_format_test import AbstractEntityFormatTest
 
 
 class TestXmlEntityFormat(AbstractEntityFormatTest):
@@ -19,7 +19,7 @@ class TestXmlEntityFormat(AbstractEntityFormatTest):
 
     @property
     def data_path(self) -> str:
-        return XML_ENTITY_PATH
+        return GEN_COMMON_TEST_FORMAT_XML_PATH
 
     @staticmethod
     def get_entities() -> List[Dict]:

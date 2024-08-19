@@ -1,11 +1,11 @@
 from typing import Dict, List
 
+from gen_common.data.objects.trace_layer import TraceLayer
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
 from gen_common.data.readers.structured_project_reader import StructuredProjectReader
-from gen_common_test.paths.project_paths import STRUCTURE_PROJECT_PATH
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_STRUCTURE_PATH
 from gen_common_test.testprojects.abstract_test_project import AbstractTestProject
 from gen_common_test.testprojects.entry_creator import EntryCreator
-from gen_common.data.objects.trace_layer import TraceLayer
 
 
 class StructuredTestProject(AbstractTestProject):
@@ -18,7 +18,7 @@ class StructuredTestProject(AbstractTestProject):
         """
         :return: Returns path to structured project.
         """
-        return STRUCTURE_PROJECT_PATH
+        return GEN_COMMON_TEST_PROJECT_STRUCTURE_PATH
 
     @classmethod
     def get_project_reader(cls) -> AbstractProjectReader:

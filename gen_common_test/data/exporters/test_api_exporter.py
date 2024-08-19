@@ -6,15 +6,15 @@ from gen_common.data.exporters.api_exporter import ApiExporter
 from gen_common.data.readers.api_project_reader import ApiProjectReader
 from gen_common.util.dict_util import DictUtil
 from gen_common.util.json_util import JsonUtil
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 from gen_common_test.testprojects.api_test_project import ApiTestProject
 
 
 class TestApiExporter(BaseTest):
 
     def test_export(self):
-        export_path = os.path.join(TEST_OUTPUT_DIR, "api.json")
+        export_path = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "api.json")
         orig_creator = TraceDatasetCreator(ApiTestProject.get_project_reader(), allowed_missing_sources=100,
                                            allowed_missing_targets=100, allowed_orphans=100)
         orig_dataset = orig_creator.create()

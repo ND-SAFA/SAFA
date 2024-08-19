@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Dict, List, Optional, Tuple, Union
 
 from gen_common.util.reflection_util import ParamScope, ReflectionUtil
-from gen_common_test.base.constants import PACKAGE_DIR_NAME, TEST_DIR_NAME
+from gen_common_test.base.constants import GEN_COMMON_DIR_NAME, GEN_COMMON_TEST_DIR_NAME
 from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.test_data.test_data_manager import TestDataManager
 
@@ -85,13 +85,13 @@ class TestReflectionUtil(BaseTest):
         self.assertFalse(ReflectionUtil.is_type((True, False), Union[Tuple[int, str], Dict], "name"))
 
     def test_get_cls_from_path(self):
-        cls = ReflectionUtil.get_cls_from_path(f"{PACKAGE_DIR_NAME}.util.reflection_util.ReflectionUtil")
+        cls = ReflectionUtil.get_cls_from_path(f"{GEN_COMMON_DIR_NAME}.util.reflection_util.ReflectionUtil")
         self.assertEqual(cls.__name__, ReflectionUtil.__name__)
 
         cls = ReflectionUtil.get_cls_from_path("bad.path")
         self.assertIsNone(cls)
 
-        cls = ReflectionUtil.get_cls_from_path(f"{TEST_DIR_NAME}.test_data.test_data_manager.Keys")  # nested
+        cls = ReflectionUtil.get_cls_from_path(f"{GEN_COMMON_TEST_DIR_NAME}.test_data.test_data_manager.Keys")  # nested
         self.assertEqual(cls.__name__, TestDataManager.Keys.__name__)
 
     def test_is_a_function(self):
@@ -107,7 +107,7 @@ class TestReflectionUtil(BaseTest):
         test_path = ReflectionUtil.get_obj_full_path(TestReflectionUtil.test_get_obj_full_path)
         self.assertIn(test_path, ['test_reflection_util.TestReflectionUtil.test_get_obj_full_path',
                                   'util.test_reflection_util.TestReflectionUtil.test_get_obj_full_path',
-                                  f'{TEST_DIR_NAME}.util.test_reflection_util.TestReflectionUtil.test_get_obj_full_path'])
+                                  f'{GEN_COMMON_TEST_DIR_NAME}.util.test_reflection_util.TestReflectionUtil.test_get_obj_full_path'])
 
     def __assert_scope(self, param_name, expected_scope: ParamScope, class_name: str = None):
         param_scope = ReflectionUtil.get_field_scope(param_name, class_name=class_name)

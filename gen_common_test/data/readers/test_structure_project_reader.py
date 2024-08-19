@@ -2,8 +2,8 @@ from gen_common.data.readers.abstract_project_reader import AbstractProjectReade
 from gen_common.data.readers.structured_project_reader import StructuredProjectReader
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_STRUCTURE_PATH
 from gen_common_test.base.tests.abstract_project_reader_test import AbstractProjectReaderTest
-from gen_common_test.paths.project_paths import STRUCTURE_PROJECT_PATH
 from gen_common_test.testprojects.structured_test_project import StructuredTestProject
 
 
@@ -29,4 +29,4 @@ class TestStructureProjectReader(AbstractProjectReaderTest):
         self.verify_summarization(test_project=self.test_project)
 
     def get_project_reader(self) -> AbstractProjectReader:
-        return StructuredProjectReader(STRUCTURE_PROJECT_PATH)
+        return StructuredProjectReader(GEN_COMMON_TEST_PROJECT_STRUCTURE_PATH)

@@ -10,8 +10,8 @@ from gen_common.infra.experiment.variables.typed_definition_variable import Type
 from gen_common.infra.experiment.variables.undetermined_variable import UndeterminedVariable
 from gen_common.infra.experiment.variables.variable import Variable
 from gen_common.traceability.output.trace_prediction_output import TracePredictionOutput
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 
 
 class BaseExperimentTest(BaseTest):
@@ -38,7 +38,7 @@ class BaseExperimentTest(BaseTest):
                         })
                     }),
                     "trainer_args": DefinitionVariable({
-                        "output_dir": Variable(TEST_OUTPUT_DIR),
+                        "output_dir": Variable(GEN_COMMON_TEST_OUTPUT_PATH),
                         "num_train_epochs": ExperimentalVariable([Variable(100), Variable(200)])
                     })
                 })]),
@@ -65,12 +65,12 @@ class BaseExperimentTest(BaseTest):
                         }),
                 }),
                 "trainer_args": DefinitionVariable({
-                    "output_dir": Variable(TEST_OUTPUT_DIR),
+                    "output_dir": Variable(GEN_COMMON_TEST_OUTPUT_PATH),
                 })
             })])
             })
         ]),
-        "output_dir": TEST_OUTPUT_DIR,
+        "output_dir": GEN_COMMON_TEST_OUTPUT_PATH,
     })
 
     def setUp(self):
@@ -80,7 +80,7 @@ class BaseExperimentTest(BaseTest):
     @staticmethod
     def _load_step_output(output_file_path=None):
         if not output_file_path:
-            output_file_path = os.path.join(TEST_OUTPUT_DIR, OUTPUT_FILENAME)
+            output_file_path = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, OUTPUT_FILENAME)
         with open(output_file_path) as out_file:
             output = json.load(out_file)
         return output

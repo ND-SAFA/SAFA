@@ -1,6 +1,6 @@
 from gen_common.data.readers.abstract_project_reader import AbstractProjectReader
 from gen_common.data.readers.repository_project_reader import RepositoryProjectReader
-from gen_common_test.paths.project_paths import REPO_ONE_PROJECT_PATH
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_REPO_ONE_PATH
 from gen_common_test.testprojects.abstract_test_project import AbstractTestProject
 
 
@@ -17,7 +17,7 @@ class RepositoryOneTestProject(AbstractTestProject):
         """
         :return: Returns path to repository test project.
         """
-        return REPO_ONE_PROJECT_PATH
+        return GEN_COMMON_TEST_PROJECT_REPO_ONE_PATH
 
     @classmethod
     def get_project_reader(cls) -> AbstractProjectReader:

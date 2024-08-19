@@ -17,8 +17,8 @@ from gen_common.util.dataframe_util import DataFrameUtil
 from gen_common_test.base.constants import SUMMARY_FORMAT
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 from gen_common_test.testprojects.artifact_test_project import ArtifactTestProject
 from gen_common_test.testprojects.prompt_test_project import PromptTestProject
 
@@ -28,7 +28,7 @@ class TestPromptDatasetCreator(BaseTest):
 
         def __init__(self, artifact_df: ArtifactDataFrame):
             self.artifact_df = artifact_df
-            self.project_path = os.path.join(TEST_OUTPUT_DIR, "prompt_dataset_creator")
+            self.project_path = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "prompt_dataset_creator")
 
         def get_full_project_path(self):
             return self.project_path

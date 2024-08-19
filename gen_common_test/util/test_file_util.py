@@ -3,9 +3,9 @@ from os.path import dirname
 
 from gen_common.constants.symbol_constants import USER_SYM
 from gen_common.util.file_util import FileUtil
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_DIR_PATH, GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.data.creators.test_mlm_pre_train_dataset_creator import TestMLMPreTrainDatasetCreator
-from gen_common_test.paths.base_paths import TEST_DIR_PATH, TEST_OUTPUT_DIR
 
 
 class TestFileUtil(BaseTest):
@@ -26,15 +26,15 @@ class TestFileUtil(BaseTest):
         """
         Tests that move dir contents moves all files inside the directory to the specified location
         """
-        orig_dir = os.path.join(TEST_OUTPUT_DIR, "orig_dir")
+        orig_dir = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "orig_dir")
         files = ["file1.txt", "file2.txt"]
         for filename in files:  # create empty files
             FileUtil.safe_open_w(os.path.join(orig_dir, filename))
-        new_dir = os.path.join(TEST_OUTPUT_DIR, "new_dir")
+        new_dir = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "new_dir")
         FileUtil.move_dir_contents(orig_dir, new_dir, delete_after_move=True)
         for filename in files:  # create empty files
             self.assertTrue(os.path.exists(os.path.join(new_dir, filename)))
-        self.assertFalse(os.path.exists(os.path.join(TEST_OUTPUT_DIR, orig_dir)))
+        self.assertFalse(os.path.exists(os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, orig_dir)))
 
     def test_add_to_path(self):
         """
@@ -74,7 +74,7 @@ class TestFileUtil(BaseTest):
         """
         Tests that move dir contents moves all files inside the directory to the specified location
         """
-        base_dir = os.path.join(TEST_OUTPUT_DIR, "base_dir")
+        base_dir = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, "base_dir")
         nested_dir = os.path.join(base_dir, "nested_dir")
         files = ["file1.txt", "file2.txt"]
 
@@ -107,7 +107,7 @@ class TestFileUtil(BaseTest):
 
     def test_expand_paths(self):
         starting_path = FileUtil.get_starting_path()
-        expected_path = f"{TEST_DIR_PATH}/util/test_file_util.py"
+        expected_path = f"{GEN_COMMON_TEST_DIR_PATH}/util/test_file_util.py"
         self.assertTrue(os.path.exists(expected_path))
 
         # Test 1 - Test that relative path to test file can be correctly assumed to starting path.
@@ -155,11 +155,11 @@ class TestFileUtil(BaseTest):
         self.assertListEqual(expected_order, orderings)
 
     def test_collapse_paths(self):
-        root_path = dirname(TEST_DIR_PATH)
+        root_path = dirname(GEN_COMMON_TEST_DIR_PATH)
         os.environ["ROOT_PATH"] = root_path
         p = f"{self.PARENT_DIR}/test_file_util.py"
         expected_path = os.path.relpath(p, root_path)
-        collapsed_path_relative = FileUtil.collapse_paths(p, replacements={"[ROOT_PATH]": dirname(TEST_DIR_PATH)})
+        collapsed_path_relative = FileUtil.collapse_paths(p, replacements={"[ROOT_PATH]": dirname(GEN_COMMON_TEST_DIR_PATH)})
         self.assertEqual(collapsed_path_relative, f"[ROOT_PATH]/{expected_path}")
 
         replacements = {"[path1]": "root/path1",

@@ -15,8 +15,8 @@ from gen_common.data.readers.prompt_project_reader import PromptProjectReader
 from gen_common.data.readers.structured_project_reader import StructuredProjectReader
 from gen_common.summarize.summary import Summary
 from gen_common.util.enum_util import EnumDict
+from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.paths.base_paths import TEST_OUTPUT_DIR
 from gen_common_test.testprojects.prompt_test_project import PromptTestProject
 
 
@@ -33,7 +33,7 @@ class TestPromptDatasetExporter(BaseTest):
 
         i = 0
         for dataset_exporter, project_reader in dataset_exporter_to_reader.items():
-            export_path = os.path.join(TEST_OUTPUT_DIR, f"prompt_dataset_{i}")
+            export_path = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, f"prompt_dataset_{i}")
             if issubclass(dataset_exporter, CSVExporter):
                 export_path = os.path.join(export_path, "dataset.csv")
             elif issubclass(dataset_exporter, ApiExporter):
@@ -57,7 +57,7 @@ class TestPromptDatasetExporter(BaseTest):
         for reader in readers:
             dataset_creator_orig = PromptDatasetCreator(project_reader=reader)
             dataset = dataset_creator_orig.create()
-            export_path = os.path.join(TEST_OUTPUT_DIR, f"prompt_dataset_{i}")
+            export_path = os.path.join(GEN_COMMON_TEST_OUTPUT_PATH, f"prompt_dataset_{i}")
             if isinstance(reader, PromptProjectReader):
                 export_path = os.path.join(export_path, "dataset.jsonl")
             PromptDatasetExporter(export_path, dataset=dataset).export()

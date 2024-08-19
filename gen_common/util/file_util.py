@@ -11,7 +11,8 @@ from yaml.dumper import Dumper
 from yaml.loader import Loader, SafeLoader
 
 from gen_common.constants.code_extensions import CODE_EXTENSIONS, CODE_FILENAMES
-from gen_common.constants.env_var_name_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, OUTPUT_PATH_PARAM, ROOT_PATH_PARAM
+from gen_common.constants.env_var_name_constants import CURRENT_PROJECT_PARAM, DATA_PATH_PARAM, OUTPUT_PATH_PARAM, PROJECT_PATH_PARAM, \
+    ROOT_PATH_PARAM
 from gen_common.constants.environment_constants import get_environment_variable
 from gen_common.constants.symbol_constants import EMPTY_STRING, F_SLASH, PERIOD, SPACE, USER_SYM
 from gen_common.infra.t_logging.logger_manager import logger
@@ -20,7 +21,7 @@ from gen_common.util.json_util import JsonUtil
 from gen_common.util.str_util import StrUtil
 
 EXCLUDE_EXTENSIONS = [".png", ".jpg", ".reg"]
-ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM]
+ENV_REPLACEMENT_VARIABLES = [DATA_PATH_PARAM, PROJECT_PATH_PARAM, ROOT_PATH_PARAM, OUTPUT_PATH_PARAM, CURRENT_PROJECT_PARAM]
 
 
 class FileUtil:

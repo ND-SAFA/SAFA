@@ -3,7 +3,7 @@ completed_steps:
   Step1: 1
   Step2: 1
   Step3: 1
-export_dir: '[ROOT_PATH]/gen_common_test/output'
+export_dir: '[PROJECT_PATH]/output'
 final_dataset: !!python/object:gen_common.data.creators.prompt_dataset_creator.PromptDatasetCreator
   data_cleaner: !!python/object:gen_common.data.processing.cleaning.data_cleaner.DataCleaner
     ordered_steps: []
@@ -30,7 +30,7 @@ final_dataset: !!python/object:gen_common.data.creators.prompt_dataset_creator.P
       conversions: {}
       definition_reader: null
       overrides: {}
-      project_path: '[ROOT_PATH]/gen_common_test/test_data/state/final_dataset'
+      project_path: '[PROJECT_PATH]/final_dataset'
       summarizer: null
     remove_orphans: false
     trace_df: null
@@ -43,13 +43,13 @@ original_dataset: !!python/object:gen_common.data.creators.prompt_dataset_creato
   project_file_id: null
   project_reader: !!python/object:gen_common.data.readers.artifact_project_reader.ArtifactProjectReader
     overrides: {}
-    project_path: '[ROOT_PATH]/gen_common_test/test_data/state/original_dataset'
+    project_path: '[PROJECT_PATH]/original_dataset'
     structured_project_reader: !!python/object:gen_common.data.readers.structured_project_reader.StructuredProjectReader
       _definition: null
       conversions: {}
       definition_reader: null
       overrides: {}
-      project_path: '[ROOT_PATH]/gen_common_test/test_data/state/original_dataset'
+      project_path: '[PROJECT_PATH]/original_dataset'
       summarizer: null
     summarizer: null
   project_summary: null

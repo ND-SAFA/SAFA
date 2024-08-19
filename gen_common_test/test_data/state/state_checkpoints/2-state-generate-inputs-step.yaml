@@ -12,7 +12,7 @@ description_of_artifact: A User story is a concise, informal description of a so
   feature or functionality, written from the perspective of the end user
 embedding_manager: null
 example_artifact: null
-export_dir: '[ROOT_PATH]/gen_common_test/output'
+export_dir: '[PROJECT_PATH]/output'
 final_dataset: null
 format_of_artifacts: As a [type of user], I want to [action or goal] so that [reason
   or benefit].
@@ -28,13 +28,13 @@ original_dataset: !!python/object:gen_common.data.creators.prompt_dataset_creato
   project_file_id: null
   project_reader: !!python/object:gen_common.data.readers.artifact_project_reader.ArtifactProjectReader
     overrides: {}
-    project_path: '[ROOT_PATH]/gen_common_test/test_data/state/original_dataset'
+    project_path: '[PROJECT_PATH]/original_dataset'
     structured_project_reader: !!python/object:gen_common.data.readers.structured_project_reader.StructuredProjectReader
       _definition: null
       conversions: {}
       definition_reader: null
       overrides: {}
-      project_path: '[ROOT_PATH]/gen_common_test/test_data/state/original_dataset'
+      project_path: '[PROJECT_PATH]/original_dataset'
       summarizer: null
     summarizer: null
   project_summary: null
@@ -67,13 +67,13 @@ source_dataset: !!python/object:gen_common.data.creators.prompt_dataset_creator.
   project_file_id: null
   project_reader: !!python/object:gen_common.data.readers.artifact_project_reader.ArtifactProjectReader
     overrides: {}
-    project_path: '[ROOT_PATH]/gen_common_test/test_data/state/source_dataset'
+    project_path: '[PROJECT_PATH]/source_dataset'
     structured_project_reader: !!python/object:gen_common.data.readers.structured_project_reader.StructuredProjectReader
       _definition: null
       conversions: {}
       definition_reader: null
       overrides: {}
-      project_path: '[ROOT_PATH]/gen_common_test/test_data/state/source_dataset'
+      project_path: '[PROJECT_PATH]/source_dataset'
       summarizer: null
     summarizer: null
   project_summary: null

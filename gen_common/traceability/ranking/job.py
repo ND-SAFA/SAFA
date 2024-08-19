@@ -14,8 +14,9 @@ from gen_common.jobs.job_args import JobArgs
 from gen_common.pipeline.abstract_pipeline import AbstractPipeline
 from gen_common.traceability.output.abstract_trace_output import AbstractTraceOutput
 from gen_common.traceability.output.trace_prediction_output import TracePredictionOutput
-from gen_common.traceability.ranking.common.ranking_args import RankingArgs, RankingUtil, SupportedRankingPipelines
+from gen_common.traceability.ranking.common.ranking_args import RankingArgs
 from gen_common.traceability.ranking.common.ranking_state import RankingState
+from gen_common.traceability.ranking.supported_ranking_pipelines import SupportedRankingPipelines
 from gen_common.traceability.relationship_manager.abstract_relationship_manager import AbstractRelationshipManager
 from gen_common.traceability.relationship_manager.cross_encoder_manager import CrossEncoderManager
 from gen_common.traceability.relationship_manager.embeddings_manager import EmbeddingsManager
@@ -24,6 +25,7 @@ from gen_common.util.dict_util import DictUtil
 from gen_common.util.enum_util import EnumDict
 from gen_common.util.file_util import FileUtil
 from gen_common.util.list_util import ListUtil
+from gen_common.util.ranking_util import RankingUtil
 
 DATA_TOO_LITTLE_INPUTS = "Missing required dataset_creator or artifact_df + layer_ids."
 DATA_TOO_MANY_INPUTS = "Expected only one of dataset_creator or artifact_df + layer_ids to be defined."

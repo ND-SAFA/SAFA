@@ -1,7 +1,8 @@
 from typing import List
 
 from gen_common.data.objects.trace import Trace
-from gen_common.traceability.ranking import SelectByThreshold, iSelector
+from gen_common.traceability.ranking.trace_selectors.i_selection_method import iSelector
+from gen_common.traceability.ranking.trace_selectors.select_by_threshold import SelectByThreshold
 from gen_common.util.ranking_util import RankingUtil
 
 

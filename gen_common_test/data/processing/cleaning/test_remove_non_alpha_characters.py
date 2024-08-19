@@ -1,6 +1,6 @@
 from gen_common.data.processing.cleaning.remove_non_alpha_chars_step import RemoveNonAlphaCharsStep
 from gen_common.util.file_util import FileUtil
-from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_CLEANING_CPP
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_CLEANING_CPP
 from gen_common_test.base.tests.base_test import BaseTest
 
 
@@ -9,7 +9,7 @@ class TestRemoveNonAlphaChars(BaseTest):
     Tests ability to remove non alpha numeric characters from strings.
     """
 
-    TEST_FILE = FileUtil.read_file(GEN_COMMON_TEST_CLEANING_CPP)
+    TEST_FILE = FileUtil.read_file(GEN_COMMON_TEST_PROJECT_CLEANING_CPP)
     EXPECTED_REMOVED_STRINGS = ["@brief", "//", "{"]
 
     def test_expected_strings_are_removed(self):

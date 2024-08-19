@@ -7,7 +7,7 @@ from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummariz
 from gen_common_test.base.constants import SUMMARY_FORMAT
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
-from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROMPT_LHP_PATH
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_PROMPT_LHP_PATH
 from gen_common_test.base.tests.base_test import BaseTest
 
 
@@ -15,7 +15,7 @@ class TestPromptProjectReader(BaseTest):
     """
     Tests that csv project is correctly parsed.
     """
-    DATASET_PATH = GEN_COMMON_TEST_PROMPT_LHP_PATH
+    DATASET_PATH = GEN_COMMON_TEST_PROJECT_PROMPT_LHP_PATH
 
     @mock_anthropic
     def test_summarization(self, ai_manager: TestAIManager):

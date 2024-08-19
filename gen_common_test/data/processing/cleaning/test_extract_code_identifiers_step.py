@@ -2,7 +2,7 @@ from unittest import skip
 
 from gen_common.data.processing.cleaning.extract_code_identifiers import ExtractCodeIdentifiersStep
 from gen_common.util.file_util import FileUtil
-from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_CLEANING_JAVA
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_CLEANING_JAVA
 from gen_common_test.base.tests.base_test import BaseTest
 
 
@@ -27,7 +27,7 @@ class TestExtractCodeIdentifiersStep(BaseTest):
         """
         Tests that identifiers from code are passed through.
         """
-        code = FileUtil.read_file(GEN_COMMON_TEST_CLEANING_JAVA)
+        code = FileUtil.read_file(GEN_COMMON_TEST_PROJECT_CLEANING_JAVA)
         expected_codes = ["Abstract Base class for both virtual and physical drones",
                           "basePosition",
                           "getLongitude",

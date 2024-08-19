@@ -13,7 +13,7 @@ from gen_common.util.param_specs import ParamSpecs
 from gen_common.util.reflection_util import ReflectionUtil
 from gen_common.util.yaml_util import YamlUtil
 from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_DIR_PATH, GEN_COMMON_TEST_OUTPUT_PATH
-from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_STATE_PATH
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_STATE_PATH
 from gen_common_test.base.tests.base_test import BaseTest
 
 
@@ -40,17 +40,17 @@ class TestState(BaseTest):
     def test_load_latest(self):
         os.environ["ROOT_PATH"] = dirname(GEN_COMMON_TEST_DIR_PATH)
         steps = ["Step1", "Step2", "Step3"]
-        state = FakeState.load_latest(GEN_COMMON_TEST_STATE_PATH, steps)
+        state = FakeState.load_latest(GEN_COMMON_TEST_PROJECT_STATE_PATH, steps)
         self.assertEqual(state.export_dir, GEN_COMMON_TEST_OUTPUT_PATH)
         self.assertSetEqual(set(steps), set(state.completed_steps.keys()))
         self.assertIsInstance(state.original_dataset, PromptDataset)
         self.assertIsInstance(state.final_dataset, PromptDataset)
 
         # failed to find a state so initialize empty
-        file_not_found_state = FakeState.load_latest(GEN_COMMON_TEST_STATE_PATH, ["UnknownStep"])
+        file_not_found_state = FakeState.load_latest(GEN_COMMON_TEST_PROJECT_STATE_PATH, ["UnknownStep"])
         self.assertSize(0, file_not_found_state.completed_steps)
 
-        failed_state = FakeState.load_latest(GEN_COMMON_TEST_STATE_PATH, ["BadFile"])
+        failed_state = FakeState.load_latest(GEN_COMMON_TEST_PROJECT_STATE_PATH, ["BadFile"])
         self.assertSize(0, failed_state.completed_steps)
 
     @skip
@@ -64,7 +64,7 @@ class TestState(BaseTest):
 
         state_name = "Step2"
         step_num = 2
-        orig_path = State.get_path_to_state_checkpoint(GEN_COMMON_TEST_STATE_PATH, state_name, step_num=step_num)
+        orig_path = State.get_path_to_state_checkpoint(GEN_COMMON_TEST_PROJECT_STATE_PATH, state_name, step_num=step_num)
         attrs = YamlUtil.read(orig_path)
         param_specs = ParamSpecs.create_from_method(HGenState.__init__)
         checked_attrs = {}

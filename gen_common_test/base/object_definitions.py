@@ -11,7 +11,7 @@ from gen_common.infra.experiment.variables.typed_definition_variable import Type
 from gen_common.llm.args.hugging_face_args import HuggingFaceArgs
 from gen_common.llm.model_manager import ModelManager
 from gen_common_test.base.paths.base_paths import GEN_COMMON_TEST_OUTPUT_PATH
-from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PRE_TRAIN_PATH
+from gen_common_test.base.paths.project_paths import GEN_COMMON_TEST_PROJECT_PRE_TRAIN_PATH
 from gen_common_test.base.tests.base_test import BaseTest
 from gen_common_test.test_data.test_data_manager import TestDataManager
 
@@ -52,7 +52,7 @@ class TestObjectDefinitions:
 
     pretrain_dataset_definition = {
         TypedDefinitionVariable.OBJECT_TYPE_KEY: "MLM_PRE_TRAIN",
-        "orig_data_path": GEN_COMMON_TEST_PRE_TRAIN_PATH,
+        "orig_data_path": GEN_COMMON_TEST_PROJECT_PRE_TRAIN_PATH,
         "training_data_dir": GEN_COMMON_TEST_OUTPUT_PATH
     }
 

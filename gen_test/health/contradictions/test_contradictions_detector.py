@@ -5,9 +5,9 @@ from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_test import BaseTest
 
-from gen.health.contradiction_prompts import create_contradiction_response
-from gen.health.contradictions_args import ContradictionsArgs
-from gen.health.contradictions_detector import ContradictionsDetector
+from gen.health.contradiction.contradiction_args import ContradictionsArgs
+from gen.health.contradiction.contradiction_detector import ContradictionsDetector
+from gen.health.contradiction.contradiction_prompts import create_contradiction_response
 from gen_test.health.contradictions.data_test_requirements import EXPECTED_CONTRADICTIONS, get_contradictions_dataset
 
 

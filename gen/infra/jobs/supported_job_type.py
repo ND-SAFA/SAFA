@@ -10,7 +10,7 @@ from gen.data.jobs.create_source_splits_job import CreateSourceSplitsJob
 from gen.data.jobs.download_repository_job import DownloadRepositoryJob
 from gen.data.jobs.export_artifacts_job import ExportArtifactsJob
 from gen.delta.delta_summarizer_job import DeltaSummarizerJob
-from gen.health.jobs.health_check_job import HealthCheckJob
+from gen.health.health_job import HealthCheckJob
 from gen.hgen.jobs.base_hgen_job import BaseHGenJob
 from gen.hgen.jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from gen.tracing.jobs.code_trace_job import TraceCodeJob

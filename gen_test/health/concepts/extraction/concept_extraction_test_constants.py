@@ -1,0 +1,5 @@
+from gen_test.health.concepts.matching.constants import ConceptData
+
+TEST_HEALTH_CONCEPTS_EXTRACTION_MOCK_DEFINITION = "test_definition"
+TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT = "undefined_concept"
+TEST_HEALTH_CONCEPTS_EXTRACTION_EXISTING_CONCEPT = ConceptData.Entities.E1

@@ -5,7 +5,7 @@ from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
 from gen_common.data.readers.structured_project_reader import StructuredProjectReader
 from gen_common.jobs.job_args import JobArgs
 
-from gen.health.jobs.concept_prediction_job import ConceptPredictionJob
+from gen.health.concepts.matching.concept_matching_job import ConceptPredictionJob
 
 
 def main():

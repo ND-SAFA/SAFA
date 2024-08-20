@@ -1,14 +1,14 @@
+from gen_common.constants.symbol_constants import NEW_LINE
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.layer_dataframe import LayerDataFrame
 from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
 from gen_common.data.keys.structure_keys import ArtifactKeys, LayerKeys
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
-from gen_common.constants.symbol_constants import NEW_LINE
 from gen_common.util.prompt_util import PromptUtil
 
-from gen.health.contradiction_prompts import CONSTITUENT2TAG
-from gen.health.requirement import Requirement, RequirementConstituent
+from gen.health.contradiction.contradiction_prompts import CONSTITUENT2TAG
+from gen.health.types.requirement import Requirement, RequirementConstituent
 
 R1 = Requirement(id="1",
                  action={RequirementConstituent.EFFECT: "stand",

@@ -1,22 +1,20 @@
 from typing import Dict, List
 
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from gen_common.data.dataframes.layer_dataframe import LayerDataFrame
+from gen_common.data.dataframes.trace_dataframe import TraceDataFrame
 from gen_common.data.keys.structure_keys import ArtifactKeys, TraceKeys
-from gen_common.data.objects.artifact import Artifact
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
+from gen_common.data.tdatasets.trace_dataset import TraceDataset
 from gen_common.llm.abstract_llm_manager import AbstractLLMManager
 from gen_common.llm.message_meta import MessageMeta
 from gen_common.util.enum_util import EnumDict
 from gen_common_test.base.tests.base_test import BaseTest
 
-from gen.health.contradiction_prompts import create_contradiction_response
-from gen_test.concepts.test_define_unknown_entities import TestDefineUnknownEntities
-from gen_test.concepts.test_prediction_entity_step import TestPredictEntityStep
-from gen_test.health.health_check_constants import ARTIFACT_CONTENT, ARTIFACT_IDS, CONCEPT_LAYER_ID, \
-    EXISTING_CONCEPTS, \
-    EXPECTED_CONFLICTING_IDS, \
-    EXPECTED_CONTEXT_IDS, EXPECTED_CONTRADICTION_EXPLANATION, EXPECTED_RELATED_ARTIFACTS, QUERY, QUERY_CONCEPTS, QUERY_CONTENT, \
-    QUERY_ID, UNDEFINED_CONCEPT
+from gen.health.concepts.extraction.undefined_concept import UndefinedConcept
+from gen_test.health.concepts.extraction.concept_extraction_test_constants import TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT
+from gen_test.health.health_check_constants import ARTIFACT_CONTENT, ARTIFACT_IDS, EXPECTED_CONFLICTING_IDS, \
+    EXPECTED_CONTEXT_IDS, EXPECTED_CONTRADICTION_EXPLANATION, EXPECTED_RELATED_ARTIFACTS, QUERY, QUERY_ID
 
 
 def assert_correct_related_artifacts(test_case: BaseTest, related_ids: List[str]):
@@ -42,38 +40,10 @@ def assert_health_check_success(tc: BaseTest, result: Dict):
     tc.assertEqual(contradiction["explanation"], EXPECTED_CONTRADICTION_EXPLANATION)
     assert_correct_related_traces(tc, result["context_traces"], EXPECTED_RELATED_ARTIFACTS, QUERY_ID)
 
-    concept_matches = result["concept_matches"]
-
-    # Direct ("dog)
-    direct_concept = EXISTING_CONCEPTS[0]
-    tc.assertEqual(1, len(concept_matches["matches"]))
-    direct_match = concept_matches["matches"][0]
-    tc.assertEqual(direct_concept, direct_match["concept_id"])
-    tc.assertEqual(direct_concept, direct_match["matched_content"])
-    tc.assertEqual(QUERY_ID, direct_match["artifact_id"])
-
-    # Predicted (pug)
-    concept_id = EXISTING_CONCEPTS[0]
-    entity_id = QUERY_CONCEPTS[0]
-    tc.assertEqual(1, len(concept_matches["predicted_matches"]))
-    predicted_match = concept_matches["predicted_matches"][0]
-    tc.assertEqual(QUERY_ID, predicted_match["target"])
-    tc.assertEqual(concept_id, predicted_match["source"])
-
-    # Undefined (undefined_concept)
-    tc.assertEqual(1, len(concept_matches["undefined_entities"]))
-    undefined_entity = concept_matches["undefined_entities"][0]
-    tc.assertEqual([QUERY_ID], undefined_entity["artifact_ids"])
-    tc.assertEqual(UNDEFINED_CONCEPT, undefined_entity["concept_id"])
-
-
-def get_dataset_for_context(include_query: bool = False):
-    artifact_df = ArtifactDataFrame({ArtifactKeys.ID: ARTIFACT_IDS,
-                                     ArtifactKeys.CONTENT: ARTIFACT_CONTENT,
-                                     ArtifactKeys.LAYER_ID: "artifacts"})
-    if include_query:
-        artifact_df.add_row(QUERY)
-    return PromptDataset(artifact_df=artifact_df)
+    concept_matches = result["undefined_concepts"]
+    tc.assertEqual(1, len(concept_matches))
+    concept_match: UndefinedConcept = concept_matches[0]
+    tc.assertEqual(TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT, concept_match.concept_id)
 
 
 def get_chat_history(artifact_ids: List = None):
@@ -82,29 +52,15 @@ def get_chat_history(artifact_ids: List = None):
                         artifact_ids=artifact_ids)]
 
 
-def get_dataset_for_health_checks():
-    dataset = get_dataset_for_context()
-    dataset.artifact_df.add_artifact(id=QUERY_ID,
-                                     content=QUERY_CONTENT,
-                                     layer_id="artifacts")
-    for i, concept in enumerate(EXISTING_CONCEPTS):
-        dataset.artifact_df.add_artifact(id=concept,
-                                         content=concept,
-                                         layer_id=CONCEPT_LAYER_ID)
-    return dataset
-
-
-class TestEntityMatching:
-    pass
-
-
-@staticmethod
-def mocks_for_health_checks(ai_manager):
-    artifacts = [Artifact(id=e, content="description", layer_id="entity")
-                 for e in QUERY_CONCEPTS]
-    test_entity_df = ArtifactDataFrame(artifacts)
-    ai_manager.add_responses([create_contradiction_response(EXPECTED_CONTRADICTION_EXPLANATION, EXPECTED_CONFLICTING_IDS)])
-    TestPredictEntityStep._create_mock_response(ai_manager, test_entity_df)
-    TestEntityMatching.mock_entity_matching(ai_manager, [QUERY_CONCEPTS[1]] + ["NA"])
-    mock_entity_definitions = {UNDEFINED_CONCEPT: "This is a new project concept"}
-    TestDefineUnknownEntities.mock_entity_definitions(ai_manager, mock_entity_definitions)
+def get_dataset_for_context(include_query: bool = False):
+    artifact_df = ArtifactDataFrame({ArtifactKeys.ID: ARTIFACT_IDS,
+                                     ArtifactKeys.CONTENT: ARTIFACT_CONTENT,
+                                     ArtifactKeys.LAYER_ID: "artifacts"})
+    if include_query:
+        artifact_df.add_row(QUERY)
+    trace_dataset = TraceDataset(
+        artifact_df=artifact_df,
+        trace_df=TraceDataFrame(),
+        layer_df=LayerDataFrame()
+    )
+    return PromptDataset(trace_dataset=trace_dataset)

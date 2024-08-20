@@ -15,7 +15,7 @@ DEFAULT_REDUCTION_PERCENTAGE_GENERATIONS = 0.5
 DEFAULT_TOKEN_TO_TARGETS_RATIO = 10000
 MAX_TOKENS_FOR_NO_SUMMARIES = 65000
 
-INPUTS_FOR_GENERATION_PATH = os.path.join(GEN_ROOT_PATH, "hgen", "inputs_for_generation")
+INPUTS_FOR_GENERATION_PATH = os.path.join(GEN_ROOT_PATH, "gen", "hgen", "inputs_for_generation")
 
 # Seeds
 CLUSTER_SEEDS_PARAM = "cluster_seeds"

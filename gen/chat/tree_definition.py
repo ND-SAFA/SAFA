@@ -19,7 +19,7 @@ from gen.chat.node_ids import ChatNodeIDs
 from gen.chat.prompts import ARTIFACT_TYPE_FOR_CONTEXT_PROMPT, INCLUDE_MORE_CONTEXT_PROMPT, \
     REWRITE_QUERY_PROMPT, TYPES_FORMAT_VAR
 from gen.chat.state import ChatState
-from gen.health.common_choices import CommonChoices
+from gen.health.types.common_choices import CommonChoices
 from gen.tracing.context_finder import ContextFinder
 
 

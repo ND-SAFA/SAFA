@@ -7,13 +7,13 @@ from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_test import BaseTest
 
-from gen.chat.args import ChatArgs
+from gen.chat.chat_args import ChatArgs
+from gen.chat.chat_node_ids import ChatNodeIDs
+from gen.chat.chat_state import ChatState
+from gen.chat.chat_tree_definition import ChatTreeDefinition
 from gen.chat.decision_tree.nodes.action_node import ActionNode
 from gen.chat.decision_tree.nodes.llm_node import LLMNode
 from gen.chat.decision_tree.path import Path
-from gen.chat.node_ids import ChatNodeIDs
-from gen.chat.state import ChatState
-from gen.chat.tree_definition import ChatTreeDefinition
 from gen_test.health.health_check_constants import EXPECTED_CONTEXT_IDS, QUERY
 from gen_test.health.health_check_utils import get_chat_history, get_dataset_for_context
 

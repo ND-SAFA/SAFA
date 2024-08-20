@@ -7,7 +7,7 @@ from gen_common.llm.message_meta import MessageMeta
 from gen_common.pipeline.args import Args
 from gen_common.util.dataclass_util import required_field
 
-from gen.chat.node_ids import ChatNodeIDs
+from gen.chat.chat_node_ids import ChatNodeIDs
 
 
 @dataclass

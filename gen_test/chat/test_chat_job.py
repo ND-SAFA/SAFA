@@ -18,7 +18,7 @@ from gen_common_test.base.mock.decorators.chat import mock_chat_model
 from gen_common_test.base.mock.langchain.test_chat_model import TestResponseManager
 from gen_common_test.base.tests.base_job_test import BaseJobTest
 
-from gen.chat.job import ChatJob
+from gen.chat.chat_job import ChatJob
 from gen_test.health.health_check_utils import get_chat_history
 
 

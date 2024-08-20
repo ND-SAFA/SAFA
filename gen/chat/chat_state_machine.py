@@ -3,11 +3,11 @@ from collections.abc import Set
 from gen_common.data.keys.prompt_keys import PromptKeys
 from gen_common.llm.llm_trainer import LLMTrainer
 
-from gen.chat.args import ChatArgs
+from gen.chat.chat_args import ChatArgs
+from gen.chat.chat_state import ChatState
+from gen.chat.chat_tree_definition import ChatTreeDefinition
 from gen.chat.decision_tree import LLMNode
 from gen.chat.decision_tree.path import Path
-from gen.chat.state import ChatState
-from gen.chat.tree_definition import ChatTreeDefinition
 
 
 class ChatStateMachine:

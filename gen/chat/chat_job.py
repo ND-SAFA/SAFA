@@ -8,8 +8,8 @@ from gen_common.jobs.job_args import JobArgs
 from gen_common.llm.abstract_llm_manager import Message, PromptRoles
 from gen_common.llm.message_meta import MessageMeta
 
-from gen.chat.args import ChatArgs
-from gen.chat.graph import ChatGraph
+from gen.chat.chat_args import ChatArgs
+from gen.chat.chat_graph import ChatGraph
 
 
 class ChatJob(AbstractJob):

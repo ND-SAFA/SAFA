@@ -4,7 +4,7 @@ from gen_common.traceability.ranking.job import RankingJob
 from gen_common.traceability.vsm.vsm_job import VSMJob
 from gen_common.util.supported_enum import SupportedEnum
 
-from gen.chat.job import ChatJob
+from gen.chat.chat_job import ChatJob
 from gen.data.jobs.create_datasets_job import CreateDatasetsJob
 from gen.data.jobs.create_source_splits_job import CreateSourceSplitsJob
 from gen.data.jobs.download_repository_job import DownloadRepositoryJob

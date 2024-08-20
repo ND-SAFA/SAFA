@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, cast
 
 from gen_common.data.keys.structure_keys import TraceKeys, TraceRelationshipType
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
@@ -8,6 +8,7 @@ from gen_common_test.base.tests.base_test import BaseTest
 from gen.health.contradiction.contradiction_args import ContradictionsArgs
 from gen.health.contradiction.contradiction_detector import ContradictionsDetector
 from gen.health.contradiction.contradiction_prompts import create_contradiction_response
+from gen.health.contradiction.contradiction_result import ContradictionResult
 from gen_test.health.contradictions.data_test_requirements import EXPECTED_CONTRADICTIONS, get_contradictions_dataset
 
 
@@ -47,9 +48,10 @@ class TestContradictionsDetector(BaseTest):
         if not isinstance(expected, list):
             expected = [expected] if expected else []
         n_results = len(expected) if expected else 0
-        results = detector.detect(query_ids)
+        results: List[ContradictionResult] = detector.detect(query_ids)
         self.assertEqual(len(results), n_results, msg=f"Query Ids: {query_ids}")
 
         for (explanation, conflicting_ids), result in zip(expected, results):
-            self.assertEqual(result["conflicting_ids"], conflicting_ids)
-            self.assertEqual(result["explanation"], explanation)
+            result = cast(ContradictionResult, result)
+            self.assertEqual(result.conflicting_ids, conflicting_ids)
+            self.assertEqual(result.explanation, explanation)

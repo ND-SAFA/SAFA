@@ -7,7 +7,7 @@ from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_test import BaseTest
 
 from gen.health.concepts.concept_args import ConceptArgs
-from gen.health.concepts.extraction.state import ConceptExtractionState
+from gen.health.concepts.extraction.concept_extraction_state import ConceptExtractionState
 from gen.health.concepts.extraction.steps.extract_undefined_concepts_step import ExtractUndefinedConceptsStep
 from gen_test.health.concepts.extraction.concept_extraction_test_constants import TEST_HEALTH_CONCEPTS_EXTRACTION_EXISTING_CONCEPT, \
     TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT

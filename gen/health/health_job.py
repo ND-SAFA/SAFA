@@ -9,11 +9,11 @@ from gen_common.util.reflection_util import ReflectionUtil
 
 from gen.health.concepts.concept_args import ConceptArgs
 from gen.health.concepts.extraction.concept_extraction_pipeline import ConceptExtractionPipeline
-from gen.health.concepts.extraction.state import ConceptExtractionState
+from gen.health.concepts.extraction.concept_extraction_state import ConceptExtractionState
 from gen.health.concepts.extraction.undefined_concept import UndefinedConcept
 from gen.health.contradiction.contradiction_args import ContradictionsArgs
 from gen.health.contradiction.contradiction_detector import ContradictionsDetector
-from gen.health.contradiction.contradiction_result import ContradictionsResult
+from gen.health.contradiction.contradiction_result import ContradictionResult
 from gen.health.health_results import HealthResults
 from gen.health.health_util import expand_query_selection
 
@@ -35,7 +35,8 @@ class HealthCheckJob(AbstractJob):
         :param use_llm_for_entity_extraction: If True, uses the llm for entity extraction instead of the standford analysis.
         """
         super().__init__(job_args, require_data=True)
-        self.query_ids = expand_query_selection(job_args.dataset.artifact_df, query_ids)
+        dataset: PromptDataset = job_args.dataset
+        self.query_ids = expand_query_selection(dataset.artifact_df, query_ids)
         self.concept_layer_id = concept_layer_id
         self.entity_layer_id = entity_layer_id
         self.context_doc_path = context_doc_path
@@ -58,7 +59,7 @@ class HealthCheckJob(AbstractJob):
                                 undefined_concepts=undefined_entities)
         return results
 
-    def _run_contradictions_detector(self, **kwargs) -> List[ContradictionsResult]:
+    def _run_contradictions_detector(self, **kwargs) -> List[ContradictionResult]:
         """
         Runs contradictions detector to identify any conflicting artifacts with the query artifact.
         :return: Any ids of conflicting artifacts and an explanation as to why if some were found.

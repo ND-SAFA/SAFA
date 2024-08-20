@@ -15,7 +15,7 @@ from pydantic.v1 import BaseModel, Field
 
 from gen.health.concepts.concept_args import ConceptArgs
 from gen.health.concepts.extraction.concept_extraction_prompt import UNDEFINED_ENTITY_EXTRACTION_PROMPT
-from gen.health.concepts.extraction.state import ConceptExtractionState
+from gen.health.concepts.extraction.concept_extraction_state import ConceptExtractionState
 from gen.health.concepts.matching.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from gen.health.concepts.matching.types.concept_variants import ConceptVariants
 from gen.health.health_util import PromptGeneratorReturnType, PromptGeneratorType, complete_iterable_prompts

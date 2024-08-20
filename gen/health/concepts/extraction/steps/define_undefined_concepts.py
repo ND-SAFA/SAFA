@@ -18,7 +18,7 @@ from pydantic.v1 import BaseModel, Field
 from pypdf import PdfReader
 
 from gen.health.concepts.concept_args import ConceptArgs
-from gen.health.concepts.extraction.state import ConceptExtractionState
+from gen.health.concepts.extraction.concept_extraction_state import ConceptExtractionState
 from gen.health.concepts.extraction.undefined_concept import UndefinedConcept
 from gen.health.health_util import PromptGeneratorReturnType, PromptGeneratorType, complete_iterable_prompts
 

@@ -27,7 +27,7 @@ from gen.health.contradiction.contradiction_args import ContradictionsArgs
 from gen.health.contradiction.contradiction_prompts import CONFLICTING_IDS_TAG, CONTRADICTIONS_INSTRUCTIONS, \
     CONTRADICTIONS_TASK_PROMPT, CONTRADICTION_TAG, \
     EXPLANATION_TAG
-from gen.health.contradiction.contradiction_result import ContradictionsResult
+from gen.health.contradiction.contradiction_result import ContradictionResult
 from gen.tracing.context_finder import ContextFinder
 
 
@@ -40,7 +40,7 @@ class ContradictionsDetector:
         """
         self.args = args
 
-    def detect(self, query_ids: List[str]) -> List[ContradictionsResult]:
+    def detect(self, query_ids: List[str]) -> List[ContradictionResult]:
         """
         Determines whether a given artifact has any contradictions
         :param query_ids: The id of the artifact to detect contradictions for.
@@ -74,7 +74,7 @@ class ContradictionsDetector:
         self.args.dataset.trace_dataset.trace_df = self._add_traces_to_df(context_traces, self.args.dataset.trace_dataset.trace_df)
         return result
 
-    def _perform_detections(self, query_ids: List[str], id2context: Dict[str, List[EnumDict]]) -> List[ContradictionsResult]:
+    def _perform_detections(self, query_ids: List[str], id2context: Dict[str, List[EnumDict]]) -> List[ContradictionResult]:
         """
         Performs the detection by prompting the LLM with the given context.
         :param query_ids: The id of the artifact to perform detection on.
@@ -104,12 +104,12 @@ class ContradictionsDetector:
             query_prediction_output = query_prediction[task_prompt.args.prompt_id]
 
             for query_contradiction in query_prediction_output[CONTRADICTION_TAG]:
-                query_contradiction_result = ContradictionsResult(
+                query_contradiction_result = ContradictionResult(
                     explanation=query_contradiction[EXPLANATION_TAG][0],
                     conflicting_ids=query_contradiction[CONFLICTING_IDS_TAG][0]
                 )
                 self._filter_unknown_ids(query_contradiction_result, id2context[query_id])
-                query_contradiction_result["conflicting_ids"] += [query_id]
+                query_contradiction_result.conflicting_ids += [query_id]
                 results.append(query_contradiction_result)
 
         results = self._consolidate_results(results)
@@ -137,7 +137,7 @@ class ContradictionsDetector:
         return prompt, prompt_builder
 
     @staticmethod
-    def _consolidate_results(results: List[ContradictionsResult]) -> List[ContradictionsResult]:
+    def _consolidate_results(results: List[ContradictionResult]) -> List[ContradictionResult]:
         """
         Consolidate results by the artifact set they contradict with.
         :param results: List of contradictions found in set of artifacts.
@@ -145,7 +145,7 @@ class ContradictionsDetector:
         """
         result_group_table = {}
         for r in results:
-            contradicting_id_hash = "*".join(sorted(set(r["conflicting_ids"])))  # TODO: Use better delimiter, curr is just unlikely
+            contradicting_id_hash = "*".join(sorted(set(r.conflicting_ids)))  # TODO: Use better delimiter, curr is just unlikely
             DictUtil.initialize_value_if_not_in_dict(result_group_table, contradicting_id_hash, [])
             result_group_table[contradicting_id_hash].append(r)
 
@@ -153,7 +153,7 @@ class ContradictionsDetector:
         return final_results
 
     @staticmethod
-    def _filter_unknown_ids(result: ContradictionsResult, context_artifacts: List[EnumDict]) -> None:
+    def _filter_unknown_ids(result: ContradictionResult, context_artifacts: List[EnumDict]) -> None:
         """
         Removes any artifact ids from the conflicting ids if they are unknown.
         :param result: The result from the contradictions detection.
@@ -161,7 +161,7 @@ class ContradictionsDetector:
         :return: None.
         """
         expected_ids = {a[ArtifactKeys.ID] for a in context_artifacts}
-        result["conflicting_ids"] = [a_id.strip() for a_id in result["conflicting_ids"] if a_id.strip() in expected_ids]
+        result.conflicting_ids = [a_id.strip() for a_id in result.conflicting_ids if a_id.strip() in expected_ids]
 
     @staticmethod
     def _add_traces_to_df(selected_entries: List[Trace], trace_df: TraceDataFrame) -> TraceDataFrame:

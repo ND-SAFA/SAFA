@@ -13,6 +13,7 @@ from gen_common.llm.prompts.prompt_builder import PromptBuilder
 from gen_common.llm.response_managers.json_response_manager import JSONResponseManager
 from gen_common.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from gen_common.util.file_util import FileUtil
+from gen_common.util.llm_util import LLMUtil, PromptGeneratorReturnType, PromptGeneratorType
 from langchain.text_splitter import NLTKTextSplitter
 from pydantic.v1 import BaseModel, Field
 from pypdf import PdfReader
@@ -20,7 +21,6 @@ from pypdf import PdfReader
 from gen.health.concepts.concept_args import ConceptArgs
 from gen.health.concepts.extraction.concept_extraction_state import ConceptExtractionState
 from gen.health.concepts.extraction.undefined_concept import UndefinedConcept
-from gen.health.health_util import PromptGeneratorReturnType, PromptGeneratorType, complete_iterable_prompts
 
 
 class _DefineUndefinedConceptFormat(BaseModel):
@@ -58,7 +58,7 @@ class DefineUndefinedConceptsStep(AbstractPipelineStep):
             undefined_concepts=undefined_concepts,
             context_doc_content=context_doc_content
         )
-        predictions = complete_iterable_prompts(
+        predictions = LLMUtil.complete_iterable_prompts(
             items=undefined_concepts,
             prompt_generator=self._create_prompt_generator(
                 format_args=args.llm_manager.prompt_args,

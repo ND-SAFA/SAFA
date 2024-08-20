@@ -3,9 +3,9 @@ import os.path
 from gen_common.data.creators.prompt_dataset_creator import PromptDatasetCreator
 from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
 from gen_common.data.readers.structured_project_reader import StructuredProjectReader
-from gen_common.jobs.job_args import JobArgs
 
-from gen.health.concepts.matching.concept_matching_job import ConceptPredictionJob
+from gen.health.concepts.concept_args import ConceptArgs
+from gen.health.concepts.matching.concept_matching_pipeline import ConceptMatchingPipeline
 
 
 def main():
@@ -16,10 +16,8 @@ def main():
             should_generate_negative_links=False
         )
     )
-    job = ConceptPredictionJob(
-        job_args=JobArgs(
-            dataset_creator=prompt_dataset_creator
-        ),
+    args = ConceptArgs(
+        dataset_creator=prompt_dataset_creator,
         query_ids=[
             "FPS/GSFPS-1693",
             "FPS/GSFPS-2237",
@@ -28,8 +26,10 @@ def main():
             "FPS/GSFPS-2849"
         ]
     )
-    response = job.run()
-    print("Response:", response)
+    pipeline = ConceptMatchingPipeline(args)
+
+    pipeline.run()
+    print("Response:", pipeline.state)
 
 
 if __name__ == '__main__':

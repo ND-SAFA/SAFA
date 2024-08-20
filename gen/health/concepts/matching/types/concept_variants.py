@@ -10,7 +10,6 @@ class ConceptVariants:
         """
         Splits the concept id into its components: base_concept, alternative names, and stemmed base concept.
         :param concept_id: The id of the concept.
-        :param stemmer: The stemmer used to stem artifacts.
         """
         base_concept, *alt_names = extract_alternate_names([concept_id])[0]
         self.concept_id = concept_id

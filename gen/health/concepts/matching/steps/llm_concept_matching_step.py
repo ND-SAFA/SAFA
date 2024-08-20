@@ -14,36 +14,12 @@ from gen_common.llm.prompts.prompt_builder import PromptBuilder
 from gen_common.llm.response_managers.json_response_manager import JSONResponseManager
 from gen_common.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from gen_common.traceability.relationship_manager.embeddings_manager import EmbeddingsManager
-from pydantic.v1 import BaseModel, Field
+from gen_common.util.llm_util import LLMUtil, PromptGeneratorType
 
 from gen.health.concepts.concept_args import ConceptArgs
+from gen.health.concepts.matching.concept_matching_prompts import LLMConceptMatchingPromptFormat, LLM_CONCEPT_MATCHING_SYSTEM_PROMPT
 from gen.health.concepts.matching.concept_matching_state import ConceptMatchingState
 from gen.health.concepts.matching.types.concept_direct_match import ConceptDirectMatch
-from gen.health.health_util import PromptGeneratorType, complete_iterable_prompts
-
-# TODO : I don't like needing to pass around the triplet of (prompt, builder, artifact)
-
-system_prompt = (
-    "You will be given a list of project-specific concepts and terminology "
-    "alongside a specific target artifact from the project. "
-    "Your job is to note which artifact IDs are referenced in the target artifact text. "
-    "Only include predictions which have a direct reference to the concept/terminology in the target artifact text. "
-    "Only provide the IDs of the concepts / terminology that are referenced in the target artifact text. "
-    "Only provide the content specified in the format instructions."
-    "If no concept IDs are found to be referenced, use empty list for predictions."
-)
-
-
-class Prediction(BaseModel):
-    artifact_id: str = Field(description="The artifact ID of the concept referenced.")
-    explanation: str = Field(description="Explanation of where the target artifact references concept.")
-
-
-class _ExpectedResponse(BaseModel):
-    """
-    Response for making predictions for cited concepts in target artifact.
-    """
-    predictions: List[Prediction] = Field(description="List of referenced concepts in target artifact.")
 
 
 class LLMConceptMatchingStep(AbstractPipelineStep):
@@ -64,7 +40,7 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
         embeddings_manager = EmbeddingsManager(content_map, create_embeddings_on_init=True)
 
         artifact2match = LLMConceptMatchingStep._create_artifact2match(state.direct_matches)
-        prediction_output = complete_iterable_prompts(
+        prediction_output = LLMUtil.complete_iterable_prompts(
             items=args.get_query_artifacts(),
             prompt_generator=self._create_prompt_generator(
                 args,
@@ -75,8 +51,7 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
             llm_manager=args.llm_manager
         )
 
-        # Parse Responses
-        text2concept = text2concept = {c[ArtifactKeys.ID].lower(): c[ArtifactKeys.ID] for c in args.get_concept_artifacts()}
+        text2concept = {c[ArtifactKeys.ID].lower(): c[ArtifactKeys.ID] for c in args.get_concept_artifacts()}
         state.predicted_matches = self._parse_responses(prediction_output,
                                                         artifact2match,
                                                         text2concept)
@@ -103,7 +78,7 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
                     ArtifactPrompt("# Target Artifact\n"),
                     Prompt(
                         response_manager=JSONResponseManager.from_langgraph_model(
-                            _ExpectedResponse
+                            LLMConceptMatchingPromptFormat
                         ))
                 ],
             )
@@ -115,7 +90,7 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
                                                                           query_concepts,
                                                                           args.n_concepts_in_prompt)
             prompt = builder.build(llm_args, artifacts=query_concepts, artifact=query_artifact)
-            prompt[PromptKeys.SYSTEM] = system_prompt
+            prompt[PromptKeys.SYSTEM] = LLM_CONCEPT_MATCHING_SYSTEM_PROMPT
             return builder, prompt
 
         return generator

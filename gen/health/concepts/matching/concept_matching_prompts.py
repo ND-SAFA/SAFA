@@ -1,52 +1,28 @@
-from gen_common.constants.symbol_constants import EMPTY_STRING
-from gen_common.llm.prompts.prompt import Prompt
-from gen_common.llm.prompts.prompt_args import PromptArgs
-from gen_common.llm.response_managers.xml_response_manager import XMLResponseManager
+from typing import List
 
-from gen.constants.concept_pipeline_constants import ENTITY_NAME_TAG, ENTITY_TAG
+from pydantic.v1 import BaseModel, Field
 
-"""
-Entity Extraction
-"""
+LLM_CONCEPT_MATCHING_SYSTEM_PROMPT = (
+    "You will be given a list of project-specific concepts and terminology "
+    "alongside a specific target artifact from the project. "
+    "Your job is to note which artifact IDs are referenced in the target artifact text. "
+    "Only include predictions which have a direct reference to the concept/terminology in the target artifact text. "
+    "Only provide the IDs of the concepts / terminology that are referenced in the target artifact text. "
+    "Only provide the content specified in the format instructions."
+    "If no concept IDs are found to be referenced, use empty list for predictions."
+)
 
 
-def get_response_format():
+class LLMConceptMatchingPredictionFormat(BaseModel):
     """
-    Creates the example response format used in the prompt to the LLM.
-    :return: Example of how to format an extracted entity.
+    Prediction that a concept is contained within target artifact.
     """
-    return create_entity_extraction_response("ENTITY", prefix="Record each entity like so: \n")
+    artifact_id: str = Field(description="The artifact ID of the concept referenced.")
+    explanation: str = Field(description="Explanation of where the target artifact references concept.")
 
 
-def create_entity_extraction_response(name: str, prefix: str = EMPTY_STRING) -> str:
+class LLMConceptMatchingPromptFormat(BaseModel):
     """
-    :param name: The entity name.
-    :param prefix: Goes before the response tags.
-    :return: Expected response format for each entity found.
+    Response for making predictions for cited concepts in target artifact.
     """
-    return (
-        f"{prefix}"
-        f"<{ENTITY_TAG}>"
-        f"<{ENTITY_NAME_TAG}>{name}</{ENTITY_NAME_TAG}>"
-        f"</{ENTITY_TAG}>"
-    )
-
-
-ENTITY_EXTRACTION_PROMPT = Prompt("Above is an artifact from a software system. "
-                                  "Please extract the key project-specific entities used in the artifact. "
-                                  "Entities include project concepts, acronyms, and terminology "
-                                  "that would mostly likely need to be defined in a project glossary. "
-                                  ""
-                                  "If none exists, just say 'NA'",
-                                  prompt_args=PromptArgs(title="Task\n"),
-                                  response_manager=XMLResponseManager(
-                                      response_tag={ENTITY_TAG: [ENTITY_NAME_TAG, ENTITY_NAME_TAG]},
-                                      response_instructions_format=get_response_format()))
-
-"""
-Entity Matching
----
-*Note, prompts objects cannot live here because many are created per artifact.*
-"""
-ENTITY_MATCHING_INSTRUCTIONS = "List the artifacts that are cited in the text below. If none exists, just say 'NA'."
-ENTITY_MATCHING_RESPONSE_FORMAT = "Record each referenced entity like so {}."
+    predictions: List[LLMConceptMatchingPredictionFormat] = Field(description="List of referenced concepts in target artifact.")

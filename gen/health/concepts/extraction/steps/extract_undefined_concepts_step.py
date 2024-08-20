@@ -11,21 +11,14 @@ from gen_common.llm.prompts.prompt import Prompt
 from gen_common.llm.prompts.prompt_builder import PromptBuilder
 from gen_common.llm.response_managers.json_response_manager import JSONResponseManager
 from gen_common.pipeline.abstract_pipeline_step import AbstractPipelineStep
-from pydantic.v1 import BaseModel, Field
+from gen_common.util.llm_util import LLMUtil, PromptGeneratorReturnType, PromptGeneratorType
 
 from gen.health.concepts.concept_args import ConceptArgs
-from gen.health.concepts.extraction.concept_extraction_prompt import UNDEFINED_ENTITY_EXTRACTION_PROMPT
+from gen.health.concepts.extraction.concept_extraction_prompt import UNDEFINED_ENTITY_EXTRACTION_PROMPT, \
+    UndefinedEntityExtractionPromptFormat
 from gen.health.concepts.extraction.concept_extraction_state import ConceptExtractionState
 from gen.health.concepts.matching.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from gen.health.concepts.matching.types.concept_variants import ConceptVariants
-from gen.health.health_util import PromptGeneratorReturnType, PromptGeneratorType, complete_iterable_prompts
-
-
-class _ExtractUndefinedConceptsFormat(BaseModel):
-    """
-    The expected format for undefined concepts found within an artifact.
-    """
-    undefined_concepts: List[str] = Field(description="List of undefined concept in artifacts.")
 
 
 class ExtractUndefinedConceptsStep(AbstractPipelineStep):
@@ -36,7 +29,7 @@ class ExtractUndefinedConceptsStep(AbstractPipelineStep):
         :param state: State used to store identified undefined concepts.
         :return: None
         """
-        predictions = complete_iterable_prompts(
+        predictions = LLMUtil.complete_iterable_prompts(
             items=args.get_query_artifacts(),
             prompt_generator=self._create_prompt_generator(
                 args.llm_manager.prompt_args,
@@ -70,7 +63,7 @@ class ExtractUndefinedConceptsStep(AbstractPipelineStep):
                 ArtifactPrompt("# Target Artifact"),
                 Prompt(
                     response_manager=JSONResponseManager.from_langgraph_model(
-                        _ExtractUndefinedConceptsFormat
+                        UndefinedEntityExtractionPromptFormat
                     ))
             ])
 

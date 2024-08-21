@@ -19,6 +19,12 @@ class LLMUtil:
     def complete_iterable_prompts(items: Iterable[ItemType],
                                   prompt_generator: Callable[[Artifact], Tuple[PromptBuilder, EnumDict]],
                                   llm_manager: AbstractLLMManager) -> List[Tuple[ItemType, Dict]]:
+        """
+        Builds and completes prompts for some iterable.
+        :param items: The items to iterate over and create prompts for.
+        :param prompt_generator: Callable function that creates prompt per item.
+        :param llm_manager: The LLM manager used to complete the prompts.
+        """
         prompts: List[EnumDict] = []
         builders: List[PromptBuilder] = []
         for a in items:

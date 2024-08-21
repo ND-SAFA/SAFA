@@ -50,6 +50,7 @@ def _wait_until_online(state: MultiThreadState, timeout: float, sleep_time: floa
 def _is_anthropic_online(state: MultiThreadState) -> bool:
     """
     Tests whether anthropic is currently experiencing an overloaded error.
+    :param state: Synchronizing state between all threads.
     :return: Whether anthropic is currently online.
     """
     try:

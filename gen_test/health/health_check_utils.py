@@ -16,7 +16,7 @@ from gen.health.contradiction.contradiction_result import ContradictionResult
 from gen.health.health_results import HealthResults
 from gen_test.health.concepts.extraction.concept_extraction_test_constants import TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT
 from gen_test.health.health_check_constants import ARTIFACT_CONTENT, ARTIFACT_IDS, EXPECTED_CONFLICTING_IDS, \
-    EXPECTED_CONTEXT_IDS, EXPECTED_CONTRADICTION_EXPLANATION, EXPECTED_RELATED_ARTIFACTS, QUERY, QUERY_ID
+    EXPECTED_CONTEXT_IDS, EXPECTED_CONTRADICTION_EXPLANATION, QUERY, QUERY_ID
 
 
 def assert_correct_related_artifacts(test_case: BaseTest, related_ids: List[str]):
@@ -40,7 +40,6 @@ def assert_health_check_success(tc: BaseTest, result: HealthResults):
     contradiction: ContradictionResult = result.contradictions[0]
     tc.assertListEqual(contradiction.conflicting_ids, EXPECTED_CONFLICTING_IDS + [QUERY_ID])
     tc.assertEqual(contradiction.explanation, EXPECTED_CONTRADICTION_EXPLANATION)
-    assert_correct_related_traces(tc, result.context_traces, EXPECTED_RELATED_ARTIFACTS, QUERY_ID)
 
     concept_matches = result.undefined_concepts
     tc.assertEqual(1, len(concept_matches))

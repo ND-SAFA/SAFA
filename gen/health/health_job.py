@@ -1,7 +1,6 @@
 import random
 from typing import List, Union
 
-from gen_common.data.keys.structure_keys import TraceKeys, TraceRelationshipType
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.jobs.abstract_job import AbstractJob
 from gen_common.jobs.job_args import JobArgs
@@ -50,12 +49,8 @@ class HealthCheckJob(AbstractJob):
         """
         dataset: PromptDataset = self.job_args.dataset
         contradictions_result = self._run_contradictions_detector()
-        related_traces = dataset.trace_dataset.trace_df.get_relationships(artifact_ids=self.query_ids,
-                                                                          artifact_key=TraceKeys.child_label())
-        context_traces = [trace for trace in related_traces if trace[TraceKeys.RELATIONSHIP_TYPE] == TraceRelationshipType.CONTEXT]
         undefined_entities = self._run_find_missing_concepts(dataset, query_ids=self.query_ids, concept_layer_id=self.concept_layer_id)
-        results = HealthResults(context_traces=context_traces,
-                                contradictions=contradictions_result,
+        results = HealthResults(contradictions=contradictions_result,
                                 undefined_concepts=undefined_entities)
         return results
 

@@ -10,6 +10,8 @@ from gen_common.util.prompt_util import PromptUtil
 from gen.health.types.common_choices import CommonChoices
 from gen.health.types.requirement import RequirementConstituent
 
+CONTRADICTIONS_QUESTION = ("Does the following artifact ({}) "
+                           "contain any content that is inconsistent or conflicting with any others?")
 CONSTITUENT2TAG = {RequirementConstituent.CONDITION: RequirementConstituent.CONDITION.value,
                    RequirementConstituent.EFFECT: RequirementConstituent.EFFECT.value,
                    RequirementConstituent.VARIABLE: {RequirementConstituent.CONDITION: f"{RequirementConstituent.CONDITION.value}-"

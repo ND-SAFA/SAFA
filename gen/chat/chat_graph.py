@@ -1,12 +1,15 @@
 from typing import Dict, Optional
 
 from gen_common.constants.cli_constants import EXIT_COMMAND
+from gen_common.graph.branches.paths.path import Path
+from gen_common.graph.branches.paths.path_selector import PathSelector
 from gen_common.graph.branches.supported_branches import SupportedBranches
 from gen_common.graph.edge import Edge
 from gen_common.graph.graph_definition import GraphDefinition
 from gen_common.graph.graph_runner import GraphRunner
 from gen_common.graph.io.graph_args import GraphArgs
 from gen_common.graph.io.graph_state import GraphState
+from gen_common.graph.io.graph_state_vars import GraphStateVars
 from gen_common.graph.llm_tools.tool_models import RequestAssistance
 from gen_common.graph.nodes.generate_node import AnswerUser
 from gen_common.graph.nodes.supported_nodes import SupportedNodes
@@ -25,7 +28,19 @@ class ChatGraph:
             Edge(SupportedNodes.CONTINUE, SupportedNodes.END_COMMAND),
             Edge(SupportedNodes.RETRIEVE, SupportedNodes.GENERATE),
             Edge(SupportedNodes.EXPLORE_NEIGHBORS, SupportedNodes.GENERATE)],
-        state_type=GraphState)
+        state_type=GraphState,
+        output_converter=PathSelector(
+            Path(condition=GraphStateVars.GENERATION.exists(),
+                 action=lambda state: AnswerUser(answer=GraphStateVars.GENERATION.get_value(state),
+                                                 reference_ids=GraphStateVars.REFERENCE_IDS.get_value(
+                                                     state))),
+            Path(condition=GraphStateVars.RELEVANT_INFORMATION.exists(),
+                 action=lambda state: RequestAssistance(
+                     relevant_information_learned=GraphStateVars.RELEVANT_INFORMATION.get_value(state),
+                     related_doc_ids=GraphStateVars.RELATED_DOC_IDS.get_value(state))),
+            Path(action=None)
+        )
+    )
 
     @staticmethod
     def get_runner() -> GraphRunner:

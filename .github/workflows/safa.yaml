@@ -33,8 +33,8 @@ jobs:
         pip install git+https://${{ secrets.TGEN_TOKEN }}@github.com/ND-SAFA/python-package-manager.git@${{ env.PYTHON_PACKAGE_MANAGER_COMMIT }}
       env:
         PIP_EXTRA_INDEX_URL: "https://${{ secrets.TGEN_TOKEN }}:x-oauth-basic@github.com"
-        GEN_COMMON_RESOURCES_COMMIT: 35f1844f0a6cdd89361f886e0894dfacd19f0184
-        PYTHON_PACKAGE_MANAGER_COMMIT: 1b05f33e809ae55033c54a90a2ad6fb71c12e8e7
+        GEN_COMMON_RESOURCES_COMMIT: 19b54fdab66699a5d2e9aad8c4c215344e486e58
+        PYTHON_PACKAGE_MANAGER_COMMIT: 8d657746c7b8d70cc366f97b7e52e79ef766a6d7
 
     - name: Download Static
       run: |

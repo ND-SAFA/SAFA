@@ -1,7 +1,11 @@
 import nltk
 
 
-def main():
+def main() -> None:
+    """
+    Downloads nltk static files.
+    :return: None
+    """
     nltk.download('stopwords', quiet=True)
     nltk.download('wordnet', quiet=True)
     nltk.download('omw-1.4', quiet=True)

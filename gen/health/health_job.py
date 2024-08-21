@@ -71,6 +71,9 @@ class HealthCheckJob(AbstractJob):
     def _run_find_missing_concepts(dataset: PromptDataset, query_ids: List[str], concept_layer_id: str) -> List[UndefinedConcept]:
         """
         Finds any concepts missing in query ids.
+        :param dataset: Dataset containing artifacts to extract concepts from.
+        :param query_ids: Artifact Ids of artifacts to extract concepts from.
+        :param concept_layer_id: Artifact type associated with concepts.
         :return: List of undefined concepts across query ids.
         """
         args = ConceptArgs(

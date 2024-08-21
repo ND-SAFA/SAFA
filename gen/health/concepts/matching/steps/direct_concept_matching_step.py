@@ -75,6 +75,12 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
 
     @staticmethod
     def find_concept_usages(content: str, concept_variants: ConceptVariants) -> Tuple[int, int]:
+        """
+        Finds usage of concept (or variants) in content.
+        :param content: The content to search within.
+        :param concept_variants: The concept (and variants) to search for.
+        :return: Start and end location of match if found, otherwise None for start and end loc.
+        """
         return DirectConceptMatchingStep._find_match_locations(
             content,
             concept_variants.base_concept, concept_variants.stemmed, *concept_variants.alt_names

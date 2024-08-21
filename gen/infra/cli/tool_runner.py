@@ -3,15 +3,14 @@ import sys
 from typing import Callable, Dict, List
 
 from dotenv import load_dotenv
+from gen_common.infra.cli.inquirer_selector import inquirer_selection
 
 load_dotenv()
 root_path = os.path.expanduser(os.environ["ROOT_PATH"])
 sys.path.append(root_path)
 
-from gen.infra.cli.tools.find_missing_docs import print_complex_functions, print_missing_headers
 from gen.infra.cli.tools.rq_tools import RQ_TOOLS
 from gen.infra.cli.toolset.tool import Tool
-from gen_common.tools.cli.inquirer_selector import inquirer_selection
 from gen.infra.cli.toolset.tool_set import ToolSet
 from gen.infra.cli.tools.s3_tools import S3_TOOLS
 
@@ -53,8 +52,7 @@ def tool_runner_loop(tool_set_map: Dict[str, List[Callable]], default_tool_set_n
 
 TOOLS = {
     "Run RQ": RQ_TOOLS,
-    "Data": S3_TOOLS,
-    "Dev-Ops": [print_missing_headers, print_complex_functions]
+    "Data": S3_TOOLS
 }
 
 if __name__ == "__main__":

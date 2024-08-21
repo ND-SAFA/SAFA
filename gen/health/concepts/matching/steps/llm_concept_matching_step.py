@@ -71,7 +71,12 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
         :return: PromptGenerator .
         """
 
-        def generator(query_artifact: Artifact):
+        def generator(artifact: Artifact):
+            """
+            Generates prompt concept matching prompt for artifact.
+            :param artifact: The artifact to create trace predictions to concepts.
+            :return: Builder and prompt.
+            """
             builder = PromptBuilder(
                 prompts=[
                     MultiArtifactPrompt("Project Concepts and Terminology", build_method=MultiArtifactPrompt.BuildMethod.XML),
@@ -83,13 +88,13 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
                 ],
             )
 
-            query_existing_concepts = artifact2previous_matches[query_artifact[ArtifactKeys.ID]]
+            query_existing_concepts = artifact2previous_matches[artifact[ArtifactKeys.ID]]
             query_concepts = [c for c in args.get_concept_artifacts() if c[ArtifactKeys.ID] not in query_existing_concepts]
             query_concepts = LLMConceptMatchingStep._get_similar_concepts(embeddings_manager,
-                                                                          query_artifact,
+                                                                          artifact,
                                                                           query_concepts,
                                                                           args.n_concepts_in_prompt)
-            prompt = builder.build(llm_args, artifacts=query_concepts, artifact=query_artifact)
+            prompt = builder.build(llm_args, artifacts=query_concepts, artifact=artifact)
             prompt[PromptKeys.SYSTEM] = LLM_CONCEPT_MATCHING_SYSTEM_PROMPT
             return builder, prompt
 

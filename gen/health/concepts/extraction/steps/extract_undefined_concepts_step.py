@@ -47,6 +47,9 @@ class ExtractUndefinedConceptsStep(AbstractPipelineStep):
                                  trace_df: TraceDataFrame) -> PromptGeneratorType:
         """
         Creates prompt generator for extracting undefined concepts in query artifacts.
+        :param llm_format_args: The LLM provider format arguments.
+        :param concept_artifacts: List of artifacts representing concepts in project.
+        :param trace_df: Trace data frame containing project trace links.
         :return: Prompt generator.
         """
 

@@ -75,7 +75,19 @@ class DefineUndefinedConceptsStep(AbstractPipelineStep):
     @staticmethod
     def _create_prompt_generator(format_args: LLMPromptBuildArgs,
                                  artifact2context: Dict[str, List[Artifact]]) -> PromptGeneratorType:
+        """
+        Creates a prompt generator for defining undefined concepts.
+        :param format_args: LLM provider format arguments.
+        :param artifact2context: Mapping of artifact id to list of related artifacts to use in context.
+        :return: PromptGenerator callable.
+        """
+
         def generator(undefined_concept: UndefinedConcept) -> PromptGeneratorReturnType:
+            """
+            Generates prompt for an undefined concept.
+            :param undefined_concept: The undefined whose prompt is created for.
+            :return: Prompt builder and built prompt for undefined concept.
+            """
             builder = PromptBuilder(prompts=[
                 ContextPrompt(artifact2context, prompt_args=PromptArgs(system_prompt=False)),
                 Prompt(f"# Undefined Concept\n{undefined_concept.concept_id}"),
@@ -94,6 +106,11 @@ class DefineUndefinedConceptsStep(AbstractPipelineStep):
 
     @staticmethod
     def create_undefined2artifacts(artifact2undefined: Dict[str, List[str]]):
+        """
+        Reverses mapping of artifact to undefined concepts to undefined concepts to related artifacts.
+        :param artifact2undefined: Map of artifacts to undefined concepts within each.
+        :return: Map of undefined concepts to artifacts referencing them.
+        """
         undefined2artifact = defaultdict(list)
         for a_id, undefined in artifact2undefined.items():
             for u_id in undefined:
@@ -106,9 +123,9 @@ class DefineUndefinedConceptsStep(AbstractPipelineStep):
                                        context_doc_content: str = None) -> Dict[str, List[Artifact]]:
         """
         Identifies relevant context for each undefined entity.
+        :param args: Concept arguments containing artifacts referencing undefined concepts.
+        :param undefined_concepts: List of undefined concepts.
         :param context_doc_content: The content from the context document.
-        :param artifacts: Contains all project artifacts.
-        :param undefined_entities: List of undefined concepts.
         :return: Mapping of entity id to related artifacts for context and a list of corresponding undefined entity as artifacts.
         """
         id2artifacts = {a[ArtifactKeys.ID]: a for a in args.get_query_artifacts()}

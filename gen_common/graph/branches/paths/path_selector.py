@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Tuple, Callable, Awaitable, List, Dict, Any, Mapping
+from typing import Any, Awaitable, Callable, Dict, List, Mapping, Tuple
 
 from langchain_core.runnables.base import Runnable, RunnableLike
 from langchain_core.runnables.branch import RunnableBranch
@@ -7,6 +7,7 @@ from langchain_core.runnables.utils import Input
 
 from gen_common.graph.branches.conditions.return_value_runnable import ReturnValueRunnable
 from gen_common.graph.branches.paths.path import Path
+from gen_common.util.langchain_util import LangchainUtil
 
 LangchainBranchType = Tuple[
     Runnable[Input, bool] |
@@ -27,13 +28,22 @@ class PathSelector:
         paths = self._convert_branches_to_langchain_type(paths)
         self.branch = RunnableBranch(*paths)
 
-    def select(self, state: Dict) -> Any:
+    def __call__(self, state: Dict, **kwargs) -> Any:
         """
         Selects a node to visit next based on the state.
         :param state: The current state.
         :return: The name of the next node to visit.
         """
-        return self.branch.invoke(state)
+        return self.select(state)
+
+    def select(self, state: Dict, run_async: bool = False) -> Any:
+        """
+        Selects a node to visit next based on the state.
+        :param state: The current state.
+        :param run_async: If True, runs in async mode else synchronously.
+        :return: The name of the next node to visit.
+        """
+        return LangchainUtil.optionally_run_async(self.branch, run_async, state)
 
     @staticmethod
     def _convert_branches_to_langchain_type(branches: Tuple[Path]) -> List[LangchainBranchType]:

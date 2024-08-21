@@ -1,4 +1,4 @@
-from typing import TypedDict, List, Dict, Set, Tuple
+from typing import Dict, List, Set, Tuple, TypedDict
 
 from langchain_core.documents.base import Document
 
@@ -31,6 +31,10 @@ class GraphState(TypedDict, total=False):
 
     # tools
     tools_already_used: List[str]
+
+    # settings
+    run_async: bool
+    thread_id: str
 
 
 def has_state_value(state: GraphState, var_name: str) -> bool:

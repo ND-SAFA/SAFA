@@ -1,4 +1,8 @@
-from unittest import TestCase
+from unittest.mock import MagicMock
+
+import httpx
+from anthropic._exceptions import InternalServerError
+from langgraph.constants import START
 
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.dataframes.layer_dataframe import LayerDataFrame
@@ -7,20 +11,27 @@ from gen_common.data.keys.structure_keys import LayerKeys, TraceKeys
 from gen_common.data.objects.artifact import Artifact
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
+from gen_common.graph.branches.paths.path import Path
+from gen_common.graph.branches.paths.path_selector import PathSelector
 from gen_common.graph.branches.supported_branches import SupportedBranches
 from gen_common.graph.edge import Edge
 from gen_common.graph.graph_definition import GraphDefinition
 from gen_common.graph.graph_runner import GraphRunner
 from gen_common.graph.io.graph_args import GraphArgs
 from gen_common.graph.io.graph_state import GraphState
+from gen_common.graph.io.graph_state_vars import GraphStateVars
 from gen_common.graph.llm_tools.tool_models import ExploreArtifactNeighborhood, RequestAssistance, RetrieveAdditionalInformation
 from gen_common.graph.nodes.generate_node import AnswerUser, GenerateNode
 from gen_common.graph.nodes.supported_nodes import SupportedNodes
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.decorators.chat import mock_chat_model
 from gen_common_test.base.mock.langchain.test_chat_model import TestResponseManager
+from gen_common_test.base.mock.test_ai_manager import TestAIManager
+from gen_common_test.base.tests.base_test import BaseTest
+from gen_common_test.models.test_anthropic_overloaded_handler import MOCK_ANTHROPIC_OVERLOADED_RESPONSE
 
 
-class TestGraphRunner(TestCase):
+class TestGraphRunner(BaseTest):
     CONCEPT_LAYER_ID = "concepts"
     PET_LAYER_ID = "pets"
     FACTS_LAYER_ID = "facts"
@@ -55,21 +66,58 @@ class TestGraphRunner(TestCase):
         self.assertEqual(answer_obj.answer, self.ANSWER)
         self.assertListEqual(answer_obj.reference_ids, self.REFERENCE_IDS)
 
-        generate_node = SupportedNodes.GENERATE.name
-        retrieve_node = SupportedNodes.RETRIEVE.name
-        explore_node = SupportedNodes.EXPLORE_NEIGHBORS.name
-        continue_node = SupportedNodes.CONTINUE.name
-        self.assertListEqual(runner.get_nodes_visited_on_last_run(),
-                             [generate_node, retrieve_node, generate_node, explore_node,
-                              generate_node, explore_node, generate_node,
-                              generate_node, continue_node])
-        self.assertEqual(runner.get_states_from_last_run()[-1]['generation'], self.ANSWER)
+        self.assert_state_history(runner)
         runner.clear_run_history()
         self.assertIsNone(runner.get_nodes_visited_on_last_run())
         self.assertIsNone(runner.get_states_from_last_run())
 
+    @mock_anthropic
     @mock_chat_model
-    def test_with_request_assistance(self, response_manager: TestResponseManager):
+    def test_run_multi(self, response_manager: TestResponseManager, anthropicResponseManager: TestAIManager):
+        first_res = RetrieveAdditionalInformation(retrieval_query="best pet")
+        second_res = ExploreArtifactNeighborhood(artifact_ids=1, artifact_types="pets")
+        third_res = ExploreArtifactNeighborhood(artifact_ids=[2, 4])
+        repeat_res = RetrieveAdditionalInformation(retrieval_query="best pet")
+        final_res = GenerateNode(self.get_args()).get_agent().create_response_obj([self.ANSWER, self.REFERENCE_IDS])
+        request_assistance = RequestAssistance()
+        internal_server_error = InternalServerError(message="This is the message",
+                                                    response=httpx.Response(
+                                                        status_code=529,
+                                                        json=MOCK_ANTHROPIC_OVERLOADED_RESPONSE,
+                                                        request=MagicMock(spec=httpx.Request)
+                                                    ),
+                                                    body=MOCK_ANTHROPIC_OVERLOADED_RESPONSE)
+        responses = {"1": [first_res, second_res, third_res, repeat_res, final_res], "2": [request_assistance], "3": ["I dont know."],
+                     "4": [Exception], "5": [internal_server_error, final_res]}
+        response_manager.set_responses(responses)
+        anthropicResponseManager.set_responses(["I'm alive!"])  # for overloaded check
+
+        questions = [self.QUESTION, "This is a really hard question?", "What is the meaning of life?", "failure", "rate limited"]
+        runner = GraphRunner(self.get_definition())
+        args = self.get_args()
+        args.user_question = None
+        outputs = runner.run_multi(args, user_question=questions, thread_ids=list(responses.keys()))
+        answer_obj = outputs[0]
+        self.assertEqual(answer_obj.answer, self.ANSWER)
+        self.assertListEqual(answer_obj.reference_ids, self.REFERENCE_IDS)
+
+        assistance_obj = outputs[1]
+        self.assertEqual(assistance_obj.relevant_information_learned, request_assistance.relevant_information_learned)
+
+        bad_response = outputs[2]
+        self.assertIsNone(bad_response)
+
+        bad_response = outputs[3]
+        self.assertIsNone(bad_response)
+
+        second_attempt_answer = outputs[4]
+        self.assertEqual(second_attempt_answer.answer, self.ANSWER)
+        self.assertListEqual(second_attempt_answer.reference_ids, self.REFERENCE_IDS)
+
+        self.assert_state_history(runner)
+
+    @mock_chat_model
+    def test_with_failure(self, response_manager: TestResponseManager):
         first_res = RetrieveAdditionalInformation(retrieval_query="best pet")
         second_res = ExploreArtifactNeighborhood(artifact_ids=1, artifact_types="pets")
         response_manager.set_responses([first_res, second_res, first_res, second_res, "I dont know"])
@@ -77,7 +125,7 @@ class TestGraphRunner(TestCase):
         self.assertIsNone(answer_obj)
 
     @mock_chat_model
-    def test_with_failure(self, response_manager: TestResponseManager):
+    def test_with_request_assistance(self, response_manager: TestResponseManager):
         first_res = RetrieveAdditionalInformation(retrieval_query="best pet")
         final_res = RequestAssistance()
         response_manager.set_responses([first_res, final_res])
@@ -85,6 +133,17 @@ class TestGraphRunner(TestCase):
         self.assertIsInstance(answer_obj, RequestAssistance)
         self.assertEqual(answer_obj.relevant_information_learned, final_res.relevant_information_learned)
         self.assertEqual(answer_obj.related_doc_ids, final_res.related_doc_ids)
+
+    def assert_state_history(self, runner: GraphRunner, run_num: int = 0):
+        generate_node = SupportedNodes.GENERATE.name
+        retrieve_node = SupportedNodes.RETRIEVE.name
+        explore_node = SupportedNodes.EXPLORE_NEIGHBORS.name
+        continue_node = SupportedNodes.CONTINUE.name
+        self.assertListEqual(runner.nodes_visited_on_runs[run_num],
+                             [START, generate_node, retrieve_node, generate_node, explore_node,
+                              generate_node, explore_node, generate_node,
+                              generate_node, continue_node])
+        self.assertEqual(runner.states_for_runs[run_num][-1]['generation'], self.ANSWER)
 
     def run_chat_test(self, response_manager: TestResponseManager):
         args = self.get_args()
@@ -105,7 +164,20 @@ class TestGraphRunner(TestCase):
                 Edge(SupportedNodes.CONTINUE, SupportedNodes.END_COMMAND),
                 Edge(SupportedNodes.RETRIEVE, SupportedNodes.GENERATE),
                 Edge(SupportedNodes.EXPLORE_NEIGHBORS, SupportedNodes.GENERATE)],
-            state_type=GraphState)
+            state_type=GraphState,
+            output_converter=self.converter())
+
+    def converter(self):
+        paths = [Path(condition=GraphStateVars.GENERATION.exists(),
+                      action=lambda state: AnswerUser(answer=GraphStateVars.GENERATION.get_value(state),
+                                                      reference_ids=GraphStateVars.REFERENCE_IDS.get_value(state))),
+                 Path(condition=GraphStateVars.RELEVANT_INFORMATION.exists(),
+                      action=lambda state: RequestAssistance(
+                          relevant_information_learned=GraphStateVars.RELEVANT_INFORMATION.get_value(state),
+                          related_doc_ids=GraphStateVars.RELATED_DOC_IDS.get_value(state))),
+                 Path(action=None)
+                 ]
+        return PathSelector(*paths)
 
     def construct_dataset(self):
         trace_df = TraceDataFrame([{TraceKeys.child_label(): str(child), TraceKeys.parent_label(): str(parent), TraceKeys.LABEL: 1}

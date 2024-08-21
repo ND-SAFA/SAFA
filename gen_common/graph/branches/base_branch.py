@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 from gen_common.graph.branches.paths.path_choices import PathChoices
 from gen_common.graph.branches.paths.path_selector import PathSelector
@@ -10,10 +10,11 @@ from gen_common.graph.nodes.supported_nodes import SupportedNodes
 class BaseBranch(AbstractNode, ABC):
     BASE_NAME = "Branch"
 
-    def perform_action(self, state: Dict) -> Any:
+    def perform_action(self, state: Dict, run_async: bool = False) -> Any:
         """
         Chooses what node to go to next based on the current state.
         :param state: The current state of the graph.
+        :param run_async: If true, runs in async mode, otherwise runs sync.
         :return: The name of the next node to visit.
         """
         return self.choose_path(state)

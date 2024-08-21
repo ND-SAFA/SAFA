@@ -1,6 +1,7 @@
-from dataclasses import dataclass
-from typing import List, Type
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Type
 
+from gen_common.graph.branches.paths.path_selector import PathSelector
 from gen_common.graph.edge import Edge
 from gen_common.graph.io.graph_state import GraphState
 from gen_common.graph.nodes.supported_nodes import SupportedNodes
@@ -12,6 +13,8 @@ class GraphDefinition:
     edges: List[Edge]
     state_type: Type[GraphState]
     root: SupportedNodes = None
+    node_args: Dict = field(default_factory=dict)
+    output_converter: Callable[[GraphState], Any] | PathSelector = None
 
     def __post_init__(self):
         """

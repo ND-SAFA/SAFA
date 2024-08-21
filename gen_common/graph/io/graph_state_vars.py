@@ -1,9 +1,9 @@
 from typing import Type
 
-from gen_common.graph.io.state_var import StateVar
 from gen_common.graph.io.graph_state import GraphState
+from gen_common.graph.io.state_to_prompt_converters import ContextPromptConverter, DocumentPromptConverter
+from gen_common.graph.io.state_var import StateVar
 from gen_common.graph.io.state_var_prompt_config import StateVarPromptConfig
-from gen_common.graph.io.state_to_prompt_converters import DocumentPromptConverter, ContextPromptConverter
 
 
 class GraphStateVars:
@@ -20,6 +20,8 @@ class GraphStateVars:
     TOOLS_ALREADY_USED = StateVar("tools_already_used")
     RELEVANT_INFORMATION = StateVar("relevant_information_learned")
     RELATED_DOC_IDS = StateVar("related_doc_ids")
+    RUN_ASYNC = StateVar("run_async")
+    THREAD_ID = StateVar("thread_id")
 
     @classmethod
     def validate(cls, state_cls: Type[GraphState] = GraphState) -> None:

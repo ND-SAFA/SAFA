@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-from typing import Optional, Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.data.exporters.serializable_exporter import SerializableExporter
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.graph.io.graph_state import GraphState
-from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.pipeline.args import Args
 from gen_common.util.dict_util import DictUtil
 from gen_common.util.pythonisms_util import default_mutable_type
@@ -19,7 +19,7 @@ converters = {PromptDataset: UnknownParamsLambda(lambda val: SerializableExporte
 class GraphArgs(Args):
     user_question: str = EMPTY_STRING
     chat_history: List[Tuple[str, str]] = None
-    artifacts_referenced_in_question: List[str] = None
+    artifacts_referenced_in_question: List[str] | str = None
     context_filepath: Optional[str] = None
     artifact_types: List[str] = field(init=False, default_factory=list)
 
@@ -30,7 +30,8 @@ class GraphArgs(Args):
         """
         super().__post_init__()
         self.artifact_types = self.dataset.artifact_df.get_artifact_types()
-        self.dataset.artifact_df.to_artifacts()
+        if isinstance(self.artifacts_referenced_in_question, str):
+            self.artifacts_referenced_in_question = [self.artifacts_referenced_in_question]
 
     def to_graph_input(self, state_class: GraphState = GraphState, **default_vars) -> Dict:
         """

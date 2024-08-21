@@ -6,7 +6,7 @@ from tqdm import tqdm
 from gen_common.constants.logging_constants import TQDM_NCOLS
 from gen_common.constants.threading_constants import THREAD_SLEEP
 from gen_common.infra.t_logging.logger_manager import logger
-from gen_common.infra.t_threading.rate_limited_queue import RateLimitedQueue
+from gen_common.infra.t_threading.rate_limited_queue import ItemType, RateLimitedQueue
 
 ExceptionHandler = Callable[["MultiThreadState", Exception], bool]
 
@@ -23,6 +23,7 @@ class MultiThreadState:
         :param max_attempts: The maximum number of retries after exception is thrown.
         :param sleep_time: The time to sleep after an exception has been thrown.
         :param rpm: Maximum rate of items per minute.
+        :param exception_handlers: Can be used to perform special logic when certain exceptions are thrown.
         """
         self.title = title
         self.iterable = list(enumerate(iterable))
@@ -39,6 +40,14 @@ class MultiThreadState:
         self.exception_handlers = exception_handlers if exception_handlers else []
         self._init_retries(retries)
         self._init_progress_bar()
+
+    def add_work(self, item: ItemType) -> None:
+        """
+        Adds work to the queue.
+        :param item: Item to add.
+        :return: None.
+        """
+        self.item_queue.put(item)
 
     def get_work(self) -> Any:
         """
@@ -79,52 +88,51 @@ class MultiThreadState:
             assert index is not None, "Expected index to be provided when collect results is activated."
             if result:
                 self.result_list[index] = result
-        self.progress_bar.update()
+        if self.progress_bar is not None:
+            self.progress_bar.update()
 
-    def on_exception(self, e: Exception, attempts: int = None, index: int = None):
+    def on_exception(self, e: Exception, attempts: int = None, index: int = None) -> bool:
         """
         Handles exception happening in child thread.
         :param e: The exception occurring.
         :param attempts: The number of attempts the child has attempted.
         :param index: The child index (also a unique identifier).
-        :return: None
+        :return: Whether the exception was handled or not.
         """
         self.item_queue.pause()
         for exception_handler in self.exception_handlers:
             is_handled = exception_handler(self, e, sleep_time=self.sleep_time)
             if is_handled:
                 self.item_queue.unpause()
-                return
+                return True
 
-        if attempts and self.below_attempt_threshold(attempts):
+        if attempts is not None and self.below_attempt_threshold(attempts):
             logger.exception(e)
             logger.info(f"Request failed, retrying in {self.sleep_time} seconds.")
             time.sleep(self.sleep_time)
         else:
             self.successful = False
             self.exception = e
-            if not index:
-                self.item_queue.unpause()
-                return
-            self.failed_responses.add(index)
-            if self.collect_results:
-                self.result_list[index] = e
+            if index:
+                self._record_failure(e, index)
         self.item_queue.unpause()
+        return False
 
     def add_time(self, seconds: float) -> None:
         """
         Increases the interval to wait between items in queue.
+        :param seconds: Number of seconds to increase the interval by.
         :return: None
         """
         self.item_queue.change_time_per_request(seconds)
-        logger.info(f"Reduced time-between-requests to {self.item_queue.time_between_requests} seconds.")
+        logger.info(f"Increased time-between-requests to {self.item_queue.time_between_requests} seconds.")
 
     def _init_progress_bar(self) -> None:
         """
         Initializes the progress bar for the job.
         :return: None
         """
-        self.progress_bar = tqdm(total=len(self.item_queue), desc=self.title, ncols=TQDM_NCOLS)
+        self.progress_bar = tqdm(total=len(self.item_queue), desc=self.title, ncols=TQDM_NCOLS) if len(self.item_queue) > 0 else None
 
     def _init_retries(self, retries: Set) -> None:
         """
@@ -135,3 +143,14 @@ class MultiThreadState:
         for i, item in self.iterable:
             if not retries or i in retries:
                 self.item_queue.put((i, item))
+
+    def _record_failure(self, e: Exception, index: int) -> None:
+        """
+        Saves the exception to failed responses.
+        :param e: The error that occurred.
+        :param index: Index corresponding to the work that failed.
+        :return: None.
+        """
+        self.failed_responses.add(index)
+        if self.collect_results:
+            self.result_list[index] = e

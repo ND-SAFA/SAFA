@@ -1,7 +1,7 @@
 from copy import deepcopy
-from typing import Tuple, Type, Callable, Any
+from typing import Any, Callable, Tuple, Type
 
-from langgraph.checkpoint.sqlite import SqliteSaver
+from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph.graph import CompiledGraph
 from langgraph.graph.state import StateGraph
 
@@ -11,6 +11,7 @@ from gen_common.graph.graph_definition import GraphDefinition
 from gen_common.graph.io.graph_args import GraphArgs
 from gen_common.graph.nodes.abstract_node import AbstractNode
 from gen_common.graph.nodes.supported_nodes import SupportedNodes
+from gen_common.util.param_specs import ParamSpecs
 from gen_common.util.reflection_util import ReflectionUtil
 from gen_common.util.supported_enum import SupportedEnum
 
@@ -33,12 +34,11 @@ class GraphBuilder:
         Builds and compiles the graph.
         :return: Compiled graph.
         """
-        memory = SqliteSaver.from_conn_string(":memory:")
         graph = StateGraph(self.graph_definition.state_type)
         self.add_nodes(graph)
         self.add_edges(graph)
         graph.set_entry_point(self.graph_definition.get_root_node().name)
-        return graph.compile(checkpointer=memory)
+        return graph.compile(checkpointer=MemorySaver())
 
     def add_nodes(self, graph: StateGraph) -> None:
         """
@@ -88,7 +88,8 @@ class GraphBuilder:
         if node.name not in self.node_map:
             value = node.value
             if ReflectionUtil.is_instance_or_subclass(value, AbstractNode):
-                value = value(self.graph_args)
+                params = ParamSpecs.create_from_method(value.__init__).get_accepted_params(self.graph_definition.node_args)
+                value = value(self.graph_args, **params)
             self.node_map[node.name] = value
         return self.node_map[node.name]
 

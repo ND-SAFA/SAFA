@@ -92,6 +92,11 @@ class JSONResponseManager(AbstractResponseManager):
 
     @staticmethod
     def _remove_extra_text(r: str) -> str:
+        """
+        Removes formatting from anthropic model to get the json string.
+        :param r: The response from the model.
+        :return: Just the json string.
+        """
         if JSON_CONTENT_START in r:
             start_idx = r.find(JSON_CONTENT_START)
             end_idx = r.find(JSON_CONTENT_END, start_idx)

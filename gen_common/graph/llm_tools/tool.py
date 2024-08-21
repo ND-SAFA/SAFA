@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from enum import Enum, IntEnum, auto
 from typing import Any, Callable, Dict, Type
 
@@ -5,8 +6,8 @@ from langchain_core.tools import BaseTool
 from pydantic.v1.fields import FieldInfo
 from pydantic.v1.main import BaseModel
 
+from gen_common.constants.symbol_constants import BRACKET_CLOSE, BRACKET_OPEN, DASH, SQ_BRACKET_CLOSE, SQ_BRACKET_OPEN
 from gen_common.graph.io.graph_state import GraphState
-from gen_common.constants.symbol_constants import DASH, BRACKET_OPEN, BRACKET_CLOSE, SQ_BRACKET_OPEN, SQ_BRACKET_CLOSE
 from gen_common.util.dict_util import DictUtil
 from gen_common.util.str_util import StrUtil
 
@@ -84,6 +85,13 @@ class BaseTool(BaseModel):
                 new_property.update(orig_property)
                 schema["properties"][name] = new_property
         return schema
+
+    @abstractmethod
+    def update_state(self, state: GraphState) -> None:
+        """
+        Updates the state with the response information.
+        :param state: The state.
+        """
 
     @classmethod
     def get_description(cls) -> str:

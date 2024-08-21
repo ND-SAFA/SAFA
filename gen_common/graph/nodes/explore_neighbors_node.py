@@ -1,8 +1,7 @@
-from typing import Set, Dict, List, Tuple
+from typing import Dict, List, Set
 
 from langchain_core.documents.base import Document
 
-from gen_common.data.creators.serialized_dataset_creator import SerializedDatasetCreator
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.data.objects.artifact import Artifact
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
@@ -13,9 +12,10 @@ from gen_common.util.dict_util import DictUtil
 
 class ExploreNeighborsNode(AbstractNode):
 
-    def perform_action(self, state: GraphState):
+    def perform_action(self, state: GraphState, run_async: bool = False):
         """
         Retrieve neighboring artifacts .
+        :param run_async: If True, runs in async mode else synchronously.
         :param state: The current state of the graph.
         """
         dataset = self.graph_args.dataset

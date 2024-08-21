@@ -34,8 +34,9 @@ def anthropic_exception_handler(state: MultiThreadState, e: Exception,
 def _wait_until_online(state: MultiThreadState, timeout: float, sleep_time: float) -> None:
     """
     Waits until Anthropogenic is no longer overloaded or until the timeout is reached.
-
+    :param state: Synchronizing state between all threads.
     :param timeout: The maximum time (in seconds) to wait. Default is 1200 seconds (20 minutes).
+    :param sleep_time: The amount of seconds to sleep between checks to anthropic.
     :return: None
     """
     start_time = time.time()

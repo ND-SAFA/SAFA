@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 from gen_common.graph.branches.base_branch import BaseBranch
 from gen_common.graph.branches.paths.path_choices import PathChoices
@@ -21,13 +21,14 @@ class LLMBranch(BaseBranch):
         self.response_tag = response_tag if response_tag else self.get_agent().get_first_response_tag()
         self.additional_paths = additional_paths if additional_paths else PathChoices()
 
-    def perform_action(self, state: Dict) -> Any:
+    def perform_action(self, state: Dict, run_async: bool = False) -> Any:
         """
         Chooses what node to go to next based on the response from the LLM.
         :param state: The current state of the graph.
+        :param run_async: If True, runs in async mode else synchronously.
         :return: The name of the next node to visit.
         """
-        response = self.get_agent().respond(state)
+        response = self.get_agent().respond(state, run_async=run_async)
         chosen = self.get_agent().extract_answer(response)
         default = self.response_map.get(chosen, self.path_choices.default)
         if not self.path_choices.paths or state is None:

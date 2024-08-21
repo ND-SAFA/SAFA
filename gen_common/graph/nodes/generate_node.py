@@ -1,29 +1,38 @@
-from ast import Str
-from typing import List, Set
+from typing import List
 
 from pydantic.v1.main import BaseModel, Field
 
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.graph.agents.base_agent import BaseAgent
 from gen_common.graph.branches.conditions.condition import Condition
 from gen_common.graph.branches.paths.path import Path
 from gen_common.graph.branches.paths.path_selector import PathSelector
+from gen_common.graph.io.graph_args import GraphArgs
 from gen_common.graph.io.graph_state import GraphState
 from gen_common.graph.io.graph_state_vars import GraphStateVars
-from gen_common.graph.llm_tools.tool_models import ExploreArtifactNeighborhood, RetrieveAdditionalInformation, STOP_TOOL_USE, \
-    RequestAssistance
+from gen_common.graph.llm_tools.tool import BaseTool
+from gen_common.graph.llm_tools.tool_models import ExploreArtifactNeighborhood, RequestAssistance, RetrieveAdditionalInformation, \
+    STOP_TOOL_USE
 from gen_common.graph.nodes.abstract_node import AbstractNode
 from gen_common.llm.response_managers.json_response_manager import JSONResponseManager
-from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.util.dict_util import DictUtil
 
 
-class AnswerUser(BaseModel):
+class AnswerUser(BaseTool):
     """
     Response to the user query.
     """
     answer: str = Field(description="Your response to the question WITHOUT preamble")
     reference_ids: List[str] = Field(description="If documents from the context were used to answer the question, provide their ids.",
                                      default_factory=list)
+
+    def update_state(self, state: GraphState) -> None:
+        """
+        Updates the state with the response information.
+        :param state: The state.
+        """
+        state["generation"] = self.answer
+        state["reference_ids"] = self.reference_ids
 
 
 class GenerateNode(AbstractNode):
@@ -42,20 +51,33 @@ class GenerateNode(AbstractNode):
         "{}"
         "\n- If you can't answer, use the other tools available to assist you. "
         "Pay attention to what tools have already been used so you do not repeat past steps. "
-        "\n- If none of the tools are valuable, or you have exhausted your strategy, and you still do not know the answer, "
-        f"use the {RequestAssistance.__name__} tool. "
     )
-    CONTEXT_ADDITION = "Remember to use the currently retrieved context to answer the question. " \
-                       "The user does not have access to the context, " \
-                       "so include any necessary details in your response. "
+    ASSISTANCE_ADDITION = (
+        "\n- If none of the tools are valuable, or you have exhausted your strategy, and you still do not know the answer, "
+        f"use the {RequestAssistance.__name__} tool. ")
+    CONTEXT_ADDITION = ("Remember to use the currently retrieved context to answer the question. "
+                        "The user does not have access to the context, "
+                        "so include any necessary details in your response. ")
 
-    def perform_action(self, state: GraphState):
+    def __init__(self, graph_args: GraphArgs, response_model: BaseTool = AnswerUser, allow_request_assistance: bool = True):
+        """
+        Performs decision-making and creates responses to user queries.
+        :param graph_args: Starting arguments to the graph.
+        :param response_model: The final response expected from the model.
+        :param allow_request_assistance: If True, allows the LLM to request assistance if it doesnt know the answer.
+        """
+        self.response_model = response_model
+        self.allow_request_assistance = allow_request_assistance
+        super().__init__(graph_args)
+
+    def perform_action(self, state: GraphState, run_async: bool = False) -> GraphState:
         """
         Generate answer to user's question.
         :param state: The current graph state.
+        :param run_async: If True, runs in async mode else synchronously.
         :return: Generation added to the state.
         """
-        response = self.get_agent().respond(state)
+        response = self.get_agent().respond(state, run_async)
         self._update_state(response, state)
         return state
 
@@ -69,7 +91,7 @@ class GenerateNode(AbstractNode):
                                           action=self.DEFAULT_PROMPT.format(EMPTY_STRING)),
                                      Path(action=self.DEFAULT_PROMPT.format(self.CONTEXT_ADDITION)))
         response_manager = JSONResponseManager.from_langgraph_model(
-            AnswerUser,
+            self.response_model,
             response_instructions_format=f"Respond WITHOUT preamble!!\n{JSONResponseManager.response_instructions_format}")
         agent = BaseAgent(system_prompt=system_prompt,
                           response_manager=response_manager,
@@ -96,21 +118,23 @@ class GenerateNode(AbstractNode):
         neighborhood_search_unavailable = no_context | no_traces | stop_neighborhood_search
 
         stop_retrieval = GraphStateVars.RETRIEVAL_QUERY == STOP_TOOL_USE
+
+        base_tools = [RequestAssistance] if self.allow_request_assistance else []
         tools = PathSelector(
             # All tools should be available
             Path(condition=~ neighborhood_search_unavailable & ~ stop_retrieval,
-                 action=[ExploreArtifactNeighborhood, RetrieveAdditionalInformation, RequestAssistance]),
+                 action=[ExploreArtifactNeighborhood, RetrieveAdditionalInformation] + base_tools),
 
             # Neighborhood search is unavailable
             Path(condition=neighborhood_search_unavailable & ~ stop_retrieval,
-                 action=[RetrieveAdditionalInformation, RequestAssistance]),
+                 action=[RetrieveAdditionalInformation] + base_tools),
 
             # Retrieval is stopped
             Path(condition=~ neighborhood_search_unavailable & stop_retrieval,
-                 action=[ExploreArtifactNeighborhood, RequestAssistance]),
+                 action=[ExploreArtifactNeighborhood] + base_tools),
 
             # All tools are unavailable
-            Path(action=[RequestAssistance]))
+            Path(action=base_tools))
         return tools
 
     def _update_state(self, response: BaseModel, state: GraphState) -> None:
@@ -121,33 +145,10 @@ class GenerateNode(AbstractNode):
         :return: None (update directly)
         """
         self._clear_previous_state_values(state)
-        if isinstance(response, AnswerUser):
-            state["generation"] = response.answer
-            state["reference_ids"] = response.reference_ids
-        elif isinstance(response, RetrieveAdditionalInformation):
-            state["retrieval_query"] = self._get_input_for_context_tool_use(response.retrieval_query, state)
-        elif isinstance(response, ExploreArtifactNeighborhood):
-            artifact_ids = self._get_input_for_context_tool_use(response.artifact_ids, state)
-            state["selected_artifact_ids"] = artifact_ids
-        elif isinstance(response, RequestAssistance):
-            state["relevant_information_learned"] = response.relevant_information_learned
-            state["related_doc_ids"] = response.related_doc_ids
-        state["tools_already_used"].append(f"{len(state['tools_already_used']) + 1}: {repr(response)}")
+        if isinstance(response, BaseTool):
+            response.update_state(state)
 
-    @staticmethod
-    def _get_input_for_context_tool_use(input_value: Str | List[str], state: GraphState) -> Set[str] | str:
-        """
-        Checks if the model is using a tool with new input - if so the input is returned as a set else the stop command is given.
-        :param input_value: The original input value.
-        :param state: The current state.
-        :return: Any new input values returned as a set else the stop command is given.
-        """
-        input_value = {input_value} if isinstance(input_value, str) else set(input_value)
-        new_input = input_value.difference(state.get("documents", {}))
-        if new_input:
-            return new_input
-        return STOP_TOOL_USE  # LLM has produced the same tool call multiple times so disable the tool for next time
-        # (prevents endless tool calling if the LLM does not get what it wants)
+        state["tools_already_used"].append(f"{len(state['tools_already_used']) + 1}: {repr(response)}")
 
     @staticmethod
     def _clear_previous_state_values(state: GraphState) -> None:

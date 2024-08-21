@@ -1,17 +1,5 @@
 from typing import Any, Dict, List, Optional, Set, Tuple, Type
 
-from gen_common.constants.environment_constants import ANTHROPIC_KEY, OPEN_AI_KEY
-from gen_common.constants.graph_defaults import BASE_AGENT_DEFAULT_MODEL
-from gen_common.llm.prompts.input_prompt import InputPrompt
-from gen_common.llm.prompts.prompt import Prompt
-from gen_common.llm.prompts.prompt_args import PromptArgs
-from gen_common.llm.prompts.prompt_builder import PromptBuilder
-from gen_common.llm.response_managers.abstract_response_manager import AbstractResponseManager
-from gen_common.util.dict_util import DictUtil
-from gen_common.util.enum_util import EnumUtil
-from gen_common.util.pythonisms_util import default_mutable
-from gen_common.util.reflection_util import ReflectionUtil
-from gen_common.util.supported_enum import SupportedEnum
 from langchain_anthropic.chat_models import ChatAnthropic
 from langchain_anthropic.output_parsers import ToolsOutputParser
 from langchain_core.documents.base import Document
@@ -20,11 +8,28 @@ from langchain_core.prompts.chat import ChatPromptTemplate
 from langchain_openai.chat_models.base import ChatOpenAI
 from pydantic.main import BaseModel
 
+from gen_common.constants import anthropic_constants, environment_constants
+from gen_common.constants.environment_constants import ANTHROPIC_KEY, OPEN_AI_KEY
+from gen_common.constants.graph_defaults import BASE_AGENT_DEFAULT_MODEL
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.graph.branches.paths.path_selector import PathSelector
 from gen_common.graph.io.graph_state import GraphState, has_state_value
 from gen_common.graph.io.graph_state_vars import GraphStateVars
 from gen_common.graph.io.state_var import StateVar
 from gen_common.graph.llm_tools.tool import ToolType
+from gen_common.infra.t_threading.threading_state import MultiThreadState
+from gen_common.llm.anthropic_exception_handler import anthropic_exception_handler
+from gen_common.llm.prompts.input_prompt import InputPrompt
+from gen_common.llm.prompts.prompt import Prompt
+from gen_common.llm.prompts.prompt_args import PromptArgs
+from gen_common.llm.prompts.prompt_builder import PromptBuilder
+from gen_common.llm.response_managers.abstract_response_manager import AbstractResponseManager
+from gen_common.util.dict_util import DictUtil
+from gen_common.util.enum_util import EnumUtil
+from gen_common.util.langchain_util import ExceptionOptions, LangchainUtil
+from gen_common.util.pythonisms_util import default_mutable
+from gen_common.util.reflection_util import ReflectionUtil
+from gen_common.util.supported_enum import SupportedEnum
 
 
 class SupportedLLMs(SupportedEnum):
@@ -39,6 +44,15 @@ API_KEYS = {
 
 
 class BaseAgent:
+    MULTI_THREAD_STATE = MultiThreadState(
+        [],
+        title=EMPTY_STRING,
+        retries=set(),
+        max_attempts=anthropic_constants.ANTHROPIC_MAX_RE_ATTEMPTS,
+        collect_results=True,
+        rpm=anthropic_constants.ANTHROPIC_MAX_RPM,
+        exception_handlers=[anthropic_exception_handler]
+    )
 
     @default_mutable()
     def __init__(self, system_prompt: Prompt | str | PathSelector,
@@ -65,21 +79,25 @@ class BaseAgent:
         self.system_prompt = system_prompt
         self.__model = None
         self.vars_for_context = state_vars_for_context
+        if environment_constants.IS_TEST:
+            self.vars_for_context.append(GraphStateVars.THREAD_ID)
+            allowed_missing_state_vars.add(GraphStateVars.THREAD_ID)
         self.allowed_missing_state_vars = allowed_missing_state_vars
         self.tools = tools
         self.chat_model_type = chat_model_type
         self.model_args = DictUtil.update_kwarg_values(model_args, model=model_name)
 
-    def respond(self, state: GraphState) -> BaseModel:
+    def respond(self, state: GraphState, run_async: bool = False) -> BaseModel:
         """
         Agent responds to provided prompt.
         :param state: The current state.
+        :param run_async: If True, runs in async mode else synchronously.
         :return: The Response model containing LLM response.
         """
         system_prompt = self._get_system_prompt(state)
         langchain_prompt = self._create_prompt(system_prompt, state)
         tools, tool_schemas = self._get_tools(state)
-        response = self._get_response(langchain_prompt, tools, tool_schemas)
+        response = self._get_response(langchain_prompt, tools, tool_schemas, run_async=run_async)
         return response
 
     def extract_answer(self, response_obj: BaseModel) -> Optional[str]:
@@ -163,19 +181,33 @@ class BaseAgent:
         return prompt
 
     def _get_response(self, prompt: ChatPromptTemplate, tools: List[ToolType],
-                      tool_schemas: List[Dict]) -> BaseModel:
+                      tool_schemas: List[Dict], run_async: bool = False) -> BaseModel:
         """
         Gets the response using the given response manager and specific inputs.
         :param prompt: The prompt used to get the response.
         :param tools: The tools provided to the model.
         :param tool_schemas: The schemas for each tool.
+        :param run_async: If True, runs in async mode else synchronously.
         :return: The response model containing the LLM response.
         """
         agent = self._get_model().bind_tools(tool_schemas)
         output_parser = ToolsOutputParser(first_tool_only=True,
                                           pydantic_schemas=tools)
         chain = prompt | agent | output_parser
-        response = chain.invoke({})
+        response, attempts = None, 0
+
+        while attempts < 1 or isinstance(response, Exception):
+            if run_async:
+                self.MULTI_THREAD_STATE.add_work("item")  # need to keep infinite work coming until prompt is completed
+                self.MULTI_THREAD_STATE.get_work()
+
+            response = LangchainUtil.optionally_run_async(chain, run_async, raise_exception=ExceptionOptions.SYNC_ONLY)
+            if isinstance(response, Exception):
+                is_handled = self.MULTI_THREAD_STATE.on_exception(response)
+                if not (is_handled and self.MULTI_THREAD_STATE.below_attempt_threshold(attempts)):
+                    raise response
+
+            attempts += 1
         return response
 
     @default_mutable()

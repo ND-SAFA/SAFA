@@ -41,6 +41,7 @@ class TraceDatasetCreator(AbstractDatasetCreator[TraceDataset]):
         :param allowed_missing_sources: Max number of allowed missing source artifacts.
         :param allowed_missing_targets: Max number of allowed missing target artifacts.
         :param allowed_orphans: Max number of allowed missing orphan artifacts.
+        :param should_generate_negative_links: If True, will automatically generate negative links.
         """
         super().__init__(data_cleaner)
         self.allowed_missing_sources = allowed_missing_sources

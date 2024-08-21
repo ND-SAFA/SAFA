@@ -4,6 +4,8 @@ from typing import Any, Dict, Optional
 
 from gen_common.graph.agents.base_agent import BaseAgent
 from gen_common.graph.io.graph_args import GraphArgs
+from gen_common.graph.io.graph_state import GraphState
+from gen_common.graph.io.graph_state_vars import GraphStateVars
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.util.str_util import StrUtil
 
@@ -19,11 +21,22 @@ class AbstractNode(abc.ABC):
         self.graph_args = graph_args
         self.__agent = None
 
+    def __call__(self, state: GraphState) -> Any:
+        """
+        Used to start the action of the node.
+        :param state: The state of the graph.
+        :return: The result of the node (generally the state).
+        """
+        logger.log_title(self.get_name().upper())
+        run_async = GraphStateVars.RUN_ASYNC.get_value(state)
+        return self.perform_action(state, run_async=run_async if run_async else False)
+
     @abstractmethod
-    def perform_action(self, state: Dict) -> Any:
+    def perform_action(self, state: Dict, run_async: bool = False) -> Any:
         """
         Runs when the node is invoked.
         :param state: The current state of the graph.
+        :param run_async: If True, runs in async mode else synchronously.
         :return: The result of the node (generally the state).
         """
 
@@ -52,13 +65,3 @@ class AbstractNode(abc.ABC):
         :return: The created agent.
         """
         raise NotImplementedError(f"{self.__class__.__name__} must implement a way to get agent.")
-
-    def __call__(self, *args, **kwargs) -> Any:
-        """
-        Used to start the action of the node.
-        :param args: Args to the node.
-        :param kwargs: Keywords to the node.
-        :return: The result of the node (generally the state).
-        """
-        logger.log_title(self.get_name().upper())
-        return self.perform_action(*args, **kwargs)

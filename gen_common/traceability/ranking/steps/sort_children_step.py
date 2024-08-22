@@ -5,11 +5,11 @@ from gen_common.constants.model_constants import USE_NL_SUMMARY_EMBEDDINGS
 from gen_common.constants.ranking_constants import PRE_SORTED_SCORE
 from gen_common.data.keys.structure_keys import TraceKeys
 from gen_common.pipeline.abstract_pipeline_step import AbstractPipelineStep
-from gen_common.traceability.ranking.common.artifact_df_util import chunk_artifact_df
 from gen_common.traceability.ranking.common.ranking_args import RankingArgs, SupportedSorter
 from gen_common.traceability.ranking.common.ranking_state import RankingState
 from gen_common.traceability.ranking.sorters.i_sorter import iSorter
 from gen_common.traceability.relationship_manager.embeddings_manager import EmbeddingsManager
+from gen_common.util.artifact_df_util import chunk_artifact_df
 from gen_common.util.enum_util import EnumDict
 from gen_common.util.ranking_util import RankingUtil
 

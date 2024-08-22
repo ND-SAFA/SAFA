@@ -22,5 +22,5 @@ CLOSE_PAREN = ")"
 USER_SYM = "~"
 SQ_BRACKET_OPEN = "["
 SQ_BRACKET_CLOSE = "]"
-JSON_BLOCK_STARTS = ["```", "```json"]
+JSON_BLOCK_START = "{"
 JSON_BLOCK_END = "```"

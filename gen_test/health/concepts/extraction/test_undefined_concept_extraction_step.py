@@ -1,5 +1,5 @@
 import json
-from typing import List
+from typing import List, Union
 from unittest import TestCase
 
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
@@ -65,12 +65,14 @@ class TestUndefinedConceptExtractionStep(BaseTest):
         ])
 
     @staticmethod
-    def create_mock_response(undefined_concepts: List[str]) -> str:
+    def create_mock_response(undefined_concepts: Union[str, List[str]]) -> str:
         """
         Creates mock response for undefined concepts.
         :param undefined_concepts: List of undefined concepts.
         :return: Mock response.
         """
+        if isinstance(undefined_concepts, str):
+            undefined_concepts = [undefined_concepts]
         return json.dumps({"undefined_concepts": undefined_concepts})
 
     @staticmethod

@@ -5,6 +5,7 @@ from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE
 from gen_common.data.keys.prompt_keys import PromptKeys
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.data.objects.artifact import Artifact
+from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.llm.prompts.context_prompt import ContextPrompt
 from gen_common.llm.prompts.llm_prompt_build_args import LLMPromptBuildArgs
 from gen_common.llm.prompts.prompt import Prompt
@@ -53,11 +54,18 @@ class DefineUndefinedConceptsStep(AbstractPipelineStep):
             )
             for concept_id, artifact_ids in undefined2artifacts.items()
         ]
+
+        if len(undefined_concepts) == 0:
+            state.undefined_concepts = []
+            logger.info("No undefined concepts")
+            return
+
         context = self._identify_context_for_entities(
             args=args,
             undefined_concepts=undefined_concepts,
             context_doc_content=context_doc_content
         )
+
         predictions = LLMUtil.complete_iterable_prompts(
             items=undefined_concepts,
             prompt_generator=self._create_prompt_generator(

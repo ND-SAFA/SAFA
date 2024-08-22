@@ -41,9 +41,9 @@ def assert_health_check_success(tc: BaseTest, result: HealthResults):
     tc.assertListEqual(contradiction.conflicting_ids, EXPECTED_CONFLICTING_IDS + [QUERY_ID])
     tc.assertEqual(contradiction.explanation, EXPECTED_CONTRADICTION_EXPLANATION)
 
-    concept_matches = result.undefined_concepts
-    tc.assertEqual(1, len(concept_matches))
-    concept_match: UndefinedConcept = concept_matches[0]
+    undefined_concepts = result.undefined_concepts
+    tc.assertEqual(1, len(undefined_concepts))
+    concept_match: UndefinedConcept = undefined_concepts[0]
     tc.assertEqual(TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT, concept_match.concept_id)
 
 

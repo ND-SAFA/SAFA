@@ -33,19 +33,18 @@ jobs:
         pip install git+https://${{ secrets.TGEN_TOKEN }}@github.com/ND-SAFA/python-package-manager.git@${{ env.PYTHON_PACKAGE_MANAGER_COMMIT }}
       env:
         PIP_EXTRA_INDEX_URL: "https://${{ secrets.TGEN_TOKEN }}:x-oauth-basic@github.com"
-        GEN_COMMON_RESOURCES_COMMIT: 45c34f9ef784f1ee2bbc5ab5f73308661bf7e1ac
-        PYTHON_PACKAGE_MANAGER_COMMIT: 1b05f33e809ae55033c54a90a2ad6fb71c12e8e7
+        GEN_COMMON_RESOURCES_COMMIT: dc690c68a1477e1740130e1ab3e7d849feee6dfb
+        PYTHON_PACKAGE_MANAGER_COMMIT: 8d657746c7b8d70cc366f97b7e52e79ef766a6d7
 
     - name: Download Static
       run: |
-        python3 tgen/scripts/tools/download_static.py
+        python3 gen/infra/cli/tools/download_static.py
 
     - name: Run Dev-Ops Checks
       run: |
-        ppm find_missing_docs tgen
+        ppm find_missing_docs gen --throw_error
 
     - name: Run Unit Tests.
-      run: python -m unittest discover -s tgen_test
+      run: python -m unittest discover -s gen_test
       env:
         DEPLOYMENT: test
-        ROOT_PATH: /home/runner/work/tgen/tgen

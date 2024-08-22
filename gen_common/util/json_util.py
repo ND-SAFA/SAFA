@@ -221,7 +221,7 @@ class JsonUtil:
         if JSON_BLOCK_START in r:
             start_p0 = r.find(JSON_BLOCK_START)
             end_idx = r.find(JSON_BLOCK_END, start_p0)
-            if end_idx == 1:
+            if end_idx == -1:
                 end_idx = len(r)
             return r[start_p0:end_idx].strip()
         return r

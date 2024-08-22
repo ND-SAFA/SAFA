@@ -4,7 +4,6 @@ from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.jobs.abstract_job import AbstractJob, JobResult
 from gen_common.jobs.job_args import JobArgs
 from gen_common.summarize.artifact.artifacts_summarizer import ArtifactsSummarizer
-from gen_common.summarize.jobs.summarize_job import SummarizeJob
 from gen_common.util.enum_util import EnumDict
 from gen_common.util.file_util import FileUtil
 from gen_common.util.prompt_util import PromptUtil
@@ -13,6 +12,8 @@ from gen_common_test.base.mock.responses.summary import PROJECT_SUMMARY_RESPONSE
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_job_test import BaseJobTest
 from gen_common_test.testprojects.generation_test_project import GenerationTestProject
+
+from gen.summary.summarize_job import SummarizeJob
 
 
 class TestSummarizeJob(BaseJobTest):

@@ -1,5 +1,4 @@
 from gen_common.clustering.clustering_job import ClusteringJob
-from gen_common.summarize.jobs.summarize_job import SummarizeJob
 from gen_common.traceability.ranking.job import RankingJob
 from gen_common.traceability.vsm.vsm_job import VSMJob
 from gen_common.util.supported_enum import SupportedEnum
@@ -13,6 +12,7 @@ from gen.delta.delta_summarizer_job import DeltaSummarizerJob
 from gen.health.health_job import HealthCheckJob
 from gen.hgen.jobs.base_hgen_job import BaseHGenJob
 from gen.hgen.jobs.multi_layer_hgen_job import MultiLayerHGenJob
+from gen.summary.summarize_job import SummarizeJob
 from gen.tracing.jobs.code_trace_job import TraceCodeJob
 from gen.tracing.jobs.ranking_chunk_job import RankingChunkJob
 from gen.tracing.jobs.tracing_job import TracingJob

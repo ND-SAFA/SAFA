@@ -4,10 +4,11 @@ from gen_common.data.exporters.prompt_dataset_exporter import PromptDatasetExpor
 from gen_common.data.exporters.safa_exporter import SafaExporter
 from gen_common.jobs.abstract_job import AbstractJob
 from gen_common.jobs.job_args import JobArgs
-from gen_common.summarize.jobs.summary_response import SummaryResponse
 from gen_common.summarize.summarizer import Summarizer
 from gen_common.summarize.summarizer_args import SummarizerArgs
 from gen_common.util.file_util import FileUtil
+
+from gen.summary.summary_response import SummaryResponse
 
 
 class SummarizeJob(AbstractJob):

@@ -7,8 +7,6 @@ from gen_common.util.dict_util import DictUtil
 from gen_common.util.json_util import JsonUtil
 
 RESPONSE_FORMAT = "\n# Format Instructions\nYou should respond using the following JSON format:\n```\n{}\n```"
-JSON_CONTENT_START = "```"
-JSON_CONTENT_END = "```"
 
 
 @dataclass
@@ -36,7 +34,7 @@ class JSONResponseManager(AbstractResponseManager):
         """
         if not self.response_tag:
             return {}
-        response = self._remove_extra_text(response)
+        response = JsonUtil.remove_json_block_definition(response)
         response_dict = json.loads(response)
         output = self._parse_response_helper(response_dict)
         return self._format_response(output)
@@ -89,22 +87,6 @@ class JSONResponseManager(AbstractResponseManager):
         :return: None
         """
         assert isinstance(response, expected_type), f"Response not in correct format: \nexpected {expected}, \nreceived {response}"
-
-    @staticmethod
-    def _remove_extra_text(r: str) -> str:
-        """
-        Removes formatting from anthropic model to get the json string.
-        :param r: The response from the model.
-        :return: Just the json string.
-        """
-        if JSON_CONTENT_START in r:
-            start_p0 = r.find(JSON_CONTENT_START)
-            start_p1 = start_p0 + len(JSON_CONTENT_START)
-            end_idx = r.find(JSON_CONTENT_END, start_p1)
-            if end_idx == 1:
-                end_idx = len(r)
-            return r[start_p1:end_idx].strip()
-        return r
 
     def _get_response_instructions_format_params(self) -> Tuple[List, Dict]:
         """

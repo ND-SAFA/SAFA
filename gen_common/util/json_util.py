@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Union
 
 import numpy as np
 
+from gen_common.constants.symbol_constants import JSON_BLOCK_END, JSON_BLOCK_STARTS
 from gen_common.util.reflection_util import ReflectionUtil
 from gen_common.util.uncased_dict import UncasedDict
 
@@ -209,3 +210,21 @@ class JsonUtil:
             for v in obj:
                 add_child_fields()
         return ordered_fields
+
+    @staticmethod
+    def remove_json_block_definition(r: str) -> str:
+        """
+        Removes formatting from anthropic model to get the json string.
+        :param r: The response from the model.
+        :return: Just the json string.
+        """
+        start_indicators_found: List[str] = [s for s in sorted(JSON_BLOCK_STARTS, key=len) if s in r]
+        if len(start_indicators_found) > 0:
+            json_start = start_indicators_found[-1]  # finds longest indicator
+            start_p0 = r.find(json_start)
+            start_p1 = start_p0 + len(json_start)
+            end_idx = r.find(JSON_BLOCK_END, start_p1)
+            if end_idx == 1:
+                end_idx = len(r)
+            return r[start_p1:end_idx].strip()
+        return r

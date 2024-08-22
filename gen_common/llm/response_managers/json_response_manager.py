@@ -1,6 +1,7 @@
-import json
 from dataclasses import dataclass
 from typing import Any, Dict, List, Tuple, Type
+
+import dirtyjson
 
 from gen_common.llm.response_managers.abstract_response_manager import AbstractResponseManager
 from gen_common.util.dict_util import DictUtil
@@ -35,7 +36,7 @@ class JSONResponseManager(AbstractResponseManager):
         if not self.response_tag:
             return {}
         response = JsonUtil.remove_json_block_definition(response)
-        response_dict = json.loads(response)
+        response_dict = dirtyjson.loads(response)
         output = self._parse_response_helper(response_dict)
         return self._format_response(output)
 

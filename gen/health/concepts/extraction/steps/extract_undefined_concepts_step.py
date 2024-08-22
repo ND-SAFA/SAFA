@@ -20,6 +20,8 @@ from gen.health.concepts.extraction.concept_extraction_state import ConceptExtra
 from gen.health.concepts.matching.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from gen.health.concepts.matching.types.concept_variants import ConceptVariants
 
+USED_CONCEPTS_TITLE = "# Concepts Used In Artifact"
+
 
 class ExtractUndefinedConceptsStep(AbstractPipelineStep):
     def _run(self, args: ConceptArgs, state: ConceptExtractionState) -> None:
@@ -61,15 +63,17 @@ class ExtractUndefinedConceptsStep(AbstractPipelineStep):
             """
             concept_map = {a[ArtifactKeys.ID]: a for a in concept_artifacts}
             linked_concepts: List[Artifact] = ExtractUndefinedConceptsStep._get_connected_concepts(artifact, concept_map, trace_df)
-            builder = PromptBuilder(prompts=[
-                MultiArtifactPrompt("# Concepts Used In Artifact"),
+            prompts = [
+                MultiArtifactPrompt(USED_CONCEPTS_TITLE) if linked_concepts else Prompt(
+                    f"{USED_CONCEPTS_TITLE}\nNo concepts defined."),
                 ArtifactPrompt("# Target Artifact"),
                 Prompt(
                     response_manager=JSONResponseManager.from_langgraph_model(
                         UndefinedEntityExtractionPromptFormat
                     ))
-            ])
+            ]
 
+            builder = PromptBuilder(prompts=prompts)
             prompt = builder.build(llm_format_args, artifact=artifact, artifacts=linked_concepts)
             prompt[PromptKeys.SYSTEM] = UNDEFINED_ENTITY_EXTRACTION_PROMPT
             return builder, prompt

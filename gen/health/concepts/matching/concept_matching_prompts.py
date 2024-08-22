@@ -25,4 +25,14 @@ class LLMConceptMatchingPromptFormat(BaseModel):
     """
     Response for making predictions for cited concepts in target artifact.
     """
-    predictions: List[LLMConceptMatchingPredictionFormat] = Field(description="List of referenced concepts in target artifact.")
+    predictions: List[dict] = Field(description=[
+        {
+            "artifact_id": "reference_concept_1",
+            "explanation": "where concept_1 is referenced in artifact"
+        },
+        {
+            "artifact_id": "reference_concept_2",
+            "explanation": "where concept_2 is referenced in artifact"
+        },
+    ]
+    )

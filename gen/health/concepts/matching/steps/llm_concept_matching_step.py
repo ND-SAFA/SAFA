@@ -116,10 +116,11 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
         traces = []
 
         for artifact, builder_output in predictions:
+            artifact_id = artifact[ArtifactKeys.ID]
             if builder_output is None:
-                logger.info(f"Unable to parse response for artifact: {artifact}")
+                logger.info(f"Unable to parse response for artifact: {artifact_id}")
                 continue
-            previous_matches = artifact2previous_matches[artifact[ArtifactKeys.ID]]
+            previous_matches = artifact2previous_matches[artifact_id]
             for prediction_dict in builder_output["predictions"]:
                 predicted_concept_id = prediction_dict["artifact_id"][0]
                 predicted_explanation = prediction_dict["explanation"][0]
@@ -131,7 +132,7 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
                 concept_id = concept_map[predicted_concept_key]
                 if predicted_concept_id not in previous_matches:
                     trace = Trace(
-                        source=artifact[ArtifactKeys.ID],
+                        source=artifact_id,
                         target=concept_id,
                         score=1,
                         explanation=f"{predicted_explanation}"

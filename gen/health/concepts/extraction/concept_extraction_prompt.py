@@ -13,4 +13,4 @@ class UndefinedEntityExtractionPromptFormat(BaseModel):
     """
     The expected format for undefined concepts found within an artifact.
     """
-    undefined_concepts: List[str] = Field(description="List of undefined concept in artifacts.")
+    undefined_concepts: List[str] = Field(description=["undefined_term_1", "undefined_term_2"])

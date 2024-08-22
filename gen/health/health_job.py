@@ -49,9 +49,9 @@ class HealthCheckJob(AbstractJob):
         """
         dataset: PromptDataset = self.job_args.dataset
         contradictions_result = self._run_contradictions_detector()
-        undefined_entities = self._run_find_missing_concepts(dataset, query_ids=self.query_ids, concept_layer_id=self.concept_layer_id)
+        undefined_concepts = self._run_find_missing_concepts(dataset, query_ids=self.query_ids, concept_layer_id=self.concept_layer_id)
         results = HealthResults(contradictions=contradictions_result,
-                                undefined_concepts=undefined_entities)
+                                undefined_concepts=undefined_concepts)
         return results
 
     def _run_contradictions_detector(self, **kwargs) -> List[ContradictionResult]:

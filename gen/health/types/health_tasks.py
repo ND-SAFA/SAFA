@@ -1,0 +1,2 @@
+class HealthTypes:
+    CONTRADICTION = ContradictionPipeline

@@ -21,8 +21,7 @@ class HealthCheckJob(AbstractJob):
     random.seed(0)
 
     def __init__(self, job_args: JobArgs, query_ids: Union[List[str], str], concept_layer_id: str,
-                 entity_layer_id="Entity", context_doc_path: str = None, use_llm_for_entity_extraction: bool = True,
-                 **additional_args):
+                 context_doc_path: str = None, use_llm_for_entity_extraction: bool = True, **additional_args):
         """
         Initializes the job to run health checks on the query artifact.
         :param job_args: Contains dataset and other common arguments to jobs in general.
@@ -37,7 +36,6 @@ class HealthCheckJob(AbstractJob):
         dataset: PromptDataset = job_args.dataset
         self.query_ids = expand_query_selection(dataset.artifact_df, query_ids)
         self.concept_layer_id = concept_layer_id
-        self.entity_layer_id = entity_layer_id
         self.context_doc_path = context_doc_path
         self.use_llm_for_entity_extraction = use_llm_for_entity_extraction
         self.additional_args = additional_args

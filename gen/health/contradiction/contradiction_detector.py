@@ -2,11 +2,21 @@ from typing import List
 
 from gen_common.graph.graph_runner import GraphRunner
 from gen_common.graph.io.graph_args import GraphArgs
+from gen_common.pipeline.abstract_pipeline import AbstractPipelineStep
+from gen_common.pipeline.abstract_pipeline_step import ArgType
+from gen_common.pipeline.state import State
 
+from gen.health.concepts.concept_args import ConceptArgs
 from gen.health.contradiction.contradiction_args import ContradictionsArgs
 from gen.health.contradiction.contradiction_graph import ContradictionsGraph
 from gen.health.contradiction.contradiction_prompts import CONTRADICTIONS_QUESTION
 from gen.health.contradiction.contradiction_result import ContradictionResult
+
+
+class DetectContradictionStep(AbstractPipelineStep[ConceptArgs]):
+
+    def _run(self, args: ArgType, state: State) -> None:
+        pass
 
 
 class ContradictionsDetector:

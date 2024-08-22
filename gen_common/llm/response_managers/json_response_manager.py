@@ -98,11 +98,12 @@ class JSONResponseManager(AbstractResponseManager):
         :return: Just the json string.
         """
         if JSON_CONTENT_START in r:
-            start_idx = r.find(JSON_CONTENT_START)
-            end_idx = r.find(JSON_CONTENT_END, start_idx)
+            start_p0 = r.find(JSON_CONTENT_START)
+            start_p1 = start_p0 + len(JSON_CONTENT_START)
+            end_idx = r.find(JSON_CONTENT_END, start_p1)
             if end_idx == 1:
                 end_idx = len(r)
-            return r[start_idx + len(JSON_CONTENT_START):end_idx].strip()
+            return r[start_p1:end_idx].strip()
         return r
 
     def _get_response_instructions_format_params(self) -> Tuple[List, Dict]:

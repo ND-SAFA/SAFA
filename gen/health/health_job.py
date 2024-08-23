@@ -35,8 +35,7 @@ class HealthJob(AbstractJob):
         :param job_args: Contains dataset and other common arguments to jobs in general.
         :param query_ids: The id of the query artifact under inspection.
         :param concept_layer_id: The id of the layer containing concept artifacts.
-        :param additional_args: Any additional arguments to the concept or contradictions detectors.
-        :param entity_layer_id: Layer ID to given extracted entities.
+        :param tasks: The health tasks to be performed by the job.
         :param context_doc_path:If provided, is used for defining unknown entities.
         :param use_llm_for_entity_extraction: If True, uses the llm for entity extraction instead of the standford analysis.
         """

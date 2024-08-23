@@ -57,11 +57,23 @@ class CondenseUndefinedConceptsStep(AbstractPipelineStep[HealthArgs, ConceptExtr
     def generate_condensed_concepts(undefined2artifacts: Dict[str, List[str]],
                                     llm_manager: AbstractLLMManager,
                                     n_concepts: int) -> List[UndefinedConcept]:
+        """
+        Prompts LLM to condense overlapping concepts.
+        :param undefined2artifacts: Map of undefined concepts to artifacts referencing them.
+        :param llm_manager: The LLM manager to use.
+        :param n_concepts: The maximum number of concepts to show to the model.
+        :return: List of undefined, but condensed concepts.
+        """
         assert len(undefined2artifacts) > 1, "Expected at least two undefined concepts."
         concept_ids = sorted([u for u in undefined2artifacts.keys()])
         batches = ListUtil.batch(concept_ids, n=n_concepts)
 
         def generator(batch: List[str]):
+            """
+            Creates prompt builder and prompt for given batch of concepts.
+            :param batch: The batch of concepts to include in each prompt.
+            :return: Builder and prompt.
+            """
             concept_content = "\n".join([f"- {b}" for b in batch])
             prompt_content = f"{_HEADER}\n{concept_content}"
             prompt = Prompt(

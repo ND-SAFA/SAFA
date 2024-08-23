@@ -8,7 +8,7 @@ from gen_test.health.concepts.matching.test_llm_concept_matching_step import Tes
 from gen_test.health.concepts.matching.utils import create_concept_args
 
 
-class TestConceptPipeline(BaseTest):
+class TestConceptMatchingPipeline(BaseTest):
     @mock_anthropic
     def test_concept_pipeline(self, ai_manager: TestAIManager) -> None:
         """

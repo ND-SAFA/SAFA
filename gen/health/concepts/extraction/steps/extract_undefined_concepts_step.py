@@ -13,18 +13,18 @@ from gen_common.llm.response_managers.json_response_manager import JSONResponseM
 from gen_common.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from gen_common.util.llm_util import LLMUtil, PromptGeneratorReturnType, PromptGeneratorType
 
-from gen.health.concepts.concept_args import ConceptArgs
 from gen.health.concepts.extraction.concept_extraction_prompt import UNDEFINED_ENTITY_EXTRACTION_PROMPT, \
     UndefinedEntityExtractionPromptFormat
 from gen.health.concepts.extraction.concept_extraction_state import ConceptExtractionState
 from gen.health.concepts.matching.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from gen.health.concepts.matching.types.concept_variants import ConceptVariants
+from gen.health.health_args import HealthArgs
 
 USED_CONCEPTS_TITLE = "# Concepts Used In Artifact"
 
 
 class ExtractUndefinedConceptsStep(AbstractPipelineStep):
-    def _run(self, args: ConceptArgs, state: ConceptExtractionState) -> None:
+    def _run(self, args: HealthArgs, state: ConceptExtractionState) -> None:
         """
         Extracts undefined concepts in query artifacts.
         :param args: Concept args containing dataset and query artifacts.

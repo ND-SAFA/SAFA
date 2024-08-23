@@ -3,19 +3,19 @@ from typing import Type
 from gen_common.pipeline.abstract_pipeline import AbstractPipeline
 from gen_common.pipeline.state import State
 
-from gen.health.concepts.concept_args import ConceptArgs
-from gen.health.concepts.matching.concept_matching_state import ConceptMatchingState
 from gen.health.concepts.matching.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from gen.health.concepts.matching.steps.llm_concept_matching_step import LLMConceptMatchingStep
+from gen.health.health_args import HealthArgs
+from gen.health.health_state import HealthState
 
 
-class ConceptMatchingPipeline(AbstractPipeline[ConceptArgs, ConceptMatchingState]):
+class ConceptMatchingPipeline(AbstractPipeline[HealthArgs, HealthState]):
     steps = [
         DirectConceptMatchingStep,
         LLMConceptMatchingStep
     ]
 
-    def __init__(self, args: ConceptArgs, **kwargs):
+    def __init__(self, args: HealthArgs, **kwargs):
         """
         Creates pipeline with starting args.
         :param args: Args to initialize pipeline with.
@@ -27,4 +27,4 @@ class ConceptMatchingPipeline(AbstractPipeline[ConceptArgs, ConceptMatchingState
         """
         :return: Returns ConceptState class
         """
-        return ConceptMatchingState
+        return HealthState

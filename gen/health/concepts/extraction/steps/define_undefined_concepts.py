@@ -19,9 +19,9 @@ from langchain.text_splitter import NLTKTextSplitter
 from pydantic.v1 import BaseModel, Field
 from pypdf import PdfReader
 
-from gen.health.concepts.concept_args import ConceptArgs
 from gen.health.concepts.extraction.concept_extraction_state import ConceptExtractionState
 from gen.health.concepts.extraction.undefined_concept import UndefinedConcept
+from gen.health.health_args import HealthArgs
 
 
 class _DefineUndefinedConceptFormat(BaseModel):
@@ -37,7 +37,7 @@ DEFINE_UNDEFINED_CONCEPT_SYSTEM_PROMPT = (
 
 
 class DefineUndefinedConceptsStep(AbstractPipelineStep):
-    def _run(self, args: ConceptArgs, state: ConceptExtractionState) -> None:
+    def _run(self, args: HealthArgs, state: ConceptExtractionState) -> None:
         """
         Gives the model a chance to define any unknown concepts using provided documentation.
         :param args: Contains the optional path to the context document.
@@ -126,7 +126,7 @@ class DefineUndefinedConceptsStep(AbstractPipelineStep):
         return undefined2artifact
 
     def _identify_context_for_entities(self,
-                                       args: ConceptArgs,
+                                       args: HealthArgs,
                                        undefined_concepts: List[UndefinedConcept],
                                        context_doc_content: str = None) -> Dict[str, List[Artifact]]:
         """

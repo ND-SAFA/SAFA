@@ -1,27 +1,32 @@
 import random
-from typing import List, Union
+from typing import List, Type, Union
 
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.jobs.abstract_job import AbstractJob
 from gen_common.jobs.job_args import JobArgs
-from gen_common.util.reflection_util import ReflectionUtil
 
-from gen.health.concepts.concept_args import ConceptArgs
 from gen.health.concepts.extraction.concept_extraction_pipeline import ConceptExtractionPipeline
-from gen.health.concepts.extraction.concept_extraction_state import ConceptExtractionState
-from gen.health.concepts.extraction.undefined_concept import UndefinedConcept
-from gen.health.contradiction.contradiction_args import ContradictionsArgs
-from gen.health.contradiction.contradiction_detector import ContradictionsDetector
-from gen.health.contradiction.contradiction_result import ContradictionResult
-from gen.health.health_results import HealthResults
+from gen.health.concepts.matching.concept_matching_pipeline import ConceptMatchingPipeline
+from gen.health.contradiction.contradiction_pipeline import ContradictionPipeline
+from gen.health.health_args import HealthArgs
+from gen.health.health_state import HealthState
 from gen.health.health_util import expand_query_selection
+from gen.health.types.health_tasks import HealthTask
+from gen_test.health.concepts.matching.constants import CONCEPT_TYPE
+
+HealthPipeline = Union[ContradictionPipeline, ConceptExtractionPipeline, ConceptMatchingPipeline]
 
 
 class HealthCheckJob(AbstractJob):
     random.seed(0)
 
-    def __init__(self, job_args: JobArgs, query_ids: Union[List[str], str], concept_layer_id: str,
-                 context_doc_path: str = None, use_llm_for_entity_extraction: bool = True, **additional_args):
+    def __init__(self,
+                 job_args: JobArgs,
+                 query_ids: Union[List[str], str],
+                 tasks: List[HealthTask],
+                 context_doc_path: str = None,
+                 use_llm_for_entity_extraction: bool = True,
+                 concept_layer_id: str = CONCEPT_TYPE):
         """
         Initializes the job to run health checks on the query artifact.
         :param job_args: Contains dataset and other common arguments to jobs in general.
@@ -34,53 +39,46 @@ class HealthCheckJob(AbstractJob):
         """
         super().__init__(job_args, require_data=True)
         dataset: PromptDataset = job_args.dataset
+        self.tasks = tasks
         self.query_ids = expand_query_selection(dataset.artifact_df, query_ids)
         self.concept_layer_id = concept_layer_id
         self.context_doc_path = context_doc_path
         self.use_llm_for_entity_extraction = use_llm_for_entity_extraction
-        self.additional_args = additional_args
 
-    def _run(self) -> HealthResults:
+    def _run(self) -> HealthState:
         """
         Runs health checks on the query artifact.
         :return: Results from each health check.
         """
-        dataset: PromptDataset = self.job_args.dataset
-        contradictions_result = self._run_contradictions_detector()
-        undefined_concepts = self._run_find_missing_concepts(dataset, query_ids=self.query_ids, concept_layer_id=self.concept_layer_id)
-        results = HealthResults(contradictions=contradictions_result,
-                                undefined_concepts=undefined_concepts)
-        return results
+        health_kwargs = self.job_args.get_args_for_pipeline(HealthArgs)
+        args = HealthArgs(
+            query_ids=self.query_ids,
+            concept_layer_id=self.concept_layer_id,
+            context_doc_path=self.context_doc_path,
+            **health_kwargs,
+        )
+        state = HealthState()
 
-    def _run_contradictions_detector(self, **kwargs) -> List[ContradictionResult]:
-        """
-        Runs contradictions detector to identify any conflicting artifacts with the query artifact.
-        :return: Any ids of conflicting artifacts and an explanation as to why if some were found.
-        """
-        pipeline_params = self.job_args.get_args_for_pipeline(ContradictionsArgs)
-        additional_params = ReflectionUtil.get_constructor_params(ContradictionsArgs, self.additional_args)
-        kwargs.update(additional_params)
-        args = ContradictionsArgs(**pipeline_params, **kwargs)
-        detector = ContradictionsDetector(args)
-        contradictions_result = detector.detect(self.query_ids)
-        return contradictions_result
+        for task in self.tasks:
+            pipeline_class = self._get_pipeline_class(task)
+            pipeline = pipeline_class(args)
+            pipeline.state = state
+            pipeline.run()
+
+        return state
 
     @staticmethod
-    def _run_find_missing_concepts(dataset: PromptDataset, query_ids: List[str], concept_layer_id: str) -> List[UndefinedConcept]:
+    def _get_pipeline_class(task: HealthTask) -> Type[HealthPipeline]:
         """
-        Finds any concepts missing in query ids.
-        :param dataset: Dataset containing artifacts to extract concepts from.
-        :param query_ids: Artifact Ids of artifacts to extract concepts from.
-        :param concept_layer_id: Artifact type associated with concepts.
-        :return: List of undefined concepts across query ids.
+        Returns the pipeline class associated with given task.
+        :param task: The health task to perform.
+        :return: Health pipeline.
         """
-        args = ConceptArgs(
-            dataset=dataset,
-            query_ids=query_ids,
-            concept_layer_id=concept_layer_id
-        )
-        pipeline = ConceptExtractionPipeline(args)
-        pipeline.run()
-
-        final_state: ConceptExtractionState = pipeline.state
-        return final_state.undefined_concepts
+        if task == HealthTask.CONTRADICTION:
+            return ContradictionPipeline
+        elif task == HealthTask.CONCEPT_MATCHING:
+            return ConceptMatchingPipeline
+        elif task == HealthTask.CONCEPT_EXTRACTION:
+            return ConceptExtractionPipeline
+        else:
+            raise Exception(f"Unknown task: {task}")

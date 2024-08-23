@@ -6,8 +6,8 @@ from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_test import BaseTest
 
-from gen.health.concepts.matching.concept_matching_state import ConceptMatchingState
 from gen.health.concepts.matching.steps.llm_concept_matching_step import LLMConceptMatchingStep
+from gen.health.health_state import HealthState
 from gen_test.health.concepts.matching.constants import ConceptData
 from gen_test.health.concepts.matching.utils import create_concept_args
 
@@ -28,13 +28,13 @@ class TestLLMConceptMatchingStep(BaseTest):
 
         # Step - Create pipeline resources
         args = create_concept_args()
-        state = ConceptMatchingState()
+        state = HealthState()
         step = LLMConceptMatchingStep()
 
         step.run(args, state)
 
     @staticmethod
-    def verify_state(tc, state: ConceptMatchingState):
+    def verify_state(tc, state: HealthState):
         matched_concepts = set([m[TraceKeys.TARGET] for m in state.predicted_matches])
         tc.assertEqual(matched_concepts, set(TestLLMConceptMatchingStep.EXPECTED_MATCHES))
 

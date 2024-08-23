@@ -11,7 +11,7 @@ from gen_test.health.concepts.matching.constants import CONCEPT_TYPE
 
 
 @dataclass
-class ConceptArgs(Args):
+class HealthArgs(Args):
     """
     :param concept_layer_id: Artifact type associated with project concepts.
     :param query_ids: Artifact Ids to match concepts against.
@@ -20,6 +20,7 @@ class ConceptArgs(Args):
     query_ids: List[str] = required_field(field_name="Query ids")
     concept_layer_id: str = CONCEPT_TYPE
     llm_manager: AbstractLLMManager = field(default_factory=get_best_default_llm_manager_long_context)
+    # concept-matching
     n_concepts_in_prompt: int = 30
     context_doc_path: str = None
 

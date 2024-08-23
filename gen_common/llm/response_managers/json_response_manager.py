@@ -33,8 +33,6 @@ class JSONResponseManager(AbstractResponseManager):
         :param response: The model response
         :return: The formatted response
         """
-        if not self.response_tag:
-            return {}
         response = JsonUtil.remove_json_block_definition(response)
         response_dict = dirtyjson.loads(response)
         output = self._parse_response_helper(response_dict)

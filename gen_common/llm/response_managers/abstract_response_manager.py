@@ -22,6 +22,10 @@ class AbstractResponseManager:
     """
     response_tag: Union[str, dict, list] = EMPTY_STRING
     """
+    :param parse_all: Whether the entire response should be parsed by response manager.
+    """
+    parse_all: bool = False
+    """
     :param tag_descriptions: Maps tag id to its description.
     """
     tag_descriptions: Dict[str, str] = field(default_factory=dict)
@@ -168,7 +172,7 @@ class AbstractResponseManager:
         :param response: The model response
         :return: The formatted response
         """
-        if not self.response_tag:
+        if not self.parse_all and not self.response_tag:
             return {}
         return self._parse_response(response)
 

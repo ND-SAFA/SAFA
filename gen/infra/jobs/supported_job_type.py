@@ -9,7 +9,7 @@ from gen.data.jobs.create_source_splits_job import CreateSourceSplitsJob
 from gen.data.jobs.download_repository_job import DownloadRepositoryJob
 from gen.data.jobs.export_artifacts_job import ExportArtifactsJob
 from gen.delta.delta_summarizer_job import DeltaSummarizerJob
-from gen.health.health_job import HealthCheckJob
+from gen.health.health_job import HealthJob
 from gen.hgen.jobs.base_hgen_job import BaseHGenJob
 from gen.hgen.jobs.multi_layer_hgen_job import MultiLayerHGenJob
 from gen.summary.summarize_job import SummarizeJob
@@ -33,5 +33,5 @@ class SupportedJobType(SupportedEnum):
     DOWNLOAD_REPO = DownloadRepositoryJob
     CREATE_SOURCE_SPLITS = CreateSourceSplitsJob
     CLUSTERING = ClusteringJob
-    HEALTH_CHECK = HealthCheckJob
+    HEALTH_CHECK = HealthJob
     CHAT = ChatJob

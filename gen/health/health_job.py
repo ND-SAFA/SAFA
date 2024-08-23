@@ -4,6 +4,8 @@ from typing import List, Type, Union
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.jobs.abstract_job import AbstractJob
 from gen_common.jobs.job_args import JobArgs
+from gen_common.pipeline.state import State
+from gen_common.util.dataclass_util import DataclassUtil
 
 from gen.health.concepts.extraction.concept_extraction_pipeline import ConceptExtractionPipeline
 from gen.health.concepts.matching.concept_matching_pipeline import ConceptMatchingPipeline
@@ -15,9 +17,10 @@ from gen.health.types.health_tasks import HealthTask
 from gen_test.health.concepts.matching.constants import CONCEPT_TYPE
 
 HealthPipeline = Union[ContradictionPipeline, ConceptExtractionPipeline, ConceptMatchingPipeline]
+HealthStateProperties = []
 
 
-class HealthCheckJob(AbstractJob):
+class HealthJob(AbstractJob):
     random.seed(0)
 
     def __init__(self,
@@ -62,8 +65,8 @@ class HealthCheckJob(AbstractJob):
         for task in self.tasks:
             pipeline_class = self._get_pipeline_class(task)
             pipeline = pipeline_class(args)
-            pipeline.state = state
             pipeline.run()
+            self.add_result_to_state(pipeline.state, state)
 
         return state
 
@@ -82,3 +85,19 @@ class HealthCheckJob(AbstractJob):
             return ConceptExtractionPipeline
         else:
             raise Exception(f"Unknown task: {task}")
+
+    @staticmethod
+    def add_result_to_state(new_state: State, existing_state: HealthState):
+        """
+        Saves any intersecting properties from new state to existing one.
+        :param new_state: The state containing values to copy.
+        :param existing_state: The state to copy values into.
+        :return: None
+        """
+        new_state_dict = DataclassUtil.convert_to_dict(new_state)
+        existing_state_dict = DataclassUtil.convert_to_dict(existing_state)
+
+        intersection_properties = set(new_state_dict.keys()).intersection(set(existing_state_dict.keys()))
+        for intersection_property in intersection_properties:
+            new_state_value = getattr(new_state, intersection_property)
+            setattr(existing_state, intersection_property, new_state_value)

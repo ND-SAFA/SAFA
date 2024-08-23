@@ -9,7 +9,7 @@ from gen_common_test.base.mock.decorators.chat import mock_chat_model
 from gen_common_test.base.mock.langchain.test_chat_model import TestResponseManager
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 
-from gen.health.health_job import HealthCheckJob
+from gen.health.health_job import HealthJob
 from gen.health.health_state import HealthState
 from gen.health.types.health_tasks import HealthTask
 from gen_test.health.health_task_verifier import HealthTaskVerifier
@@ -38,7 +38,7 @@ def run_health_test_case(tc: TestCase,
     test_func()
 
 
-def _create_job(task: HealthTask, dataset: PromptDataset, query_ids: List[str]) -> HealthCheckJob:
+def _create_job(task: HealthTask, dataset: PromptDataset, query_ids: List[str]) -> HealthJob:
     """
     Creates health check job.
     :param task: The task to perform in the job.
@@ -46,7 +46,7 @@ def _create_job(task: HealthTask, dataset: PromptDataset, query_ids: List[str]) 
     :param query_ids: Ids of target artifacts
     :return: Health Job.
     """
-    job = HealthCheckJob(
+    job = HealthJob(
         JobArgs(dataset=dataset),
         query_ids=query_ids,
         tasks=[task]
@@ -54,7 +54,7 @@ def _create_job(task: HealthTask, dataset: PromptDataset, query_ids: List[str]) 
     return job
 
 
-def _run_task(tc, job: HealthCheckJob) -> HealthState:
+def _run_task(tc, job: HealthJob) -> HealthState:
     """
     Runs health task.
     :param job: The job to run.

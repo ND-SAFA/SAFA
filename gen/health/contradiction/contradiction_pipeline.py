@@ -3,12 +3,12 @@ from typing import Type
 from gen_common.pipeline.abstract_pipeline import AbstractPipeline
 from gen_common.pipeline.state import State
 
+from gen.health.contradiction.contradiction_state import ContradictionState
 from gen.health.contradiction.steps.detect_contradiction_step import DetectContradictionStep
 from gen.health.health_args import HealthArgs
-from gen.health.health_state import HealthState
 
 
-class ContradictionPipeline(AbstractPipeline[HealthArgs, HealthState]):
+class ContradictionPipeline(AbstractPipeline[HealthArgs, ContradictionState]):
     steps = [DetectContradictionStep]
 
     def __init__(self, args: HealthArgs):
@@ -22,4 +22,4 @@ class ContradictionPipeline(AbstractPipeline[HealthArgs, HealthState]):
         """
         :return: Returns Health state class
         """
-        return HealthState
+        return ContradictionState

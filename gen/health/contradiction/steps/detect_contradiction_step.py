@@ -7,13 +7,14 @@ from gen_common.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from gen.health.contradiction.contradiction_graph import ContradictionsGraph
 from gen.health.contradiction.contradiction_prompts import CONTRADICTIONS_QUESTION
 from gen.health.contradiction.contradiction_result import ContradictionResult
+from gen.health.contradiction.contradiction_state import ContradictionState
 from gen.health.health_args import HealthArgs
 from gen.health.health_state import HealthState
 
 
 class DetectContradictionStep(AbstractPipelineStep[HealthArgs, HealthState]):
 
-    def _run(self, args: HealthArgs, state: HealthState) -> None:
+    def _run(self, args: HealthArgs, state: ContradictionState) -> None:
         """
         Detects contradictions in query artifacts.
         :param args: Health args containing artifacts.

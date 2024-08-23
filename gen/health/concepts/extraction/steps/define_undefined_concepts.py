@@ -1,4 +1,3 @@
-from collections import defaultdict
 from typing import Dict, List
 
 from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE
@@ -45,29 +44,20 @@ class DefineUndefinedConceptsStep(AbstractPipelineStep):
         :return: None
         """
         context_doc_content = self._read_context_document(args.context_doc_path) if args.context_doc_path else None
-        undefined2artifacts = self.create_undefined2artifacts(state.artifact2undefined)
-        undefined_concepts = [
-            UndefinedConcept(
-                artifact_ids=artifact_ids,
-                concept_id=concept_id,
-                definition=EMPTY_STRING
-            )
-            for concept_id, artifact_ids in undefined2artifacts.items()
-        ]
 
-        if len(undefined_concepts) == 0:
+        if len(state.undefined_concepts) == 0:
             state.undefined_concepts = []
-            logger.info("No undefined concepts")
+            logger.info("Skipping concept definition generation, no undefined concepts.")
             return
 
         context = self._identify_context_for_entities(
             args=args,
-            undefined_concepts=undefined_concepts,
+            undefined_concepts=state.undefined_concepts,
             context_doc_content=context_doc_content
         )
 
         predictions = LLMUtil.complete_iterable_prompts(
-            items=undefined_concepts,
+            items=state.undefined_concepts,
             prompt_generator=self._create_prompt_generator(
                 format_args=args.llm_manager.prompt_args,
                 artifact2context=context
@@ -78,7 +68,6 @@ class DefineUndefinedConceptsStep(AbstractPipelineStep):
         for undefined_concept, prediction in predictions:
             definition = prediction.get("definition", [EMPTY_STRING])[0]
             undefined_concept.definition = definition
-        state.undefined_concepts = undefined_concepts
 
     @staticmethod
     def _create_prompt_generator(format_args: LLMPromptBuildArgs,
@@ -111,19 +100,6 @@ class DefineUndefinedConceptsStep(AbstractPipelineStep):
             return builder, prompt
 
         return generator
-
-    @staticmethod
-    def create_undefined2artifacts(artifact2undefined: Dict[str, List[str]]):
-        """
-        Reverses mapping of artifact to undefined concepts to undefined concepts to related artifacts.
-        :param artifact2undefined: Map of artifacts to undefined concepts within each.
-        :return: Map of undefined concepts to artifacts referencing them.
-        """
-        undefined2artifact = defaultdict(list)
-        for a_id, undefined in artifact2undefined.items():
-            for u_id in undefined:
-                undefined2artifact[u_id].append(a_id)
-        return undefined2artifact
 
     def _identify_context_for_entities(self,
                                        args: HealthArgs,

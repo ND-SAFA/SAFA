@@ -1,9 +1,10 @@
 import random
-from typing import List, Type, Union
+from typing import Dict, List, Type, Union
 
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.jobs.abstract_job import AbstractJob
 from gen_common.jobs.job_args import JobArgs
+from gen_common.pipeline.abstract_pipeline import AbstractPipeline
 from gen_common.pipeline.state import State
 from gen_common.util.dataclass_util import DataclassUtil
 
@@ -16,8 +17,12 @@ from gen.health.health_util import expand_query_selection
 from gen.health.types.health_tasks import HealthTask
 from gen_test.health.concepts.matching.constants import CONCEPT_TYPE
 
-HealthPipeline = Union[ContradictionPipeline, ConceptExtractionPipeline, ConceptMatchingPipeline]
-HealthStateProperties = []
+HealthPipelineType = Type[AbstractPipeline[HealthArgs, State]]
+HealthPipelineMap: Dict[HealthTask, HealthPipelineType] = {
+    HealthTask.CONTRADICTION: ContradictionPipeline,
+    HealthTask.CONCEPT_EXTRACTION: ConceptExtractionPipeline,
+    HealthTask.CONCEPT_MATCHING: ConceptMatchingPipeline
+}
 
 
 class HealthJob(AbstractJob):
@@ -70,20 +75,15 @@ class HealthJob(AbstractJob):
         return state
 
     @staticmethod
-    def _get_pipeline_class(task: HealthTask) -> Type[HealthPipeline]:
+    def _get_pipeline_class(task: HealthTask) -> HealthPipelineType:
         """
         Returns the pipeline class associated with given task.
         :param task: The health task to perform.
         :return: Health pipeline.
         """
-        if task == HealthTask.CONTRADICTION:
-            return ContradictionPipeline
-        elif task == HealthTask.CONCEPT_MATCHING:
-            return ConceptMatchingPipeline
-        elif task == HealthTask.CONCEPT_EXTRACTION:
-            return ConceptExtractionPipeline
-        else:
-            raise Exception(f"Unknown task: {task}")
+        if task not in HealthPipelineMap:
+            raise ValueError(f"Unknown pipeline task:{task}")
+        return HealthPipelineMap[task]
 
     @staticmethod
     def add_result_to_state(new_state: State, existing_state: HealthState):

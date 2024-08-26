@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 from typing import Dict, List
 
-from gen_common.constants.symbol_constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import EMPTY_STRING, NEW_LINE
 from gen_common.data.keys.prompt_keys import PromptKeys
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.llm.abstract_llm_manager import AbstractLLMManager
@@ -65,7 +65,7 @@ class CondenseUndefinedConceptsStep(AbstractPipelineStep[HealthArgs, ConceptExtr
         :return: List of undefined, but condensed concepts.
         """
         assert len(undefined2artifacts) > 1, "Expected at least two undefined concepts."
-        concept_ids = sorted([u for u in undefined2artifacts.keys()])
+        concept_ids = sorted(undefined2artifacts.keys())  # TODO: Replace with clustering to improve robustness
         batches = ListUtil.batch(concept_ids, n=n_concepts)
 
         def generator(batch: List[str]):
@@ -74,7 +74,7 @@ class CondenseUndefinedConceptsStep(AbstractPipelineStep[HealthArgs, ConceptExtr
             :param batch: The batch of concepts to include in each prompt.
             :return: Builder and prompt.
             """
-            concept_content = "\n".join([f"- {b}" for b in batch])
+            concept_content = NEW_LINE.join([f"- {b}" for b in batch])
             prompt_content = f"{_HEADER}\n{concept_content}"
             prompt = Prompt(
                 prompt_content,
@@ -88,23 +88,50 @@ class CondenseUndefinedConceptsStep(AbstractPipelineStep[HealthArgs, ConceptExtr
             prompt[PromptKeys.SYSTEM] = _SYSTEM_PROMPT
             return builder, prompt
 
-        output = LLMUtil.complete_iterable_prompts(
-            batches,
-            generator,
-            llm_manager
-        )
+        llm_output = LLMUtil.complete_iterable_prompts(batches, generator, llm_manager)
+        predictions: List[Dict] = [batch_prediction for batch, batch_prediction in llm_output]
 
-        undefined_concepts = []
-        for prediction in output:
-            _batch, batch_output = prediction
-            for base_term, associated_concepts in batch_output.items():
-                artifact_ids = [a for c in associated_concepts if c in undefined2artifacts for a in undefined2artifacts[c]]
+        undefined_concepts = CondenseUndefinedConceptsStep._parse_undefined_concept_response(predictions, undefined2artifacts)
+        return undefined_concepts
+
+    @staticmethod
+    def _parse_undefined_concept_response(output: List[Dict], undefined2artifacts: Dict[str, List[str]]):
+        """
+        Parses the responses for condensing concepts.
+        :param output: Parsed model predictions per batch.
+        :param undefined2artifacts: Map of undefined concepts to artifact's referencing them.
+        :return: List of undefined concepts aggregated or extracted from artifacts.
+        """
+        new_concepts = {}
+        undefined_concept_ids = set(undefined2artifacts.keys())
+        flattened_predictions = [(base_term, associated_concepts)
+                                 for batch_output in output
+                                 for base_term, associated_concepts in batch_output.items()]
+
+        # Add missing concepts
+        referenced_concepts = [r for _, referenced_concepts in flattened_predictions for r in referenced_concepts]
+        unreferenced_concepts = set(undefined_concept_ids).difference(set(referenced_concepts))
+        for unreferenced_concept in unreferenced_concepts:
+            new_concepts[unreferenced_concept] = UndefinedConcept(
+                concept_id=unreferenced_concept,
+                artifact_ids=undefined2artifacts[unreferenced_concept],
+                definition=EMPTY_STRING
+            )
+
+        # Process predictions, merge conflicting concepts that may exist between batches
+        for term, term_concepts in flattened_predictions:
+            term_concepts_artifact_ids = [a for c in term_concepts if c in undefined2artifacts for a in undefined2artifacts[c]]
+            if term in new_concepts:
+                existing_concept = new_concepts[term]
+                existing_concept.artifact_ids = list(set(existing_concept.artifact_ids + term_concepts_artifact_ids))
+            else:
                 uc = UndefinedConcept(
-                    artifact_ids=artifact_ids,
-                    concept_id=base_term,
+                    artifact_ids=term_concepts_artifact_ids,
+                    concept_id=term,
                     definition=EMPTY_STRING
                 )
-                undefined_concepts.append(uc)
+                new_concepts[term] = uc
+        undefined_concepts = list(new_concepts.values())
         return undefined_concepts
 
     @staticmethod

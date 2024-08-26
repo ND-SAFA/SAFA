@@ -12,11 +12,10 @@ from gen_common.util.enum_util import EnumDict
 from gen_common_test.base.tests.base_test import BaseTest
 
 from gen.health.concepts.extraction.undefined_concept import UndefinedConcept
-from gen.health.contradiction.contradiction_result import ContradictionResult
-from gen.health.health_results import HealthResults
+from gen.health.health_state import HealthState
 from gen_test.health.concepts.extraction.concept_extraction_test_constants import TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT
-from gen_test.health.health_check_constants import ARTIFACT_CONTENT, ARTIFACT_IDS, EXPECTED_CONFLICTING_IDS, \
-    EXPECTED_CONTEXT_IDS, EXPECTED_CONTRADICTION_EXPLANATION, QUERY, QUERY_ID
+from gen_test.health.health_check_constants import ARTIFACT_CONTENT, ARTIFACT_IDS, CONCEPT_LAYER_ID, EXISTING_CONCEPTS, \
+    EXPECTED_CONTEXT_IDS, QUERY, QUERY_CONTENT, QUERY_ID
 
 
 def assert_correct_related_artifacts(test_case: BaseTest, related_ids: List[str]):
@@ -35,16 +34,11 @@ def assert_correct_related_traces(test_case: BaseTest, related_traces: List[Enum
         test_case.assertEqual(trace[TraceKeys.child_label().value], query_artifact)
 
 
-def assert_health_check_success(tc: BaseTest, result: HealthResults):
-    tc.assertEqual(1, len(result.contradictions))
-    contradiction: ContradictionResult = result.contradictions[0]
-    tc.assertListEqual(contradiction.conflicting_ids, EXPECTED_CONFLICTING_IDS + [QUERY_ID])
-    tc.assertEqual(contradiction.explanation, EXPECTED_CONTRADICTION_EXPLANATION)
-
+def assert_health_check_success(self: BaseTest, result: HealthState):
     undefined_concepts = result.undefined_concepts
-    tc.assertEqual(1, len(undefined_concepts))
+    self.assertEqual(1, len(undefined_concepts))
     concept_match: UndefinedConcept = undefined_concepts[0]
-    tc.assertEqual(TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT, concept_match.concept_id)
+    self.assertEqual(TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT, concept_match.concept_id)
 
 
 def get_chat_history(artifact_ids: List = None):
@@ -65,3 +59,18 @@ def get_dataset_for_context(include_query: bool = False):
         layer_df=LayerDataFrame()
     )
     return PromptDataset(trace_dataset=trace_dataset)
+
+
+def get_dataset_for_health_checks():
+    """
+    :return: Dataset used in health checks test.
+    """
+    dataset = get_dataset_for_context()
+    dataset.artifact_df.add_artifact(id=QUERY_ID,
+                                     content=QUERY_CONTENT,
+                                     layer_id="artifacts")
+    for i, concept in enumerate(EXISTING_CONCEPTS):
+        dataset.artifact_df.add_artifact(id=concept,
+                                         content=concept,
+                                         layer_id=CONCEPT_LAYER_ID)
+    return dataset

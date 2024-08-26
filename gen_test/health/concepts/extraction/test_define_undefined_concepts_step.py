@@ -1,12 +1,14 @@
 import json
 from unittest import TestCase
 
+from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_test import BaseTest
 
 from gen.health.concepts.extraction.concept_extraction_state import ConceptExtractionState
 from gen.health.concepts.extraction.steps.define_undefined_concepts import DefineUndefinedConceptsStep
+from gen.health.concepts.extraction.undefined_concept import UndefinedConcept
 from gen_test.health.concepts.extraction.concept_extraction_test_constants import TEST_HEALTH_CONCEPTS_EXTRACTION_MOCK_DEFINITION, \
     TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT
 from gen_test.health.concepts.matching.constants import CONCEPT_R1
@@ -26,7 +28,11 @@ class TestDefineUndefinedConceptsStep(BaseTest):
 
         args = create_concept_args()
         state = ConceptExtractionState()
-        state.artifact2undefined = {CONCEPT_R1: [TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT]}
+        state.undefined_concepts = [UndefinedConcept(
+            concept_id=TEST_HEALTH_CONCEPTS_EXTRACTION_UNDEFINED_CONCEPT,
+            artifact_ids=[CONCEPT_R1],
+            definition=EMPTY_STRING
+        )]
         step = DefineUndefinedConceptsStep()
 
         step.run(args, state)

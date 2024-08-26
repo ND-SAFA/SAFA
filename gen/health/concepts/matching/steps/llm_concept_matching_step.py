@@ -16,10 +16,10 @@ from gen_common.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from gen_common.traceability.relationship_manager.embeddings_manager import EmbeddingsManager
 from gen_common.util.llm_util import LLMUtil, PromptGeneratorType
 
-from gen.health.concepts.concept_args import ConceptArgs
 from gen.health.concepts.matching.concept_matching_prompts import LLMConceptMatchingPromptFormat, LLM_CONCEPT_MATCHING_SYSTEM_PROMPT
-from gen.health.concepts.matching.concept_matching_state import ConceptMatchingState
 from gen.health.concepts.matching.types.concept_direct_match import ConceptDirectMatch
+from gen.health.health_args import HealthArgs
+from gen.health.health_state import HealthState
 
 
 class LLMConceptMatchingStep(AbstractPipelineStep):
@@ -29,7 +29,7 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
     * This is just a starting point and more robust entity extraction must be researched.
     """
 
-    def _run(self, args: ConceptArgs, state: ConceptMatchingState) -> None:
+    def _run(self, args: HealthArgs, state: HealthState) -> None:
         """
         Extracts the most important entities from the target artifact.
         :param args: Contains artifact content to extract entities from.
@@ -57,7 +57,7 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
                                                         text2concept)
 
     @staticmethod
-    def _create_prompt_generator(args: ConceptArgs,
+    def _create_prompt_generator(args: HealthArgs,
                                  llm_args: LLMPromptBuildArgs,
                                  artifact2previous_matches: Dict[str, List[str]],
                                  embeddings_manager: EmbeddingsManager
@@ -70,6 +70,16 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
         :param embeddings_manager: Embedding manager used to search for related concepts with.
         :return: PromptGenerator .
         """
+        builder = PromptBuilder(
+            prompts=[
+                MultiArtifactPrompt("Project Concepts and Terminology", build_method=MultiArtifactPrompt.BuildMethod.XML),
+                ArtifactPrompt("# Target Artifact\n"),
+                Prompt(
+                    response_manager=JSONResponseManager.from_langgraph_model(
+                        LLMConceptMatchingPromptFormat
+                    ))
+            ],
+        )
 
         def generator(artifact: Artifact):
             """
@@ -77,17 +87,6 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
             :param artifact: The artifact to create trace predictions to concepts.
             :return: Builder and prompt.
             """
-            builder = PromptBuilder(
-                prompts=[
-                    MultiArtifactPrompt("Project Concepts and Terminology", build_method=MultiArtifactPrompt.BuildMethod.XML),
-                    ArtifactPrompt("# Target Artifact\n"),
-                    Prompt(
-                        response_manager=JSONResponseManager.from_langgraph_model(
-                            LLMConceptMatchingPromptFormat
-                        ))
-                ],
-            )
-
             query_existing_concepts = artifact2previous_matches[artifact[ArtifactKeys.ID]]
             query_concepts = [c for c in args.get_concept_artifacts() if c[ArtifactKeys.ID] not in query_existing_concepts]
             query_concepts = LLMConceptMatchingStep._get_similar_concepts(embeddings_manager,

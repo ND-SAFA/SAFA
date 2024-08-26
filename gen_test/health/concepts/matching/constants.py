@@ -111,7 +111,8 @@ class ConceptData:
         C4 = "Telemetry (TLM)"
         C5 = "Data Collection System (DCS)"
 
-    DirectMatches = [Concepts.C1, Concepts.C2, Concepts.C3, Concepts.C4]
+    DirectMatchesAfterMulti = [Concepts.C3, Concepts.C4]
+    DirectMatchesBeforeMulti = [Concepts.C1, Concepts.C2] + DirectMatchesAfterMulti
     Predicted = [{"source": Entities.E2, "target": Concepts.C5}]
 
     @staticmethod

@@ -6,10 +6,10 @@ from gen_common.pipeline.abstract_pipeline_step import AbstractPipelineStep
 from gen_common.util.str_util import StrUtil
 from tqdm import tqdm
 
+from gen.health.concepts.matching.concept_matching_state import ConceptMatchingState
 from gen.health.concepts.matching.types.concept_direct_match import ConceptDirectMatch
 from gen.health.concepts.matching.types.concept_variants import ConceptVariants
 from gen.health.health_args import HealthArgs
-from gen.health.health_state import HealthState
 
 
 class DirectConceptMatchingStep(AbstractPipelineStep):
@@ -33,7 +33,7 @@ class DirectConceptMatchingStep(AbstractPipelineStep):
     * This functionality will be fixed at a future date but allows as an easy way to define alternate names.
     """
 
-    def _run(self, args: HealthArgs, state: HealthState) -> None:
+    def _run(self, args: HealthArgs, state: ConceptMatchingState) -> None:
         """
         Finds any concept that are directly cited in target artifact.
         :param args: Contains concepts and target artifact.

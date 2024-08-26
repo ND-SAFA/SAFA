@@ -6,6 +6,7 @@ from gen_common_test.base.mock.langchain.test_chat_model import TestResponseMana
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 
 from gen.health.health_state import HealthState
+from gen_test.health.concepts.matching.constants import ConceptData
 from gen_test.health.concepts.matching.test_direct_concept_matching import TestDirectConceptMatching
 from gen_test.health.concepts.matching.test_llm_concept_matching_step import TestLLMConceptMatchingStep
 from gen_test.health.concepts.matching.utils import create_concept_dataset
@@ -20,5 +21,5 @@ class ConceptMatchingVerifier(HealthTaskVerifier):
         TestLLMConceptMatchingStep.mock_predictions(ai_manager)
 
     def verify_state(self, tc: TestCase, state: HealthState) -> None:
-        TestDirectConceptMatching.verify_state(tc, state)
+        TestDirectConceptMatching.verify_state(tc, state, ConceptData.DirectMatchesAfterMulti)
         TestLLMConceptMatchingStep.verify_state(tc, state)

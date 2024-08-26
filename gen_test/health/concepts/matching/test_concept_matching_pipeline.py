@@ -3,6 +3,7 @@ from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_test import BaseTest
 
 from gen.health.concepts.matching.concept_matching_pipeline import ConceptMatchingPipeline
+from gen_test.health.concepts.matching.constants import ConceptData
 from gen_test.health.concepts.matching.test_direct_concept_matching import TestDirectConceptMatching
 from gen_test.health.concepts.matching.test_llm_concept_matching_step import TestLLMConceptMatchingStep
 from gen_test.health.concepts.matching.utils import create_concept_args
@@ -23,5 +24,5 @@ class TestConceptMatchingPipeline(BaseTest):
 
         pipeline.run()
 
-        TestDirectConceptMatching.verify_state(self, pipeline.state)
+        TestDirectConceptMatching.verify_state(self, pipeline.state, ConceptData.DirectMatchesAfterMulti)
         TestLLMConceptMatchingStep.verify_state(self, pipeline.state)

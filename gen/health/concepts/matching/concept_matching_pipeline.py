@@ -3,16 +3,18 @@ from typing import Type
 from gen_common.pipeline.abstract_pipeline import AbstractPipeline
 from gen_common.pipeline.state import State
 
+from gen.health.concepts.matching.concept_matching_state import ConceptMatchingState
 from gen.health.concepts.matching.steps.direct_concept_matching_step import DirectConceptMatchingStep
 from gen.health.concepts.matching.steps.llm_concept_matching_step import LLMConceptMatchingStep
+from gen.health.concepts.matching.steps.multi_match_step import MultiMatchStep
 from gen.health.health_args import HealthArgs
-from gen.health.health_state import HealthState
 
 
-class ConceptMatchingPipeline(AbstractPipeline[HealthArgs, HealthState]):
+class ConceptMatchingPipeline(AbstractPipeline[HealthArgs, ConceptMatchingState]):
     steps = [
         DirectConceptMatchingStep,
-        LLMConceptMatchingStep
+        LLMConceptMatchingStep,
+        MultiMatchStep
     ]
 
     def __init__(self, args: HealthArgs, **kwargs):
@@ -27,4 +29,4 @@ class ConceptMatchingPipeline(AbstractPipeline[HealthArgs, HealthState]):
         """
         :return: Returns ConceptState class
         """
-        return HealthState
+        return ConceptMatchingState

@@ -1,10 +1,11 @@
+from typing import List
 from unittest import TestCase
 
 from gen_common_test.base.tests.base_test import BaseTest
 
+from gen.health.concepts.matching.concept_matching_state import ConceptMatchingState
 from gen.health.concepts.matching.concept_matching_util import extract_alternate_names
 from gen.health.concepts.matching.steps.direct_concept_matching_step import DirectConceptMatchingStep
-from gen.health.health_state import HealthState
 from gen_test.health.concepts.matching.constants import CONCEPT_R1, ConceptData
 from gen_test.health.concepts.matching.utils import create_concept_args
 
@@ -18,16 +19,16 @@ class TestDirectConceptMatching(BaseTest):
         args = create_concept_args()
         step = DirectConceptMatchingStep()
 
-        state = HealthState()
+        state = ConceptMatchingState()
         step.run(args, state)
 
-        self.verify_state(self, state)
+        self.verify_state(self, state, ConceptData.DirectMatchesBeforeMulti)
 
     @staticmethod
-    def verify_state(tc: TestCase, state: HealthState):
-        tc.assertEqual(len(ConceptData.DirectMatches), len(state.direct_matches))
+    def verify_state(tc: TestCase, state: ConceptMatchingState, expected_matches: List[str]):
+        tc.assertEqual(len(expected_matches), len(state.direct_matches))
 
-        for expected, result in zip(ConceptData.DirectMatches, state.direct_matches):
+        for expected, result in zip(expected_matches, state.direct_matches):
             tc.assertEqual(CONCEPT_R1, result["artifact_id"])
             tc.assertEqual(expected, result["concept_id"])
 

@@ -17,9 +17,9 @@ from gen_common.traceability.relationship_manager.embeddings_manager import Embe
 from gen_common.util.llm_util import LLMUtil, PromptGeneratorType
 
 from gen.health.concepts.matching.concept_matching_prompts import LLMConceptMatchingPromptFormat, LLM_CONCEPT_MATCHING_SYSTEM_PROMPT
+from gen.health.concepts.matching.concept_matching_state import ConceptMatchingState
 from gen.health.concepts.matching.types.concept_direct_match import ConceptDirectMatch
 from gen.health.health_args import HealthArgs
-from gen.health.health_state import HealthState
 
 
 class LLMConceptMatchingStep(AbstractPipelineStep):
@@ -29,7 +29,7 @@ class LLMConceptMatchingStep(AbstractPipelineStep):
     * This is just a starting point and more robust entity extraction must be researched.
     """
 
-    def _run(self, args: HealthArgs, state: HealthState) -> None:
+    def _run(self, args: HealthArgs, state: ConceptMatchingState) -> None:
         """
         Extracts the most important entities from the target artifact.
         :param args: Contains artifact content to extract entities from.

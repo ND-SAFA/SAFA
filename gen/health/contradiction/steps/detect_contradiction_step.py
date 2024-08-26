@@ -29,6 +29,8 @@ class DetectContradictionStep(AbstractPipelineStep[HealthArgs, HealthState]):
         user_questions = [CONTRADICTIONS_QUESTION.format(q_id) for q_id in query_ids]
         results: List[ContradictionResult] = runner.run_multi(args=graph_args, user_question=user_questions,
                                                               artifacts_referenced_in_question=query_ids)
-        [result.conflicting_ids.append(q_id) for q_id, result in zip(query_ids, results) if result and result.conflicting_ids]
+        [result.conflicting_ids.append(q_id)
+         for q_id, result in zip(query_ids, results)
+         if result and len(result.conflicting_ids) > 0]
 
         state.contradictions = results

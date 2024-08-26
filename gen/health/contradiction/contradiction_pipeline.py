@@ -16,7 +16,7 @@ class ContradictionPipeline(AbstractPipeline[HealthArgs, ContradictionState]):
         Creates contradictions pipeline for given health args.
         :param args: Arguments defining artifacts and query artifacts.
         """
-        super().__init__(args, self.steps)
+        super().__init__(args, self.steps, skip_summarization=True)
 
     def state_class(self) -> Type[State]:
         """

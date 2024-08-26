@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gen"
-version = "0.0.3"
+version = "0.0.4"
 description = "SAFA.ai generative server."
 readme = "README.md"
 keywords = ["traceability"]
@@ -25,4 +25,4 @@ where = ["."]
 include = ["gen", "gen_test"]
 
 [project.scripts]
-tgen_download_static = "gen.scripts.tools.download_static:main"
+tgen_download_static = "gen.infra.cli.tools.download_static:main"

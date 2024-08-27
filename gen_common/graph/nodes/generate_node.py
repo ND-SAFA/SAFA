@@ -11,8 +11,8 @@ from gen_common.graph.io.graph_args import GraphArgs
 from gen_common.graph.io.graph_state import GraphState
 from gen_common.graph.io.graph_state_vars import GraphStateVars
 from gen_common.graph.llm_tools.tool import BaseTool
-from gen_common.graph.llm_tools.tool_models import ExploreArtifactNeighborhood, RequestAssistance, RetrieveAdditionalInformation, \
-    STOP_TOOL_USE, AnswerUser
+from gen_common.graph.llm_tools.tool_models import AnswerUser, ExploreArtifactNeighborhood, RequestAssistance, \
+    RetrieveAdditionalInformation
 from gen_common.graph.nodes.abstract_node import AbstractNode
 from gen_common.llm.response_managers.json_response_manager import JSONResponseManager
 from gen_common.util.dict_util import DictUtil
@@ -29,7 +29,7 @@ class PromptComponents:
                  f"Consider whether you can answer the question using your own knowledge or "
                  f"any documents provided. "
                  "Answer the user's query as accurately and specifically as possible ")
-    TOOL_USE = ("- If you can't answer, use the other tools available to assist you. "
+    TOOL_USE = ("Note: If you can't answer, use the other tools available to assist you. "
                 "Pay attention to what tools have already been used so you do not repeat past steps. ")
     DONT_KNOW_OPTION = (
         "- If none of the tools are valuable, or you have exhausted your strategy, and you still do not know the answer, "
@@ -101,11 +101,11 @@ class GenerateNode(AbstractNode):
         :return: The selector for choosing a tool based on state.
         """
         no_context = ~ GraphStateVars.DOCUMENTS
-        stop_neighborhood_search = GraphStateVars.SELECTED_ARTIFACT_IDS == STOP_TOOL_USE
+        stop_neighborhood_search = GraphStateVars.BLACKLISTED_TOOLS.contains(ExploreArtifactNeighborhood.__name__)
         no_traces = Condition((self.graph_args.dataset.trace_dataset, "is", None))
         neighborhood_search_unavailable = no_context | no_traces | stop_neighborhood_search
 
-        stop_retrieval = GraphStateVars.RETRIEVAL_QUERY == STOP_TOOL_USE
+        stop_retrieval = GraphStateVars.BLACKLISTED_TOOLS.contains(RetrieveAdditionalInformation.__name__)
 
         base_tools = [RequestAssistance] if self.allow_request_assistance else []
         tools = PathSelector(
@@ -132,7 +132,7 @@ class GenerateNode(AbstractNode):
         :param prompt_components: The components of the prompt.
         :return: Single prompt, with all components joined by newline
         """
-        return NEW_LINE.join(prompt_components)
+        return f"{NEW_LINE}{NEW_LINE}".join(prompt_components)
 
     @staticmethod
     def _get_default_system_prompt() -> List[str]:
@@ -157,7 +157,10 @@ class GenerateNode(AbstractNode):
         if isinstance(response, BaseTool):
             response.update_state(state)
 
-        state["tools_already_used"].append(f"{len(state['tools_already_used']) + 1}: {repr(response)}")
+        repr_response = repr(response)
+        if repr_response in state["tools_already_used"]:
+            state["backlisted_tools"].add(response.__class__.__name__)
+        state["tools_already_used"].append(repr_response)
 
     @staticmethod
     def _clear_previous_state_values(state: GraphState) -> None:

@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_core.documents.base import Document
 from langchain_core.vectorstores import VectorStore
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -288,7 +288,7 @@ class VectorStoreManager(AbstractRelationshipManager):
         Creates vector store, loads it if previous version saved at vector store path.
         :return: Vector store created.
         """
-        if self.__vectorstore:
+        if self.__vectorstore is not None:
             return self.__vectorstore
         vector_params = {
             "embedding_function": HuggingFaceEmbeddings(model_name=self.model_name),

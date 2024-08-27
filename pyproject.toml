@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gen-common"
-version = "0.0.21"
+version = "0.0.22"
 description = "SAFA.ai common utilities for python / generative workloads."
 readme = "README.md"
 keywords = ["traceability"]
@@ -20,3 +20,6 @@ homepage = "https://safa.ai"  # Replace with your actual homepage URL if needed
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["gen_common", "gen_common_test"]
+
+[project.scripts]
+gen_download_static = "gen_common.infra.cli.download_static:main"

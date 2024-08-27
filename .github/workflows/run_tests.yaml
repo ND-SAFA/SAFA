@@ -34,6 +34,6 @@ jobs:
 
     - name: Run Unit Tests
       run: |
-        python -m unittest discover -s common_resources_test
+        python -m unittest discover -s gen_common_test
       env:
         DEFAULT_EMBEDDING_MODEL: "sentence-transformers/all-MiniLM-L6-v2"

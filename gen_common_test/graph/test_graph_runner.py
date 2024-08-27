@@ -20,8 +20,9 @@ from gen_common.graph.graph_runner import GraphRunner
 from gen_common.graph.io.graph_args import GraphArgs
 from gen_common.graph.io.graph_state import GraphState
 from gen_common.graph.io.graph_state_vars import GraphStateVars
-from gen_common.graph.llm_tools.tool_models import ExploreArtifactNeighborhood, RequestAssistance, RetrieveAdditionalInformation
-from gen_common.graph.nodes.generate_node import AnswerUser, GenerateNode
+from gen_common.graph.llm_tools.tool_models import ExploreArtifactNeighborhood, RequestAssistance, RetrieveAdditionalInformation, \
+    AnswerUser
+from gen_common.graph.nodes.generate_node import GenerateNode
 from gen_common.graph.nodes.supported_nodes import SupportedNodes
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.decorators.chat import mock_chat_model

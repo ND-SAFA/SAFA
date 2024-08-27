@@ -3,8 +3,8 @@ from langchain_core.documents.base import Document
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.graph.io.graph_state import GraphState
 from gen_common.graph.llm_tools.tool_models import ExploreArtifactNeighborhood, RequestAssistance, RetrieveAdditionalInformation, \
-    STOP_TOOL_USE
-from gen_common.graph.nodes.generate_node import AnswerUser, GenerateNode
+    STOP_TOOL_USE, AnswerUser
+from gen_common.graph.nodes.generate_node import GenerateNode
 from gen_common.llm.abstract_llm_manager import PromptRoles
 from gen_common_test.base.mock.decorators.chat import mock_chat_model
 from gen_common_test.base.mock.langchain.prompt_assertion import AssertInPrompt, AssertToolAvailable, PromptAssertion

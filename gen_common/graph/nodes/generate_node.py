@@ -1,8 +1,8 @@
 from typing import List
 
-from pydantic.v1.main import BaseModel, Field
+from pydantic.v1.main import BaseModel
 
-from gen_common.constants.symbol_constants import EMPTY_STRING
+from gen_common.constants.symbol_constants import NEW_LINE
 from gen_common.graph.agents.base_agent import BaseAgent
 from gen_common.graph.branches.conditions.condition import Condition
 from gen_common.graph.branches.paths.path import Path
@@ -12,60 +12,48 @@ from gen_common.graph.io.graph_state import GraphState
 from gen_common.graph.io.graph_state_vars import GraphStateVars
 from gen_common.graph.llm_tools.tool import BaseTool
 from gen_common.graph.llm_tools.tool_models import ExploreArtifactNeighborhood, RequestAssistance, RetrieveAdditionalInformation, \
-    STOP_TOOL_USE
+    STOP_TOOL_USE, AnswerUser
 from gen_common.graph.nodes.abstract_node import AbstractNode
 from gen_common.llm.response_managers.json_response_manager import JSONResponseManager
 from gen_common.util.dict_util import DictUtil
 
 
-class AnswerUser(BaseTool):
-    """
-    Response to the user query.
-    """
-    answer: str = Field(description="Your response to the question WITHOUT preamble")
-    reference_ids: List[str] = Field(description="If documents from the context were used to answer the question, provide their ids.",
-                                     default_factory=list)
-
-    def update_state(self, state: GraphState) -> None:
-        """
-        Updates the state with the response information.
-        :param state: The state.
-        """
-        state["generation"] = self.answer
-        state["reference_ids"] = self.reference_ids
-
-
-class GenerateNode(AbstractNode):
-    RESPONSE_TAG = "answer"
-
-    DEFAULT_PROMPT = (
-        "You are an assistant for question-answering tasks, working on a software project."
-        "\n\n# Project Description\n"
-        "This project contains a graph of artifact's, connected by trace links representing different types of relationships. "
-        "These artifact's and their relationships will be useful to answering the question and can be accessed "
-        "using the available tools. "
-        "\n\n# Task\n"
-        f"1. Consider whether you can answer the question using your own knowledge or "
-        f"any documents provided. "
-        "Answer the user's query as accurately and specifically as possible "
-        "{}"
-        "\n- If you can't answer, use the other tools available to assist you. "
-        "Pay attention to what tools have already been used so you do not repeat past steps. "
-    )
-    ASSISTANCE_ADDITION = (
-        "\n- If none of the tools are valuable, or you have exhausted your strategy, and you still do not know the answer, "
+class PromptComponents:
+    ROLE_DESCRIPTION = "You are an assistant for {} task, working on a software project."
+    PROJ_DESCRIPTION = ("\n# Project Description\n"
+                        "This project contains a graph of artifact's, "
+                        "connected by trace links representing different types of relationships. "
+                        "These artifact's and their relationships will be useful to answering the question and can be accessed "
+                        "using the available tools. ")
+    BASE_TASK = ("\n# Task\n"
+                 f"Consider whether you can answer the question using your own knowledge or "
+                 f"any documents provided. "
+                 "Answer the user's query as accurately and specifically as possible ")
+    TOOL_USE = ("- If you can't answer, use the other tools available to assist you. "
+                "Pay attention to what tools have already been used so you do not repeat past steps. ")
+    DONT_KNOW_OPTION = (
+        "- If none of the tools are valuable, or you have exhausted your strategy, and you still do not know the answer, "
         f"use the {RequestAssistance.__name__} tool. ")
-    CONTEXT_ADDITION = ("Remember to use the currently retrieved context to answer the question. "
+    CONTEXT_PROVIDED = ("- Remember to use the currently retrieved context to answer the question. "
                         "The user does not have access to the context, "
                         "so include any necessary details in your response. ")
 
-    def __init__(self, graph_args: GraphArgs, response_model: BaseTool = AnswerUser, allow_request_assistance: bool = True):
+
+class GenerateNode(AbstractNode):
+
+    def __init__(self, graph_args: GraphArgs, response_model: BaseTool = AnswerUser,
+                 allow_request_assistance: bool = True, prompt_components: List[str] = None):
         """
         Performs decision-making and creates responses to user queries.
         :param graph_args: Starting arguments to the graph.
         :param response_model: The final response expected from the model.
         :param allow_request_assistance: If True, allows the LLM to request assistance if it doesnt know the answer.
+        :param prompt_components: List of prompt elements that will be joined by newlines to create the system prompt.
         """
+        prompt_components = self._get_default_system_prompt() if not prompt_components else prompt_components
+        if allow_request_assistance:
+            prompt_components += PromptComponents.DONT_KNOW_OPTION
+        self.system_prompt = self._join_prompt_components(*prompt_components)
         self.response_model = response_model
         self.allow_request_assistance = allow_request_assistance
         super().__init__(graph_args)
@@ -88,8 +76,8 @@ class GenerateNode(AbstractNode):
         """
         tools = self._get_tool_selector()
         system_prompt = PathSelector(Path(condition=~ GraphStateVars.DOCUMENTS,
-                                          action=self.DEFAULT_PROMPT.format(EMPTY_STRING)),
-                                     Path(action=self.DEFAULT_PROMPT.format(self.CONTEXT_ADDITION)))
+                                          action=self.system_prompt),
+                                     Path(action=self._join_prompt_components(self.system_prompt, PromptComponents.CONTEXT_PROVIDED)))
         response_manager = JSONResponseManager.from_langgraph_model(
             self.response_model,
             response_instructions_format=f"Respond WITHOUT preamble!!\n{JSONResponseManager.response_instructions_format}")
@@ -136,6 +124,27 @@ class GenerateNode(AbstractNode):
             # All tools are unavailable
             Path(action=base_tools))
         return tools
+
+    @staticmethod
+    def _join_prompt_components(*prompt_components: str) -> str:
+        """
+        Joins the prompt components into a single prompt.
+        :param prompt_components: The components of the prompt.
+        :return: Single prompt, with all components joined by newline
+        """
+        return NEW_LINE.join(prompt_components)
+
+    @staticmethod
+    def _get_default_system_prompt() -> List[str]:
+        """
+        Default prompt for the question-answering task.
+        :return: List of prompt components for the default task.
+        """
+        default_prompt = [PromptComponents.ROLE_DESCRIPTION.format("question-answering"),
+                          PromptComponents.PROJ_DESCRIPTION,
+                          PromptComponents.BASE_TASK,
+                          PromptComponents.TOOL_USE]
+        return default_prompt
 
     def _update_state(self, response: BaseModel, state: GraphState) -> None:
         """

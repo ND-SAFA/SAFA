@@ -1,6 +1,7 @@
 import uuid
 from typing import List, Set
 
+from pydantic.v1.fields import Field
 from pydantic.v1.main import Field
 
 from gen_common.graph.io.graph_state import GraphState
@@ -97,3 +98,20 @@ class RequestAssistance(BaseTool):
         """
         state["relevant_information_learned"] = self.relevant_information_learned
         state["related_doc_ids"] = self.related_doc_ids
+
+
+class AnswerUser(BaseTool):
+    """
+    Response to the user query.
+    """
+    answer: str = Field(description="Your response to the question WITHOUT preamble")
+    reference_ids: List[str] = Field(description="If documents from the context were used to answer the question, provide their ids.",
+                                     default_factory=list)
+
+    def update_state(self, state: GraphState) -> None:
+        """
+        Updates the state with the response information.
+        :param state: The state.
+        """
+        state["generation"] = self.answer
+        state["reference_ids"] = self.reference_ids

@@ -1,7 +1,7 @@
+import json
 import uuid
 from typing import List, Set
 
-from pydantic.v1.fields import Field
 from pydantic.v1.main import Field
 
 from gen_common.graph.io.graph_state import GraphState
@@ -27,17 +27,15 @@ def get_input_for_context_tool_use(input_value: str | List[str], state: GraphSta
 
 class RetrieveAdditionalInformation(BaseTool):
     """
-    Invoking this tool will perform a semantic search for topically related artifacts in the project.
+    Invoking this tool will perform a keyword-based search for artifacts in the project containing those words.
     This is useful if you currently do not have enough context/information to answer the user's question
-    and would like to see further information about a topic in the project.
+    and would like to see further information about a set of topics in the project.
 
-    To use this function, translate the user's question into a better version that is optimized  for vectorstore retrieval.
-    Look at the input and try to reason about the underlying semantic intent / meaning. If you would like to retrieve information
-    about multiple, independent topics, you may also provide the retrieval query as a list of search terms.
+    To use this function, translate the user's question into a set of keyword-based search queries.
+    Look at the input and try to reason about the underlying semantic intent / meaning.
+    Provide the retrieval query as a list of search queries.
     """
-    retrieval_query: str | List[str] = Field(description="A query from the user question optimized for vectorstore retrieval. "
-                                                         "To search for multiple, independent terms, "
-                                                         "a list of queries can be provided.")
+    retrieval_query: List[str] = Field(description=json.dumps(["word1 word2", "word3 word4"]))
 
     def update_state(self, state: GraphState) -> None:
         """

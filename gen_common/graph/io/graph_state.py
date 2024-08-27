@@ -30,7 +30,8 @@ class GraphState(TypedDict, total=False):
     related_doc_ids: List[str]
 
     # tools
-    tools_already_used: List[str]
+    tools_already_used: List[str]  # TODO: Convert to set once formatting bug has been fixed
+    backlisted_tools: Set[str]
 
     # settings
     run_async: bool

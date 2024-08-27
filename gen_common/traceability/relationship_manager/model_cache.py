@@ -23,6 +23,7 @@ class ModelCache:
         :param model_type: The type of model to get.
         :return: The model.
         """
+        logger.info(f"retrieving model {model_name}...")
         if model_name in ModelCache.MODEL_MAP:
             logger.info(f"Loading cached model: {model_name}")
             return ModelCache.MODEL_MAP[model_name]

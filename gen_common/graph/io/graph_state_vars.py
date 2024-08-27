@@ -22,6 +22,7 @@ class GraphStateVars:
     RELATED_DOC_IDS = StateVar("related_doc_ids")
     RUN_ASYNC = StateVar("run_async")
     THREAD_ID = StateVar("thread_id")
+    BLACKLISTED_TOOLS = StateVar("backlisted_tools")
 
     @classmethod
     def validate(cls, state_cls: Type[GraphState] = GraphState) -> None:

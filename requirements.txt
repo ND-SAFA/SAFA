@@ -1,7 +1,6 @@
 anthropic==0.28.0
 beautifulsoup4==4.12.3
 comment-parser==1.2.4
-chromadb==0.5.5
 datasets==2.19.2
 dirtyjson==1.0.8
 evaluate==0.4.2

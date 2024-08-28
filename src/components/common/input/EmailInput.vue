@@ -47,7 +47,7 @@ const model = useVModel(props, "modelValue");
 const errorMessage = computed(() => {
   if (
     model.value &&
-    !/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(model.value)
+    !/^\w+([+.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(model.value)
   ) {
     const error = "E-mail must contain a valid domain.";
     emit("update:errorMessage", error);

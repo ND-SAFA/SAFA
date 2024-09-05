@@ -19,6 +19,7 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         :return: None
         """
         artifact_df = state.dataset.artifact_df
+        artifact_df.dropna(subset=[ArtifactKeys.CONTENT.value])
         should_filter = args.include_subset_by_type or args.include_subset_by_dir
         indices2remove = StepFilterDataset.identify_indices_with_duplicate_content(artifact_df)
         missing_content = {i for i, a in artifact_df.itertuples() if not DataFrameUtil.get_optional_value(a[ArtifactKeys.CONTENT],

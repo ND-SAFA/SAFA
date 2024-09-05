@@ -6,7 +6,7 @@ import uuid
 from abc import abstractmethod
 from copy import deepcopy
 from inspect import getfullargspec
-from typing import Any, Dict
+from typing import Any, Dict, Type
 
 from gen_common.constants.experiment_constants import OUTPUT_FILENAME
 from gen_common.infra.base_object import BaseObject
@@ -15,12 +15,15 @@ from gen_common.jobs.job_args import JobArgs
 from gen_common.jobs.job_result import JobResult
 from gen_common.traceability.relationship_manager.model_cache import ModelCache
 from gen_common.util.file_util import FileUtil
+from gen_common.util.override import overrides
 from gen_common.util.random_util import RandomUtil
 from gen_common.util.reflection_util import ParamScope, ReflectionUtil
 from gen_common.util.status import Status
+from gen_common.util.supported_enum import SupportedEnum
 
 
 class AbstractJob(threading.Thread, BaseObject):
+    SUPPORTED_JOBS = None
 
     def __init__(self, job_args: JobArgs = None, require_data: bool = False):
         """
@@ -110,6 +113,27 @@ class AbstractJob(threading.Thread, BaseObject):
         :return: The job name
         """
         return self.__class__.__name__.split("Job")[0]
+
+    @classmethod
+    def register_supported_jobs(cls, supported_jobs_class: Type[SupportedEnum]) -> None:
+        """
+        Registers the supported job enum class for creating jobs from JSON.
+        :param supported_jobs_class: The class to use for getting supported jobs.
+        :return: None.
+        """
+        cls.SUPPORTED_JOBS = supported_jobs_class
+
+    @classmethod
+    @overrides(BaseObject)
+    def _get_enum_class(cls, child_class_name: str) -> Type:
+        """
+        Returns the correct enum class mapping name to class given the abstract parent class type and name of child class
+        :param child_class_name: the name of the child class
+        :return: the enum class mapping name to class
+        """
+        if cls.SUPPORTED_JOBS is None:
+            raise Exception("Must register supported jobs before loading json.")
+        return cls.SUPPORTED_JOBS
 
     def __deepcopy__(self, memodict: Dict = {}) -> "AbstractJob":
         """

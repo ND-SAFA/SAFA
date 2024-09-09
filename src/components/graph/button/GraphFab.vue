@@ -1,79 +1,79 @@
 <template>
   <q-page-sticky
     v-if="displayActions"
-    position="bottom-left"
     :offset="fabPos"
     class="artifact-fab"
+    position="bottom-left"
   >
     <q-fab
       v-model="open"
       v-touch-pan.prevent.mouse="handleMoveFab"
-      direction="up"
-      vertical-actions-align="left"
-      :color="drawMode ? 'secondary' : 'gradient'"
       :active-icon="getIcon('cancel')"
-      :icon="drawMode ? getIcon('trace') : getIcon('graph-add')"
+      :color="drawMode ? 'secondary' : 'gradient'"
       :disable="draggingFab"
+      :icon="drawMode ? getIcon('trace') : getIcon('graph-add')"
       class="bg-neutral"
       data-cy="button-fab-toggle"
+      direction="up"
+      vertical-actions-align="left"
     >
       <q-fab-action
         v-if="displayGenerateActions"
-        label="Generate Trace Links"
         :icon="getIcon('generate-traces')"
-        color="gradient"
         class="bg-neutral"
+        color="gradient"
         data-cy="button-fab-generate-trace"
+        label="Generate Trace Links"
         @click="appStore.openDetailsPanel('generateTrace')"
       />
       <q-fab-action
         v-if="displayGenerateActions"
-        label="Generate Artifacts"
         :icon="getIcon('generate-artifacts')"
-        color="gradient"
         class="bg-neutral"
+        color="gradient"
         data-cy="button-fab-generate-artifact"
+        label="Generate Artifacts"
         @click="appStore.openDetailsPanel('generateArtifact')"
       />
       <q-fab-action
         v-if="displayGenerateActions && ENABLED_FEATURES.GENERATE_SUMMARIES"
-        label="Summarize Artifacts"
         :icon="getIcon('generate-summaries')"
-        color="gradient"
         class="bg-neutral"
+        color="gradient"
         data-cy="button-fab-summarize-artifact"
+        label="Summarize Artifacts"
         @click="appStore.openDetailsPanel('summarizeArtifact')"
       />
       <q-fab-action
         v-if="isTreeMode"
-        :label="drawMode ? 'Cancel Draw Mode' : 'Draw Trace Link'"
         :icon="drawMode ? getIcon('cancel') : getIcon('trace')"
+        :label="drawMode ? 'Cancel Draw Mode' : 'Draw Trace Link'"
         class="bg-neutral"
         data-cy="button-fab-draw-trace"
         @click="cyStore.drawMode('toggle')"
       />
       <q-fab-action
         v-if="isTreeMode"
-        label="Create Trace Link"
         :icon="getIcon('create-trace')"
         class="bg-neutral"
         data-cy="button-fab-create-trace"
+        label="Create Trace Link"
         @click="appStore.openDetailsPanel('saveTrace')"
       />
       <q-fab-action
         v-if="isTreeMode"
-        label="Create Artifact"
         :icon="getIcon('create-artifact')"
         class="bg-neutral"
         data-cy="button-fab-create-artifact"
+        label="Create Artifact"
         @click="artifactSaveStore.openPanel({ isNewArtifact: true })"
       />
     </q-fab>
     <icon-button
       v-if="drawMode"
+      class="q-ml-sm"
       icon="cancel"
       tooltip="Cancel draw mode"
-      class="q-ml-sm"
       @click="cyStore.drawMode('disable')"
     />
   </q-page-sticky>
@@ -88,7 +88,7 @@ export default {
 };
 </script>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, ref } from "vue";
 import { ENABLED_FEATURES, getIcon } from "@/util";
 import {

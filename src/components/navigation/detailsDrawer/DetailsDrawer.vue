@@ -1,11 +1,11 @@
 <template>
   <q-drawer
+    :breakpoint="500"
+    :class="className"
+    :model-value="drawerOpen"
+    :width="width"
     bordered
     side="right"
-    :model-value="drawerOpen"
-    :breakpoint="500"
-    :width="width"
-    :class="className"
   >
     <div class="q-pa-sm q-mb-md bg-neutral">
       <delta-panel />
@@ -22,6 +22,7 @@
       <trace-matrix-panel />
       <generate-trace-link-panel />
       <artifact-generation-panel />
+      <health-panel />
       <artifact-summarization-panel />
     </div>
   </q-drawer>
@@ -36,7 +37,7 @@ export default {
 };
 </script>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed } from "vue";
 import { appStore, useScreen } from "@/hooks";
 import { DeltaPanel } from "@/components/delta/panel";
@@ -44,6 +45,7 @@ import { ViewPanel } from "@/components/view";
 import {
   ArtifactPanel,
   ArtifactBodyPanel,
+  HealthPanel,
   SaveArtifactPanel,
   ArtifactGenerationPanel,
   ArtifactSummarizationPanel,

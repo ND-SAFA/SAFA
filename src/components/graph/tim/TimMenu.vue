@@ -1,44 +1,44 @@
 <template>
   <node-display
     v-if="displayActions"
-    variant="menu"
     color="neutral"
+    variant="menu"
     @mousedown.stop
     @mouseup.stop
   >
     <flex-box>
       <icon-button
+        :icon="drawMode ? 'cancel' : 'trace'"
         :tooltip="
           drawMode ? 'Cancel draw mode' : 'Draw artifact type direction'
         "
-        :icon="drawMode ? 'cancel' : 'trace'"
         @click="handleAction(() => cyStore.drawMode('toggle'))"
       />
-      <separator v-if="displayGenerateActions" vertical class="q-mx-xs" />
+      <separator v-if="displayGenerateActions" class="q-mx-xs" vertical />
       <icon-button
         v-if="displayGenerateActions && ENABLED_FEATURES.GENERATE_SUMMARIES"
-        tooltip="Summarize artifacts"
-        icon="generate-summaries"
         color="gradient"
         data-cy="button-summarize-artifact"
+        icon="generate-summaries"
+        tooltip="Summarize artifacts"
         @click="
           handleAction(() => appStore.openDetailsPanel('summarizeArtifact'))
         "
       />
       <icon-button
         v-if="displayGenerateActions"
-        tooltip="Generate artifacts"
-        icon="generate-artifacts"
         color="gradient"
+        icon="generate-artifacts"
+        tooltip="Generate artifacts"
         @click="
           handleAction(() => appStore.openDetailsPanel('generateArtifact'))
         "
       />
       <icon-button
         v-if="displayGenerateActions"
-        tooltip="Generate trace links"
-        icon="generate-traces"
         color="gradient"
+        icon="generate-traces"
+        tooltip="Generate trace links"
         @click="handleAction(() => appStore.openDetailsPanel('generateTrace'))"
       />
     </flex-box>
@@ -54,7 +54,7 @@ export default {
 };
 </script>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { computed, inject } from "vue";
 import { ENABLED_FEATURES } from "@/util";
 import { appStore, cyStore, permissionStore } from "@/hooks";

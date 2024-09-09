@@ -11,6 +11,6 @@ export const ENABLED_FEATURES = {
   ONBOARDING_PUBLIC_REPOS: false,
 
   GENERATE_SUMMARIES: false,
-
+  HEALTH: false,
   SIGN_UP: true,
 };

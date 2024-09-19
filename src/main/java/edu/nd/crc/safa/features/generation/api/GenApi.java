@@ -20,6 +20,7 @@ import edu.nd.crc.safa.features.generation.summary.SummaryResponse;
 import edu.nd.crc.safa.features.generation.tgen.TGenRequest;
 import edu.nd.crc.safa.features.generation.tgen.TGenResponse;
 import edu.nd.crc.safa.features.health.HealthConstants;
+import edu.nd.crc.safa.features.health.entities.HealthTask;
 import edu.nd.crc.safa.features.health.entities.gen.GenHealthRequest;
 import edu.nd.crc.safa.features.health.entities.gen.GenHealthResponse;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
@@ -43,17 +44,18 @@ public class GenApi implements ITraceGenerationController {
     /**
      * Generates health check for target artifacts.
      *
-     * @param projectArtifacts List of artifacts in project.
-     * @param targetArtifacts  Target artifact to generate health checks for.
+     * @param dataset         Dataset containing artifacts and trace links.
+     * @param targetArtifacts Target artifact to generate health checks for.
+     * @param tasks           Tasks to perform on target artifacts.
      * @return Health checks generated for artifact.
      */
-    public GenHealthResponse generateHealthChecks(List<GenerationArtifact> projectArtifacts,
+    public GenHealthResponse generateHealthChecks(List<HealthTask> tasks,
+                                                  GenerationDataset dataset,
                                                   List<GenerationArtifact> targetArtifacts) {
-        GenerationDataset dataset = new GenerationDataset(projectArtifacts);
         List<String> queryIds = targetArtifacts.stream().map(GenerationArtifact::getId).toList();
-        GenHealthRequest request = new GenHealthRequest(dataset, queryIds, HealthConstants.CONCEPT_TYPE);
-        String chatEndpoint = TGenConfig.getEndpoint("health");
-        return genApiController.performJob(chatEndpoint, request, GenHealthResponse.class, null);
+        GenHealthRequest request = new GenHealthRequest(tasks, dataset, queryIds, HealthConstants.CONCEPT_TYPE);
+        String healthEndpoint = TGenConfig.getEndpoint("health");
+        return genApiController.performJob(healthEndpoint, request, GenHealthResponse.class, null);
     }
 
     /**
@@ -61,13 +63,13 @@ public class GenApi implements ITraceGenerationController {
      *
      * @param userMessageContent User message to respond to.
      * @param chatMessages       Previous messages in chat.
-     * @param artifacts          Projects artifacts used in context.
+     * @param dataset            Dataset containing project artifacts and traces.
      * @return Gen chat response.
      */
     public GenChatResponse generateChatResponse(String userMessageContent,
                                                 List<GenChatMessage> chatMessages,
-                                                List<GenerationArtifact> artifacts) {
-        GenerationDataset dataset = new GenerationDataset(artifacts);
+                                                GenerationDataset dataset) {
+
         chatMessages.add(GenChatMessage.fromUserMessage(userMessageContent));
         GenChatRequest request = new GenChatRequest(dataset, chatMessages);
         String chatEndpoint = TGenConfig.getEndpoint("chat");
@@ -78,12 +80,11 @@ public class GenApi implements ITraceGenerationController {
      * Generates name for title of chat.
      *
      * @param chatMessages Messages in chat.
-     * @param artifacts    Artifacts in dataset.
+     * @param dataset      Dataset containing artifacts and trace link.
      * @return Title of chat.
      */
     public GenChatTitleResponse generateChatTitle(List<GenChatMessage> chatMessages,
-                                                  List<GenerationArtifact> artifacts) {
-        GenerationDataset dataset = new GenerationDataset(artifacts);
+                                                  GenerationDataset dataset) {
         GenChatRequest request = new GenChatRequest(dataset, chatMessages);
         String chatEndpoint = TGenConfig.getEndpoint("chat-title");
         return genApiController.performRequest(chatEndpoint, request, GenChatTitleResponse.class);

@@ -186,7 +186,6 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
                 .bodyToMono(JiraProjectPermissionDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to retrieve JIRA permission"));
 
-        System.out.println(permissionDTO);
         if (!permissionDTO.getPermissions().containsKey(JiraProjectPermissionDTO.BROWSE_PROJECTS_PERMISSION)) {
             return false;
         }
@@ -207,12 +206,12 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
         body.setRedirectLink(this.redirectLink);
 
         JiraAuthResponseDTO dto = WebApiUtils.blockOptional(
-                this.webClient
-                        .method(ApiRoute.REFRESH_TOKEN.getMethod())
-                        .uri(uri)
-                        .bodyValue(body)
-                        .retrieve()
-                        .bodyToMono(JiraAuthResponseDTO.class)
+            this.webClient
+                .method(ApiRoute.REFRESH_TOKEN.getMethod())
+                .uri(uri)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(JiraAuthResponseDTO.class)
         ).orElseThrow(() -> new SafaError("Error while trying to use access code"));
 
         JiraAccessCredentialsDTO result = new JiraAccessCredentialsDTO();
@@ -227,7 +226,7 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
     @Override
     public List<JiraInstallationDTO> getInstallations(JiraAccessCredentials credentials) {
         String uri = this.buildAuthRequestURI(ApiRoute.INSTALLATIONS);
-        
+
         return WebApiUtils.blockOptional(
             this.webClient
                 .method(ApiRoute.INSTALLATIONS.getMethod())
@@ -235,7 +234,8 @@ public class JiraConnectionServiceImpl implements JiraConnectionService {
                 .header(HttpHeaders.AUTHORIZATION,
                     this.buildAuthorizationHeaderValue(credentials.getBearerAccessToken()))
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<JiraInstallationDTO>>() {})
+                .bodyToMono(new ParameterizedTypeReference<List<JiraInstallationDTO>>() {
+                })
         ).orElseThrow(() -> new SafaError("Error while trying to use access code"));
     }
 

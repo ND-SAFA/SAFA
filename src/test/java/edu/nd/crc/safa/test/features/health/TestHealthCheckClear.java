@@ -36,7 +36,7 @@ class TestHealthCheckClear extends GenerationalTest {
 
         HealthResponseDTO healthResponseDTO = getServiceProvider()
             .getHealthService()
-            .performArtifactHealthChecks(projectVersion, List.of(targetArtifact));
+            .performHealthChecks(projectVersion, List.of(targetArtifact));
 
 
         testVerifier.verifyHealthResponse(healthResponseDTO);

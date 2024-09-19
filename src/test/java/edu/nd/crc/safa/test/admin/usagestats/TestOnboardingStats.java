@@ -189,8 +189,9 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
 
         UUID firstUserId = safaUserService.getUserByEmail(users.get(0).getUsername()).getUserId();
         UserStatisticsDTO firstUserStats = SafaRequest.withRoute(AppRoutes.Statistics.ONBOARDING_BY_USER)
-                .withPathVariable("userId", firstUserId.toString())
-                .getAsType(new TypeReference<>(){});
+            .withPathVariable("userId", firstUserId.toString())
+            .getAsType(new TypeReference<>() {
+            });
         assertThat(firstUserStats.getImportsPerformed()).isEqualTo(1);
         assertThat(firstUserStats.getSummarizationsPerformed()).isEqualTo(0);
         assertThat(firstUserStats.getGenerationsPerformed()).isEqualTo(1);
@@ -209,7 +210,6 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
     }
 
     private void verifyAccount(int index) {
-        System.out.println("Verify " + index);
         SafaUser user = getUserAtIndex(index);
         EmailVerificationToken token = verificationTokenRepository.findByUserUserId(user.getUserId());
 
@@ -218,7 +218,6 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
     }
 
     private void removeProperTracking(int index) {
-        System.out.println("Remove tracking " + index);
         SafaUser user = getUserAtIndex(index);
         ApplicationUsageStatistics stats = usageStatsRepo.findByUser(user).orElseThrow();
         stats.setAccountCreated(null);
@@ -226,7 +225,6 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
     }
 
     private void connectGithub(int index) throws Exception {
-        System.out.println("Connect github " + index);
         becomeUser(index);
         SafaRequest.withRoute(AppRoutes.Github.Credentials.REGISTER)
             .withPathVariable("accessCode", "token")
@@ -234,7 +232,6 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
     }
 
     private void importProject(int index) throws IOException {
-        System.out.println("Import project " + index);
         becomeUser(index);
 
         enqueueResponse("repository_response.json");
@@ -252,8 +249,6 @@ public class TestOnboardingStats extends AbstractGithubGraphqlTest {
     }
 
     private void doGeneration(int index) {
-        System.out.println("Generate " + index);
-
         becomeUser(index);
         Organization org = organizationService.getPersonalOrganization(getUserAtIndex(index));
         org.setPaymentTier(PaymentTier.UNLIMITED);

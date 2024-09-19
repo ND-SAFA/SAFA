@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.comments.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -102,8 +103,7 @@ public class CommentRetrievalService {
      * @return Response containing comments grouped by properties.
      */
     public ArtifactCommentResponseDTO getArtifactComments(UUID artifactId) {
-        Artifact artifact = artifactService.findById(artifactId);
-        List<Comment> artifactComments = commentRepository.findByArtifactOrderByCreatedAtAsc(artifact);
+        List<Comment> artifactComments = getCommentsReferencingArtifact(artifactId);
         Map<UUID, CommentDTO> id2dto = retrieveCommentDTOS(artifactComments);
         return ArtifactCommentResponseDTO.fromTypes(id2dto);
     }
@@ -167,5 +167,23 @@ public class CommentRetrievalService {
                 .toList();
             return MultiArtifactCommentDTO.fromComment(e.getKey(), artifactIds);
         }).toList();
+    }
+
+    /**
+     * Finds comments referencing artifact.
+     *
+     * @param artifactId Id of artifact to retrieve comments for.
+     * @return List of comments referencing artifact.
+     */
+    private List<Comment> getCommentsReferencingArtifact(UUID artifactId) {
+        Artifact artifact = artifactService.findById(artifactId);
+        Map<UUID, Comment> commentMap = new Hashtable<>();
+        for (CommentArtifact ca : commentArtifactRepository.findAllByArtifactReferenced_ArtifactId(artifactId)) {
+            commentMap.put(ca.getComment().getId(), ca.getComment());
+        }
+        for (Comment c : commentRepository.findByArtifactOrderByCreatedAtAsc(artifact)) {
+            commentMap.put(c.getId(), c);
+        }
+        return commentMap.values().stream().toList();
     }
 }

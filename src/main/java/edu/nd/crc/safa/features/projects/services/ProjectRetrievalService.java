@@ -88,11 +88,11 @@ public class ProjectRetrievalService {
      */
     public ProjectAppEntity getProjectAppEntity(SafaUser user, ProjectVersion projectVersion) {
         // Versioned Entities
-        ProjectEntities entities = retrieveProjectEntitiesAtProjectVersion(projectVersion, user);
+        ProjectEntities entities = retrieveProjectEntitiesAtProjectVersion(projectVersion);
 
         // Project Entities
         List<MembershipAppEntity> projectMembers =
-                this.membershipService.getMembershipsInProject(projectVersion.getProject(), user);
+            this.membershipService.getMembershipsInProject(projectVersion.getProject(), user);
 
         // Documents
         List<DocumentAppEntity> documents = this.documentService.getAppEntities(projectVersion, user);
@@ -163,12 +163,11 @@ public class ProjectRetrievalService {
      * Retrieves artifact and trace links in given version.
      *
      * @param projectVersion The version of the entities to retrieve.
-     * @param user           The user making the request
      * @return {@link ProjectEntities} Artifacts and trace links at given version.
      */
-    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion, SafaUser user) {
+    public ProjectEntities retrieveProjectEntitiesAtProjectVersion(ProjectVersion projectVersion) {
         List<ArtifactAppEntity> artifacts = this.artifactService
-            .getAppEntities(projectVersion, user);
+            .getAppEntities(projectVersion, null);
         List<UUID> artifactIds = artifacts
             .stream()
             .map(ArtifactAppEntity::getId)

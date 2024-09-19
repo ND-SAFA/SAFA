@@ -15,7 +15,8 @@ import edu.nd.crc.safa.features.chat.entities.persistent.ChatShare;
 import edu.nd.crc.safa.features.chat.repositories.ChatRepository;
 import edu.nd.crc.safa.features.chat.repositories.ChatShareRepository;
 import edu.nd.crc.safa.features.generation.api.GenApi;
-import edu.nd.crc.safa.features.generation.common.GenerationArtifact;
+import edu.nd.crc.safa.features.generation.api.GenerationDatasetService;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.permissions.MissingPermissionException;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -34,6 +35,7 @@ public class ChatService {
     private ChatMessageService chatMessageService;
     private GenApi genApi;
     private ArtifactService artifactService;
+    private GenerationDatasetService generationDatasetService;
 
     /**
      * Generates a new title for chat.
@@ -43,11 +45,8 @@ public class ChatService {
      */
     public String generateChatTitle(Chat chat) {
         List<GenChatMessage> genChatMessages = chatMessageService.getGenChatMessages(chat);
-        List<GenerationArtifact> generationArtifacts =
-            artifactService
-                .getArtifactLookupTable(chat.getProjectVersion())
-                .getGenerationArtifacts();
-        String generatedTitle = genApi.generateChatTitle(genChatMessages, generationArtifacts).getTitle();
+        GenerationDataset dataset = generationDatasetService.retrieveGenerationDataset(chat.getProjectVersion());
+        String generatedTitle = genApi.generateChatTitle(genChatMessages, dataset).getTitle();
         chat.setTitle(generatedTitle);
         this.chatRepository.save(chat);
         return generatedTitle;

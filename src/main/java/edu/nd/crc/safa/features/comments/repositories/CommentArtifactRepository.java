@@ -11,4 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CommentArtifactRepository extends CrudRepository<CommentArtifact, UUID> {
     List<CommentArtifact> findAllByComment_IdIn(List<UUID> commentIds);
+
+    List<CommentArtifact> findAllByArtifactReferenced_ArtifactId(UUID artifactId);
 }

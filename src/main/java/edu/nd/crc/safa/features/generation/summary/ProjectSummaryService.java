@@ -48,14 +48,16 @@ public class ProjectSummaryService {
         boolean hasProjectSummary = projectSummary != null && !projectSummary.isEmpty();
         boolean hasCodeSummaries = hasCodeSummaries(artifacts);
 
-        SummaryResponse summarizationResponse = this.summarizeProject(artifacts, logger);
+        if (!hasProjectSummary && !hasCodeSummaries) {
+            SummaryResponse summarizationResponse = this.summarizeProject(artifacts, logger);
 
-        // Save project summary
-        projectSummary = summarizationResponse.getSummary();
-        saveProjectSummary(project, projectSummary, logger);
+            // Save project summary
+            projectSummary = summarizationResponse.getSummary();
+            saveProjectSummary(project, projectSummary, logger);
 
-        // Save artifact summaries
-        saveArtifactSummaries(user, projectVersion, artifacts, summarizationResponse, logger);
+            // Save artifact summaries
+            saveArtifactSummaries(user, projectVersion, artifacts, summarizationResponse, logger);
+        }
         return new Pair<>(projectSummary, artifacts);
     }
 

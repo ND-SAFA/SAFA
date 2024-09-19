@@ -32,12 +32,10 @@ public class SummaryService {
         for (GenerationArtifact generationArtifact : summarizedArtifacts) {
             String artifactName = generationArtifact.getId();
             if (!artifactNameMap.containsKey(artifactName)) {
-                System.out.println("Unable to find artifact:" + artifactName);
                 continue;
             }
             String summary = generationArtifact.getSummary();
             if (summary == null) {
-                System.out.println("Summary was null: " + artifactName);
                 continue;
             }
             artifactNameMap.get(artifactName).setSummary(summary);
@@ -66,7 +64,6 @@ public class SummaryService {
                                                              JobLogger jobLogger) {
         List<ArtifactAppEntity> artifactAppEntities = artifactService.getAppEntitiesByIds(request.getProjectVersion(),
             request.getArtifacts());
-        System.out.println("Initial entities:\n" + artifactAppEntities);
         List<GenerationArtifact> generationArtifacts = artifactAppEntities.stream().map(GenerationArtifact::new)
             .collect(Collectors.toList());
         SummaryRequest tgenRequest = new SummaryRequest(generationArtifacts,

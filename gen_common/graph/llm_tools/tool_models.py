@@ -1,5 +1,4 @@
 import json
-import uuid
 from typing import List, Set
 
 from pydantic.v1.main import Field
@@ -7,10 +6,8 @@ from pydantic.v1.main import Field
 from gen_common.graph.io.graph_state import GraphState
 from gen_common.graph.llm_tools.tool import BaseTool
 
-STOP_TOOL_USE = str(uuid.uuid4())
 
-
-def get_input_for_context_tool_use(input_value: str | List[str], state: GraphState) -> Set[str] | str:
+def get_input_for_context_tool_use(input_value: str | List[str], state: GraphState) -> Set[str] | str | None:
     """
     Checks if the model is using a tool with new input - if so the input is returned as a set else the stop command is given.
     :param input_value: The original input value.
@@ -21,7 +18,7 @@ def get_input_for_context_tool_use(input_value: str | List[str], state: GraphSta
     new_input = input_value.difference(state.get("documents", {}))
     if new_input:
         return new_input
-    return STOP_TOOL_USE  # LLM has produced the same tool call multiple times so disable the tool for next time
+    return  # LLM has produced the same tool call multiple times so disable the tool for next time
     # (prevents endless tool calling if the LLM does not get what it wants)
 
 
@@ -35,7 +32,7 @@ class RetrieveAdditionalInformation(BaseTool):
     Look at the input and try to reason about the underlying semantic intent / meaning.
     Provide the retrieval query as a list of search queries.
     """
-    retrieval_query: List[str] = Field(description=json.dumps(["word1 word2", "word3 word4"]))
+    retrieval_query: str | List[str] = Field(description=json.dumps(["word1 word2", "word3 word4"]))
 
     def update_state(self, state: GraphState) -> None:
         """

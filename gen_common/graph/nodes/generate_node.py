@@ -154,7 +154,9 @@ class GenerateNode(AbstractNode):
         :return: None (update directly)
         """
         self._clear_previous_state_values(state)
-        if isinstance(response, BaseTool):
+        if not isinstance(response, BaseTool):
+            state["backlisted_tools"].add(AnswerUser.__name__)
+        else:
             response.update_state(state)
 
         repr_response = repr(response)

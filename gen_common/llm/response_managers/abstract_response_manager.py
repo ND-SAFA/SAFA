@@ -107,6 +107,16 @@ class AbstractResponseManager:
         if self.get_all_tag_ids():
             self._r_id = DASH.join(self.get_all_tag_ids())
 
+    def get_response_instruction_format_vars(self, prompt_id: str) -> Dict:
+        """
+        Gets the format variables for the response instructions.
+        :param prompt_id: ID of the prompt to get the format variables for.
+        :return: Dictionary mapping format var name to the response instructions to fill with.
+        """
+        if response_instructions := self.format_response_instructions():
+            return {f"format_instructions_{prompt_id}": response_instructions}
+        return dict()
+
     def get_langgraph_model(self) -> Type[BaseModel]:
         """
         Converts the expected response into a langgraph model.

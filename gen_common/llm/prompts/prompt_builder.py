@@ -69,7 +69,7 @@ class PromptBuilder:
         built_prompt = self.build(model_format_args, correct_completion, partial_format_instructions=True, **prompt_kwargs)
         partial_variables = {}
         for prompt in self.prompts:
-            partial_variables.update(prompt.response_instructions_variables)
+            partial_variables.update(prompt.get_response_instruction_format_vars())
         return self.to_langgraph(built_prompt, conversation, partial_variables)
 
     def add_prompt(self, prompt: Prompt, i: int = None) -> None:

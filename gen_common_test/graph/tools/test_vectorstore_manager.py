@@ -2,6 +2,7 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from langchain_community.vectorstores.chroma import Chroma
+from langchain_core.vectorstores.base import VectorStore
 
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.keys.structure_keys import ArtifactKeys
@@ -18,7 +19,7 @@ class TestVectorStoreManager(BaseTest):
     NEW_ARTIFACT_ID = "new_artifact"
     NEW_ARTIFACT_CONTENT = "The cat in the hat sat on a mat"
 
-    @mock.patch.object(Chroma, "add_documents")
+    @mock.patch.object(VectorStore, "add_documents")
     def test_update_or_add_contents(self, add_docs_mock: MagicMock):
         vectorstore_manager = self.create_test_vectorstore_manager()
         new_artifact_id = "new_art"

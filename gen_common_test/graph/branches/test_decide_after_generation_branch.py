@@ -12,11 +12,11 @@ class TestDecideAfterGenerationBranch(BaseTest):
         self.assertEqual(selection, SupportedNodes.CONTINUE.name)
 
     def test_perform_action_retrieve(self):
-        args, state = get_io_without_data(retrieval_query=["query"])
+        args, state = get_io_without_data(retrieval_query={"query"})
         selection = DecideAfterGenerationBranch(args).perform_action(state)
         self.assertEqual(selection, SupportedNodes.RETRIEVE.name)
 
     def test_perform_action_explore(self):
-        args, state = get_io_without_data(selected_artifact_ids=["artifact_id"])
+        args, state = get_io_without_data(selected_artifact_ids={"artifact_id"})
         selection = DecideAfterGenerationBranch(args).perform_action(state)
         self.assertEqual(selection, SupportedNodes.EXPLORE_NEIGHBORS.name)

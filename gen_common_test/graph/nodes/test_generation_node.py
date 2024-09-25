@@ -3,8 +3,8 @@ from langchain_core.documents.base import Document
 from gen_common.data.keys.structure_keys import ArtifactKeys
 from gen_common.graph.io.graph_state import GraphState
 from gen_common.graph.llm_tools.tool_models import ExploreArtifactNeighborhood, RequestAssistance, RetrieveAdditionalInformation, \
-    STOP_TOOL_USE, AnswerUser
-from gen_common.graph.nodes.generate_node import GenerateNode
+    AnswerUser
+from gen_common.graph.nodes.generate_node import GenerateNode, PromptComponents
 from gen_common.llm.abstract_llm_manager import PromptRoles
 from gen_common_test.base.mock.decorators.chat import mock_chat_model
 from gen_common_test.base.mock.langchain.prompt_assertion import AssertInPrompt, AssertToolAvailable, PromptAssertion
@@ -47,10 +47,11 @@ class TestGenerationNode(BaseTest):
                                                         self.RETRIEVE_TOOL)])
 
         args, state = self.get_io(include_documents=True,
+                                  tools_already_used=[repr(self.RETRIEVE_TOOL)],
                                   retrieval_query=self.RETRIEVE_TOOL.retrieval_query,
-                                  selected_artifact_ids=STOP_TOOL_USE)
+                                  backlisted_tools={ExploreArtifactNeighborhood.__name__})
         res: GraphState = GenerateNode(args).perform_action(state)
-        self.assertEqual(res.get("retrieval_query"), STOP_TOOL_USE)
+        self.assertIn(RetrieveAdditionalInformation.__name__, res["backlisted_tools"])
 
     @mock_chat_model
     def test_generate(self, response_manager: TestResponseManager):
@@ -65,8 +66,7 @@ class TestGenerationNode(BaseTest):
                                                          ],
                                                         self.ANSWER_USER_TOOL)])
         args, state = self.get_io(include_documents=True,
-                                  retrieval_query=STOP_TOOL_USE,
-                                  selected_artifact_ids=STOP_TOOL_USE)
+                                  backlisted_tools={RetrieveAdditionalInformation.__name__, ExploreArtifactNeighborhood.__name__})
         res: GraphState = GenerateNode(args).perform_action(state)
         self.assertEqual(res.get("generation"), self.ANSWER_USER_TOOL.answer)
         self.assertEqual(res.get("reference_ids"), self.ANSWER_USER_TOOL.reference_ids)
@@ -140,23 +140,24 @@ class TestGenerationNode(BaseTest):
         docs = PetData.get_context_docs()
         docs[list(self.EXPLORE_NEIGHBORHOOD_TOOL.artifact_ids)[0]] = [Document("Neighbor of A0", metadata={"id": "neighor_0"})]
         args, state = self.get_io(documents=docs,
-                                  retrieval_query=STOP_TOOL_USE,
+                                  tools_already_used=[repr(self.EXPLORE_NEIGHBORHOOD_TOOL)],
+                                  backlisted_tools={RetrieveAdditionalInformation.__name__},
                                   current_tools_used=[f"1. {repr(self.RETRIEVE_TOOL)}"])
         res: GraphState = GenerateNode(args).perform_action(state)
-        self.assertEqual(res.get("selected_artifact_ids"), STOP_TOOL_USE)
+        self.assertIn(ExploreArtifactNeighborhood.__name__, res["backlisted_tools"])
 
     def assert_no_context_prompt(self, *args, **kwargs):
         # assert prompt is correct when it does not contain context
         AssertToolAvailable(self, tool=ExploreArtifactNeighborhood, is_expected_to_be_available=False)(*args, **kwargs)
         AssertToolAvailable(self, tool=AnswerUser)(*args, **kwargs)
-        self.assertNotIn(GenerateNode.CONTEXT_ADDITION, kwargs.get("system"))
+        self.assertNotIn(PromptComponents.CONTEXT_PROVIDED, kwargs.get("system"))
         message = kwargs.get("messages")[0]["content"]
         self.assertNotIn("Documents", message)
 
     def assert_context_prompt(self, *args, **kwargs):
         # assert prompt is correct when it does contain context
         AssertToolAvailable(self, tool=AnswerUser)(*args, **kwargs)
-        self.assertIn(GenerateNode.CONTEXT_ADDITION, kwargs.get("system"))
+        self.assertIn(PromptComponents.CONTEXT_PROVIDED, kwargs.get("system"))
         message = kwargs.get("messages")[-1]["content"]
         for index in PetData.CONTEXT_ARTIFACTS:
             self.assertIn(PetData.ARTIFACT_CONTENT[index], message)

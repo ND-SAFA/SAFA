@@ -27,9 +27,6 @@ class Prompt:
         self.args = prompt_args if prompt_args else PromptArgs()
         self.args.set_id(Prompt.SEED)
         self.response_manager = response_manager if response_manager else XMLResponseManager(include_response_instructions=False)
-        response_instructions = self.response_manager.format_response_instructions()
-        self.response_instructions_variables = {f"format_instructions_{self.args.prompt_id}": response_instructions} \
-            if response_instructions else {}
         Prompt.SEED += 1
 
     def build(self, partial_format_instructions: bool = False, **kwargs) -> str:
@@ -41,9 +38,9 @@ class Prompt:
         """
         structure = DictUtil.get_dict_values(kwargs, structure=self.args.structure_with_new_lines, pop=True)
         prompt = self._build(structure=structure, **kwargs)
-        if self.response_instructions_variables:
-            format_var = DictUtil.get_key_by_index(self.response_instructions_variables)
-            expected_response = self.response_instructions_variables[format_var]
+        if response_instructions_variables := self.get_response_instruction_format_vars():
+            format_var = DictUtil.get_key_by_index(response_instructions_variables)
+            expected_response = response_instructions_variables[format_var]
             if partial_format_instructions:
                 expected_response = StrUtil.get_format_symbol(format_var)
             prompt = f"{prompt}{SPACE}{expected_response}"
@@ -89,6 +86,13 @@ class Prompt:
         """
         value = self.value if not value else value
         return f"{value_prefix}{value}{value_suffix}" if value else EMPTY_STRING
+
+    def get_response_instruction_format_vars(self) -> dict:
+        """
+        Gets the format variables for the response instructions.
+        :return: Dictionary mapping format var name to the response instructions to fill with.
+        """
+        return self.response_manager.get_response_instruction_format_vars(prompt_id=self.args.prompt_id)
 
     def _build(self, structure: bool = False, **kwargs) -> str:
         """

@@ -47,7 +47,8 @@ class GraphArgs(Args):
                 if converter_key in converters:
                     val = converters[converter_key](val=val, **vars(self))
 
-                assert ReflectionUtil.is_type(val, var_type, var_name), f"{var_name} is not of expected type {var_type}"
+                assert ReflectionUtil.is_type(val, var_type, var_name), f"{var_name} is not of expected type {var_type}. " \
+                                                                        f"Got {type(var_name)} instead."
                 params[var_name] = val
             else:
                 params[var_name] = default_mutable_type(var_type)

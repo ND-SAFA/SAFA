@@ -8,7 +8,7 @@ from gen_common_test.graph.graph_test_util import get_io_without_data
 class TestRetrieveNode(BaseTest):
 
     def test_perform_action(self):
-        queries = ["query1", "query2"]
+        queries = {"query1", "query2"}
         arg, state = get_io_without_data(retrieval_query=queries)
         updated_state = RetrieveNode(arg).perform_action(state)
         for query in queries:

@@ -32,8 +32,12 @@ jobs:
         pip3 install -r requirements.txt
         pip3 install -r dev-requirements.txt
 
+    - name: Download Static
+      run: |
+        python3 gen_common/infra/cli/download_static.py
+
     - name: Run Unit Tests
       run: |
-        python -m unittest discover -s common_resources_test
+        python -m unittest discover -s gen_common_test
       env:
         DEFAULT_EMBEDDING_MODEL: "sentence-transformers/all-MiniLM-L6-v2"

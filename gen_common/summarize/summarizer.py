@@ -42,9 +42,9 @@ class Summarizer(AbstractPipeline):
         if not SummarizerUtil.needs_project_summary(self.state.dataset.project_summary, self.args) or self.args.no_project_summary:
             if self.args.do_resummarize_artifacts \
                     or not self.state.dataset.artifact_df.is_summarized(code_or_above_limit_only=self.args.summarize_code_only):
-                self.steps = [StepSummarizeArtifacts()]
+                self.steps = self.steps[:2]
             else:
-                self.steps = []
+                self.steps = self.steps[:1]
         super().run(log_start=len(self.steps) > 0)
         if not self.state.summarized_dataset:
             self.state.summarized_dataset = self.state.dataset

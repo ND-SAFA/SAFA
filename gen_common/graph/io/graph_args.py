@@ -6,7 +6,6 @@ from gen_common.data.exporters.serializable_exporter import SerializableExporter
 from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.graph.io.graph_state import GraphState
 from gen_common.pipeline.args import Args
-from gen_common.util.dict_util import DictUtil
 from gen_common.util.pythonisms_util import default_mutable_type
 from gen_common.util.reflection_util import ReflectionUtil
 from gen_common.util.unknown_params_lambda import UnknownParamsLambda
@@ -33,26 +32,25 @@ class GraphArgs(Args):
         if isinstance(self.artifacts_referenced_in_question, str):
             self.artifacts_referenced_in_question = [self.artifacts_referenced_in_question]
 
-    def to_graph_input(self, state_class: GraphState = GraphState, **default_vars) -> Dict:
+    def to_graph_input(self, state_class: GraphState = GraphState, **overriding_args) -> Dict:
         """
         Creates the input dictionary for the langgraph.
         :param state_class: The input/state class used for graph.
-        :param default_vars: Any vars to default in the state.
+        :param overriding_args: Any vars to override the state with.
         :return: The input dictionary for the langgraph.
         """
-        default_vars = DictUtil.update_kwarg_values(default_vars, replace_existing=False)
         params = {}
         for var_name, var_type in state_class.__annotations__.items():
-            val = getattr(self, var_name, None)
+            val = overriding_args[var_name] if var_name in overriding_args else getattr(self, var_name, None)
             if val:
                 converter_key = var_name if var_name in converters else type(val)
                 if converter_key in converters:
                     val = converters[converter_key](val=val, **vars(self))
 
-                assert ReflectionUtil.is_type(val, var_type, var_name), f"{var_name} is not of expected type {var_type}"
+                assert ReflectionUtil.is_type(val, var_type, var_name), f"{var_name} is not of expected type {var_type}. " \
+                                                                        f"Got {type(var_name)} instead."
                 params[var_name] = val
             else:
                 params[var_name] = default_mutable_type(var_type)
-        params.update(default_vars)
         inputs = state_class(**params)
         return inputs

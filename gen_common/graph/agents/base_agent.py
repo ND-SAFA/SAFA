@@ -241,7 +241,10 @@ class BaseAgent:
         if isinstance(system_prompt, PathSelector):
             system_prompt = system_prompt.select(state)
         if isinstance(system_prompt, str):
-            return Prompt(system_prompt, prompt_args=PromptArgs(system_prompt=True))
+            system_prompt = Prompt(system_prompt)
+        assert isinstance(system_prompt, Prompt), f"System prompt must be of type {Prompt.__name__}, " \
+                                                  f"found {system_prompt.__class__.__name__}"
+        system_prompt.args.system_prompt = True
         return system_prompt
 
     @staticmethod

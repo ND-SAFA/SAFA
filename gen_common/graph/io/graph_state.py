@@ -23,14 +23,15 @@ class GraphState(TypedDict, total=False):
     documents: Dict[str, List[Document]]
     retrieval_query: str | Set[str]
     artifact_types: List[str]
-    selected_artifact_ids: Set[str]
+    selected_artifact_ids: Set[str] | str
 
     # request assistance
     relevant_information_learned: str
     related_doc_ids: List[str]
 
     # tools
-    tools_already_used: List[str]
+    tools_already_used: List[str]  # TODO: Convert to set once formatting bug has been fixed
+    backlisted_tools: Set[str]
 
     # settings
     run_async: bool

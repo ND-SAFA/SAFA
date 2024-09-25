@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 from typing import Dict, List, Tuple, Union
 
 from gen_common.constants.ranking_constants import DEFAULT_SELECT_TOP_PREDICTIONS
@@ -156,7 +157,7 @@ class RankingJob(AbstractJob):
         export_dir = self.job_args.export_dir
         if export_dir and not export_dir.endswith(RankingJob._get_run_dir(child_type, parent_type)):
             export_dir = FileUtil.safely_join_paths(export_dir, RankingJob._get_run_dir(child_type, parent_type))
-        layer_dataset = PromptDataset(artifact_df=selected_artifacts, trace_dataset=full_dataset.trace_dataset,
+        layer_dataset = PromptDataset(artifact_df=selected_artifacts, trace_dataset=deepcopy(full_dataset.trace_dataset),
                                       project_summary=full_dataset.project_summary)
         embeddings_manager, cross_encoder_manager = self._get_embeddings_or_cross_encoder_manager()
         pipeline_args = RankingArgs(dataset=layer_dataset,

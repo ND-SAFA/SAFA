@@ -1,5 +1,6 @@
 from collections import Counter
 from typing import List, Set, Union
+from gen_common.infra.t_logging.logger_manager import logger
 
 from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
 from gen_common.data.keys.structure_keys import ArtifactKeys
@@ -19,6 +20,11 @@ class StepFilterDataset(AbstractPipelineStep[SummarizerArgs, SummarizerState]):
         :return: None
         """
         artifact_df = state.dataset.artifact_df
+        filtered_artifact_df = ArtifactDataFrame(artifact_df.dropna(subset=[ArtifactKeys.CONTENT.value]))
+        if n_removed :=  len(artifact_df) - len(filtered_artifact_df):
+            logger.warning(f"Removed {n_removed} because they were missing content.")
+
+        artifact_df = filtered_artifact_df
         should_filter = args.include_subset_by_type or args.include_subset_by_dir
         indices2remove = StepFilterDataset.identify_indices_with_duplicate_content(artifact_df)
         missing_content = {i for i, a in artifact_df.itertuples() if not DataFrameUtil.get_optional_value(a[ArtifactKeys.CONTENT],

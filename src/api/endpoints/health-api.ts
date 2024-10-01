@@ -21,7 +21,7 @@ export function performHealthChecks(
     artifactIds,
     artifactTypes,
   };
-  return buildRequest<HealthCheckCollectionSchema>("healthChecks").post(
-    request
-  );
+  return buildRequest<HealthCheckCollectionSchema, "", HealthRequest>(
+    "healthChecks"
+  ).post(request);
 }

@@ -12,7 +12,6 @@ import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.jobs.builders.ProjectSummaryJobBuilder;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.permissions.checks.AdditionalPermissionCheck;
-import edu.nd.crc.safa.features.permissions.checks.billing.HasUnlimitedCreditsCheck;
 import edu.nd.crc.safa.features.permissions.checks.config.SummarizationMaxProjectSizeCheck;
 import edu.nd.crc.safa.features.permissions.entities.ProjectPermission;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
@@ -69,7 +68,6 @@ public class SummarizeController extends BaseController {
             .fetchVersion(versionId)
             .asUser(user)
             .withPermissions(Set.of(ProjectPermission.GENERATE, ProjectPermission.EDIT_DATA))
-            .withAdditionalCheck(new HasUnlimitedCreditsCheck())
             .withAdditionalCheck(maxSizeCheck)
             .get();
     }

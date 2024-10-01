@@ -1,19 +1,14 @@
 version: '3'
 services:
-  reverse-proxy:
-    image: nginx
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./ssl:/etc/nginx/ssl
-    ports:
-      - "3000:443"
   bend:
     depends_on: [ "mysql" ]
     container_name: bend
     build:
       context: .
+      args:
+        - SPRING_PROFILE=dev
     ports:
-      - 3500:3000
+      - 3000:80
     networks:
       - safa
     environment:
@@ -28,7 +23,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 3G
+          memory: 1G
     environment:
       MYSQL_ROOT_PASSWORD: secret2
       MYSQL_USER: user

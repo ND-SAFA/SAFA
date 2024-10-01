@@ -79,7 +79,8 @@ export type DetailsOpenState =
   | "generateTrace"
   | "displayArtifactLevel"
   | "saveArtifactLevel"
-  | "displayTraceMatrix";
+  | "displayTraceMatrix"
+  | "health";
 
 /**
  * Defines a title and message for a confirmation dialog.

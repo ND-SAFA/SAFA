@@ -73,7 +73,10 @@ public class GenerateLinksJob extends CommitJob {
     @IJobStep(value = "Retrieving Project", position = 1)
     public void retrieveProjectEntities() {
         this.projectAppEntity =
-            getServiceProvider().getProjectRetrievalService().getProjectAppEntity(this.projectVersion);
+            getServiceProvider().getProjectRetrievalService().getProjectAppEntity(
+                this.getUser(),
+                this.projectVersion
+            );
     }
 
     @IJobStep(value = "Summarizing Project Entities", position = 2)

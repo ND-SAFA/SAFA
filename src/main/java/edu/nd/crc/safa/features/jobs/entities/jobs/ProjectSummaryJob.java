@@ -22,7 +22,10 @@ public class ProjectSummaryJob extends CommitJob {
     public void summarizeProjectEntities() {
         ProjectVersion projectVersion = this.getProjectVersion();
         ProjectAppEntity projectAppEntity =
-            getServiceProvider().getProjectRetrievalService().getProjectAppEntity(projectVersion);
+            getServiceProvider().getProjectRetrievalService().getProjectAppEntity(
+                this.getUser(),
+                projectVersion
+            );
         this.getServiceProvider().getProjectSummaryService().summaryProjectAppEntity(
             getUser(),
             projectAppEntity,

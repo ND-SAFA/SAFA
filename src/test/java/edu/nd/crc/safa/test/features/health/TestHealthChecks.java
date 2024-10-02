@@ -6,7 +6,9 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.comments.entities.dtos.ArtifactCommentResponseDTO;
+import edu.nd.crc.safa.features.health.entities.HealthRequest;
 import edu.nd.crc.safa.features.health.entities.HealthResponseDTO;
+import edu.nd.crc.safa.features.health.entities.HealthTask;
 import edu.nd.crc.safa.features.health.entities.gen.GenHealthResponse;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.generation.GenerationalTest;
@@ -28,11 +30,19 @@ class TestHealthChecks extends GenerationalTest {
         List<Artifact> projectArtifacts =
             getServiceProvider().getArtifactRepository().getProjectArtifacts(projectVersion.getProject().getId());
 
-        mockHealthResponse(testData.createMockGenHealthResponse());
+        GenHealthResponse mockResponse = testData.createMockGenHealthResponse();
+        mockHealthResponse(mockResponse);
+
+        HealthRequest request = new HealthRequest();
+        request.setArtifactIds(List.of(targetArtifact.getId()));
+        request.setTasks(List.of(HealthTask.CONTRADICTION, HealthTask.CONCEPT_EXTRACTION, HealthTask.CONCEPT_MATCHING));
 
         HealthResponseDTO healthResponseDTO = getServiceProvider()
             .getHealthService()
-            .performArtifactHealthChecks(projectVersion, List.of(targetArtifact));
+            .performHealthChecks(
+                getCurrentUser(),
+                projectVersion,
+                request);
 
         HealthCheckTestVerifier testVerifier = new HealthCheckTestVerifier(projectVersion, projectArtifacts);
         testVerifier.verifyHealthResponse(healthResponseDTO);

@@ -22,5 +22,5 @@ public class GenUndefinedEntity {
     /**
      * Predicted definition of undefined concept.
      */
-    private String conceptDefinition;
+    private String definition;
 }

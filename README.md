@@ -1,7 +1,7 @@
 # Build Status
 
-| Branch | Status |
-|--------|--------|
+| Branch | Status                                                                                                                                                          |
+|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | dev    | [![dev](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml/badge.svg?branch=development)](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml) |
 | prod   | [![prod](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml/badge.svg?branch=production)](https://github.com/ND-SAFA/bend/actions/workflows/safa.yaml) |
 
@@ -21,3 +21,15 @@ To get the stack running on your localhost port 8080 then run:
 In order to delete any docker data associated with the database of the api run:
 
 `docker-compose down -v`
+
+# TODO
+
+## Broken Features
+
+1. Turn off account verification
+2. Turn off transaction service and balance checking
+
+## Tech Debt
+
+1. Centralize the conversion between [Name]Version to [Name]AppEntity.
+2. Flat files should automatically check if properties passed in can be fullfilled.

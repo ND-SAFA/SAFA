@@ -13,6 +13,7 @@ import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 /**
@@ -24,13 +25,33 @@ public class SummaryService {
     private final GenApi genApi;
     private final ArtifactService artifactService;
 
+    @NotNull
+    private static List<ArtifactAppEntity> getArtifactAppEntities(
+        List<ArtifactAppEntity> artifactAppEntities,
+        List<GenerationArtifact> summarizedArtifacts) {
+        Map<String, ArtifactAppEntity> artifactNameMap =
+            ProjectDataStructures.createArtifactNameMap(artifactAppEntities);
+        for (GenerationArtifact generationArtifact : summarizedArtifacts) {
+            String artifactName = generationArtifact.getId();
+            if (!artifactNameMap.containsKey(artifactName)) {
+                continue;
+            }
+            String summary = generationArtifact.getSummary();
+            if (summary == null) {
+                continue;
+            }
+            artifactNameMap.get(artifactName).setSummary(summary);
+        }
+        return artifactNameMap.values().stream().toList();
+    }
+
     /**
      * Generates summarize for artifacts.
      *
      * @param request The summarization request.
      * @return List of summaries.
      */
-    public List<GenerationArtifact> generateArtifactSummaries(SummarizeArtifactRequestDTO request) {
+    public List<ArtifactAppEntity> generateArtifactSummaries(SummarizeArtifactRequestDTO request) {
         return generateArtifactSummaries(request, null);
     }
 
@@ -41,15 +62,16 @@ public class SummaryService {
      * @param jobLogger The logger to store logs under.
      * @return List of artifact summaries in the same order as the order ids given.
      */
-    public List<GenerationArtifact> generateArtifactSummaries(SummarizeArtifactRequestDTO request,
-                                                              JobLogger jobLogger) {
+    public List<ArtifactAppEntity> generateArtifactSummaries(SummarizeArtifactRequestDTO request,
+                                                             JobLogger jobLogger) {
         List<ArtifactAppEntity> artifactAppEntities = artifactService.getAppEntitiesByIds(request.getProjectVersion(),
             request.getArtifacts());
         List<GenerationArtifact> generationArtifacts = artifactAppEntities.stream().map(GenerationArtifact::new)
             .collect(Collectors.toList());
         SummaryRequest tgenRequest = new SummaryRequest(generationArtifacts,
             request.getProjectSummary());
-        return performGenArtifactSummaryRequest(tgenRequest, jobLogger);
+        List<GenerationArtifact> summarizedArtifacts = performGenArtifactSummaryRequest(tgenRequest, jobLogger);
+        return getArtifactAppEntities(artifactAppEntities, summarizedArtifacts);
     }
 
     /**

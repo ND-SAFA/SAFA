@@ -43,6 +43,7 @@ public class LayoutManager {
     public LayoutManager(ServiceProvider serviceProvider,
                          ProjectVersion projectVersion,
                          SafaUser user) {
+        //TODO: Remove use dep
         if (projectVersion == null) {
             throw new IllegalArgumentException("Project version is null.");
         }
@@ -53,7 +54,7 @@ public class LayoutManager {
         this.project = projectVersion.getProject();
         this.projectEntities = serviceProvider
             .getProjectRetrievalService()
-            .retrieveProjectEntitiesAtProjectVersion(projectVersion, user);
+            .retrieveProjectEntitiesAtProjectVersion(projectVersion);
         this.serviceProvider = serviceProvider;
     }
 

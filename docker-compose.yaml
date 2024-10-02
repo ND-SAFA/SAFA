@@ -1,21 +1,25 @@
 version: '3'
 services:
+  fend:
+    container_name: fend
+    build:
+      context: ../fend
+      args:
+        API_ENDPOINT: http://localhost:3000
+    ports:
+      - 8080:80
   bend:
     depends_on: [ "mysql" ]
     container_name: bend
     build:
       context: .
-      args:
-        - SPRING_PROFILE=dev
     ports:
       - 3000:80
     networks:
       - safa
     environment:
-      - SERVER_ADDRESS=0.0.0.0
-      - TGEN_ENDPOINT=http://host.docker.internal:4000
+      - TGEN_ENDPOINT=http://localhost:4000
       - DB_URL=jdbc:mysql://mysql/safa-db
-      - PORT=3000
   mysql:
     image: mysql:8.0
     hostname: mysql
@@ -29,6 +33,8 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: secret3
       MYSQL_DATABASE: safa-db
+    volumes:
+      - ./my.cnf:/etc/mysql/my.cnf # Mount the custom my.cnf file
     ports:
       - 3306:3306
     networks:

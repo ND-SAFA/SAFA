@@ -193,6 +193,8 @@ public class AppRoutes {
     @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Health {
         public static final String GENERATE = "/health/versions/{versionId}";
+        public static final String CONCEPT = "/concept/versions/{versionId}";
+        public static final String HEALTH = "/health";
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)

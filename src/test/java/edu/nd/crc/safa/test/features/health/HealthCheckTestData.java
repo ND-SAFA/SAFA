@@ -8,7 +8,6 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.generation.common.GenerationLink;
 import edu.nd.crc.safa.features.health.HealthConstants;
 import edu.nd.crc.safa.features.health.entities.ConceptMatchDTO;
-import edu.nd.crc.safa.features.health.entities.gen.GenConceptResponse;
 import edu.nd.crc.safa.features.health.entities.gen.GenContradiction;
 import edu.nd.crc.safa.features.health.entities.gen.GenHealthResponse;
 import edu.nd.crc.safa.features.health.entities.gen.GenUndefinedEntity;
@@ -56,12 +55,10 @@ public class HealthCheckTestData {
      */
     public GenHealthResponse createMockGenHealthResponse() {
         GenHealthResponse genResponse = new GenHealthResponse();
-
-        GenConceptResponse genConceptResponse = new GenConceptResponse();
-        genConceptResponse.setMatches(List.of(new ConceptMatchDTO(TARGET_NAME, "C1", C1_START_LOC, C1_END_LOC)));
-        genConceptResponse.setMultiMatches(getTestMultiMatchMap());
-        genConceptResponse.setPredictedMatches(List.of(asLink("C4")));
-        genConceptResponse.setUndefinedEntities(List.of(
+        genResponse.setDirectMatches(List.of(new ConceptMatchDTO(TARGET_NAME, "C1", C1_START_LOC, C1_END_LOC)));
+        genResponse.setMultiMatches(getTestMultiMatchMap());
+        genResponse.setPredictedMatches(List.of(asConceptLink("C4")));
+        genResponse.setUndefinedConcepts(List.of(
             new GenUndefinedEntity(
                 List.of(TARGET_NAME),
                 "U1",
@@ -72,16 +69,14 @@ public class HealthCheckTestData {
         GenContradiction genContradiction = new GenContradiction();
         genContradiction.setConflictingIds(List.of(TARGET_NAME));
         genContradiction.setExplanation(HealthCheckTestVerifier.CONTRADICTION_MSG);
-
-        genResponse.setConceptMatches(genConceptResponse);
         genResponse.setContradictions(List.of(genContradiction));
         return genResponse;
     }
 
-    private GenerationLink asLink(String conceptID) {
+    private GenerationLink asConceptLink(String conceptId) {
         GenerationLink link = new GenerationLink();
-        link.setSource(conceptID);
-        link.setTarget(TARGET_NAME);
+        link.setSource(TARGET_NAME);
+        link.setTarget(conceptId);
         return link;
     }
 

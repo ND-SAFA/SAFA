@@ -19,6 +19,8 @@ import edu.nd.crc.safa.features.chat.entities.persistent.GenChatResponse;
 import edu.nd.crc.safa.features.chat.repositories.ChatMessageArtifactRepository;
 import edu.nd.crc.safa.features.chat.repositories.ChatMessageRepository;
 import edu.nd.crc.safa.features.generation.api.GenApi;
+import edu.nd.crc.safa.features.generation.api.GenerationDatasetService;
+import edu.nd.crc.safa.features.generation.common.GenerationDataset;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.utilities.ProjectDataStructures;
@@ -34,6 +36,7 @@ public class ChatMessageService {
     private ChatMessageArtifactRepository chatMessageArtifactRepository;
     private ArtifactService artifactService;
     private GenApi genApi;
+    private GenerationDatasetService generationDatasetService;
 
     /**
      * Sends message in chat.
@@ -139,9 +142,12 @@ public class ChatMessageService {
 
         // Send to gen...
         ArtifactLookupTable artifactLookupTable = artifactService.getArtifactLookupTable(projectVersion);
-
+        GenerationDataset generationDataset = generationDatasetService.retrieveGenerationDataset(projectVersion);
         GenChatResponse genChatResponse = genApi.generateChatResponse(
-            userMessage.getContent(), chatMessages, artifactLookupTable.getGenerationArtifacts());
+            userMessage.getContent(),
+            chatMessages,
+            generationDataset
+        );
         responseMessage.setContent(genChatResponse.getMessage());
         responseMessage.setCreatedAt(LocalDateTime.now());
         List<ChatMessageArtifact> responseMessageArtifacts = genChatResponse.getArtifactIds().stream()

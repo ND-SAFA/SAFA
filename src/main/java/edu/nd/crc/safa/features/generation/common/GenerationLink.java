@@ -42,4 +42,20 @@ public class GenerationLink {
         this.explanation = trace.getExplanation();
         this.label = trace.getTraceType() == TraceType.MANUAL ? 1 : -1;
     }
+
+    /**
+     * @return trace app entity with link information.
+     */
+    public TraceAppEntity toTrace() {
+        TraceAppEntity trace = new TraceAppEntity();
+        trace.setSourceName(this.source);
+        trace.setTargetName(this.target);
+        if (this.label == 1) {
+            trace.asManualTrace();
+        } else {
+            trace.asGeneratedTrace(this.score);
+        }
+        trace.setExplanation(this.explanation);
+        return trace;
+    }
 }

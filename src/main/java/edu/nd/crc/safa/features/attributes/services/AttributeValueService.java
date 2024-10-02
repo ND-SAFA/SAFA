@@ -65,7 +65,7 @@ public class AttributeValueService {
         artifactVersions.forEach(a -> artifactVersionMap.put(a.getVersionEntityId(), a));
 
         List<ArtifactVersion> versionsWithoutAttributes = artifactVersions.stream()
-                .filter(a -> a.getCustomAttributeValues().isEmpty()).toList();
+            .filter(a -> a.getCustomAttributeValues().isEmpty()).toList();
 
         List<ArtifactAttributeVersion> attributeVersions =
             serviceProvider.getArtifactAttributeVersionRepository().findByArtifactVersionIn(versionsWithoutAttributes);

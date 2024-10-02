@@ -88,7 +88,7 @@ public class AuthenticationConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("https://localhost.safa.ai:8080");
+        config.addAllowedOriginPattern("http://localhost:8080");
         config.addAllowedOriginPattern("https://staging.safa.ai");
         config.addAllowedOriginPattern("https://app.safa.ai");
         config.addAllowedOriginPattern("https://dev.safa.ai");

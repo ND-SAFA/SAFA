@@ -39,6 +39,7 @@ class TestProjectSummaryCommonRequests extends GenerationalTest {
 
         String newSummary = "new-summary";
         mockProjectSummaryResponse(newSummary);
+
         runProjectSummaryJob();
 
         refreshProject();

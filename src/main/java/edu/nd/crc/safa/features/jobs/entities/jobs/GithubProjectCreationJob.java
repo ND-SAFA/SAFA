@@ -20,7 +20,6 @@ import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.email.services.EmailService;
-import edu.nd.crc.safa.features.generation.summary.ProjectSummaryService;
 import edu.nd.crc.safa.features.github.entities.api.GithubGraphQlTreeObjectsResponse;
 import edu.nd.crc.safa.features.github.entities.api.GithubIdentifier;
 import edu.nd.crc.safa.features.github.entities.api.graphql.Branch;
@@ -65,6 +64,7 @@ import org.springframework.context.ApplicationEventPublisher;
 public class GithubProjectCreationJob extends CommitJob {
 
     protected static final int CREATE_PROJECT_STEP_NUM = 3;
+    private static final String GLOB_SEPARATOR = "\0";
     private final String[] DEFAULT_BRANCHES = {
         "master",
         "main",
@@ -73,9 +73,6 @@ public class GithubProjectCreationJob extends CommitJob {
         "prod",
         "production"
     };
-
-    private static final String GLOB_SEPARATOR = "\0";
-
     /**
      * Internal project identifier
      */
@@ -383,12 +380,12 @@ public class GithubProjectCreationJob extends CommitJob {
         }
 
         List<ArtifactAppEntity> newArtifacts = getProjectCommitDefinition().getArtifactList(ModificationType.ADDED);
-        ProjectSummaryService summaryService = getServiceProvider().getProjectSummaryService();
-        summaryService.summarizeProjectEntities(
+        getServiceProvider().getProjectSummaryService().summarizeProjectEntities(
             this.user,
             this.getProjectVersion(),
             newArtifacts,
-            logger
+            logger,
+            true
         );
 
         // The summarization above commits the artifacts, so there's no need for the job to do it again later

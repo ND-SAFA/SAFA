@@ -20,20 +20,18 @@ import edu.nd.crc.safa.test.requests.SafaRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 public class TestPaymentTierPermissionCheck extends ApplicationBaseTest {
 
+    private final static String projectName = "projectName";
     @MockBean
     private HGenService mockHgenService;
-
     @MockBean
     private ProjectSummaryService projectSummaryService;
-
     private ProjectVersion projectVersion;
-
-    private final static String projectName = "projectName";
 
     @BeforeEach
     public void setup() {
@@ -50,6 +48,7 @@ public class TestPaymentTierPermissionCheck extends ApplicationBaseTest {
             .postWithJsonObject(body);
     }
 
+    @Disabled("Migration to desktop version is turning off billing.")
     @Test
     public void testTierCheckFail() {
         // TODO endpoint to set payment tier

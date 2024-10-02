@@ -26,7 +26,9 @@ public class SummaryService {
     private final ArtifactService artifactService;
 
     @NotNull
-    private static List<ArtifactAppEntity> getArtifactAppEntities(List<ArtifactAppEntity> artifactAppEntities, List<GenerationArtifact> summarizedArtifacts) {
+    private static List<ArtifactAppEntity> getArtifactAppEntities(
+        List<ArtifactAppEntity> artifactAppEntities,
+        List<GenerationArtifact> summarizedArtifacts) {
         Map<String, ArtifactAppEntity> artifactNameMap =
             ProjectDataStructures.createArtifactNameMap(artifactAppEntities);
         for (GenerationArtifact generationArtifact : summarizedArtifacts) {

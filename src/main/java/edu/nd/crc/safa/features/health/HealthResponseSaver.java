@@ -58,6 +58,7 @@ public class HealthResponseSaver {
      * Saves health checks as comments under artifact.
      *
      * @param user           The user tagged with changing these entities.
+     * @param response       The health response whose entities are saved.
      * @param projectVersion Project version to save comments under.
      * @param genResponse    GEN API response containing health checks.
      * @return Response object containing comments.
@@ -304,11 +305,14 @@ public class HealthResponseSaver {
     private List<MultiArtifactCommentDTO> saveContradictions(ProjectVersion projectVersion,
                                                              Map<String, Artifact> artifactNameLookup,
                                                              List<GenContradiction> contradictions) {
+        List<MultiArtifactCommentDTO> dtos = new ArrayList<>();
         Map<Comment, List<CommentArtifact>> comment2contradictions = new HashMap<>();
         for (GenContradiction contradiction : contradictions) {
             String ownerArtifactId = contradiction.getConflictingIds().get(0);
-            contradiction.getConflictingIds().remove(0);
+
             Artifact artifact = artifactNameLookup.get(ownerArtifactId);
+
+
             Comment comment = asMatchedConcept(
                 projectVersion,
                 artifact,
@@ -316,30 +320,31 @@ public class HealthResponseSaver {
                 contradiction.getExplanation()
             );
             comment = this.commentRepository.save(comment);
+            List<UUID> artifactIds = new ArrayList<>();
+            artifactIds.add(artifact.getArtifactId());
+
 
             for (String artifactId : contradiction.getConflictingIds()) {
                 if (artifactId.equals(ownerArtifactId)) {
                     continue;
                 }
-                List<CommentArtifact> artifactContradictions = new ArrayList<>();
                 for (String conflictingArtifactId : contradiction.getConflictingIds()) {
                     Artifact otherConflictingArtifact = artifactNameLookup.get(conflictingArtifactId);
                     CommentArtifact commentArtifact = new CommentArtifact(
                         comment,
                         otherConflictingArtifact
                     );
-                    commentArtifact = this.commentArtifactRepository.save(commentArtifact);
-                    artifactContradictions.add(commentArtifact);
+                    this.commentArtifactRepository.save(commentArtifact);
+                    artifactIds.add(otherConflictingArtifact.getArtifactId());
                 }
-                comment2contradictions.put(comment, artifactContradictions);
             }
+
+            MultiArtifactCommentDTO dto = MultiArtifactCommentDTO.fromComment(comment, artifactIds);
+            dto.setType(CommentType.CONTRADICTION);
+            dtos.add(dto);
         }
 
-        return comment2contradictions.entrySet().stream().map(entry -> {
-            List<UUID> artifactIds =
-                entry.getValue().stream().map(ca -> ca.getArtifactReferenced().getArtifactId()).toList();
-            return MultiArtifactCommentDTO.fromComment(entry.getKey(), artifactIds);
-        }).toList();
+        return dtos;
     }
 
     /**

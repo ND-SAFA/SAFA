@@ -27,11 +27,13 @@ public class GenerationDatasetService {
      * @return Generation dataset.
      */
     public GenerationDataset retrieveGenerationDataset(ProjectVersion projectVersion) {
-        ProjectEntities projectEntities = projectRetrievalService.retrieveProjectEntitiesAtProjectVersion(projectVersion);
+        ProjectEntities projectEntities = projectRetrievalService
+            .retrieveProjectEntitiesAtProjectVersion(projectVersion);
         GenerationDataset dataset = new GenerationDataset();
         List<GenerationArtifact> generationArtifacts =
             projectEntities.getArtifacts().stream().map(GenerationArtifact::new).collect(Collectors.toList());
-        List<GenerationLink> generationLinks = projectEntities.getTraces().stream().map(GenerationLink::new).collect(Collectors.toList());
+        List<GenerationLink> generationLinks = projectEntities.getTraces().stream()
+            .map(GenerationLink::new).collect(Collectors.toList());
         dataset.setArtifacts(generationArtifacts);
         dataset.setLinks(generationLinks);
         // TODO : Add layers

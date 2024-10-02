@@ -108,6 +108,4 @@ public class ProjectEntities {
             .collect(Collectors.toList());
         return new ProjectEntities(documentArtifacts, documentTraces);
     }
-
-
 }

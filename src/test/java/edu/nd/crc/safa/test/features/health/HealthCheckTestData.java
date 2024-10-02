@@ -57,7 +57,7 @@ public class HealthCheckTestData {
         GenHealthResponse genResponse = new GenHealthResponse();
         genResponse.setDirectMatches(List.of(new ConceptMatchDTO(TARGET_NAME, "C1", C1_START_LOC, C1_END_LOC)));
         genResponse.setMultiMatches(getTestMultiMatchMap());
-        genResponse.setPredictedMatches(List.of(asLink("C4")));
+        genResponse.setPredictedMatches(List.of(asConceptLink("C4")));
         genResponse.setUndefinedConcepts(List.of(
             new GenUndefinedEntity(
                 List.of(TARGET_NAME),
@@ -73,10 +73,10 @@ public class HealthCheckTestData {
         return genResponse;
     }
 
-    private GenerationLink asLink(String conceptID) {
+    private GenerationLink asConceptLink(String conceptId) {
         GenerationLink link = new GenerationLink();
-        link.setSource(conceptID);
-        link.setTarget(TARGET_NAME);
+        link.setSource(TARGET_NAME);
+        link.setTarget(conceptId);
         return link;
     }
 

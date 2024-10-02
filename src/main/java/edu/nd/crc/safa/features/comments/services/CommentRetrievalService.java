@@ -2,6 +2,7 @@ package edu.nd.crc.safa.features.comments.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,6 @@ import edu.nd.crc.safa.features.comments.repositories.CommentArtifactRepository;
 import edu.nd.crc.safa.features.comments.repositories.CommentConceptRepository;
 import edu.nd.crc.safa.features.comments.repositories.CommentRepository;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
-import edu.nd.crc.safa.utilities.ProjectDataStructures;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -155,18 +155,25 @@ public class CommentRetrievalService {
      * @return DTOs.
      */
     public List<MultiArtifactCommentDTO> toMultiArtifactComments(List<Comment> comments) {
-        List<UUID> commentIds = comments.stream().map(Comment::getId).toList();
-        Map<Comment, List<CommentArtifact>> commentId2artifacts = ProjectDataStructures.createGroupLookup(
-            commentArtifactRepository.findAllByComment_IdIn(commentIds),
-            CommentArtifact::getComment
-        );
-        return commentId2artifacts.entrySet().stream().map(e -> {
-            List<UUID> artifactIds = e.getValue()
-                .stream()
-                .map(c -> c.getArtifactReferenced().getArtifactId())
-                .toList();
-            return MultiArtifactCommentDTO.fromComment(e.getKey(), artifactIds);
-        }).toList();
+        List<MultiArtifactCommentDTO> dtos = new ArrayList<>();
+        for (Comment comment : comments) {
+            Set<UUID> artifactIdSet = new HashSet<>();
+            List<CommentArtifact> commentArtifacts =
+                commentArtifactRepository.findAllByComment_IdIn(List.of(comment.getId()));
+
+            if (comment.getType().equals(CommentType.CONTRADICTION)) {
+                // Only contradictions have their source artifact added to list of artifact ids.
+                artifactIdSet.add(comment.getArtifact().getArtifactId());
+            }
+
+            for (CommentArtifact ca : commentArtifacts) {
+                artifactIdSet.add(ca.getArtifactReferenced().getArtifactId());
+            }
+
+            MultiArtifactCommentDTO dto = MultiArtifactCommentDTO.fromComment(comment, new ArrayList<>(artifactIdSet));
+            dtos.add(dto);
+        }
+        return dtos;
     }
 
     /**

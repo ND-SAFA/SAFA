@@ -6,7 +6,9 @@ import java.util.UUID;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.comments.entities.dtos.ArtifactCommentResponseDTO;
+import edu.nd.crc.safa.features.health.entities.HealthRequest;
 import edu.nd.crc.safa.features.health.entities.HealthResponseDTO;
+import edu.nd.crc.safa.features.health.entities.HealthTask;
 import edu.nd.crc.safa.features.health.entities.gen.GenHealthResponse;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.features.generation.GenerationalTest;
@@ -33,10 +35,16 @@ class TestHealthCheckClear extends GenerationalTest {
 
         // Step - Trigger health
         mockHealthResponse(testData.createMockGenHealthResponse());
-
+        
+        HealthRequest request = new HealthRequest();
+        request.setArtifactIds(List.of(targetArtifact.getId()));
+        request.setTasks(List.of(HealthTask.CONTRADICTION, HealthTask.CONCEPT_EXTRACTION, HealthTask.CONCEPT_MATCHING));
         HealthResponseDTO healthResponseDTO = getServiceProvider()
             .getHealthService()
-            .performHealthChecks(projectVersion, List.of(targetArtifact));
+            .performHealthChecks(
+                getCurrentUser(),
+                projectVersion,
+                request);
 
 
         testVerifier.verifyHealthResponse(healthResponseDTO);

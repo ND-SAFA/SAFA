@@ -29,6 +29,7 @@ public class AppRoutes {
         public static final String DELETE_ACCOUNT = Accounts.ROOT + "/delete";
         public static final String SELF = Accounts.ROOT + "/self";
         public static final String DEFAULT_ORG = Accounts.ROOT + "/organization";
+        public static final String IMPERSONATE = "/execute-as/{user}";
 
         @NoArgsConstructor(access = AccessLevel.NONE)
         public static class SuperUser {
@@ -401,5 +402,11 @@ public class AppRoutes {
         public static final String ROOT = "/statistics";
         public static final String ONBOARDING_ROOT = ROOT + "/onboarding";
         public static final String ONBOARDING_BY_USER = ONBOARDING_ROOT + "/{userId}";
+    }
+
+    @NoArgsConstructor(access = AccessLevel.NONE)
+    public static class Audit {
+        public static final String ROOT = "/auditing";
+        public static final String LOGS = ROOT + "/logs";
     }
 }

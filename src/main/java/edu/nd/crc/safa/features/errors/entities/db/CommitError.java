@@ -14,6 +14,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -54,7 +55,8 @@ public class CommitError implements Serializable {
     @Column(name = "line_number")
     private Long lineNumber;
 
-    @Column(name = "description", length = 500)
+    @Column(name = "description", columnDefinition = "mediumtext")
+    @Lob
     private String description;
 
     public CommitError(ProjectVersion projectVersion,

@@ -1,4 +1,4 @@
-import { HealthCheckCollectionSchema } from "@/types";
+import { JobSchema } from "@/types";
 import { projectStore } from "@/hooks";
 import { buildRequest } from "@/api";
 import { HealthRequest, HealthTask } from "@/types/api/health-api";
@@ -13,7 +13,7 @@ export function performHealthChecks(
   tasks: HealthTask[],
   artifactIds: string[],
   artifactTypes: string[]
-): Promise<HealthCheckCollectionSchema> {
+): Promise<JobSchema> {
   const versionId = projectStore.versionId;
   const request: HealthRequest = {
     versionId,
@@ -21,7 +21,7 @@ export function performHealthChecks(
     artifactIds,
     artifactTypes,
   };
-  return buildRequest<HealthCheckCollectionSchema, "", HealthRequest>(
-    "healthChecks"
-  ).post(request);
+  return buildRequest<JobSchema, "", HealthRequest>("healthChecks").post(
+    request
+  );
 }

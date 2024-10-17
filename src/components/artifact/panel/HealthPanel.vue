@@ -44,6 +44,7 @@ export default {
 <script lang="ts" setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { QSelect } from "quasar";
+import { appStore, jobApiStore } from "@/hooks";
 import {
   DetailsPanel,
   ArtifactInput,
@@ -66,8 +67,6 @@ const isButtonEnabled = computed(() => {
     (artifactTypes.value.length > 0 || artifactIds.value.length > 0)
   );
 });
-
-console.log("ENABLED", isButtonEnabled.value);
 
 const taskOptions = ref<Array<{ label: string; value: HealthTask }>>([
   { label: "Contradiction", value: "contradiction" },
@@ -94,8 +93,10 @@ function handlePerformHealthChecks() {
     artifactIds.value,
     artifactTypes.value
   );
-  console.log("Artifact Ids:", artifactIds.value);
-  console.log("Types:", artifactTypes.value);
+  appStore.closeSidePanels();
+  artifactTypes.value = [];
+  artifactIds.value = [];
+  selectedTasks.value = [];
 }
 </script>
 

@@ -54,12 +54,6 @@ public class AppRoutes {
     }
 
     @NoArgsConstructor(access = AccessLevel.NONE)
-    public static class AttributeLayout {
-        public static final String ROOT = Projects.BY_ID + "/attribute-layouts";
-        public static final String BY_ID = ROOT + "/{id}";
-    }
-
-    @NoArgsConstructor(access = AccessLevel.NONE)
     public static class Comments {
         public static final String COMMENT_CREATE = "/comments/artifact/{artifactId}";
         public static final String COMMENT_GET = "/comments/artifact/{artifactId}";

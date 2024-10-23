@@ -3,7 +3,7 @@ package edu.nd.crc.safa.test.features.artifacts.services;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -153,7 +153,7 @@ class TestArtifactDataStructureService extends ApplicationBaseTest {
             artifactName,
             artifactSummary,
             newContent,
-            new Hashtable<>());
+            new HashMap<>());
 
         // VP - Verify that artifact body is detected to be modified
         AuthorizationSetter.setSessionAuthorization(currentUserName, this.serviceProvider); // Required because getting

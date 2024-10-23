@@ -6,8 +6,6 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.jobs.entities.db.JobDbEntity;
@@ -199,8 +197,6 @@ public class NotificationTestService {
             case TRACES -> TraceAppEntity.class;
             case JOBS -> JobAppEntity.class;
             case TRACE_MATRICES -> TraceMatrixAppEntity.class;
-            case ATTRIBUTES -> CustomAttributeAppEntity.class;
-            case LAYOUT -> AttributeLayoutAppEntity.class;
             case WARNINGS -> String.class;
             default -> throw new RuntimeException("No conversion class registered for: " + entity);
         };

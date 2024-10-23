@@ -3,8 +3,6 @@ package edu.nd.crc.safa.test.common;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepositoryImpl;
-import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttributeRepository;
-import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.documents.repositories.DocumentArtifactRepository;
 import edu.nd.crc.safa.features.documents.repositories.DocumentRepository;
@@ -76,14 +74,8 @@ public abstract class EntityBaseTest extends SpringBootBaseTest {
     protected JobService jobService;
 
     @Autowired
-    protected CustomAttributeRepository customAttributeRepository;
-
-    @Autowired
     @Getter
     protected ServiceProvider serviceProvider;
-
-    @Autowired
-    protected AttributeSystemServiceProvider attributeSystemServiceProvider;
 
     @Autowired
     protected ArtifactVersionRepositoryImpl artifactVersionRepositoryImpl;

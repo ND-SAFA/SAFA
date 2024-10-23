@@ -4,9 +4,6 @@ import edu.nd.crc.safa.authentication.TokenService;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
-import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
-import edu.nd.crc.safa.features.attributes.services.AttributeService;
-import edu.nd.crc.safa.features.attributes.services.AttributeValueService;
 import edu.nd.crc.safa.features.billing.services.BillingService;
 import edu.nd.crc.safa.features.billing.services.CostEstimationService;
 import edu.nd.crc.safa.features.billing.services.TransactionService;
@@ -128,10 +125,6 @@ public class ServiceProvider {
     private final ArtifactPositionRepository artifactPositionRepository;
     private final ArtifactVersionRepository artifactVersionRepository;
     private final ArtifactService artifactService;
-    // Custom Attributes
-    private final AttributeService attributeService;
-    private final AttributeValueService attributeValueService;
-    private final AttributeLayoutService attributeLayoutService;
     //Traces
     private final ITraceGenerationController traceGenerationController;
     private final TraceLinkVersionRepository traceLinkVersionRepository;

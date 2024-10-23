@@ -3,7 +3,6 @@ package edu.nd.crc.safa.features.notifications.builders;
 import java.util.List;
 import java.util.UUID;
 
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.NotificationEntity;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -72,15 +71,7 @@ public class ProjectChangeBuilder extends AbstractEntityChangeBuilder<ProjectCha
     public ProjectChangeBuilder withDocumentDelete(UUID documentId) {
         return withEntityDelete(NotificationEntity.DOCUMENT, List.of(documentId));
     }
-
-    public ProjectChangeBuilder withAttributeUpdate(CustomAttributeAppEntity customAttribute) {
-        return withEntitiesUpdate(NotificationEntity.ATTRIBUTES, List.of(customAttribute));
-    }
-
-    public ProjectChangeBuilder withAttributeDelete(UUID attributeId) {
-        return withEntityDelete(NotificationEntity.ATTRIBUTES, List.of(attributeId));
-    }
-
+    
     @Override
     protected ProjectChangeBuilder self() {
         return this;

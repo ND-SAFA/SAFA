@@ -3,11 +3,8 @@ package edu.nd.crc.safa.test.services.requests;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import edu.nd.crc.safa.config.AppRoutes;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
 import edu.nd.crc.safa.features.jobs.entities.app.JobAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.app.MembershipAppEntity;
 import edu.nd.crc.safa.features.organizations.entities.db.ProjectRole;
@@ -19,9 +16,7 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.requests.SafaRequest;
 import edu.nd.crc.safa.test.services.UserUtils;
-import edu.nd.crc.safa.test.services.builders.AndBuilder;
 import edu.nd.crc.safa.test.services.builders.BuilderState;
-import edu.nd.crc.safa.test.services.builders.CustomAttributeBuilder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.AllArgsConstructor;
@@ -77,7 +72,8 @@ public class CommonProjectRequests {
                                                               ProjectController.TransferOwnershipDTO transferDetails) {
         return SafaRequest.withRoute(AppRoutes.Projects.TRANSFER_OWNERSHIP)
             .withProject(project)
-            .putAndParseResponse(transferDetails, new TypeReference<>(){});
+            .putAndParseResponse(transferDetails, new TypeReference<>() {
+            });
     }
 
     public static JSONObject transferProjectOwnership(Project project,
@@ -86,19 +82,5 @@ public class CommonProjectRequests {
         return SafaRequest.withRoute(AppRoutes.Projects.TRANSFER_OWNERSHIP)
             .withProject(project)
             .putWithJsonObject(transferDetails, resultMatcher);
-    }
-
-    public AndBuilder<CommonProjectRequests, CustomAttributeAppEntity> createCustomAttribute(String projectParam,
-                                                                                             Consumer<CustomAttributeBuilder> consumer) {
-        Project project = state.getProject(projectParam);
-        CustomAttributeBuilder builder = new CustomAttributeBuilder();
-        consumer.accept(builder);
-        CustomAttribute customAttribute = builder.getCustomAttribute();
-        CustomAttributeAppEntity customAttributeAppEntity = new CustomAttributeAppEntity(customAttribute);
-        CustomAttributeAppEntity createAttribute = SafaRequest
-            .withRoute(AppRoutes.Attribute.ROOT)
-            .withProject(project)
-            .postWithJsonObject(customAttributeAppEntity, CustomAttributeAppEntity.class);
-        return new AndBuilder<>(this, createAttribute, this.state);
     }
 }

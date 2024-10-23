@@ -1,12 +1,12 @@
 package edu.nd.crc.safa.features.artifacts.entities.db;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import edu.nd.crc.safa.config.AppConstraints;
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.common.IVersionEntity;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -81,8 +81,9 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         columnDefinition = "mediumtext")
     private String content;
 
-    @Transient
-    private Map<String, JsonNode> customAttributeValues;
+    @Lob
+    @Column(name = "custom_attributes", columnDefinition = "mediumtext")
+    private String customAttributes;
 
     @Transient
     private List<UUID> documentIds;
@@ -90,7 +91,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
     public ArtifactVersion() {
         this.summary = "";
         this.content = "";
-        this.customAttributeValues = new HashMap<>();
+        this.customAttributes = "{}";
     }
 
     public ArtifactVersion(ProjectVersion projectVersion,
@@ -103,7 +104,7 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         this.projectVersion = projectVersion;
         this.summary = summary;
         this.content = content;
-        this.customAttributeValues = new HashMap<>();
+        this.customAttributes = "{}";
     }
 
     public ArtifactVersion(ProjectVersion projectVersion,
@@ -111,6 +112,10 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
                            String summary,
                            String content) {
         this(projectVersion, ModificationType.ADDED, artifact, summary, content);
+    }
+
+    public void setCustomAttributes(Map<String, JsonNode> jsonObject) {
+        this.customAttributes = ObjectMapperConfig.serialize(jsonObject);
     }
 
     @Override
@@ -139,37 +144,24 @@ public class ArtifactVersion implements Serializable, IVersionEntity<ArtifactApp
         return this.artifact.getType();
     }
 
-    /**
-     * Adds a custom attribute value to this ArtifactVersion object. This does NOT associate this
-     * custom attribute value with this artifact version in the database. It is merely a convenience so
-     * that all attribute values associated with this artifact version can be stored in a single
-     * object temporarily while this object is in flight.
-     *
-     * @param keyname The key for the attribute.
-     * @param value   The value of the attribute as a json node.
-     */
-    public void addCustomAttributeValue(String keyname, JsonNode value) {
-        customAttributeValues.put(keyname, value);
-    }
-
     public boolean hasSameContent(IVersionEntity entityVersion) {
         if (entityVersion instanceof ArtifactVersion artifactVersion) {
             return hasSameContent(artifactVersion.getName(),
                 artifactVersion.getSummary(),
                 artifactVersion.getContent(),
-                artifactVersion.getCustomAttributeValues());
+                artifactVersion.getCustomAttributes());
         }
         return false;
     }
 
     public boolean hasSameContent(ArtifactAppEntity a) {
-        return hasSameContent(a.getName(), a.getSummary(), a.getBody(), a.getAttributes());
+        return hasSameContent(a.getName(), a.getSummary(), a.getBody(), a.getAttributes().toString());
     }
 
-    private boolean hasSameContent(String name, String summary, String content, Map<String, JsonNode> attributes) {
+    private boolean hasSameContent(String name, String summary, String content, String customAttributes) {
         return this.getName().equals(name)
             && this.summary.equals(summary)
             && this.content.equals(content)
-            && this.customAttributeValues.equals(attributes);
+            && this.customAttributes.equals(customAttributes);
     }
 }

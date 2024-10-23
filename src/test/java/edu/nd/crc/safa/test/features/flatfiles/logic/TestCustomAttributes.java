@@ -12,8 +12,6 @@ import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.config.ProjectPaths;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
-import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 import edu.nd.crc.safa.features.flatfiles.services.DataFileBuilder;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.test.common.ApplicationBaseTest;
@@ -25,12 +23,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestCustomAttributes extends ApplicationBaseTest {
 
-    @Autowired
-    AttributeSystemServiceProvider attributeSystemServiceProvider;
 
     @Test
     void testCsv() throws Exception {
@@ -98,9 +93,6 @@ public class TestCustomAttributes extends ApplicationBaseTest {
     private ProjectVersion createProject(String projectName) {
         return dbEntityBuilder
             .newProject(projectName)
-            .newCustomAttribute(projectName, CustomAttributeType.TEXT, "strAttr", "strAttr")
-            .newCustomAttribute(projectName, CustomAttributeType.RELATION, "listAttr", "listAttr")
-            .newCustomAttribute(projectName, CustomAttributeType.INT, "intAttr", "intAttr")
             .newVersionWithReturn(projectName);
     }
 }

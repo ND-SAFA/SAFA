@@ -1,7 +1,7 @@
 package edu.nd.crc.safa.features.jira.services;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -74,7 +74,7 @@ public class JiraParsingService {
             name,
             summary,
             description,
-            new Hashtable<>()
+            new HashMap<>()
         );
 
         artifacts.add(artifactAppEntity);

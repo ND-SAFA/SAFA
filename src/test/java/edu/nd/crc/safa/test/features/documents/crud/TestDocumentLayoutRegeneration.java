@@ -122,7 +122,7 @@ class TestDocumentLayoutRegeneration extends ApplicationBaseTest {
             a2name,
             summary,
             body,
-            new HashMap<>()
+            new HashMap()
         );
         static ArtifactAppEntity artifact3 = new ArtifactAppEntity(
             null,
@@ -130,7 +130,7 @@ class TestDocumentLayoutRegeneration extends ApplicationBaseTest {
             a3name,
             summary,
             body,
-            new HashMap<>()
+            new HashMap()
         );
         static TraceAppEntity traceAppEntity = new TraceAppEntity(
             null,

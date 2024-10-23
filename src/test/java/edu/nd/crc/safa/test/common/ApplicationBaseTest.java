@@ -143,8 +143,7 @@ public abstract class ApplicationBaseTest extends EntityBaseTest {
         }
         this.rootBuilder = new RootBuilder(this.serviceProvider, this.getPort());
         BuilderState state = rootBuilder.store(s -> s).get();
-        this.dbEntityBuilder = new DbEntityBuilder(serviceProvider, customAttributeRepository,
-            attributeSystemServiceProvider);
+        this.dbEntityBuilder = new DbEntityBuilder(serviceProvider);
         this.jsonBuilder = new JsonBuilder();
         this.creationService = new CreationTestService(this.getServiceProvider(), this.dbEntityBuilder);
         this.assertionService = new VerificationTestService(state);

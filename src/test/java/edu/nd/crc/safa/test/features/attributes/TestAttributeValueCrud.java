@@ -1,17 +1,15 @@
-package edu.nd.crc.safa.test.features.attributes.crud;
+package edu.nd.crc.safa.test.features.attributes;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
-import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
-import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -19,27 +17,45 @@ import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
-import edu.nd.crc.safa.test.features.attributes.AttributesForTesting;
 import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.DoubleNode;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> {
 
-    private final AttributesForTesting attributesForTesting = new AttributesForTesting();
     private final String artifactType = "Requirement";
-    @Autowired
-    AttributeSystemServiceProvider attributeServiceProvider;
-    private CustomAttributeType currentType;
-    private CustomAttribute currentAttribute;
+    private final JsonNode updatedValue = TextNode.valueOf("thisissomenewvalue");
     private UUID currentId;
+    private JsonNode currentValue;
+    private String currentKey;
 
     @Override
     @Test
     public void testCrud() throws Exception {
-        for (CustomAttributeType attributeType : CustomAttributeType.values()) {
-            currentType = attributeType;
+        ArrayNode intArray = JsonNodeFactory.instance.arrayNode();
+        intArray.add(1);
+        intArray.add(2);
+
+        ObjectNode objectKey = JsonNodeFactory.instance.objectNode();
+        objectKey.put("some_key", "hi");
+
+        Map<String, JsonNode> testValues = new HashMap<>();
+        testValues.put("float_key", DoubleNode.valueOf(5.1F));
+        testValues.put("int_key", IntNode.valueOf(5));
+        testValues.put("str_key", TextNode.valueOf("5"));
+        testValues.put("int_array", intArray);
+        testValues.put("object_key", objectKey);
+
+        for (Map.Entry<String, JsonNode> entry : testValues.entrySet()) {
+            this.currentKey = entry.getKey();
+            this.currentValue = entry.getValue();
             super.testCrud();
             this.rootBuilder.clear();
         }
@@ -58,15 +74,14 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
 
     @Override
     protected UUID createEntity() throws Exception {
-        currentAttribute = attributesForTesting.setupAttribute(dbEntityBuilder, projectName,
-            attributeServiceProvider, currentType);
-
+        Map<String, JsonNode> customAttributes = new HashMap<>();
+        customAttributes.put(currentKey, currentValue);
         ArtifactAppEntity artifact = new ArtifactAppEntity(null,
             artifactType,
             "RE-20",
             "summary",
             "body",
-            Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).value)
+            customAttributes
         );
 
         ProjectCommitDefinition commit = commitService
@@ -82,10 +97,8 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     @Override
     protected void verifyCreatedEntity(ArtifactAppEntity retrievedEntity) {
         assertEquals(1, retrievedEntity.getAttributes().size());
-        assertTrue(retrievedEntity.getAttributes().containsKey(currentAttribute.getKeyname()));
-
-        AttributesForTesting.AttributeInfo schemaInfo = attributesForTesting.attributes.get(currentAttribute.getType());
-        assertEquals(schemaInfo.getValue(), retrievedEntity.getAttributes().get(currentAttribute.getKeyname()));
+        assertTrue(retrievedEntity.getAttributes().containsKey(currentKey));
+        assertEquals(currentValue, retrievedEntity.getAttributes().get(currentKey));
     }
 
     @Override
@@ -99,12 +112,14 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
 
     @Override
     protected void updateEntity() throws Exception {
+        Map<String, JsonNode> customAttributes = new HashMap<>();
+        customAttributes.put(currentKey, updatedValue);
         ArtifactAppEntity artifact = new ArtifactAppEntity(currentId,
             artifactType,
             "RE-20",
             "summary",
             "body",
-            Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).altValue)
+            customAttributes
         );
 
         commitService.commit(CommitBuilder
@@ -115,10 +130,8 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
     @Override
     protected void verifyUpdatedEntity(ArtifactAppEntity retrievedEntity) {
         assertEquals(1, retrievedEntity.getAttributes().size());
-        assertTrue(retrievedEntity.getAttributes().containsKey(currentAttribute.getKeyname()));
-
-        AttributesForTesting.AttributeInfo schemaInfo = attributesForTesting.attributes.get(currentAttribute.getType());
-        assertEquals(schemaInfo.getAltValue(), retrievedEntity.getAttributes().get(currentAttribute.getKeyname()));
+        assertTrue(retrievedEntity.getAttributes().containsKey(currentKey));
+        assertEquals(updatedValue, retrievedEntity.getAttributes().get(currentKey));
     }
 
     @Override
@@ -129,12 +142,13 @@ public class TestAttributeValueCrud extends AbstractCrudTest<ArtifactAppEntity> 
 
     @Override
     protected void deleteEntity(ArtifactAppEntity entity) throws Exception {
+        Map<String, JsonNode> customAttributes = new HashMap<>();
         ArtifactAppEntity artifact = new ArtifactAppEntity(currentId,
             artifactType,
             "RE-20",
             "summary",
             "body",
-            Map.of(currentAttribute.getKeyname(), attributesForTesting.attributes.get(currentType).altValue)
+            customAttributes
         );
 
         commitService.commit(CommitBuilder

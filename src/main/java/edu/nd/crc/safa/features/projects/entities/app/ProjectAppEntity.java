@@ -10,8 +10,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.layout.entities.app.LayoutPosition;
@@ -74,10 +72,6 @@ public class ProjectAppEntity implements IAppEntity {
 
     private Map<UUID, LayoutPosition> layout;
 
-    private List<CustomAttributeAppEntity> attributes;
-
-    private List<AttributeLayoutAppEntity> attributeLayouts;
-
     private Map<UUID, SubtreeAppEntity> subtrees;
 
     private List<TraceMatrixAppEntity> traceMatrices;
@@ -99,8 +93,6 @@ public class ProjectAppEntity implements IAppEntity {
         this.warnings = new Hashtable<>();
         this.errors = new ProjectParsingErrors();
         this.layout = new Hashtable<>();
-        this.attributes = new ArrayList<>();
-        this.attributeLayouts = new ArrayList<>();
         this.subtrees = new HashMap<>();
         this.traceMatrices = new ArrayList<>();
         this.lastEdited = LocalDateTime.now();
@@ -117,8 +109,6 @@ public class ProjectAppEntity implements IAppEntity {
                             Map<UUID, List<@Valid @NotNull RuleName>> warnings,
                             ProjectParsingErrors errors,
                             Map<UUID, LayoutPosition> layout,
-                            List<CustomAttributeAppEntity> attributes,
-                            List<AttributeLayoutAppEntity> attributeLayouts,
                             Map<UUID, SubtreeAppEntity> subtrees,
                             List<TraceMatrixAppEntity> traceMatrices,
                             List<String> permissions) {
@@ -138,8 +128,6 @@ public class ProjectAppEntity implements IAppEntity {
         this.warnings = warnings;
         this.errors = errors;
         this.layout = layout;
-        this.attributes = attributes;
-        this.attributeLayouts = attributeLayouts;
         this.subtrees = subtrees;
         this.traceMatrices = traceMatrices;
         this.permissions = permissions;

@@ -10,10 +10,6 @@ import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactRepository;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
-import edu.nd.crc.safa.features.attributes.entities.db.definitions.CustomAttribute;
-import edu.nd.crc.safa.features.attributes.repositories.definitions.CustomAttributeRepository;
-import edu.nd.crc.safa.features.attributes.services.AttributeSystemServiceProvider;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -49,7 +45,6 @@ import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 import edu.nd.crc.safa.features.versions.repositories.ProjectVersionRepository;
 import edu.nd.crc.safa.features.versions.services.VersionService;
-import edu.nd.crc.safa.test.features.attributes.AttributesForTesting;
 
 import lombok.Setter;
 import org.junit.jupiter.api.AfterEach;
@@ -75,8 +70,6 @@ public class DbEntityBuilder extends AbstractBuilder {
     private final TraceLinkRepository traceLinkRepository;
     private final TraceLinkVersionRepository traceLinkVersionRepository;
     private final ProjectService projectService;
-    private final CustomAttributeRepository customAttributeRepository;
-    private final AttributeSystemServiceProvider attributeSystemServiceProvider;
     private final VersionService versionService;
     private final TeamService teamService;
     private final OrganizationService organizationService;
@@ -95,9 +88,7 @@ public class DbEntityBuilder extends AbstractBuilder {
     SafaUser currentUser;
 
     @Autowired
-    public DbEntityBuilder(ServiceProvider serviceProvider,
-                           CustomAttributeRepository customAttributeRepository,
-                           AttributeSystemServiceProvider attributeSystemServiceProvider) {
+    public DbEntityBuilder(ServiceProvider serviceProvider) {
         this.projects = new Hashtable<>();
         this.projectRepository = serviceProvider.getProjectRepository();
         this.projectService = serviceProvider.getProjectService();
@@ -109,8 +100,6 @@ public class DbEntityBuilder extends AbstractBuilder {
         this.artifactVersionRepository = serviceProvider.getArtifactVersionRepository();
         this.traceLinkRepository = serviceProvider.getTraceLinkRepository();
         this.traceLinkVersionRepository = serviceProvider.getTraceLinkVersionRepository();
-        this.customAttributeRepository = customAttributeRepository;
-        this.attributeSystemServiceProvider = attributeSystemServiceProvider;
         this.versionService = serviceProvider.getVersionService();
         this.teamService = serviceProvider.getTeamService();
         this.organizationService = serviceProvider.getOrganizationService();
@@ -142,7 +131,6 @@ public class DbEntityBuilder extends AbstractBuilder {
             this.artifactTypeService.deleteAll();
             this.artifactRepository.deleteAll();
             this.artifactVersionRepository.deleteAll();
-            this.customAttributeRepository.deleteAll();
             this.revisionNumber = 0;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -270,26 +258,6 @@ public class DbEntityBuilder extends AbstractBuilder {
     public boolean hasType(String projectName, String typeName) {
         assertProjectExists(this.artifactTypes, projectName);
         return this.artifactTypes.get(projectName).containsKey(typeName);
-    }
-
-    public DbEntityBuilder newCustomAttribute(String projectName, CustomAttributeType type, String label, String key) {
-        newCustomAttributeWithReturn(projectName, type, label, key);
-        return this;
-    }
-
-    public CustomAttribute newCustomAttributeWithReturn(String projectName, CustomAttributeType type,
-                                                        String label, String key) {
-        Project project = getProject(projectName);
-
-        CustomAttribute field = new CustomAttribute();
-        field.setProjectId(project.getId());
-        field.setType(type);
-        field.setLabel(label);
-        field.setKeyname(key);
-
-        field = this.customAttributeRepository.save(field);
-        AttributesForTesting.addExtraInfo(field, attributeSystemServiceProvider);
-        return field;
     }
 
     public Artifact newArtifactWithReturn(String projectName, String typeName, String artifactName) {

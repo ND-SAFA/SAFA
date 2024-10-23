@@ -72,6 +72,7 @@ public class ArtifactAppEntity implements IAppEntity {
         this.name = "";
         this.body = "";
         this.summary = "";
+        this.attributes = new HashMap<>();
     }
 
     public ArtifactAppEntity(UUID artifactId,

@@ -7,10 +7,6 @@ import java.util.stream.Collectors;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.services.ArtifactService;
-import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
-import edu.nd.crc.safa.features.attributes.services.AttributeLayoutService;
-import edu.nd.crc.safa.features.attributes.services.AttributeService;
 import edu.nd.crc.safa.features.common.ProjectEntities;
 import edu.nd.crc.safa.features.documents.entities.app.DocumentAppEntity;
 import edu.nd.crc.safa.features.documents.services.CurrentDocumentService;
@@ -43,7 +39,6 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -70,8 +65,6 @@ public class ProjectRetrievalService {
     private final ArtifactPositionService artifactPositionService;
     private final WarningService warningService;
     private final CommitErrorRetrievalService commitErrorRetrievalService;
-    private final AttributeService attributeService;
-    private final AttributeLayoutService attributeLayoutService;
     private final SafaUserService safaUserService;
     private final TraceMatrixService traceMatrixService;
 
@@ -113,12 +106,6 @@ public class ProjectRetrievalService {
         // Layout
         Map<UUID, LayoutPosition> layout = artifactPositionService.retrieveDocumentLayout(projectVersion, null);
 
-        List<CustomAttributeAppEntity> attributes = this.attributeService
-            .getAttributeEntitiesForProject(projectVersion.getProject(), Sort.by("label"));
-
-        List<AttributeLayoutAppEntity> attributeLayouts =
-            this.attributeLayoutService.getAppEntities(projectVersion, user);
-
         ProjectGraph graph = new ProjectGraph(entities);
         Map<UUID, SubtreeAppEntity> subtrees = graph.getSubtreeInfo();
 
@@ -141,8 +128,6 @@ public class ProjectRetrievalService {
             warnings,
             errors,
             layout,
-            attributes,
-            attributeLayouts,
             subtrees,
             traceMatrices,
             permissions);

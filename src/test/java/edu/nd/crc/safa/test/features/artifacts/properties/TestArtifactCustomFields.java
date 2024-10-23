@@ -1,6 +1,7 @@
 package edu.nd.crc.safa.test.features.artifacts.properties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,6 @@ import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.repositories.ArtifactVersionRepository;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.delta.entities.app.EntityDelta;
 import edu.nd.crc.safa.features.delta.entities.app.ModifiedEntity;
@@ -43,7 +43,6 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
 
         ProjectVersion projectVersion = this.dbEntityBuilder
             .newProject(projectName)
-            .newCustomAttribute(projectName, CustomAttributeType.TEXT, fieldName, fieldName)
             .newVersionWithReturn(projectName);
 
         // Step - Create artifact json
@@ -74,9 +73,7 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         ArtifactAppEntity appEntity =
             artifactVersionRepository.retrieveAppEntitiesByProjectVersion(projectVersion).get(0);
         Map<String, JsonNode> customFieldsResponse = appEntity.getAttributes();
-        assertThat(customFieldsResponse)
-            .hasSize(1)
-            .containsEntry(fieldName, TextNode.valueOf(fieldValue));
+        assertEquals(customFieldsResponse.get(fieldName), TextNode.valueOf(fieldValue));
 
         // Step - Create second version
         ProjectVersion afterVersion = this.dbEntityBuilder.newVersionWithReturn(projectName);
@@ -93,8 +90,8 @@ class TestArtifactCustomFields extends ApplicationBaseTest {
         // VP - Verify change detected
         assertThat(modifiedArtifacts).containsKey(artifactId);
         ModifiedEntity<ArtifactAppEntity> modifiedArtifactEntity = modifiedArtifacts.get(artifactId);
-        JsonNode beforeValue = modifiedArtifactEntity.getBefore().getAttributes().get(fieldName);
-        JsonNode afterValue = modifiedArtifactEntity.getAfter().getAttributes().get(fieldName);
+        Object beforeValue = modifiedArtifactEntity.getBefore().getAttributes().get(fieldName);
+        Object afterValue = modifiedArtifactEntity.getAfter().getAttributes().get(fieldName);
         assertThat(beforeValue).isEqualTo(TextNode.valueOf(fieldValue));
         assertThat(afterValue).isEqualTo(TextNode.valueOf(newFieldValue));
     }

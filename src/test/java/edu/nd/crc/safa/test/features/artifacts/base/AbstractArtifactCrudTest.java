@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeType;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.IAppEntityService;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -14,6 +13,7 @@ import edu.nd.crc.safa.features.notifications.TopicCreator;
 import edu.nd.crc.safa.features.notifications.entities.EntityChangeMessage;
 import edu.nd.crc.safa.features.notifications.entities.NotificationAction;
 import edu.nd.crc.safa.test.common.AbstractCrudTest;
+import edu.nd.crc.safa.test.services.CommonRequestService;
 import edu.nd.crc.safa.test.services.builders.CommitBuilder;
 
 public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<ArtifactAppEntity> {
@@ -32,12 +32,7 @@ public abstract class AbstractArtifactCrudTest extends AbstractCrudTest<Artifact
 
     @Override
     protected UUID createEntity() throws Exception {
-        this.rootBuilder
-            .request(r -> r.project()
-                .createCustomAttribute("project", c -> c
-                    .withKeyName("key")
-                    .withLabel("key")
-                    .withType(CustomAttributeType.TEXT)));
+        this.rootBuilder.request(CommonRequestService::project);
 
         ProjectCommitDefinition commit = commitService
             .commit(CommitBuilder

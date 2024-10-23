@@ -11,11 +11,7 @@ import java.util.Queue;
 import java.util.function.Predicate;
 
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.AttributeLayoutAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.AttributePositionAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
-import edu.nd.crc.safa.features.attributes.services.AttributeService;
+import edu.nd.crc.safa.features.attributes.ReservedAttributes;
 import edu.nd.crc.safa.features.commits.entities.app.ProjectCommitDefinition;
 import edu.nd.crc.safa.features.common.ServiceProvider;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
@@ -213,28 +209,11 @@ public class GithubProjectCreationJob extends CommitJob {
         // Step - Update job name
         this.getServiceProvider().getJobService().setJobName(this.getJobDbEntity(), createJobName(projectName));
 
-        createCustomAttributes(this.user, project);
-
         // Step - Map GitHub project to SAFA project
         this.githubProject = this.getGithubProjectMapping(project);
         createImportPredicate();
 
         logger.log("Project %s is mapped to GitHub project %s.", project.getProjectId(), githubProject.getId());
-    }
-
-    /**
-     * Creates custom attributes that are used for the github import.
-     *
-     * @param project The project we're importing into
-     */
-    private void createCustomAttributes(SafaUser user, Project project) {
-        for (CustomAttributeAppEntity attribute : ReservedAttributes.Github.ALL_ATTRIBUTES) {
-            AttributeService attributeService = getServiceProvider().getAttributeService();
-
-            if (attributeService.getByProjectAndKeyname(project, attribute.getKey()).isEmpty()) {
-                getServiceProvider().getAttributeService().saveEntity(user, project, attribute, true);
-            }
-        }
     }
 
     /**
@@ -340,12 +319,6 @@ public class GithubProjectCreationJob extends CommitJob {
     private ArtifactType createArtifactType(Project project, String artifactTypeName) {
         ArtifactType artifactType = getServiceProvider().getTypeService()
             .createArtifactType(project, artifactTypeName, user);
-        List<AttributePositionAppEntity> attributePositions = List.of(
-            new AttributePositionAppEntity(ReservedAttributes.Github.LINK.getKey(), 0, 0, 1, 1)
-        );
-        AttributeLayoutAppEntity layoutEntity = new AttributeLayoutAppEntity(null, artifactTypeName + " Layout",
-            List.of(artifactTypeName), attributePositions);
-        getServiceProvider().getAttributeLayoutService().saveLayoutEntity(user, layoutEntity, project, true);
         return artifactType;
     }
 
@@ -496,8 +469,7 @@ public class GithubProjectCreationJob extends CommitJob {
 
     protected Map<String, JsonNode> getAttributes(String filePath) {
         Map<String, JsonNode> attributes = new HashMap<>();
-        attributes.put(ReservedAttributes.Github.LINK.getKey(),
-            TextNode.valueOf(buildGithubFileUrl(filePath)));
+        attributes.put(ReservedAttributes.Github.LINK, TextNode.valueOf(buildGithubFileUrl(filePath)));
         return attributes;
     }
 

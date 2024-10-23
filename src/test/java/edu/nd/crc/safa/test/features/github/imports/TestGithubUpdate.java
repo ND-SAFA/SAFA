@@ -4,8 +4,7 @@ import java.util.List;
 
 import edu.nd.crc.safa.config.AppRoutes;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.CustomAttributeAppEntity;
-import edu.nd.crc.safa.features.attributes.entities.ReservedAttributes;
+import edu.nd.crc.safa.features.attributes.ReservedAttributes;
 import edu.nd.crc.safa.features.github.entities.app.GithubImportDTO;
 import edu.nd.crc.safa.features.github.entities.db.GithubProject;
 import edu.nd.crc.safa.features.projects.entities.db.Project;
@@ -63,8 +62,7 @@ public class TestGithubUpdate extends AbstractGithubTest {
 
         for (ArtifactAppEntity artifact : artifacts) {
             if (artifact.getType().equals(type.getName())) {
-                ReservedAttributes.Github.ALL_ATTRIBUTES.stream()
-                    .map(CustomAttributeAppEntity::getKey)
+                ReservedAttributes.Github.ALL_ATTRIBUTES
                     .forEach(key -> Assertions.assertTrue(artifact.getAttributes().containsKey(key)));
             }
         }
@@ -117,8 +115,7 @@ public class TestGithubUpdate extends AbstractGithubTest {
 
         for (ArtifactAppEntity artifact : artifacts) {
             if (artifact.getType().equals(type.getName())) {
-                ReservedAttributes.Github.ALL_ATTRIBUTES.stream()
-                    .map(CustomAttributeAppEntity::getKey)
+                ReservedAttributes.Github.ALL_ATTRIBUTES
                     .forEach(key -> Assertions.assertTrue(artifact.getAttributes().containsKey(key)));
             }
         }

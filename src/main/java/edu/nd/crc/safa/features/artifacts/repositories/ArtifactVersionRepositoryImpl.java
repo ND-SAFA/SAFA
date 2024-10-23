@@ -1,14 +1,13 @@
 package edu.nd.crc.safa.features.artifacts.repositories;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import edu.nd.crc.safa.config.ObjectMapperConfig;
 import edu.nd.crc.safa.features.artifacts.entities.ArtifactAppEntity;
 import edu.nd.crc.safa.features.artifacts.entities.db.Artifact;
 import edu.nd.crc.safa.features.artifacts.entities.db.ArtifactVersion;
-import edu.nd.crc.safa.features.attributes.services.AttributeValueService;
 import edu.nd.crc.safa.features.commits.repositories.GenericVersionRepository;
 import edu.nd.crc.safa.features.delta.entities.db.ModificationType;
 import edu.nd.crc.safa.features.documents.entities.db.Document;
@@ -29,7 +28,6 @@ import edu.nd.crc.safa.features.types.services.TypeService;
 import edu.nd.crc.safa.features.users.entities.db.SafaUser;
 import edu.nd.crc.safa.features.versions.entities.ProjectVersion;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -50,8 +48,6 @@ public class ArtifactVersionRepositoryImpl
     @Setter(onMethod = @__({@Autowired}))
     private DocumentRepository documentRepository;
     @Setter(onMethod = @__({@Autowired}))
-    private AttributeValueService attributeValueService;
-    @Setter(onMethod = @__({@Autowired}))
     private ArtifactTypeCountService typeCountService;
     @Setter(onMethod = @__({@Autowired}))
     private NotificationService notificationService;
@@ -59,10 +55,6 @@ public class ArtifactVersionRepositoryImpl
     @Override
     public ArtifactVersion save(ArtifactVersion artifactVersion) {
         ArtifactVersion version = this.artifactVersionRepository.save(artifactVersion);
-
-        attributeValueService.saveAllAttributeValues(artifactVersion,
-            artifactVersion.getCustomAttributeValues());
-
         return version;
     }
 
@@ -84,9 +76,7 @@ public class ArtifactVersionRepositoryImpl
             artifactAppEntity.getSummary(),
             artifactAppEntity.getBody());
 
-        for (Map.Entry<String, JsonNode> entry : artifactAppEntity.getAttributes().entrySet()) {
-            artifactVersion.addCustomAttributeValue(entry.getKey(), entry.getValue());
-        }
+        artifactVersion.setCustomAttributes(artifactAppEntity.getAttributes());
 
         return artifactVersion;
     }
@@ -120,7 +110,6 @@ public class ArtifactVersionRepositoryImpl
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByProject(Project project) {
         List<ArtifactVersion> versions = artifactVersionRepository.findByProjectVersionProject(project);
-        attributeValueService.attachCustomAttributesToArtifacts(versions);
         return versions;
     }
 
@@ -132,7 +121,6 @@ public class ArtifactVersionRepositoryImpl
     @Override
     public List<ArtifactVersion> retrieveVersionEntitiesByBaseEntity(Artifact artifact) {
         List<ArtifactVersion> versions = artifactVersionRepository.findByArtifact(artifact);
-        attributeValueService.attachCustomAttributesToArtifacts(versions);
         return versions;
     }
 
@@ -143,8 +131,6 @@ public class ArtifactVersionRepositoryImpl
 
     @Override
     public ArtifactAppEntity retrieveAppEntityFromVersionEntity(ArtifactVersion artifactVersion) {
-        // Step 1 - Create base entity information
-        attributeValueService.attachCustomAttributesToArtifact(artifactVersion);
 
         ArtifactAppEntity artifactAppEntity = new ArtifactAppEntity(
             artifactVersion.getArtifact().getArtifactId(),
@@ -152,7 +138,7 @@ public class ArtifactVersionRepositoryImpl
             artifactVersion.getName(),
             artifactVersion.getSummary(),
             artifactVersion.getContent(),
-            artifactVersion.getCustomAttributeValues());
+            ObjectMapperConfig.deserialize(artifactVersion.getCustomAttributes()));
 
         // Step 2 - Attach document links
         attachDocumentLinks(artifactVersion, artifactAppEntity);

@@ -2,7 +2,14 @@
 FROM public.ecr.aws/docker/library/python:3.10 AS base
 SHELL ["/bin/bash", "-c"]
 
-RUN pip install --upgrade pip
+# Install build dependencies for hdbscan on ARM64
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip setuptools wheel
 
 ## Step - Install requirements
 ADD tgen/requirements/ /app/tgen/requirements/

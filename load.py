@@ -6,8 +6,7 @@ from sentence_transformers import SentenceTransformer
 
 load_dotenv()
 CACHE_DIR = os.environ.get("HF_DATASETS_CACHE", "~/.cache/models")
-CACHED_MODELS = ["sentence-transformers/all-roberta-large-v1",
-                 "sentence-transformers/all-MiniLM-L6-v2"]
+CACHED_MODELS = ["sentence-transformers/all-MiniLM-L6-v2"]
 os.makedirs(CACHE_DIR, exist_ok=True)
 print("Cache Dir:", CACHE_DIR)
 print("Models:", os.listdir(CACHE_DIR))

@@ -11,6 +11,7 @@ services:
     - "4000:80"
     volumes:
     - tgen-volume:/vol
+    - ~/.cache/models:/root/.cache/huggingface/datasets
     networks:
     - safa_network
     environment:
@@ -23,6 +24,7 @@ services:
     - BROKER_URL=redis://redis:6379/0
     - BROKER_USERNAME=guest
     - BROKER_PASSWORD=guest
+    - HF_DATASETS_CACHE=/root/.cache/huggingface/datasets
   redis:
     container_name: redis
     image: redis:alpine

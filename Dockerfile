@@ -4,7 +4,7 @@ SHELL ["/bin/bash", "-c"]
 
 # Step 2 - Install gradle
 ARG GRADLE_VERSION=8.1
-RUN yum update -y -q && yum install -y -q wget unzip zip
+RUN yum update -y -q && yum install -y -q wget unzip zip tar
 RUN curl -q -s "https://get.sdkman.io" | bash
 RUN source "$HOME/.sdkman/bin/sdkman-init.sh" && sdk install gradle $GRADLE_VERSION
 

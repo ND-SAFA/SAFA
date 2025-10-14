@@ -3,8 +3,8 @@ from typing import Dict
 from api.endpoints.gen.chat.chat_serializer import ChatRequest, ChatSerializer
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
-from tgen.chat.message_meta import MessageMeta
-from tgen.jobs.chat_jobs.chat_job import ChatJob
+from gen.chat.chat_job import ChatJob
+from gen_common.llm.message_meta import MessageMeta
 
 
 @endpoint(ChatSerializer, is_async=True)

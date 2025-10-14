@@ -7,7 +7,7 @@ from django.http import HttpRequest, JsonResponse
 from api.endpoints.auth_view import authorize_request
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.utils.view_util import ViewUtil
-from tgen.common.util.json_util import NpEncoder
+from gen_common.util.json_util import NpEncoder
 
 
 class IHandler(ABC):

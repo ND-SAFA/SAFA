@@ -1,6 +1,6 @@
 from enum import auto
 
-from tgen.common.util.supported_enum import SupportedEnum
+from gen_common.util.supported_enum import SupportedEnum
 
 
 class CeleryStatus(SupportedEnum):

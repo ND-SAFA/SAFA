@@ -3,7 +3,7 @@ beautifulsoup4~=4.12.3
 comment-parser==1.2.4
 evaluate==0.4.2
 GitPython==3.1.41
-hdbscan==0.8.33
+hdbscan==0.8.38
 javac-parser==1.0.0
 javalang==0.13.0
 langchain==0.2.12

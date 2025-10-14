@@ -5,14 +5,15 @@ from uuid import UUID
 from django.http import HttpRequest
 from rest_framework import serializers
 
-from tgen.common.constants.dataset_constants import NO_CHECK
-from tgen.common.util.status import Status
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.readers.api_project_reader import ApiProjectReader
-from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.jobs.abstract_job import AbstractJob
-from tgen.jobs.components.args.job_args import JobArgs
+from gen_common.constants.dataset_constants import NO_CHECK
+from gen_common.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
+from gen_common.data.readers.api_project_reader import ApiProjectReader
+from gen_common.data.readers.definitions.api_definition import ApiDefinition
+from gen_common.jobs.abstract_job import AbstractJob
+from gen_common.jobs.job_args import JobArgs
+from gen_common.util.status import Status
+
 
 
 class ViewUtil:

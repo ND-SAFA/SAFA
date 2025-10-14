@@ -2,8 +2,8 @@ from apiTests.base_test import BaseTest
 from apiTests.common.request_proxy import RequestProxy
 from apiTests.common.test_data import TestData, TestSubset
 from apiTests.common.test_verifier import TestVerifier
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
+from gen_common_test.base.mock.test_ai_manager import TestAIManager
 
 
 class TestTGen(BaseTest):

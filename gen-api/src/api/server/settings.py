@@ -15,13 +15,13 @@ import sys
 
 from kombu.serialization import register
 
+from gen_common.infra.t_logging.logger_manager import logger
 from .paths import load_source_code_paths
 
 load_source_code_paths()
 
-from tgen.common.constants import anthropic_constants
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.json_util import NpEncoder
+from gen_common.constants import anthropic_constants
+from gen_common.util.json_util import NpEncoder
 
 from pathlib import Path
 from socket import gethostbyname
@@ -179,20 +179,9 @@ CELERY_ACCEPT_CONTENT = ['NpEncoder']
 CELERY_TASK_SERIALIZER = 'NpEncoder'
 CELERY_RESULT_SERIALIZER = 'NpEncoder'
 GEN_BROKER = os.environ.get("BROKER", "celery")
+CELERY_BROKER_URL = os.environ.get("BROKER_URL", "redis://localhost:6379/0")
 
-if GEN_BROKER == "celery":
-    from celery_s3.backends import S3Backend
 
-    base_path = f"/{ENV_NAME}"
-    CELERY_RESULT_BACKEND = 'celery_s3.backends.S3Backend'
-    CELERY_S3_BACKEND_SETTINGS = {
-        'aws_access_key_id': f'{os.environ.get("BACKEND_ACCESS_ID", "")}',
-        'aws_secret_access_key': f'{os.environ.get("BACKEND_SECRET_KEY", "")}',
-        'bucket': f'{os.environ.get("BACKEND_BUCKET_NAME", "")}',
-        'reduced_redundancy': True,
-        'base_path': bytes(base_path, "utf-8")  # See `Rabbit Hole Fix`
-    }
-    print("using s3 for back-end.")
 """"
 FootNotes:
 

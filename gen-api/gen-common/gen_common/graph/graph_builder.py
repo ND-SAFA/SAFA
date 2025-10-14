@@ -2,7 +2,6 @@ from copy import deepcopy
 from typing import Any, Callable, Tuple, Type
 
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.graph.graph import CompiledGraph
 from langgraph.graph.state import StateGraph
 
 from gen_common.graph.branches.supported_branches import SupportedBranches
@@ -29,7 +28,7 @@ class GraphBuilder:
         self.nodes_in_graph = set(self.graph_definition.nodes + [SupportedNodes.END_COMMAND])
         self.node_map = {}
 
-    def build(self) -> CompiledGraph:
+    def build(self) :
         """
         Builds and compiles the graph.
         :return: Compiled graph.

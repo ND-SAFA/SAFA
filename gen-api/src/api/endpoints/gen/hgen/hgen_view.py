@@ -8,12 +8,9 @@ from api.endpoints.handler.dataset_converter import create_api_dataset
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.server.settings import ENV_FAILURE_PATH, ENV_NAME
 from api.utils.view_util import ViewUtil
-from tgen.common.constants.project_summary_constants import PS_SUBSYSTEM_TITLE
-from tgen.common.logging.logger_manager import logger
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.hgen.hgen_args import HGenArgs
-from tgen.jobs.hgen_jobs.base_hgen_job import BaseHGenJob
-from tgen.jobs.hgen_jobs.multi_layer_hgen_job import MultiLayerHGenJob
+from gen.hgen.hgen_args import HGenArgs
+from gen.hgen.jobs.multi_layer_hgen_job import MultiLayerHGenJob
+from gen_common.constants.summary_constants import PS_SUBSYSTEM_TITLE
 
 ARTIFACT_LAYER = "source_layer_id"
 

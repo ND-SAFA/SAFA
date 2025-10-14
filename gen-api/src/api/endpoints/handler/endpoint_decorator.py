@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 from api.docs.doc_generator import autodoc
 from api.endpoints.handler.async_endpoint_handler import AsyncEndpointHandler
 from api.endpoints.handler.endpoint_handler import EndpointHandlerProxy
-from tgen.common.constants import environment_constants
-from tgen.common.util.json_util import NpEncoder
+from gen_common.constants import environment_constants
+from gen_common.util.json_util import NpEncoder
 
 load_dotenv()
 

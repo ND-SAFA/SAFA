@@ -2,7 +2,7 @@ from typing import TypedDict
 
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.gen.serializers.dataset_serializer import DatasetSerializer
-from tgen.data.readers.definitions.api_definition import ApiDefinition
+from gen_common.data.readers.definitions.api_definition import ApiDefinition
 
 
 class TraceRequest(TypedDict):

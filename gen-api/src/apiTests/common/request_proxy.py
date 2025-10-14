@@ -7,12 +7,14 @@ from api.endpoints.auth_view import AUTH_KEY
 from api.endpoints.gen.serializers.message_serializer import MessageDTO
 from api.server.app_endpoints import AppEndpoints
 from apiTests.base_test import BaseTest
-from tgen.common.objects.artifact import Artifact
-from tgen.common.objects.trace import Trace
-from tgen.common.util.json_util import NpEncoder
-from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.data.tdatasets.trace_dataset import TraceDataset
-from tgen.jobs.summary_jobs.summary_response import SummaryResponse
+from gen.summary.summary_response import SummaryResponse
+from gen_common.data.objects.artifact import Artifact
+from gen_common.data.objects.trace import Trace
+from gen_common.data.readers.definitions.api_definition import ApiDefinition
+from gen_common.data.tdatasets.trace_dataset import TraceDataset
+
+from gen_common.util.json_util import NpEncoder
+
 
 
 class RequestProxy:

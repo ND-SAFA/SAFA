@@ -4,8 +4,8 @@ from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_MEDIUM
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
-from tgen.chat.message_meta import MessageMeta
-from tgen.models.llm.abstract_llm_manager import Message, PromptRoles
+from gen_common.llm.abstract_llm_manager import PromptRoles, Message
+from gen_common.llm.message_meta import MessageMeta
 
 
 class MessageDTO(TypedDict):

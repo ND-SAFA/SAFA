@@ -25,18 +25,17 @@ COPY requirements/ /app/requirements
 RUN pip3 install -r "/app/requirements/$TASK_MANAGER-requirements.txt"
 
 ## Step - Copy source and build files
-COPY tgen/tgen/ /app/tgen/
+COPY tgen/gen/ /app/gen/
 COPY src/api/ /app/api/
-
-### Step - Collect static files
-WORKDIR /app
-COPY tgen/download_static.py /app/download_static.py
-RUN python3 download_static.py
-RUN python3 api/manage.py collectstatic --noinput
 
 ### COPy
 ADD load.py /app/
 COPY changelog /changelog
+
+# Set safe environment variables
+ENV DJANGO_SETTINGS_MODULE=api.server.settings \
+    WANDB_MODE=offline \
+    ENV_MODE=development
 
 # Finalize
 EXPOSE 80

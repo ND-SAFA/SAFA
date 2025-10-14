@@ -1,10 +1,10 @@
 from typing import Tuple
 
-from tgen.core.args.anthropic_args import AnthropicArgs
-from tgen.core.args.open_ai_args import OpenAIArgs
-from tgen.models.llm.abstract_llm_manager import AbstractLLMManager
-from tgen.models.llm.anthropic_manager import AnthropicManager
-from tgen.models.llm.open_ai_manager import OpenAIManager
+from gen_common.llm.abstract_llm_manager import AbstractLLMManager
+from gen_common.llm.anthropic_manager import AnthropicManager
+from gen_common.llm.args.anthropic_args import AnthropicArgs
+from gen_common.llm.args.open_ai_args import OpenAIArgs
+from gen_common.llm.open_ai_manager import OpenAIManager
 
 
 class ModelUtil:

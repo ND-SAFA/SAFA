@@ -3,8 +3,8 @@ from typing import List
 import pandas as pd
 
 from apiTests.common.test_constants import SOURCE_CODE_PATH
-from tgen.common.constants.deliminator_constants import EMPTY_STRING
-from tgen.common.objects.artifact import Artifact
+from gen_common.constants.deliminator_constants import EMPTY_STRING
+from gen_common.objects.artifact import Artifact
 
 ARTIFACT_MOCK_CONTENT = "dummy-text"
 

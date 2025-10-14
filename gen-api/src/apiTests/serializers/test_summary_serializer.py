@@ -1,6 +1,6 @@
 from api.endpoints.gen.summarize.summarize_serializer import SummarizeRequest, SummarizeSerializer
 from apiTests.base_test import BaseTest
-from tgen.data.dataframes.artifact_dataframe import ArtifactKeys
+from gen_common.data.keys.structure_keys import ArtifactKeys
 
 
 class TestSummarySerializer(BaseTest):

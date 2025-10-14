@@ -6,14 +6,16 @@ import pandas as pd
 
 from apiTests.common.data_encoder import DataEncoder
 from apiTests.common.test_constants import CHILD_TYPE, FR_ARTIFACT_PATH, PARENT_TYPE, SOURCE_CODE_PATH, SUMMARY_JSON_PATH, SUMMARY_PATH
-from tgen.common.objects.artifact import Artifact
-from tgen.common.objects.trace_layer import TraceLayer
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.file_util import FileUtil
-from tgen.common.util.json_util import JsonUtil
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.data.readers.definitions.api_definition import ApiDefinition
+from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from gen_common.data.keys.structure_keys import ArtifactKeys
+from gen_common.data.objects.artifact import Artifact
+from gen_common.data.objects.trace_layer import TraceLayer
+from gen_common.data.readers.definitions.api_definition import ApiDefinition
+
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.file_util import FileUtil
+from gen_common.util.json_util import JsonUtil
+
 
 
 class TestSubset(Enum):

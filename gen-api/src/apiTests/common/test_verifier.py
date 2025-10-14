@@ -1,10 +1,10 @@
 from typing import Dict, List
 from unittest import TestCase
 
-from tgen.common.objects.artifact import Artifact
-from tgen.common.objects.trace import Trace
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
-from tgen.tracing.ranking.common.ranking_util import RankingUtil
+from gen_common.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from gen_common.data.objects.artifact import Artifact
+from gen_common.data.objects.trace import Trace
+from gen_common.util.ranking_util import RankingUtil
 
 
 class TestVerifier:

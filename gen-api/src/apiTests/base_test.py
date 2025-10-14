@@ -6,7 +6,7 @@ from django.core.wsgi import get_wsgi_application
 from dotenv import load_dotenv
 
 from api.endpoints.auth_view import create_key
-from tgen.common.constants import anthropic_constants, environment_constants, open_ai_constants
+from gen_common.constants import anthropic_constants, environment_constants, open_ai_constants
 
 
 class BaseTest(TestCase):

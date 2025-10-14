@@ -3,7 +3,7 @@ from typing import Dict, OrderedDict
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from tgen.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
+from gen_common.data.processing.cleaning.separate_joined_words_step import SeparateJoinedWordsStep
 
 
 class SerializerUtility:

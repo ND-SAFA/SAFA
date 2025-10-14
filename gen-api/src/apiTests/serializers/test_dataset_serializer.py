@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from api.endpoints.gen.serializers.dataset_serializer import DatasetSerializer
 from apiTests.base_test import BaseTest
 from apiTests.common.test_data import TestData, TestSubset
-from tgen.data.readers.definitions.api_definition import ApiDefinition
+from gen_common.data.readers.definitions.api_definition import ApiDefinition
 
 load_dotenv()
 

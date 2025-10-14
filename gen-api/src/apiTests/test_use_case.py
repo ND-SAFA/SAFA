@@ -4,12 +4,12 @@ from apiTests.base_test import BaseTest
 from apiTests.common.request_proxy import RequestProxy
 from apiTests.common.test_data import TestData
 from apiTests.common.test_data_creator import TestDataCreator
-from tgen.common.objects.artifact import Artifact
-from tgen.common.util.enum_util import EnumDict
-from tgen.common.util.list_util import ListUtil
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from gen_common.data.keys.structure_keys import ArtifactKeys
+from gen_common.data.objects.artifact import Artifact
+from gen_common.util.enum_util import EnumDict
+from gen_common.util.list_util import ListUtil
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
+from gen_common_test.base.mock.test_ai_manager import TestAIManager
 
 
 class TestUseCase(BaseTest):

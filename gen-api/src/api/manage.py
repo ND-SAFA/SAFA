@@ -23,7 +23,7 @@ def main():
 
 if __name__ == '__main__':
     if len(sys.argv) == 4:
-        from tgen.common.logging.logger_manager import logger
+        from gen_common.infra.t_logging.logger_manager import logger
 
         env_file = sys.argv.pop(-1)
         env_file_path = os.path.normpath(os.path.join("..", "..", env_file))

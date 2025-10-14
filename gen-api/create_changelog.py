@@ -6,8 +6,8 @@ from packaging import version
 
 sys.path.append("../tgen")
 
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.file_util import FileUtil
+from gen_common.infra.t_logging.logger_manager import logger
+from gen_common.util.file_util import FileUtil
 
 
 def get_latest_version_from_changelog(directory):

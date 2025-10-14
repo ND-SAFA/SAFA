@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Set, Tuple, Type, Union
 
 import bs4
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 
 from gen_common.constants.symbol_constants import DASH, EMPTY_STRING
 from gen_common.infra.t_logging.logger_manager import logger

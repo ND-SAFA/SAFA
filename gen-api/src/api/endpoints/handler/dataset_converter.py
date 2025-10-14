@@ -1,10 +1,10 @@
 from typing import List
 
-from tgen.common.objects.artifact import Artifact
-from tgen.data.creators.prompt_dataset_creator import PromptDatasetCreator
-from tgen.data.creators.trace_dataset_creator import TraceDatasetCreator
-from tgen.data.readers.api_project_reader import ApiProjectReader
-from tgen.data.readers.definitions.api_definition import ApiDefinition
+from gen_common.data.creators.prompt_dataset_creator import PromptDatasetCreator
+from gen_common.data.creators.trace_dataset_creator import TraceDatasetCreator
+from gen_common.data.objects.artifact import Artifact
+from gen_common.data.readers.api_project_reader import ApiProjectReader
+from gen_common.data.readers.definitions.api_definition import ApiDefinition
 
 
 def create_api_dataset(artifacts: List[Artifact], project_summary: str = None) -> PromptDatasetCreator:

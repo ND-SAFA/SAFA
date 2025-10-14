@@ -3,7 +3,6 @@ import uuid
 from typing import Any, Dict, List
 
 from langgraph.constants import START
-from langgraph.graph.graph import CompiledGraph
 
 from gen_common.graph.graph_builder import GraphBuilder
 from gen_common.graph.graph_definition import GraphDefinition
@@ -161,7 +160,7 @@ class GraphRunner:
         self.states_for_runs[self.run_num] = states
         self.run_num += 1
 
-    def _save_state_history(self, app: CompiledGraph, configs: List[Dict[str, Dict]]) -> bool:
+    def _save_state_history(self, app: "CompiledGraph", configs: List[Dict[str, Dict]]) -> bool:
         """
         Saves the states and nodes that were visited during each graph run.
         :param app: The compiled graph.
@@ -194,7 +193,7 @@ class GraphRunner:
         assert len(thread_ids) == n, f"Number of thread ({len(thread_ids)}) ids must be the same as the number of params ({n})"
         return thread_ids
 
-    def __get_async_result(self, app: CompiledGraph, initial_state: GraphState,
+    def __get_async_result(self, app: "CompiledGraph", initial_state: GraphState,
                            config: Dict[str, Dict]) -> Any | GraphState | None:
         """
         Runs the graph async and returns the final state.

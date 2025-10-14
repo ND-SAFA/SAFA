@@ -3,8 +3,8 @@ import os.path
 
 from api.endpoints.gen.serializers import ArtifactSerializer
 from apiTests.base_test import BaseTest
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.json_util import JsonUtil
+from gen_common.infra.t_logging.logger_manager import logger
+from gen_common.util.json_util import JsonUtil
 
 
 class ProjectTest(BaseTest):

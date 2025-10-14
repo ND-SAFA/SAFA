@@ -2,7 +2,7 @@ from typing import List
 
 from api.endpoints.gen.serializers.message_serializer import MessageMetaSerializer
 from apiTests.base_test import BaseTest
-from tgen.chat.message_meta import MessageMeta
+from gen_common.llm.message_meta import MessageMeta
 
 
 class TestChatSerializer(BaseTest):

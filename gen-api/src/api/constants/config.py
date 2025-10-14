@@ -2,7 +2,7 @@ import os
 from typing import List
 
 from api.server.paths import REPO_PATH
-from tgen.common.util.file_util import FileUtil
+from gen_common.util.file_util import FileUtil
 
 CHANGELOG = "changelog"
 HOMEPAGE_HEADER = "# Welcome to SAFA's generative server"

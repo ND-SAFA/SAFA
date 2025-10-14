@@ -3,11 +3,13 @@ from typing import Dict, List
 from api.endpoints.gen.chat.chat_serializer import ChatRequest, ChatSerializer
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
-from tgen.chat.chat_node_ids import ChatNodeIDs
-from tgen.chat.message_meta import MessageMeta
-from tgen.common.util.llm_response_util import LLMResponseUtil
-from tgen.jobs.chat_jobs.chat_job import ChatJob
-from tgen.models.llm.abstract_llm_manager import Message
+from gen.chat.chat_job import ChatJob
+from gen.chat.chat_node_ids import ChatNodeIDs
+from gen_common.llm.abstract_llm_manager import Message
+from gen_common.llm.message_meta import MessageMeta
+
+from gen_common.util.llm_response_util import LLMResponseUtil
+
 
 PROMPT_TAG = "title"
 PROMPT = f"Please give this chat a title enclosed in <{PROMPT_TAG}></{PROMPT_TAG}>."

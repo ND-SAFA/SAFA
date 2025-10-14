@@ -10,8 +10,10 @@ from api.constants.celery_status import CeleryStatus
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.handler.endpoint_decorator import endpoint, endpoint_get
 from api.server.celery import celery
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.json_util import NpEncoder
+
+
+from gen_common.infra.t_logging.logger_manager import logger
+from gen_common.util.json_util import NpEncoder
 
 
 class TaskIdentifier(TypedDict):

@@ -2,9 +2,9 @@ from api.endpoints.gen.summarize.summarize_serializer import SummarizeRequest, S
 from api.endpoints.handler.dataset_converter import create_api_dataset
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
-from tgen.jobs.components.args.job_args import JobArgs
-from tgen.jobs.summary_jobs.summarize_job import SummarizeJob
-from tgen.jobs.summary_jobs.summary_response import SummaryResponse
+from gen.summary.summarize_job import SummarizeJob
+from gen.summary.summary_response import SummaryResponse
+from gen_common.jobs.job_args import JobArgs
 
 
 def perform_summarize_request(data: SummarizeRequest, **kwargs) -> SummaryResponse:

@@ -3,8 +3,8 @@ import os
 
 import boto3
 
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.json_util import NpEncoder
+from gen_common.infra.t_logging.logger_manager import logger
+from gen_common.util.json_util import NpEncoder
 
 
 class CloudUtility:

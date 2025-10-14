@@ -2,11 +2,11 @@ from apiTests.base_test import BaseTest
 from apiTests.common.request_proxy import RequestProxy
 from apiTests.common.test_data_creator import TestDataCreator
 from apiTests.common.test_verifier import TestVerifier
-from tgen.common.constants.project_summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
-from tgen.data.keys.structure_keys import ArtifactKeys
-from tgen.jobs.summary_jobs.summary_response import SummaryResponse
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from gen.summary.summary_response import SummaryResponse
+from gen_common.constants.summary_constants import DEFAULT_PROJECT_SUMMARY_SECTIONS
+from gen_common.data.keys.structure_keys import ArtifactKeys
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
+from gen_common_test.base.mock.test_ai_manager import TestAIManager
 
 
 class TestProjectSummary(BaseTest):

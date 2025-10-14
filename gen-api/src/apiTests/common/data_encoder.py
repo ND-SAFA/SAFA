@@ -1,7 +1,7 @@
 import json
 from typing import Dict
 
-from tgen.common.util.json_util import NpEncoder
+from gen_common.util.json_util import NpEncoder
 
 
 class DataEncoder:

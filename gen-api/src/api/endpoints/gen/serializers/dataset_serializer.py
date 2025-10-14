@@ -6,8 +6,8 @@ from api.constants.api_constants import TEXT_LONG
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.gen.serializers.artifact_serializer import ArtifactSerializer
 from api.endpoints.gen.serializers.trace_layer_serializer import LayerSerializer
-from tgen.common.objects.trace_layer import TraceLayer
-from tgen.data.readers.definitions.api_definition import ApiDefinition
+from gen_common.data.objects.trace_layer import TraceLayer
+from gen_common.data.readers.definitions.api_definition import ApiDefinition
 
 
 class DatasetPayload(TypedDict):

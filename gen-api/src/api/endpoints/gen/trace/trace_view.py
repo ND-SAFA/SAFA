@@ -4,15 +4,15 @@ from typing import List, Type, TypedDict, Union
 from api.endpoints.gen.trace.trace_serializer import TraceRequest, TraceSerializer
 from api.endpoints.handler.endpoint_decorator import endpoint
 from api.utils.view_util import ViewUtil
-from tgen.common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
-from tgen.common.constants.ranking_constants import DEFAULT_SEARCH_FILTER
-from tgen.common.objects.trace import Trace
-from tgen.data.readers.definitions.api_definition import ApiDefinition
-from tgen.jobs.tracing_jobs.ranking_job import RankingJob
-from tgen.jobs.tracing_jobs.tracing_job import TracingJob
-from tgen.tracing.ranking.sorters.supported_sorters import SupportedSorter
-from tgen.tracing.ranking.supported_ranking_pipelines import SupportedRankingPipelines
-from tgen.tracing.ranking.trace_selectors.i_selection_method import iSelector
+from gen.tracing.jobs.tracing_job import TracingJob
+from gen_common.constants.hugging_face_constants import SMALL_EMBEDDING_MODEL
+from gen_common.constants.ranking_constants import DEFAULT_SEARCH_FILTER
+from gen_common.data.objects.trace import Trace
+from gen_common.data.readers.definitions.api_definition import ApiDefinition
+from gen_common.traceability.ranking.job import RankingJob
+from gen_common.traceability.ranking.sorters.supported_sorters import SupportedSorter
+from gen_common.traceability.ranking.supported_ranking_pipelines import SupportedRankingPipelines
+from gen_common.traceability.ranking.trace_selectors.i_selection_method import iSelector
 
 JOB_DIR = os.path.expanduser("~/.cache/safa/jobs")
 

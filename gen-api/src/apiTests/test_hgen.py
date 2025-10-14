@@ -2,10 +2,10 @@ from apiTests.base_test import BaseTest
 from apiTests.common.request_proxy import RequestProxy
 from apiTests.common.test_constants import CHILD_TYPE, PARENT_TYPE
 from apiTests.common.test_data import TestArtifacts, TestData
-from tgen.common.objects.artifact import Artifact
-from tgen.data.keys.structure_keys import ArtifactKeys, TraceKeys
-from tgen.testres.mocking.mock_anthropic import mock_anthropic
-from tgen.testres.mocking.test_response_manager import TestAIManager
+from gen_common.data.keys.structure_keys import ArtifactKeys, TraceKeys
+from gen_common.data.objects.artifact import Artifact
+from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
+from gen_common_test.base.mock.test_ai_manager import TestAIManager
 
 
 class TestHGen(BaseTest):

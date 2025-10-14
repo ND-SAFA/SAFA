@@ -1,6 +1,6 @@
 from enum import Enum
 
-from tgen.common.constants.deliminator_constants import EMPTY_STRING, F_SLASH
+from gen_common.constants.symbol_constants import EMPTY_STRING, F_SLASH
 
 
 class AppEndpoints(Enum):

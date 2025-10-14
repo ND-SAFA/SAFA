@@ -6,7 +6,7 @@ from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.handler.async_endpoint_handler import AsyncEndpointHandler
 from api.endpoints.handler.ihandler import IHandler
 from api.endpoints.handler.sync_endpoint_handler import SyncEndpointHandler
-from tgen.common.constants import environment_constants
+from gen_common.constants import environment_constants
 
 
 class EndpointHandlerProxy:

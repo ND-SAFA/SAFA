@@ -5,9 +5,10 @@ from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_LONG, TEXT_MEDIUM
 from api.endpoints.gen.serializers.artifact_serializer import ArtifactSerializer
-from tgen.common.objects.artifact import Artifact
-from tgen.common.util.base_object import BaseObject
-from tgen.common.util.dataframe_util import DataFrameUtil
+from gen_common.data.objects.artifact import Artifact
+from gen_common.infra.base_object import BaseObject
+
+from gen_common.util.dataframe_util import DataFrameUtil
 
 
 @dataclass

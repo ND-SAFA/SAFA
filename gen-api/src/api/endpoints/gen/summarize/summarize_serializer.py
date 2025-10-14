@@ -6,7 +6,7 @@ from rest_framework import serializers
 from api.constants.api_constants import TEXT_LONG
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.gen.serializers.artifact_serializer import ArtifactSerializer
-from tgen.common.objects.artifact import Artifact
+from gen_common.data.objects.artifact import Artifact
 
 
 @dataclass

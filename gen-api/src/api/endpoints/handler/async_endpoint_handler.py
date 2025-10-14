@@ -8,10 +8,12 @@ from django.http import JsonResponse
 from api.constants.config import get_current_version
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.endpoints.handler.ihandler import IHandler
-from tgen.common.logging.log_capture import LogCapture
-from tgen.common.logging.logger_manager import logger
-from tgen.common.util.json_util import NpEncoder
-from tgen.relationship_manager.model_cache import ModelCache
+from gen_common.infra.t_logging.log_capture import LogCapture
+from gen_common.infra.t_logging.logger_manager import logger
+from gen_common.traceability.relationship_manager.model_cache import ModelCache
+
+from gen_common.util.json_util import NpEncoder
+
 
 
 class AsyncEndpointHandler(IHandler):

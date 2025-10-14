@@ -1,7 +1,7 @@
 from api.endpoints.gen.hgen.hgen_serializer import HGenRequest, HGenSerializer
 from apiTests.base_test import BaseTest
-from tgen.data.dataframes.artifact_dataframe import ArtifactDataFrame
-from tgen.testres.test_assertions import TestAssertions
+from gen_common.data.dataframes.artifact_dataframe import ArtifactDataFrame
+from gen_common_test.base.assertions import TestAssertions
 
 
 class TestHGenSerializer(BaseTest):

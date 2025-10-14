@@ -1,0 +1,34 @@
+# Python
+/**/venv
+/**/__pycache__
+cache
+/storage/**
+/**/.ipynb_checkpoints/**
+
+# IDEs
+.idea
+
+# Mac
+/**/.DS_Store
+
+# Transformers
+src/tes/output/runs/**
+
+/**/output
+
+# Deployment
+/deployment/**
+
+# Datasets
+datasets/**
+
+# Secrets
+application-credentials.json
+*.pem
+*.env
+wandb/**
+wandb/**
+*/wandb
+
+build
+build/**

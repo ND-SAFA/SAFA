@@ -1,0 +1,35 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "LLM",
+          "data_output_path": "[DATA_PATH]/[CURRENT_PROJECT]",
+          "task": "PREDICT",
+          "trainer_args": {
+            "output_dir": "[OUTPUT_PATH]/llm-predict/[CURRENT_PROJECT]"
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.30
+            },
+            "eval_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": 0.10
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

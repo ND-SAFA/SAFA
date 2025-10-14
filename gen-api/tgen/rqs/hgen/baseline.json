@@ -1,0 +1,37 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "MULTI_LAYER_HGEN",
+          "starting_hgen_job": {
+            "hgen_args": {
+              "generate_trace_links": true,
+              "perform_clustering": false,
+              "min_orphan_score_threshold": 0.1,
+              "export_dir": "[OUTPUT_PATH]/hgen/baseline/[CURRENT_PROJECT]",
+              "source_layer_ids": "[SOURCE_LAYER_IDS_LIST]",
+              "target_type": "[TARGET_TYPE]",
+              "interactive_mode": "[IS_INTERACTIVE_BOOL]",
+              "generate_explanations": "[GENERATE_EXPLANATIONS_BOOL_OPTIONAL]",
+              "seed_project_summary_section": "[PS_SECTION_OPTIONAL]",
+              "seed_layer_id": "[SEED_LAYER_ID_OPTIONAL]",
+              "add_seeds_as_artifacts": "[ADD_SEEDS_AS_ARTIFACTS_BOOL_OPTIONAL]",
+              "reduction_percentage": "[REDUCTION_PERCENTAGE_OPTIONAL_FLOAT]",
+              "dataset_creator": {
+                "object_type": "PROMPT",
+                "trace_dataset_creator": {
+                  "project_reader": {
+                    "object_type": "STRUCTURE",
+                    "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+                  }
+                }
+              }
+            }
+          },
+          "target_types": "[OTHER_TARGET_TYPES_LIST_OPTIONAL]"
+        }
+      ]
+    }
+  ]
+}

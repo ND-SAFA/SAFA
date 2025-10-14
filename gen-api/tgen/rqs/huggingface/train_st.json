@@ -1,0 +1,57 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "HUGGING_FACE",
+          "task": "TRAIN",
+          "trainer": "[ST_ARCH]",
+          "job_args": {
+            "random_seed": 812,
+            "output_dir": "[OUTPUT_PATH]/train-st/[TRAIN_PROJECT]"
+          },
+          "model_manager": {
+            "model_path": "[BASE_MODEL]"
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[TRAIN_PROJECT]"
+              }
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "SPLIT_BY_LINK",
+              "val_percentage": "[VAL_PERCENTAGE_FLOAT]"
+            },
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[EVAL_PROJECT]"
+              }
+            }
+          },
+          "trainer_args": {
+            "freeze_base": "[FREEZE_BASE_BOOL]",
+            "use_scores": "[USE_SCORES_BOOL]",
+            "num_train_epochs": "[EPOCHS_INT]",
+            "train_batch_size": "[BATCH_SIZE_INT]",
+            "per_device_eval_batch_size": "[BATCH_SIZE_INT]",
+            "do_training_eval": "[DO_TRAINING_EVAL_BOOL]",
+            "best_model_path": "[MODEL_PATH]/[BEST_MODEL_NAME]",
+            "output_dir": "[OUTPUT_PATH]",
+            "st_loss_function": "[LOSS_FUNCTION]",
+            "skip_save": false,
+            "load_best_model_at_end": true,
+            "save_strategy": "epoch",
+            "evaluation_strategy": "epoch",
+            "eval_steps": 1
+          }
+        }
+      ]
+    }
+  ]
+}

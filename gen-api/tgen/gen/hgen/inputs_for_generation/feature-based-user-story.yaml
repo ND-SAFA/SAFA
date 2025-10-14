@@ -1,0 +1,25 @@
+description:
+- A Feature-based user story is a high-level description of a software feature or
+  functionality, written from the perspective of the end user. It focuses on the value
+  the feature provides to the user and helps the development team understand the user's
+  needs and expectations. This artifact is different from other software artifacts,
+  such as use cases or requirements, as it is more focused on the user experience
+  and is typically written in a simple, non-technical language.
+example:
+- As a frequent traveler, I want to be able to filter hotel search results by distance
+  from a specific location, so that I can find hotels that are conveniently located
+  near my desired destination.
+format:
+- As a [type of user], I want to [action or feature], so that [reason or benefit].
+questions:
+- - What are the main classes/files in the codebase and what is their purpose?
+  - Is there a clear architecture like MVC or layered architecture? What are the components?
+  - What are the key functions/methods that indicate the main features of the system?
+  - Is there any configuration or external dependencies that would affect features?
+  - Are there any obvious entry points like a main method or REST endpoints that drive
+    the features?
+  - What are the main data structures and how are they used in features?
+  - Are there any special algorithms or complex logic that would map to specific features?
+  - Are there any UI or front-end files that indicate user-facing features?
+  - Are there automated tests or specs that describe intended functionality?
+  - What external resources like databases or files are accessed that enable features?

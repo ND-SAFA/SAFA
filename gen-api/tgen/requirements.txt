@@ -1,0 +1,2 @@
+-r requirements/nlp-requirements.txt
+-r requirements/base-requirements.txt

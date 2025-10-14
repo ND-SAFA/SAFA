@@ -1,0 +1,37 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "LLM",
+          "task": "PREDICT",
+          "trainer_args": {
+            "object_type": "ANTHROPIC",
+            "model": "claude-instant-v1",
+            "output_dir": "[OUTPUT_PATH]/llm-predict/[CURRENT_PROJECT]"
+          },
+          "llm_manager": {
+            "object_type": "ANTHROPIC",
+            "llm_args": {
+              "metrics": [
+                "classification",
+                "confusion_matrix",
+                "specificity",
+                "accuracy"
+              ]
+            }
+          },
+          "trainer_dataset_manager": {
+            "eval_dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

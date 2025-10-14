@@ -1,0 +1,41 @@
+description:
+  - An Epic in a software development project is a large, high-level user story that
+    encompasses a significant feature or functionality. It is typically too big to be
+    completed in a single iteration and needs to be broken down into smaller, more manageable
+    user stories. An Epic is different from other software artifacts, such as tasks
+    or bugs, as it represents a broader scope and provides a strategic overview of the
+    desired outcome, rather than focusing on specific technical details or issues.
+example:
+  - '
+
+  Epic: Improve User Onboarding Experience
+
+
+  As a new user, I want to have a seamless onboarding experience so that I can quickly
+  understand and start using the application.
+
+
+  - Create a visually appealing and informative welcome screen
+
+  - Develop a step-by-step tutorial for first-time users
+
+  - Implement tooltips and contextual help throughout the application
+
+  - Allow users to import data from other applications to speed up the setup process
+
+  - Provide a feedback mechanism for users to report issues or suggest improvements
+
+  '
+format:
+  - '[Action Verb] [Feature or Functionality Description]'
+questions:
+  - - What is the goal or objective of this feature?
+    - Who are the users or stakeholders that benefit from this feature?
+    - What user need or business requirement does this feature address?
+    - How does this feature improve the product or system?
+    - What larger workflow, process or goal is this feature part of?
+    - What dependencies does this feature have on other parts of the system?
+    - What risks, constraints or limitations does this feature present?
+    - How does this feature align with the product vision or roadmap?
+    - What metrics will indicate the success or failure of this feature?
+    - How difficult will it be to design, build and test this feature?

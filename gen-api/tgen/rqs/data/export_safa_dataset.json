@@ -1,0 +1,24 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "CREATE_DATASETS",
+          "format_type": "SAFA",
+           "job_args": {
+            "export_dir": "[OUTPUT_PATH]/safa-exports/[CURRENT_PROJECT]"
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "ARTIFACT",
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

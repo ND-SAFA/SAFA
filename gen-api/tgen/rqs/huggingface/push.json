@@ -1,0 +1,24 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "HUGGING_FACE",
+          "task": "PUSH",
+          "job_args": {
+            "random_seed": 812,
+            "output_dir": "[OUTPUT_PATH]/push/[EXPORT_MODEL_NAME]"
+          },
+          "model_manager": {
+            "model_path": "[MODEL_PATH]",
+            "model_task": "AUTO"
+          },
+          "trainer_args": {
+            "hub_model_id": "thearod5/[EXPORT_MODEL_NAME]"
+          },
+          "trainer_dataset_manager": {}
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "CONTRADICTIONS",
+          "job_args": {
+            "dataset_creator": {
+              "object_type": "TRACE",
+              "project_reader": {
+                "object_type": "CSV",
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT].csv"
+              }
+            },
+            "export_dir": "[OUTPUT_PATH]/contradictions/[CURRENT_PROJECT]"
+          }
+        }
+      ]
+    }
+  ]
+}

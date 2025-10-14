@@ -1,0 +1,25 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "RANKING",
+          "ranking_pipeline": "CLUSTERING",
+          "generate_explanations": false,
+          "job_args": {
+            "export_dir": "[OUTPUT_PATH]/tracing-clustering/[CURRENT_PROJECT]",
+            "dataset_creator": {
+              "object_type": "PROMPT",
+              "trace_dataset_creator": {
+                "project_reader": {
+                  "object_type": "STRUCTURE",
+                  "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "HUGGING_FACE",
+          "task": "PRE_TRAIN",
+          "job_args": {
+            "output_dir": "[OUTPUT_PATH]/pretrain/[CURRENT_PROJECT]"
+          },
+          "model_manager": {
+            "model_path": "[MODEL]"
+          },
+          "trainer_args": {
+            "num_train_epochs": 5,
+            "per_device_train_batch_size": 4,
+            "gradient_accumulation_steps": 16,
+            "learning_rate": 1e-6,
+            "skip_save": false,
+            "load_best_model_at_end": true
+          },
+          "trainer_dataset_manager": {
+            "train_dataset_creator": {
+              "object_type": "MLM_PRE_TRAIN",
+              "orig_data_path": "[DATA_PATH]/pretrain/[CURRENT_PROJECT]"
+            },
+            "val_dataset_creator": {
+              "object_type": "SPLIT",
+              "split_strategy": "PRE_TRAIN",
+              "val_percentage": 0.20
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

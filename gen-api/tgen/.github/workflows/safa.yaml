@@ -1,0 +1,50 @@
+name: Build Pipeline
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code.
+      uses: actions/checkout@v3
+
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+        cache-dependency-path: '**/*-requirements.txt'
+
+    - name: Upgrade Pip
+      run: python -m pip install --upgrade pip
+
+    - name: Install Packages
+      run: |
+        pip install -r requirements/nlp-requirements.txt
+        pip install -r requirements/devops-requirements.txt
+        pip install -r requirements/base-requirements.txt
+
+    - name: Download Sub-Modules
+      run: |
+        pip install git+https://${{ secrets.TGEN_TOKEN }}@github.com/ND-SAFA/gen-common-resources.git@${{ env.GEN_COMMON_RESOURCES_COMMIT }}
+        pip install git+https://${{ secrets.TGEN_TOKEN }}@github.com/ND-SAFA/python-package-manager.git@${{ env.PYTHON_PACKAGE_MANAGER_COMMIT }}
+      env:
+        PIP_EXTRA_INDEX_URL: "https://${{ secrets.TGEN_TOKEN }}:x-oauth-basic@github.com"
+        GEN_COMMON_RESOURCES_COMMIT: a3d66dcd084b91a1b9806b748cba5866acdf5ecb
+        PYTHON_PACKAGE_MANAGER_COMMIT: 8d657746c7b8d70cc366f97b7e52e79ef766a6d7
+
+    - name: Download Static
+      run: |
+        python3 gen/infra/cli/tools/download_static.py
+
+    - name: Run Dev-Ops Checks
+      run: |
+        ppm find_missing_docs gen --throw_error
+
+    - name: Run Unit Tests.
+      run: python -m unittest discover -s gen_test
+      env:
+        DEPLOYMENT: test

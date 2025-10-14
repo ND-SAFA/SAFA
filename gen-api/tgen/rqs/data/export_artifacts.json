@@ -1,0 +1,19 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "EXPORT_ARTIFACTS",
+          "job_args": {
+            "dataset_creator": {
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/fend"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

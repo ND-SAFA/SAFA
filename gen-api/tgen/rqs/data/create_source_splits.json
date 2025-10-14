@@ -1,0 +1,24 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "CREATE_SOURCE_SPLITS",
+          "job_args": {
+            "export_dir": "[OUTPUT_PATH]/splits/[CURRENT_PROJECT]",
+            "dataset_creator": {
+              "project_reader": {
+                "object_type": "STRUCTURE",
+                "project_path": "[DATA_PATH]/[CURRENT_PROJECT]"
+              }
+            }
+          },
+          "splits": [
+            0.10,
+            0.30
+          ]
+        }
+      ]
+    }
+  ]
+}

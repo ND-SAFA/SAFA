@@ -1,0 +1,18 @@
+{
+  "steps": [
+    {
+      "jobs": [
+        {
+          "object_type": "DOWNLOAD_REPO",
+          "job_args": {
+          },
+          "repo_name": "[CURRENT_PROJECT]",
+          "artifact_store_path": "[REPO_PATH]",
+          "clone_path": "[CLONE_PATH]",
+          "output_path": "[OUTPUT_PATH]/splits/[CURRENT_PROJECT]",
+          "load": true
+        }
+      ]
+    }
+  ]
+}

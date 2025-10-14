@@ -1,0 +1,6 @@
+[
+  {
+    "name": "gen-core",
+    "imageUri": "238179308728.dkr.ecr.us-east-1.amazonaws.com/gen:latest"
+  }
+]

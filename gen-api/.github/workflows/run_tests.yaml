@@ -1,0 +1,47 @@
+name: Django Unit Tests
+
+on:
+  pull_request:
+    branches:
+    - development
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+    body: /build
+jobs:
+  build:
+    name: TGEN API BUILD
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+        ref: ${{ github.ref }}
+        token: ${{ secrets.TGEN_TOKEN }}
+
+    - uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+        cache-dependency-path: '**/*-requirements.txt'
+
+    - name: Upgrade Pip
+      run: python -m pip install --upgrade pip
+
+    - name: Install Requirements
+      run: |
+        pip3 install -r tgen/requirements/devops-requirements.txt
+        pip3 install -r tgen/requirements.txt
+        pip3 install -r requirements.txt
+        pip3 install -r requirements/s3-requirements.txt
+        python3 tgen/download_static.py
+
+    - name: Run unit tests
+      run: |
+        python src/api/manage.py test src/apiTests
+      env:
+        DEFAULT_EMBEDDING_MODEL: "sentence-transformers/all-MiniLM-L6-v2"
+        DEPLOYMENT: test
+        DJANGO_SETTINGS_MODULE: api.server.settings
+        SECRET_KEY: "qc&bx49=cmhwi)^a+v@2e%^_hp(3a)e3+49q!lxj_p8oza7$^z"

@@ -1,0 +1,36 @@
+# Python
+/**/venv
+/**/__pycache__
+cache
+/storage/**
+/**/.ipynb_checkpoints/**
+
+# IDEs
+.idea
+
+# Mac
+/**/.DS_Store
+
+# Transformers
+src/tes/output/runs/**
+
+/**/output
+
+# Django
+/src/api/db.sqlite3
+
+# Deployment
+/deployment/**
+
+# Datasets
+datasets/**
+
+# Secrets
+application-credentials.json
+*.pem
+*.env
+wandb/**
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

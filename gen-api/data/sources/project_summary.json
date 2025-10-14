@@ -1,0 +1,56 @@
+{
+  "Overview": {
+    "title": "Overview",
+    "chunks": [
+      "The software system provides capabilities for managing artifacts and traceability links across project versions. Artifacts represent unique entities such as documents, source code files, or other items that are produced and stored within software projects. Relationships between these artifacts are captured as trace links, which connect source artifacts to target artifacts.",
+      "The system leverages a relational database and object-relational mapping to enable persisting artifacts and trace links. The Artifact and TraceLink classes define the structure of the data and map it to database tables using annotations like JPA. This allows the underlying data to be stored and queried from the database.",
+      "To retrieve this data, the ArtifactService and TraceLinkService classes actively convert raw database entities into application-level objects. The ArtifactService takes a project version and retrieves all related artifact database entries, which are then constructed into Artifact application entities. The TraceLinkService utilizes these artifacts to identify related trace links, filter and convert trace database entries into TraceLink application entities.",
+      "Configuration settings and filtering predicates can customize the data retrieval process. Overall, this architecture enables managing artifact and trace link data across versions, abstracting database persistence details behind services, and producing application entities to power additional behaviors in the system."
+    ]
+  },
+  "Features": {
+    "title": "Features",
+    "chunks": [
+      "The system shall enable persisting artifact entities to a relational database with attributes for a unique identifier, name, and relationships to associated project and artifact types.",
+      "The system shall enable retrieving persisted artifact entities from the database by specifying a project version or project. The retrieved results shall be converted from the database entities to application entities.",
+      "The system shall enable defining trace link entities to represent relationships between artifacts. Trace links shall be persisted to the database with constraints to ensure uniqueness of links between a source and target artifact pair.",
+      "The system shall enable retrieving trace link entities from the database for a specified project version. Retrieved trace link database entities shall be filtered and converted to application trace link entities.",
+      "The system shall be configurable to trace code artifacts based on their file system locations. Tracing of code artifacts shall be enabled or disabled through configuration settings."
+    ]
+  },
+  "Entities": {
+    "title": "Entities",
+    "chunks": [
+      "Artifact: An entity representing a unique artifact (e.g. code file, document, etc.) stored within a project. Has attributes like ID, name, and relationships. Can be persisted and retrieved from the database.",
+      "Project: An entity representing a software project within the system. Artifacts belong to specific projects.",
+      "ProjectVersion: Represents a version or snapshot of a project at a point in time. Artifacts are associated with specific project versions.",
+      "ArtifactType: Categorizes artifacts into types like code, document, etc. Artifacts have a type.",
+      "TraceLink: An entity representing a traceability link between two artifacts. Connects a source and target artifact. Can be queried to understand relationships.",
+      "Repository: A database or storage mechanism for persisting entities like artifacts and traces.",
+      "Service: Code module that retrieves entity data from repositories and assembles into application objects.",
+      "Filtering: Applying criteria to query results to narrow to a subset of entities based on properties.",
+      "Metadata: Data about an entity, like its name or timestamp.",
+      "Application Entity: An object instance representing a domain entity for use in the application code.",
+      "Mapping: Associating a programming language class with a database table to enable persistence.",
+      "Relationship: An association between entities like a trace link between artifacts."
+    ]
+  },
+  "Sub-systems": {
+    "title": "Sub-systems",
+    "chunks": [
+      "## Artifact Management\nThe Artifact Management sub-system handles persisting and retrieving artifact data within the system. The Artifact and ArtifactService classes allow artifacts to be stored in the database with identifying information like name and ID. The ArtifactService provides methods to query artifacts by project version or ID. This enables other parts of the system to consistently retrieve artifact data.",
+      "## Trace Link Management\nThe Trace Link Management sub-system handles persisting and retrieving trace links between artifacts. The TraceLink entity captures trace data like source and target artifacts. The TraceLinkService queries trace versions and reconstructs application trace entities. This allows traces between artifacts to be stored, updated, and retrieved over time. It enables understanding relationships between artifacts.",
+      "## Artifact Conversion\nThe Artifact Conversion sub-system handles converting raw database entities into application-level entities. The ArtifactService and TraceLinkService use repository data to construct Artifact and TraceLink application objects. This abstracts persistence details. The definition.json file defines artifact conversions. This encapsulates entity reconstruction."
+    ]
+  },
+  "Data Flow": {
+    "title": "Data Flow",
+    "chunks": [
+      "The system relies on the Artifact and TraceLink entity classes to represent unique artifacts and traceability links in the database. These classes define the structure of the data but do not actively process it.",
+      "The ArtifactService takes in a Project or ProjectVersion and uses the IVersionRepository to retrieve the underlying artifact database entities. It converts these to Artifact entity objects using the versionToAppEntity method. This produces the output list of Artifact entities for a given project snapshot.",
+      "The TraceLinkService depends on the ArtifactService to get Artifact entities. It also retrieves TraceLink database versions from the trace repository. After filtering and conversion, it outputs TraceAppEntity objects representing trace links for a project version.",
+      "The definition.json file provides configuration settings like allowed orphans that influence the artifact and trace retrieval. However, it does not actively process data itself.",
+      "In summary, the ArtifactService processes project data to output Artifact entities, while the TraceLinkService uses those artifacts to output traceability links. The entities and configuration file provide the necessary data structures, but do not transform data on their own."
+    ]
+  }
+}

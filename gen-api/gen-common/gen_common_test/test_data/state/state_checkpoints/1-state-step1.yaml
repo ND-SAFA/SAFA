@@ -1,0 +1,31 @@
+_CHECKPOINT_DIRNAME: state_checkpoints
+completed_steps:
+  Step1: 1
+export_dir: '[PROJECT_PATH]/output'
+final_dataset: null
+original_dataset: !!python/object:gen_common.data.creators.prompt_dataset_creator.PromptDatasetCreator
+  data_cleaner: !!python/object:gen_common.data.processing.cleaning.data_cleaner.DataCleaner
+    ordered_steps: []
+    steps: []
+  data_export_path: null
+  ensure_code_is_summarized: false
+  project_file_id: null
+  project_reader: !!python/object:gen_common.data.readers.artifact_project_reader.ArtifactProjectReader
+    overrides: {}
+    project_path: '[PROJECT_PATH]/original_dataset'
+    structured_project_reader: !!python/object:gen_common.data.readers.structured_project_reader.StructuredProjectReader
+      _definition: null
+      conversions: {}
+      definition_reader: null
+      overrides: {}
+      project_path: '[PROJECT_PATH]/original_dataset'
+      summarizer: null
+    summarizer: null
+  project_summary: null
+  summarizer: null
+  trace_dataset_creator: null
+project_summary: null
+property1: 5
+property2: null
+total_input_cost: 0
+total_output_cost: 0

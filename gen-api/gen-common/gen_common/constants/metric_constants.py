@@ -1,0 +1,6 @@
+K_METRIC_DEFAULT = [1, 2, 3]
+THRESHOLD_DEFAULT = 0.5
+UPPER_RECALL_THRESHOLD = .75
+MAP_KEY = "map"
+AP_KEY = "global_ap"
+LAG_KEY = "lag"

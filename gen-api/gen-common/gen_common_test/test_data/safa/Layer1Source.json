@@ -1,0 +1,40 @@
+{
+  "artifacts": [
+    {
+      "summary": "",
+      "logicType": null,
+      "safetyCaseType": null,
+      "documentType": "ARTIFACT_TREE",
+      "customFields": {},
+      "name": "s1",
+      "id": null,
+      "body": "s_token1",
+      "type": "Code",
+      "documentIds": []
+    },
+     {
+      "summary": "",
+      "logicType": null,
+      "safetyCaseType": null,
+      "documentType": "ARTIFACT_TREE",
+      "customFields": {},
+      "name": "s2",
+      "id": null,
+      "body": "s_token2",
+      "type": "Code",
+      "documentIds": []
+    },
+     {
+      "summary": "",
+      "logicType": null,
+      "safetyCaseType": null,
+      "documentType": "ARTIFACT_TREE",
+      "customFields": {},
+      "name": "s3",
+      "id": null,
+      "body": "s_token3",
+      "type": "Code",
+      "documentIds": []
+    }
+  ]
+}

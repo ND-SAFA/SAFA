@@ -1,0 +1,38 @@
+from typing import Dict, List, Tuple, Union
+
+import numpy as np
+
+MAX_SEQ_LENGTH_DEFAULT = 512
+N_EPOCHS_DEFAULT = 3
+TRAIN_BATCH_SIZE_DEFAULT = 8
+EVALUATION_STRATEGY_DEFAULT = SAVE_STRATEGY_DEFAULT = "epoch"  # should be the same to load best model as per transformers docs
+LOGGING_STRATEGY_DEFAULT = "steps"
+EVAL_STEPS_DEFAULT = SAVE_STEPS_DEFAULT = None
+LOGGING_STEPS_DEFAULT = 1
+GREATER_IS_BETTER_DEFAULT = False
+SAVE_TOTAL_LIMIT_DEFAULT = 1
+LOAD_BEST_MODEL_AT_END_DEFAULT = True
+METRIC_FOR_BEST_MODEL_DEFAULT = "eval_loss"
+OPTIMIZER_DEFAULT = "adam"
+SCHEDULER_DEFAULT = "linear"
+GRADIENT_ACCUMULATION_DEFAULT = 1
+USE_BALANCED_BATCHES_DEFAULT = False
+MULTI_GPU_DEFAULT = True
+EVAL_ON_EPOCH_DEFAULT = True
+SAVE_RANDOM_MODEL_DEFAULT = True
+MIN_LENGTH_DEFAULT = 1
+SMALL_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+SMALL_CROSS_ENCODER = "cross-encoder/ms-marco-TinyBERT-L-2"
+TEXT_PARAM = "text"
+INPUT_IDS_PARAM = "input_ids"
+TRAIN_PARAM = "train"
+POS_LINK = 1
+NEG_LINK = 0
+SEPARATOR_BAR = "-" * 50
+EmbeddingType = np.array  # TODO: Merge with embedding type.
+DEFAULT_EVAL_METRIC = "f2"
+DEFAULT_MAX_STEPS_BEFORE_EVAL = 50
+DEFAULT_SAVE_BEST_MODEL = True
+DEFAULT_ENCODING_BATCH_SIZE = 32
+TracePredictions = Union[np.ndarray, Tuple[np.ndarray], List]
+Metrics = Dict[str, float]

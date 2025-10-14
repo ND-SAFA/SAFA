@@ -1,0 +1,26 @@
+import os
+
+NEW_LINE = os.linesep
+SPACE = " "
+EMPTY_STRING = ''
+TAB = "\t"
+PERIOD = "."
+COMMA = ","
+NONE = "none"
+UNDERSCORE = "_"
+F_SLASH = "/"
+B_SLASH = "\\"
+SEMI_COLON = ";"
+BRACKET_OPEN = "{"
+BRACKET_CLOSE = "}"
+DASH = "-"
+COLON = ":"
+L_CARROT = "<"
+R_CARROT = ">"
+OPEN_PAREN = "("
+CLOSE_PAREN = ")"
+USER_SYM = "~"
+SQ_BRACKET_OPEN = "["
+SQ_BRACKET_CLOSE = "]"
+JSON_BLOCK_START = "{"
+JSON_BLOCK_END = "```"

@@ -1,0 +1,13 @@
+USE_NL_SUMMARY_PROMPT = False
+USE_NL_SUMMARY_EMBEDDINGS = False
+MAX_TOKENS_FOR_NO_SUMMARIES = 65000
+DEFAULT_TEST_EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+DEFAULT_DEPLOYMENT_EMBEDDING_MODEL = "sentence-transformers/all-roberta-large-v1"
+DEFAULT_DEPLOYMENT_CROSS_ENCODER_MODEL = "mixedbread-ai/mxbai-rerank-large-v1"
+TRAIN_TASK = "train"
+PREDICT_TASK = "predict"
+MAX_NL_SIZE_BEFORE_SUMMARIZATION = 60000
+
+STAGES = ["train", "val", "eval"]
+
+DEFAULT_COMPLETION_TOKENS = 4096

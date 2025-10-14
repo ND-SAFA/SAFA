@@ -1,0 +1,10 @@
+EXIT_COMMAND = "exit"
+BACK_COMMAND = "back"
+EXIT_MESSAGE = "Bye bye :)"
+REQUIRED_FIELD_ERROR = "Required field received empty value."
+
+CONFIRM_MESSAGE_DEFAULT = "Confirm?"
+CONFIRM_OPTIONS = "(y/n)"
+CONFIRM_PARSE_ERROR = "Unable to parse response: {}"
+CONFIRM_POS = "y"
+CONFIRM_NEG = "n"

@@ -1,0 +1,3 @@
+GEN_COMMON_DIR_NAME = "gen_common"
+GEN_COMMON_TEST_DIR_NAME = f"{GEN_COMMON_DIR_NAME}_test"
+SUMMARY_FORMAT = "Summary of {}"

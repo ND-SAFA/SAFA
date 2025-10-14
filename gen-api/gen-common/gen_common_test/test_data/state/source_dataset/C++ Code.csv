@@ -1,0 +1,3589 @@
+id,content,layer_id,summary
+/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/main.cpp
+                        ${CURR_DIR}/Player.cpp
+                        ${CURR_DIR}/Game.cpp"" CACHE STRING ""Sources for project"" FORCE)
+
+add_subdirectory(""Debug"")
+add_subdirectory(""Exception"")
+add_subdirectory(""Graphics"")
+add_subdirectory(""Rendering"")
+add_subdirectory(""Utils"")
+add_subdirectory(""World"")
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/main.cpp
+                        ${CURR_DIR}/Player.cpp
+                        ${CURR_DIR}/Game.cpp"" CACHE STRING ""Sources for project"" FORCE)
+
+add_subdirectory(""Debug"")
+add_subdirectory(""Exception"")
+add_subdirectory(""Graphics"")
+add_subdirectory(""Rendering"")
+add_subdirectory(""Utils"")
+add_subdirectory(""World"")
+"
+/Debug/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/DebugOptions.cpp"" CACHE STRING ""Sources for project"" FORCE)
+
+add_subdirectory(""Graphics"")
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/DebugOptions.cpp"" CACHE STRING ""Sources for project"" FORCE)
+
+add_subdirectory(""Graphics"")
+"
+/Debug/DebugOptions.cpp,"#include ""Debug/DebugOptions.h""
+
+/*
+ * This file just defines the default values for the debug options.
+ *
+ * See Debug/DebugOptions.h for more details
+ */
+
+bool DebugOptions::_renderEntityHitboxes = true;
+bool DebugOptions::_renderPlayerHitbox   = true;
+bool DebugOptions::_showFpsCounter       = true;
+bool DebugOptions::_showDebug            = false;
+",C++ Code,"The code defines default values for debugging options in a 3D game engine that handles rendering a 3D world with blocks, textures, and UI elements. When initialized, the render engine will enable rendering of entity hitboxes and the player hitbox, show an FPS counter, and have debugging mode disabled. The engine loads shaders, images, and manages blocks that make up chunks and the game world. It handles player movement, collision detection with axis aligned bounding boxes, and contains various UI components like menus, buttons, and a color selector."
+/Debug/Graphics/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/FPSCounter.cpp"" CACHE STRING ""Sources for project"" FORCE)
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/FPSCounter.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
+/Debug/Graphics/FPSCounter.cpp,"#include ""Debug/DebugOptions.h""
+#include ""Debug/Graphics/FPSCounter.h""
+#include ""Utils/Font.h""
+#include ""Utils/Utils.h""
+
+/*! \callergraph
+ *
+ * Initialize a new FPSCounter. Initializes a new sf::Text with a white fill color,
+ * a black outline color, and an outline thickness of 1, which is located at the
+ * provided position.
+ *
+ * \p position    - the upper left corner position to render the underlying sf::Text     <br>
+ * \p refreshRate - how often (in milliseconds) to update the text                       <br>
+ */
+FPSCounter::FPSCounter(sf::Vector2i position, long refreshRate) :
+    _refreshRate(refreshRate),
+    _count(0),
+    _accumulator(),
+    _lastCall(),
+    _lastUpdate()
+{
+    setFont(Font::defaultFont);
+    setString("">9000"");
+    setFillColor(sf::Color::White);
+    setOutlineColor(sf::Color::Black);
+    setOutlineThickness(1);
+    setCharacterSize(30);
+    setPosition(position.x, position.y);
+}
+
+/*! \callergraph
+ *
+ * Updates the FPSCounter's internal states. This is meant to be called once every
+ * frame. It will:                                                                         <br>
+ *     1) Increase the count of how many frames have gone by since the last time
+ *        the text was updated                                                             <br>
+ *     2) Update the text if the specified amount of time has gone by (see constructor)    <br>
+ */
+void FPSCounter::update() {
+    _count++;
+
+    auto currentTime    = std::chrono::high_resolution_clock::now();
+    auto callTimeDiff   = std::chrono::duration_cast<Milliseconds>(currentTime - _lastCall);
+    auto updateTimeDiff = std::chrono::duration_cast<Milliseconds>(currentTime - _lastUpdate);
+
+    _accumulator += callTimeDiff;
+
+    if (updateTimeDiff > Milliseconds(_refreshRate)) {
+
+        // fps = (frames / milli) * (millis / second)
+        int fps = ((float)_count / (float)_accumulator.count()) * (1000.f);
+
+        setString(""FPS: "" + Utils::toString(fps));
+
+        // reset everything
+        _count = 0;
+        _accumulator = _accumulator.zero();
+        _lastUpdate = currentTime;
+    }
+
+    _lastCall = currentTime;
+}
+
+/*! \callergraph
+ *
+ * Renders the FPSCounter to the screen
+ *
+ * See super method for more documentation
+ */
+void FPSCounter::render(RenderEngine& e, sf::RenderWindow& w) {
+    if (DebugOptions::showFpsCounter()) {
+        w.pushGLStates();
+        w.draw(*this);
+        w.popGLStates();
+    }
+}
+
+/*! \callergraph
+ *
+ * Returns the counter's refresh rate, i.e., how often it will update
+ * the text, in milliseconds
+ */
+long FPSCounter::getRefreshRate() {
+    return _refreshRate;
+}
+
+/*! \callergraph
+ *
+ * Sets how often to update the text
+ *
+ * \p r - refresh rate, in milliseconds
+ */
+void FPSCounter::setRefreshRate(long r) {
+    _refreshRate = r;
+}
+",C++ Code,"This code implements a frames per second (FPS) counter that displays the current FPS as text on the screen. It does this by counting the number of rendered frames and measuring the elapsed time between frames using a high resolution clock. The FPS value is calculated from these measurements and displayed as text that is updated periodically based on a specified refresh rate, which determines how often the displayed text is updated. The FPS counter utilizes several utility functions and interfaces to handle rendering the text to the screen, setting various text properties, and determining whether the FPS counter should be displayed based on debug options. The FPS counter is designed to provide a real-time display of performance for a game or 3D rendering application."
+/Exception/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Exception.cpp"" CACHE STRING ""Sources for project"" FORCE)
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Exception.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
+/Exception/Exception.cpp,"// Including both and putting the if statements in the files makes Visual Studio happier
+// Doesn't really affect the code too much so eh
+#include ""Exception_Linux.cpp""
+#include ""Exception_Windows.cpp""
+
+#include <cstring>
+
+#include <GlobalLogger.hpp>
+
+#include ""Exception/Exception.h""
+
+using Logger::globalLogger;
+
+/*! \callergraph
+ *
+ * Constructs a new Exception.
+ *
+ * The stack skip should be essentially how many function calls exist between the original
+ * exception constructor and this one, which basically boils down to the class's level in the
+ * heirarchy (i.e., direct descendants of this class should give 1, their children give 2, etc.).
+ * As such, it probably makes sense to have each guy take an optional stack skip and call this
+ * constructor with that value plus 1.
+ *
+ * \p reason    - The issue that caused the exception itself. Mostly in the format ""ExceptionName: Cause of exception.""        <br>
+ * \p stackSkip - explained above                                                                                              <br>
+ * \p address   - The address in the code that caused the exception. Defaults to nullptr. Only used for segmentation faults    <br>
+ */
+Exception::Exception(std::string reason, int stackSkip, void* address) :
+            std::runtime_error(reason), _reason(reason), _stackSkip(stackSkip + 2), _address(address) { //+2 because of the 2 extra functions we add (constructor and printStackTrace())
+    globalLogger.warn(""Exception thrown - "", reason);
+    _out = new char*;
+    *_out = nullptr;
+    saveStackTrace();
+
+    (void)_address; //Suppresses unused variable warnings, since this variable is only used on Windows
+}
+
+/*! \callergraph
+ *
+ * Returns a readable explaination of the exception.
+ * Overrides std::runtime_error::what().
+ *
+ * This is where the backtrace is translated into text.
+ * I delay it like that because creating a string representation involves
+ * getting line numbers, which involves calling /usr/bin/addr2line a bunch
+ * of times. If an exception is thrown and later caught without printing
+ * anything, there's no reason to invoke multiple instances of another process.
+ */
+const char* Exception::what() const noexcept {
+    std::stringstream ss;
+    ss << _reason << std::endl;
+    printStackTrace(ss);
+
+    *_out = new char[ss.str().length()]; //Have to do it this way to get around the const thing, plus I want it to be freed in the destructor
+    strcpy(*_out, ss.str().c_str());
+    return *_out;
+}
+",C++ Code,"The code defines an Exception class that handles creating, storing information, and representing exceptions raised during program execution. When an exception is constructed, it stores the provided reason, stack skip count, and optional address that caused the exception. It then saves the stack trace by walking up the call stack. When the exception's string representation is requested using the what() method, it generates a readable string containing the exception reason and stack trace by translating the stack trace into text using line number information obtained from an external utility. The string representation is cached to avoid repeatedly generating it unnecessarily. The class is designed to be subclassed so that child exceptions can increment the stack skip count when calling the parent constructor."
+/Exception/Exception_Linux.cpp,"#include ""Utils/Platforms.h""
+#ifdef JOC_LINUX_BUILD
+
+#include <cstring>
+#include <cxxabi.h>
+#include <execinfo.h>
+#include <sstream>
+
+#include <GlobalLogger.hpp>
+
+#include ""Exception/Exception.h""
+
+#define STRING_BUFFER_SIZE 1024
+
+using Logger::globalLogger;
+
+/*! \callergraph
+ *
+ * ""Demangles"" stack trace item names.
+ * Code from https://panthema.net/2008/0901-stacktrace-demangled/
+ *
+ * When C++ code is translated into assembly, each function has to be given
+ * a label to jump to. With C code, that label can just be the function name.
+ * However, with C++, the full function name would be something like
+ * Exception::demangle (and that doesn't even take function overloading into account,
+ * but I have no idea how they handle that). Since the colon (:) isn't a valid
+ * character to be part of a label, they have to ""mangle"" the name into a format
+ * that is valid. The format it turns into is pretty much unreadable. For instance,
+ * this function becomes: <br>
+ *     _ZNK9Exception8demangleERNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEEPPcm
+ *
+ * Which is very hard to read. So, this function takes that
+ * mess and translates it back using a provided function abi::__cxa_demangle
+ *
+ * \p ss         - The string stream representing the final output that we'll write into
+ * \p symbollist - array of strings containing the mangled names
+ * \p addrlen    - number of entries to process (name is a carry-over from where I got this code)
+ */
+void Exception::demangle(std::stringstream& ss, char** symbollist, size_t addrlen) const {
+    size_t funcnamesize = STRING_BUFFER_SIZE;
+    char funcname[STRING_BUFFER_SIZE];
+
+    // iterate over the returned symbol lines
+    // stack skip is how many to skip because is takes some extra function
+    // calls to get from where the throw is done to where the backtrace was saved
+    // addrlen - 2 is because the first 2 are above main and not really useful to us
+    for (unsigned int i = _stackSkip; i < addrlen - 2; i++) {
+        char* begin_name = NULL;
+        char* begin_offset = NULL;
+        char* end_offset = NULL;
+
+        for (char *p = symbollist[i]; *p; ++p) {
+            if (*p == '(')
+                begin_name = p;
+            else if (*p == '+')
+                begin_offset = p;
+            else if (*p == ')' && (begin_offset || begin_name))
+                end_offset = p;
+        }
+
+        if (begin_name && end_offset && (begin_name < end_offset)) {
+            *begin_name++ = '\0';
+            *end_offset++ = '\0';
+            if (begin_offset)
+                *begin_offset++ = '\0';
+
+            // mangled name is now in [begin_name, begin_offset) and caller
+            // offset in [begin_offset, end_offset). now apply
+            // __cxa_demangle():
+
+            int status = 0;
+            char* ret = abi::__cxa_demangle(begin_name, funcname, &funcnamesize, &status);
+            char* fname = begin_name;
+            if (status == 0)
+                fname = ret;
+
+            static char buf[STRING_BUFFER_SIZE];
+            char* p = end_offset;
+
+            while (*p != ']') {
+                p++;
+            }
+
+            *p = '\0';
+
+            // prepare command to be executed
+            // our program need to be passed after the -e parameter
+            sprintf(buf, ""/usr/bin/addr2line -e ./jackofclubs %s"", end_offset + 2);
+            FILE* f = popen(buf, ""r"");
+            fgets(buf, STRING_BUFFER_SIZE, f);
+
+            ss << ""    "" << fname << "" - "";
+            if (buf[0] != '?') {
+                ss << buf; // buf already has newline
+            }
+            else {
+                ss << ""unknown location"" << std::endl;
+            }
+
+            pclose(f);
+        }
+        else {
+            // couldn't parse the line? print the whole line.
+            ss << ""    "" << symbollist[i] << std::endl;
+        }
+    }
+}
+
+/*! \callergraph
+ *
+ * Prints the stacktrace saved in the exception into the stringstream.
+ *
+ * \p ss - the stringstream to print the data into
+ */
+void Exception::printStackTrace(std::stringstream& ss) const {
+    char** lines = backtrace_symbols(_stackTrace, _stackSize);
+    demangle(ss, lines, _stackSize);
+    delete[] lines;
+}
+
+/*! \callergraph
+ * Uses linux-specific library function to save the stacktrace for this function call.
+ * The fact that it will include everything up to this function is why we have the
+ * stack skip later. There's no point in printing stuff for the Exception library itself.
+ */
+void Exception::saveStackTrace() {
+    _stackSize = backtrace(_stackTrace, STACK_TRACE_MAX_SIZE);
+}
+
+
+#endif
+",C++ Code,"This code implements stack trace functionality for debugging purposes. When an exception is thrown, it saves the stack trace by calling the `backtrace()` function, which captures the call stack up to that point. It then demangles the function names in the stack trace, which are mangled by the compiler, to make them human readable. Finally, it can print the formatted stack trace to a string stream, giving developers useful information to debug the issue that caused the exception. Having the ability to see the call stack that led to an exception allows developers to quickly identify the root cause and fix bugs in their software system."
+/Exception/Exception_Windows.cpp,"#include ""Utils/Platforms.h""
+#ifdef JOC_WINDOWS_BUILD
+
+#include <Windows.h>
+#include <dbghelp.h>
+#include <iostream>
+
+#include ""Exception/Exception.h""
+
+void Exception::demangle(std::stringstream& ss, char** symbollist, size_t addrlen) const {
+    return;
+}
+
+static void printStackItem(std::stringstream& ss, HANDLE process, void* address, SYMBOL_INFO* symbol, IMAGEHLP_LINE* line) {
+	DWORD dwDisplacement;
+
+	bool ret1 = SymFromAddr(process, (DWORD64)address, 0, symbol);
+	bool ret2 = SymGetLineFromAddr(process, (DWORD)address, &dwDisplacement, line);
+
+	if (ret1) {
+		ss << ""    "" << symbol->Name;
+		if (ret2) {
+			ss << "" - "" << line->FileName << "":"" << line->LineNumber;
+		}
+		ss << std::endl;
+	}
+}
+
+#define MAX_SYMBOL_LENGTH 1024
+void Exception::printStackTrace(std::stringstream& ss) const {
+	char* symbol_data_raw = new char[MAX_SYMBOL_LENGTH + sizeof(SYMBOL_INFO)/sizeof(char)];
+	SYMBOL_INFO* symbol = (SYMBOL_INFO*)symbol_data_raw;
+	symbol->MaxNameLen = MAX_SYMBOL_LENGTH;
+	symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+	IMAGEHLP_LINE *line = new IMAGEHLP_LINE;
+	line->SizeOfStruct = sizeof(IMAGEHLP_LINE);
+
+	HANDLE process = GetCurrentProcess();
+
+	if (_address != nullptr) {
+		printStackItem(ss, process, _address, symbol, line);
+	}
+
+	for (int i = 0; i < _stackSize; ++i) {
+		printStackItem(ss, process, _stackTrace[i], symbol, line);
+	}
+
+	delete[] symbol_data_raw;
+	delete line;
+}
+
+void Exception::saveStackTrace() {
+	HANDLE process = GetCurrentProcess();
+	SymInitialize(process, NULL, true);
+	_stackSize = CaptureStackBackTrace(_stackSkip, STACK_TRACE_MAX_SIZE, _stackTrace, NULL);
+}
+
+#endif
+",C++ Code,"The code implements a 3D rendering engine that handles window creation, OpenGL context, shader programs, textures, 3D objects, player input, collision detection, and UI elements to render a 3D scene and provide a user interface. It contains classes for representing blocks, chunks, and a world that make up the 3D scene, as well as components for rendering, selecting, and highlighting blocks. It also includes player, menu, and UI classes to handle player input and provide an in-game menu system. Finally, it implements exception handling functionality to print stack traces for debugging purposes."
+/Game.cpp,"#include <SFML/Window.hpp>
+
+#include <GlobalLogger.hpp>
+
+#include ""Debug/DebugOptions.h""
+#include ""Game.h""
+#include ""Graphics/Screen/WorldScreen.h""
+
+using Logger::globalLogger;
+
+/*! \callergraph
+ *
+ * Constructs the game and initializes the render engine
+ */
+Game::Game() :
+    _re()
+{
+    globalLogger.log(""Initializing Game"");
+}
+
+/*! \callergraph
+ *
+ * Starts the game and runs the main loop, which polls events
+ * and dispatches them to the appropriate handler.
+ */
+void Game::run() {
+    globalLogger.log(""Initializing World Screen"");
+    _screen = std::unique_ptr<Screen>(new WorldScreen(_re.getWindow(), *this));
+
+    globalLogger.log(""Getting Render Window"");
+    sf::RenderWindow& window = _re.getWindow();
+
+    globalLogger.log(""Starting main game loop"");
+    while (_running) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (!handleEvent(event)) {
+                _screen->handleEvent(event);
+            }
+        }
+        _screen->tick();
+        _re.beginRender();
+        _screen->render(_re, window);
+        _re.endRender();
+    }
+}
+
+/*! \callergraph
+ *
+ * Ends the game by signalling the main loop should terminate
+ */
+void Game::end() {
+    globalLogger.log(""Stopping main game loop"");
+    _running = false;
+}
+
+/*! \callergraph
+ *
+ * Handles a portion of the possible events.
+ *
+ * Currently handled events:                                                                                      <br>
+ *     1) Window Closed  - Ends the main loop                                                                     <br>
+ *     2) Window Resized - Notifies the render engine                                                             <br>
+ *     3) F3 Pressed     - Marks debug options as available to be shown (screen handles actually showing them)    <br>
+ *
+ * Returns true if the event has been sufficiently handled (i.e. should not be forwarded along) and false otherwise
+ *
+ * \p e - The event to process
+ */
+bool Game::handleEvent(const sf::Event& e) {
+    switch (e.type) {
+        case sf::Event::Closed:
+            end();
+            return true;
+        case sf::Event::Resized:
+            _re.handleResize(e.size);
+            return false;
+        case sf::Event::KeyPressed:
+            if (e.key.code == sf::Keyboard::F3) {
+                DebugOptions::setShowDebugOptions(!DebugOptions::showDebugOptions());
+                return true;
+            }
+            return false;
+        default:
+            return false;
+    }
+}
+",C++ Code,"The code initializes a game engine by constructing a `Game` object that initializes a `RenderEngine` for rendering 2D and 3D graphics to a window. It then loads a `WorldScreen` that represents the main game screen. The `run()` method contains the main loop that polls for window events, passes them to the appropriate handler, ticks the `WorldScreen` to update game state, and renders the screen's graphics. The `Game` class handles a subset of events like window close and resize, delegating the rest to the `WorldScreen`. When the game ends, the main loop is stopped."
+/Graphics/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+add_subdirectory(""Components"")
+add_subdirectory(""Menu"")
+add_subdirectory(""Screen"")
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+add_subdirectory(""Components"")
+add_subdirectory(""Menu"")
+add_subdirectory(""Screen"")
+"
+/Graphics/Components/Button.cpp,"#include ""Graphics/Components/Button.h""
+#include ""Utils/Font.h""
+
+/*! \callergraph */
+bool Button::handleMouseMoved(const sf::Event::MouseMoveEvent& e) {
+    if (getBounds().contains(e.x, e.y)) {
+        _rect->setFillColor(sf::Color(200, 200, 200));
+    } else {
+        _rect->setFillColor(sf::Color::White);
+    }
+    return false;
+}
+
+/*! \callergraph */
+bool Button::handleMouseButtonPressed(const sf::Event::MouseButtonEvent& e) {
+    if (getBounds().contains(e.x, e.y)) {
+        _function(_name);
+        return true;
+    }
+
+    return false;
+}
+
+void Button::layout(const sf::RenderWindow& w) {
+    Component::layout(w);
+
+    sf::Vector2i size = getSize();
+    _rect->setSize(size);
+    _rect->setLocalPosition(sf::Vector2i(0,0));
+
+    sf::Vector2i textSize = _text->getSize();
+    _text->setLocalPosition(sf::Vector2i(size.x / 2.f - textSize.x / 2.f, size.y / 2.f - textSize.y / 2.f));
+}
+",C++ Code,The code defines a Button class that represents a clickable UI element. It handles mouse events to change the button's color when the mouse hovers over it and calls a function when the button is clicked. The layout method positions the button's rectangle shape and text label within the given window size to properly display the button. The Button class provides the basic functionality for rendering clickable UI elements within the software system's graphical user interface.
+/Graphics/Components/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Component.cpp
+                        ${CURR_DIR}/Button.cpp
+                        ${CURR_DIR}/Rectangle.cpp
+                        ${CURR_DIR}/Text.cpp
+                        ${CURR_DIR}/HBox.cpp
+                        ${CURR_DIR}/VBox.cpp"" CACHE STRING ""Sources for project"" FORCE)
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Component.cpp
+                        ${CURR_DIR}/Button.cpp
+                        ${CURR_DIR}/Rectangle.cpp
+                        ${CURR_DIR}/Text.cpp
+                        ${CURR_DIR}/HBox.cpp
+                        ${CURR_DIR}/VBox.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
+/Graphics/Components/Component.cpp,"#include <algorithm>
+#include <stdexcept>
+
+#include ""Graphics/Components/Component.h""
+
+/*! \callergraph
+ *
+ * Constucts a new component based on 
+ * its position relative to the parent.
+ *
+ * \p localPos  - The position of the component relative to its parent                              <br>
+ * \p size      - The length and width of the rectangular bounding box surrounding the component    <br>
+ */
+Component::Component(const sf::Vector2i& localPos, const sf::Vector2i& size, bool children) :
+    _boundingBox(localPos, size),
+    _localPos(localPos),
+    _childrenAllowed(children)
+{}
+
+Component::Component(const sf::Vector2i& size, bool children) :
+    _boundingBox(sf::Vector2i(0,0), size),
+    _localPos(sf::Vector2i(0,0)),
+    _childrenAllowed(children)
+{}
+
+Component::Component(bool children) : Component(sf::Vector2i(0,0)) {}
+
+/*! \callergraph
+ *
+ * Sets the size of the component
+ *
+ * \p size - new size
+ */
+void Component::setSize(const sf::Vector2i& size) {
+    _boundingBox.width = size.x;
+    _boundingBox.height = size.y;
+}
+
+void Component::setSize(int x, int y) {
+    setSize(sf::Vector2i(x, y));
+}
+
+/*! \callergraph
+ *
+ * Sets the global position of the component. This is the
+ * position that's sent to the window for rendering. This
+ * function is private and is called from the other
+ * set*Position functions.
+ *
+ * \p pos - global position
+ */
+void Component::setGlobalPosition(const sf::Vector2i& pos) {
+    _boundingBox.left = pos.x;
+    _boundingBox.top = pos.y;
+}
+
+/*! \callergraph
+ *
+ * Sets the component's position relative to its parent
+ *
+ * \p pos - position relative to parent
+ */
+void Component::setLocalPosition(const sf::Vector2i& pos) {
+    sf::Vector2i parentPos = getParentPosition();
+    _localPos = pos;
+    setGlobalPosition(parentPos + _localPos);
+}
+
+void Component::setLocalPosition(int x, int y) {
+    setLocalPosition(sf::Vector2i(x, y));
+}
+
+/*! \callergraph
+ *
+ * Notifies the component of its parent's position so it
+ * can recalculate its global position.
+ *
+ * \p pos - parent's global position
+ */
+void Component::setParentPosition(const sf::Vector2i& pos) {
+    setGlobalPosition(pos + _localPos);
+}
+
+/*! \callergraph
+ *
+ * Returns the length and width of the rectangular bounding box
+ * surrounding the component
+ */
+const sf::Vector2i Component::getSize() const {
+    return sf::Vector2i(_boundingBox.width, _boundingBox.height);
+}
+
+/*! \callergraph
+ *
+ * Returns the component's position relative to its parent
+ */
+const sf::Vector2i Component::getLocalPosition() const {
+    return _localPos;
+}
+
+/*! \callergraph
+ *
+ * Returns the component's global position. Note that, unlike
+ * setGlobalPosition(), this function is public
+ */
+const sf::Vector2i Component::getGlobalPosition() const {
+    return sf::Vector2i(_boundingBox.left, _boundingBox.top);
+}
+
+/*! \callergraph
+ *
+ * Returns what the component thinks its parent's position is.
+ * This may or may not be the parent's actual position.
+ */
+const sf::Vector2i Component::getParentPosition() const {
+    return getGlobalPosition() - getLocalPosition();
+}
+
+/*! \callergraph
+ *
+ * Returns the bounding box of the component
+ */
+const sf::Rect<int> Component::getBounds() const {
+    return _boundingBox;
+}
+
+void Component::forceAdd(std::shared_ptr<Component> component) {
+    _children.push_back(component);
+}
+
+std::shared_ptr<Component> Component::forceRemove(std::shared_ptr<Component> component) {
+    auto pos = std::find(_children.begin(), _children.end(), component);
+    if (pos != _children.end()) {
+        _children.erase(pos);
+        return component;
+    }
+    return nullptr;
+}
+
+void Component::add(std::shared_ptr<Component> component) {
+    if (_childrenAllowed) {
+        forceAdd(component);
+    } else {
+        throw std::invalid_argument(""Trying to add a child component when doing so is disallowed"");
+    }
+}
+
+std::shared_ptr<Component> Component::remove(std::shared_ptr<Component> component) {
+    if (_childrenAllowed) {
+        return forceRemove(component);
+    } else {
+        throw std::invalid_argument(""Trying to remove a child component when doing so is disallowed"");
+    }
+}
+
+void Component::render(RenderEngine& e, sf::RenderWindow& w) {
+    renderComponent(w);
+    for (std::shared_ptr<Component> comp : _children) {
+        comp->setParentPosition(getGlobalPosition());
+        comp->render(e, w);
+    }
+}
+
+void Component::renderComponent(sf::RenderWindow& w) {}
+
+void Component::layout(const sf::RenderWindow& w) {
+    for (auto child : _children) {
+        child->layout(w);
+    }
+}
+
+bool Component::handleKeyPressed(const sf::Event::KeyEvent& e) {
+    return delegateToChildren([e](auto& child){return child.handleKeyPressed(e);});
+}
+
+bool Component::handleMouseMoved(const sf::Event::MouseMoveEvent& e) {
+    return delegateToChildren([e](auto& child){return child.handleMouseMoved(e);});
+}
+
+bool Component::handleMouseButtonPressed(const sf::Event::MouseButtonEvent& e) {
+    return delegateToChildren([e](auto& child){return child.handleMouseButtonPressed(e);});
+}
+
+bool Component::handleMouseButtonReleased(const sf::Event::MouseButtonEvent& e) {
+    return delegateToChildren([e](auto& child){return child.handleMouseButtonReleased(e);});
+}
+
+bool Component::handleResize(const sf::Event::SizeEvent& e) {
+    return delegateToChildren([e](auto& child){return child.handleResize(e);});
+}
+",C++ Code,"The code defines various classes that comprise a 3D rendering system, including components for loading and compiling shaders, managing blocks and chunks in a 3D world, handling a player object, creating UI elements, and displaying debug information. The classes define functions for initializing the components, setting properties like position and size, rendering to a window using an underlying render engine, and handling input events from the mouse and keyboard. Together, the components form a system that takes image files and shader programs as input, renders a 3D scene to an output window, and allows interaction through the UI and input handling. The class definitions focus on encapsulating responsibilities and exposing a clean interface while managing relationships between dependent components."
+/Graphics/Components/HBox.cpp,"#include <algorithm>
+
+#include ""Graphics/Components/HBox.h""
+
+HBox::HBox(std::initializer_list<std::shared_ptr<Component>> args) {
+    for (auto arg : args) {
+        add(arg);
+    }
+}
+
+void HBox::layout(const sf::RenderWindow& w) {
+    Component::layout(w);
+
+    setLocalPosition(0,0);
+
+    int maxHeight = -1;
+    int totalX = 0;
+    for (auto& child : getChildren()) {
+        maxHeight = std::max(maxHeight, child->getSize().y);
+        totalX += child->getSize().x;
+    }
+
+    setSize(sf::Vector2i(totalX, maxHeight));
+
+    int currX = 0;
+    for (auto& child : getChildren()) {
+        int yVal = maxHeight / 2.0 - child->getSize().y / 2.0;
+        child->setLocalPosition(sf::Vector2i(currX, yVal));
+        currX += child->getSize().x;
+    }
+}
+",C++ Code,"The code implements a render engine that handles window creation, OpenGL context, and scene rendering. It contains classes for loading and compiling shaders, managing shader programs, loading image files, rendering block selections, representing individual blocks, managing chunks of blocks, containing the entire world, storing the player state, performing collision detection, and creating various UI components and menus for color selection, pausing, settings, and debugging options. The HBox class implements a horizontal box layout manager for arranging child UI components horizontally, calculating their total width and maximum height, and positioning them accordingly within the box."
+/Graphics/Components/Rectangle.cpp,"#include ""Graphics/Components/Rectangle.h""
+
+void Rectangle::renderComponent(sf::RenderWindow& w) {
+    w.draw(_theRectangle);
+}
+
+void Rectangle::layout(const sf::RenderWindow& w) {
+    _theRectangle.setPosition(sf::Vector2f(getGlobalPosition()));
+    _theRectangle.setSize(sf::Vector2f(getSize()));
+}
+
+void Rectangle::setFillColor(const sf::Color& color) {
+    _theRectangle.setFillColor(color);
+}
+
+void Rectangle::setOutlineColor(const sf::Color& color) {
+    _theRectangle.setOutlineColor(color);
+}
+
+void Rectangle::setOutlineThickness(float thickness) {
+    _theRectangle.setOutlineThickness(thickness);
+}
+
+const sf::Color& Rectangle::getFillColor() const {
+    return _theRectangle.getFillColor();
+}
+
+const sf::Color& Rectangle::getOutlineColor() const {
+    return _theRectangle.getOutlineColor();
+}
+
+float Rectangle::getOutlineThickness() const {
+    return _theRectangle.getOutlineThickness();
+}
+",C++ Code,"The code defines a Rectangle component class that encapsulates the functionality for rendering, laying out, and updating the properties of a rectangular UI element. The component renders itself to an SFML window by drawing an SFML rectangle shape, lays itself out by positioning and sizing that rectangle shape based on the component's properties, and provides setter functions for the component's fill color, outline color, outline thickness, and getter functions to read those properties. The component functions act upon an SFML rectangle shape member variable to render the rectangle UI element to the screen."
+/Graphics/Components/Text.cpp,"#include ""Graphics/Components/Text.h""
+
+Text::Text() : Text(sf::Vector2i(0,0)) {}
+Text::Text(sf::Vector2i localPos, const sf::String& text, const sf::Font& font) : Component(localPos, false /*childrenAllowed*/), _theText(text, font) {
+    sf::FloatRect textBounds = _theText.getGlobalBounds();
+    setSize(sf::Vector2i(textBounds.width, textBounds.height));
+}
+Text::Text(sf::Vector2i localPos, unsigned int fontSize, const sf::String& text, const sf::Font& font) : Text(localPos, text, font) {
+    _theText.setCharacterSize(fontSize);
+}
+
+void Text::renderComponent(sf::RenderWindow& w) {
+    sf::FloatRect textSize = _theText.getLocalBounds();
+    _theText.setOrigin(textSize.left + textSize.width / 2, textSize.top + textSize.height / 2);
+    _theText.setPosition(sf::Vector2f(getGlobalPosition()) + sf::Vector2f(textSize.width / 2, textSize.height / 2));
+    w.draw(_theText);
+}
+
+void Text::layout(const sf::RenderWindow& w) {
+    sf::FloatRect textBounds = _theText.getGlobalBounds();
+    setSize(sf::Vector2i(textBounds.width, textBounds.height));
+}
+
+void Text::setFillColor(const sf::Color& color) {
+    _theText.setFillColor(color);
+}
+
+const sf::Color& Text::getFillColor() {
+    return _theText.getFillColor();
+}
+
+unsigned int Text::getFontSize() {
+    return _theText.getCharacterSize();
+}
+
+const sf::String& Text::getString() {
+    return _theText.getString();
+}
+
+void Text::setFontSize(unsigned int size) {
+    _theText.setCharacterSize(size);
+}
+
+void Text::setString(const sf::String& string) {
+    _theText.setString(string);
+}
+
+float Text::textWidth() {
+    sf::Vector2f start = _theText.findCharacterPos(0);
+    sf::Vector2f end   = _theText.findCharacterPos(std::numeric_limits<std::size_t>::max());
+    return end.x - start.x;
+}
+
+float Text::textHeight() {
+    return _theText.getLocalBounds().height;
+}
+",C++ Code,"The code defines a Text component class that represents a UI text element within a larger software system. The Text class handles setting the text string, font, color, and size, and it renders the text to a window using the RenderEngine. It inherits from a base Component class and implements functions for setting properties, laying out the component size, and rendering the text to a window."
+/Graphics/Components/VBox.cpp,"#include <algorithm>
+
+#include ""Graphics/Components/VBox.h""
+
+VBox::VBox(std::initializer_list<std::shared_ptr<Component>> args) {
+    for (auto arg : args) {
+        add(arg);
+    }
+}
+
+void VBox::layout(const sf::RenderWindow& w) {
+    Component::layout(w);
+
+    setLocalPosition(0,0);
+
+    int maxWidth = -1;
+    int totalY = 0;
+    for (auto& child : getChildren()) {
+        maxWidth = std::max(maxWidth, child->getSize().x);
+        totalY += child->getSize().y;
+    }
+
+    setSize(sf::Vector2i(maxWidth, totalY));
+
+    int currY = 0;
+    for (auto& child : getChildren()) {
+        int xVal = maxWidth / 2.0 - child->getSize().x / 2.0;
+        child->setLocalPosition(sf::Vector2i(xVal, currY));
+        currY += child->getSize().y;
+    }
+}
+",C++ Code,"The code handles the rendering of a 3D game world by managing resources and components required for 3D graphics. It loads images, shader programs, and handles window creation using a RenderEngine class. Game objects like blocks, chunks, and the player are represented by classes that manage their rendering and collision detection. UI components like menus and buttons are used for the in-game interface. Debugging aids like the FPS counter are also available. The VBox class implements a vertical box layout manager for arranging UI components. It positions and sizes child components to fill the available vertical space, centering them horizontally."
+/Graphics/Menu/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Menu.cpp
+                        ${CURR_DIR}/ColorSelectorMenu.cpp
+                        ${CURR_DIR}/EscapeMenu.cpp
+                        ${CURR_DIR}/SettingsMenu.cpp"" CACHE STRING ""Sources for project"" FORCE)
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Menu.cpp
+                        ${CURR_DIR}/ColorSelectorMenu.cpp
+                        ${CURR_DIR}/EscapeMenu.cpp
+                        ${CURR_DIR}/SettingsMenu.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
+/Graphics/Menu/ColorSelectorMenu.cpp,"#include ""Graphics/Menu/ColorSelectorMenu.h""
+
+#define SLIDER_WIDTH      30
+#define SLIDER_HEIGHT    256
+#define START_X           50
+#define START_Y          100
+#define SPACER            20
+#define COLOR_RECT_SIZE  200
+#define WIDTH            500
+#define HEIGHT           450
+#define COLOR_TEXT_SIZE   17
+#define TITLE_TEXT_SIZE   30
+
+/*! \callergraph
+ *
+ * Constructs a new ColorSelectorMenu by telling it what color variable it should
+ * be modifying. Also initializes all of the GUI members.
+ *
+ * \p color - the color data we will be modifying
+ */
+ColorSelectorMenu::ColorSelectorMenu(sf::Color& color) :
+    Menu(sf::Vector2f(WIDTH, HEIGHT), Menu::Type::ColorSelector),
+    _redRef(color.r),   // These three keep references to the original data
+    _greenRef(color.g),
+    _blueRef(color.b),
+    _redSlider  (std::make_shared<Slider<sf::Uint8>>(0, 255, color.r, sf::Vector2i(START_X, START_Y), sf::Vector2i(SLIDER_WIDTH, SLIDER_HEIGHT))),
+    _greenSlider(std::make_shared<Slider<sf::Uint8>>(0, 255, color.g, sf::Vector2i(START_X + SPACER + SLIDER_WIDTH, START_Y), sf::Vector2i(SLIDER_WIDTH, SLIDER_HEIGHT))),
+    _blueSlider (std::make_shared<Slider<sf::Uint8>>(0, 255, color.b, sf::Vector2i(START_X + 2 * SPACER + 2 * SLIDER_WIDTH, START_Y), sf::Vector2i(SLIDER_WIDTH, SLIDER_HEIGHT))),
+    _colorRect(std::make_shared<Rectangle>(sf::Vector2i(COLOR_RECT_SIZE, COLOR_RECT_SIZE))),
+    _redText  (std::make_shared<Text>(sf::Vector2i(0,0), ""Red"")),
+    _greenText(std::make_shared<Text>(sf::Vector2i(0,0), ""Green"")),
+    _blueText (std::make_shared<Text>(sf::Vector2i(0,0), ""Blue"")),
+    _titleText(std::make_shared<Text>(sf::Vector2i(0,0), ""Color Selector""))
+{
+    _redText->setFontSize(COLOR_TEXT_SIZE);
+    _greenText->setFontSize(COLOR_TEXT_SIZE);
+    _blueText->setFontSize(COLOR_TEXT_SIZE);
+    _titleText->setFontSize(TITLE_TEXT_SIZE);
+
+    add(_redSlider);
+    add(_greenSlider);
+    add(_blueSlider);
+    add(_colorRect);
+    add(_redText);
+    add(_greenText);
+    add(_blueText);
+    add(_titleText);
+}
+
+void ColorSelectorMenu::layout(const sf::RenderWindow& w) {
+    Menu::layout(w);
+
+    // Get our position...
+    sf::IntRect bounds = getBounds();
+
+    {
+        // Now grab the last slider's position and make the color preview
+        // be to the right of it (3 SPACER's away)
+        sf::Vector2i blueSliderPos = _blueSlider->getLocalPosition();
+        _colorRect->setLocalPosition(blueSliderPos + sf::Vector2i(SLIDER_WIDTH + 3 * SPACER, SLIDER_HEIGHT / 2 - COLOR_RECT_SIZE / 2));
+        _colorRect->setFillColor(sf::Color(_redRef, _greenRef, _blueRef)); // Gotta make sure the preview has the right color
+    }
+
+    {
+        // Now we grab the slider positions...
+        sf::Vector2i redPos = _redSlider->getLocalPosition();
+        sf::Vector2i greenPos = _greenSlider->getLocalPosition();
+        sf::Vector2i bluePos = _blueSlider->getLocalPosition();
+
+        // ...and center the text boxes under them
+        _redText->setLocalPosition  (sf::Vector2i(redPos.x   + SLIDER_WIDTH / 2 - _redText->textWidth()   / 2, redPos.y   - 25));
+        _greenText->setLocalPosition(sf::Vector2i(greenPos.x + SLIDER_WIDTH / 2 - _greenText->textWidth() / 2, greenPos.y - 25));
+        _blueText->setLocalPosition (sf::Vector2i(bluePos.x  + SLIDER_WIDTH / 2 - _blueText->textWidth()  / 2, bluePos.y  - 25));
+    }
+
+    // Last calculation: center the title text at the top
+    _titleText->setLocalPosition(sf::Vector2i((float)bounds.width / 2 - _titleText->textWidth() / 2, 25));
+
+}
+",C++ Code,"The code defines a ColorSelectorMenu class that provides a UI for modifying a color value. The constructor initializes UI elements like sliders, a preview rectangle and text labels. The layout() method positions these elements based on the window size, centering the title text at the top and placing the sliders, preview rectangle and text labels below in a grid-like fashion. This allows the ColorSelectorMenu to be rendered and provide a UI for modifying a color in an organized and user-friendly manner."
+/Graphics/Menu/EscapeMenu.cpp,"#include <GlobalLogger.hpp>
+
+#include ""Graphics/Menu/EscapeMenu.h""
+#include ""Graphics/Menu/SettingsMenu.h""
+
+using Logger::globalLogger;
+
+#define BUTTON_CALLBACK std::bind(&EscapeMenu::buttonCallback, this, std::placeholders::_1)
+
+const static std::string QUIT_BUTTON_STRING = ""quitButton"";
+const static std::string RESUME_BUTTON_STRING = ""resumeButton"";
+const static std::string SETTINGS_BUTTON_STRING = ""settingsButton"";
+const static int BUTTON_WIDTH = 250;
+const static int BUTTON_HEIGHT = 75;
+const static int BUTTON_PADDING = 20;
+
+/*! \callergraph
+ *
+ * \p width  - Width of the screen                                                          <br>
+ * \p height - Height of the screen                                                         <br>
+ * \p g      - Reference to the Game object so that the quit button can call Game::end()    <br>
+ */
+EscapeMenu::EscapeMenu(int width, int height, Game& g, Screen& screen) :
+    Menu(sf::Vector2f(width, height), Menu::Type::Escape),
+    _game(g),
+    _screen(screen),
+    _quitButton(std::make_shared<Button>(sf::Vector2i(0, 0), sf::Vector2i(BUTTON_WIDTH, BUTTON_HEIGHT), BUTTON_CALLBACK, QUIT_BUTTON_STRING, ""Quit"")),
+    _resumeButton(std::make_shared<Button>(sf::Vector2i(0, 0), sf::Vector2i(BUTTON_WIDTH, BUTTON_HEIGHT), BUTTON_CALLBACK, RESUME_BUTTON_STRING, ""Resume"")),
+    _settingsButton(std::make_shared<Button>(sf::Vector2i(0, 0), sf::Vector2i(BUTTON_WIDTH, BUTTON_HEIGHT), BUTTON_CALLBACK, SETTINGS_BUTTON_STRING, ""Settings"")),
+    _resumeButtonClicked(false)
+{
+    add(_quitButton);
+    add(_resumeButton);
+    add(_settingsButton);
+}
+
+void EscapeMenu::layout(const sf::RenderWindow& w) {
+    Menu::layout(w);
+
+    sf::Vector2i quitSize = _quitButton->getSize();
+    sf::Vector2i settingsSize = _settingsButton->getSize();
+    sf::Vector2i resumeSize = _resumeButton->getSize();
+    auto size = getSize();
+    int fullHeight = quitSize.y + resumeSize.y + settingsSize.y + 2 * BUTTON_PADDING;
+
+    _resumeButton->setLocalPosition (sf::Vector2i(size.x / 2 - resumeSize.x / 2,
+                                                  size.y / 2 - fullHeight / 2));
+
+    _settingsButton->setLocalPosition (sf::Vector2i(size.x / 2 - settingsSize.x / 2,
+                                                    size.y / 2 - fullHeight / 2 + resumeSize.y + BUTTON_PADDING));
+
+    _quitButton->setLocalPosition (sf::Vector2i(size.x / 2 - quitSize.x / 2,
+                                                size.y / 2 - fullHeight / 2 + resumeSize.y + settingsSize.y + 2 * BUTTON_PADDING));
+}
+
+/*! \callergraph
+ *
+ * Callback for the buttons. Handles dispatching what they do
+ *
+ * \p s - The name of the button
+ */
+void EscapeMenu::buttonCallback(const std::string& s) {
+    globalLogger.log(""Pressed "", s);
+
+    if (s == QUIT_BUTTON_STRING) {
+       _game.end();
+    } else if (s == RESUME_BUTTON_STRING) {
+        _resumeButtonClicked = true;
+    } else if (s == SETTINGS_BUTTON_STRING) {
+        _screen.addMenu(new SettingsMenu());
+    } else {
+        globalLogger.error(""Unknown button clicked: "", s);
+    }
+
+}
+
+/*! \callergraph */
+bool EscapeMenu::handleMouseButtonPressed(const sf::Event::MouseButtonEvent& e) {
+    Component::handleMouseButtonPressed(e);
+    return !_resumeButtonClicked;
+}
+
+/*! \callergraph */
+bool EscapeMenu::handleResize(const sf::Event::SizeEvent& e) {
+    setSize(sf::Vector2i(e.width, e.height));
+    return false;
+}
+",C++ Code,"The code implements an in-game pause menu for a 3D game engine. It creates buttons for quitting the game, resuming the game, and opening a settings menu. When initialized, it passes the game window size and a reference to the main game object. It then lays out the buttons vertically in the center of the screen and assigns callback functions for when each button is pressed. The callbacks either quit the game, resume the game by hiding the menu, or display the settings menu. It also overrides functions to handle mouse clicks and window resizes, passing them to the component class or re-laying out the buttons respectively."
+/Graphics/Menu/Menu.cpp,"#include ""Graphics/Menu/Menu.h""
+
+/*! \callergraph
+ *
+ * Base constructor that sets up the menu background
+ * (just a blackish box with a full black outline)
+ *
+ * \p size - the height and width of the menu (centered automatically)
+ * \p type - the Menu::Type of the derived class (see Menu.h)
+ */
+Menu::Menu(sf::Vector2f size, Type type) : Component(sf::Vector2i(size)), _box(size), _type(type) {
+    _box.setFillColor(sf::Color(0,0,0,128)); //Black but kinda see-through
+    _box.setOutlineColor(sf::Color::Black);
+    _box.setOutlineThickness(5);
+}
+
+/*! \callergraph
+ *
+ * Centers the menu on the window
+ *
+ * \p w - the window to center on
+ */
+void Menu::center(const sf::RenderWindow& w) {
+    _box.setSize(sf::Vector2f(getSize()));
+
+    sf::Vector2u wsize = w.getSize();
+    sf::Vector2f bsize = _box.getSize();
+    _box.setPosition(wsize.x / 2 - bsize.x / 2, wsize.y / 2 - bsize.y / 2);
+    setLocalPosition(sf::Vector2i(_box.getPosition()));
+}
+
+/*! \callergraph
+ *
+ * Renders the window. First it sets itself up to use sfml rendering,
+ * then it renders the backround and calls the child class's rendering
+ * function. This overrides Renderable::render.
+ *
+ * \p w - the window for sfml calls (used)
+ */
+void Menu::renderComponent(sf::RenderWindow& w) {
+    w.draw(_box);
+}
+
+void Menu::layout(const sf::RenderWindow& w) {
+    Component::layout(w);
+    center(w);
+}
+
+bool Menu::handleMouseButtonPressed(const sf::Event::MouseButtonEvent& e) {
+    // Return value is whether the event has been fully handled, which it has been as long as
+    // it's within the bounds of the menu
+    Component::handleMouseButtonPressed(e);
+    return getBounds().contains(sf::Vector2i(e.x, e.y));
+}
+",C++ Code,"The code defines a base Menu class that handles the common functionality for rendering and interacting with menus in a 2D graphics application. The Menu class initializes the menu with a black semi-transparent box outline, centers the menu on the application window, renders the menu background and calls the child class's rendering function, and handles mouse button presses by checking if they are within the menu bounds. The code is written in an object-oriented manner with an emphasis on reusability and extensibility, allowing child menu classes to inherit this base functionality and implement their specific features."
+/Graphics/Menu/SettingsMenu.cpp,"#include ""Graphics/Menu/SettingsMenu.h""
+
+#define WIDTH  500
+#define HEIGHT 500
+
+SettingsMenu::SettingsMenu() : Menu(sf::Vector2f(WIDTH, HEIGHT), Menu::Type::Settings),
+    lightPos{0., 0., 0.}, 
+    _lightPosXSlider(std::make_shared<Slider<float>>(-1., 1., lightPos[0], sf::Vector2i(0,0), sf::Vector2i(200,50), Slider<float>::BAR_DIRECTION::HORIZONTAL, Slider<float>::TEXT_LOCATION::RIGHT)),
+    _lightPosYSlider(std::make_shared<Slider<float>>(-1., 1., lightPos[1], sf::Vector2i(0,0), sf::Vector2i(200,50), Slider<float>::BAR_DIRECTION::HORIZONTAL, Slider<float>::TEXT_LOCATION::RIGHT)),
+    _lightPosZSlider(std::make_shared<Slider<float>>(-1., 1., lightPos[2], sf::Vector2i(0,0), sf::Vector2i(200,50), Slider<float>::BAR_DIRECTION::HORIZONTAL, Slider<float>::TEXT_LOCATION::RIGHT)),
+    _lightPosXText(std::make_shared<Text>(sf::Vector2i(0,0), ""Light Position X Value:"")),
+    _lightPosYText(std::make_shared<Text>(sf::Vector2i(0,0), ""Light Position Y Value:"")),
+    _lightPosZText(std::make_shared<Text>(sf::Vector2i(0,0), ""Light Position Z Value:"")),
+    _lightPosXBox(std::make_shared<HBox>(std::initializer_list<std::shared_ptr<Component>>{_lightPosXText, _lightPosXSlider})),
+    _lightPosYBox(std::make_shared<HBox>(std::initializer_list<std::shared_ptr<Component>>{_lightPosYText, _lightPosYSlider})),
+    _lightPosZBox(std::make_shared<HBox>(std::initializer_list<std::shared_ptr<Component>>{_lightPosZText, _lightPosZSlider})),
+    _vbox(std::make_shared<VBox>(std::initializer_list<std::shared_ptr<Component>>{_lightPosXBox, _lightPosYBox, _lightPosZBox}))
+{
+    add(_vbox);
+}
+",C++ Code,"The code defines various classes that work together to render a 3D scene in real time. It handles lower level tasks like creating an OpenGL context and loading shaders, as well as higher level tasks like managing blocks, chunks, and a player within a 3D world. Various UI elements are defined to provide settings and debugging options to control aspects of the rendering. The SettingsMenu class shown creates a menu for adjusting the position of a light source within the scene, using slider and text components to allow the user to modify the X, Y, and Z coordinates of the light. The classes work cooperatively to process inputs, update the scene, and render it to the window for the user."
+/Graphics/Menu/new_menu.sh,"#!/bin/bash
+
+if [ ""$#"" -ne 1 ]; then
+  echo ""Usage: $0 <menu name>""
+  exit 1
+fi
+
+cd $(dirname $0)
+
+sed s/\{NAME\}/$1/g skeleton/menu_skeleton.cpp > ""$1""Menu.cpp.tmp
+sed s/\{NAME\}/$1/g skeleton/menu_skeleton.h > ""$1""Menu.h.tmp
+
+upperName=$(echo ""$1"" | sed -r 's/([a-z0-9])([A-Z])/\1_\L\2/g')
+upperName=$(echo $upperName | awk '{print toupper($0)}')
+
+sed s/\{NAME_UPPER}/$upperName/g ""$1""Menu.cpp.tmp > ""$1""Menu.cpp
+sed s/\{NAME_UPPER}/$upperName/g ""$1""Menu.h.tmp > ""$1""Menu.h
+
+rm ""$1""Menu.cpp.tmp
+rm ""$1""Menu.h.tmp
+
+echo ""Don't forget to add the new menu type!""
+",C++ Code,"The code handles the rendering of a 3D game world by managing various rendering and game entities. It contains a render engine that creates the window and OpenGL context for displaying the scene. It loads shaders and images to apply textures. It represents game entities like blocks, chunks, and players, and manages collision detection. It also contains UI components for menus and debugging aids to display information to the user. Overall, the code processes inputs like images, shaders, and user input, and outputs a rendered 3D game world to a window for the user to interact with."
+/Graphics/Menu/skeleton/menu_skeleton.cpp,"#include ""Graphics/Menu/{NAME}Menu.h""
+
+#define WIDTH  500
+#define HEIGHT 500
+
+{NAME}Menu::{NAME}Menu() : Menu(sf::Vector2f(WIDTH, HEIGHT), Menu::Type::{NAME}) {}
+
+void {NAME}Menu::renderMenu(sf::RenderWindow& w) {
+    return;
+}
+
+bool {NAME}Menu::handleKeyPressed(const sf::Event::KeyEvent& e) {
+    return false;
+}
+
+bool {NAME}Menu::handleMouseMoved(const sf::Event::MouseMoveEvent& e) {
+    return false;
+}
+
+bool {NAME}Menu::handleMouseButtonPressed(const sf::Event::MouseButtonEvent& e) {
+    return false;
+}
+
+bool {NAME}Menu::handleMouseButtonReleased(const sf::Event::MouseButtonEvent& e) {
+    return false;
+}
+
+bool {NAME}Menu::handleResize(const sf::Event::SizeEvent& e) {
+    return false;
+}
+",C++ Code,The code defines a base class for rendering and handling input for a menu in a graphical user interface. It defines a Menu class that handles rendering to a window and responding to window events. It then defines a subclass for a specific menu type that inherits the base rendering and input handling behavior while customizing aspects for that menu type. The base class and subclass work together to provide a reusable framework for defining and rendering different menu types within a graphical user interface for the software system.
+/Graphics/Screen/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/WorldScreen.cpp"" CACHE STRING ""Sources for project"" FORCE)
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/WorldScreen.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
+/Graphics/Screen/WorldScreen.cpp,"#include <SFML/System.hpp>
+#include <SFML/Window.hpp>
+
+#include <GlobalLogger.hpp>
+
+#include ""Graphics/Menu/ColorSelectorMenu.h""
+#include ""Graphics/Menu/EscapeMenu.h""
+#include ""Graphics/Screen/WorldScreen.h""
+#include ""Utils/Math.h""
+
+using Logger::globalLogger;
+
+#define MOUSE_SENSITIVITY 0.1
+#define MOVEMENT_SPEED 0.09
+#define JUMP_SPEED 0.3
+#define GRAVITY_SPEED 0.02
+#define SPRINT_SCALE 1.5
+
+/*! \callergraph
+ *
+ * Construct a new WorldScreen and give it some info about the
+ * environment it's running in (window and game). Sets up player's
+ * initial position and constructs GUI elements.
+ *
+ * \p window - The window we're running in (used to help interface with the mouse)    <br>
+ * \p game   - The Game being run (used to end the game)                              <br>
+ */
+WorldScreen::WorldScreen(sf::RenderWindow& window, Game& game) :
+    _world(),
+    _player(Player::Type::SELF, sf::Vector3f(0.f, 140.f, 0.f), sf::Vector3f(0.f, 0.f, 0.f)),
+    _fpsCounter(sf::Vector2i(5, 0)),
+    _activeMenu(nullptr),
+    _colorRect(sf::Vector2f(100, 100)),
+    _centerRect(sf::Vector2f(4, 4)),
+    _mouseCaptured(true),
+    _screenMiddle(window.getSize().x / 2, window.getSize().y / 2),
+    _selectedColor(sf::Color::White),
+    _window(window),
+    _game(game)
+{
+    _colorRect.setOutlineColor(sf::Color::Black);
+    _colorRect.setOutlineThickness(2);
+}
+
+/*! \callergraph
+ *
+ * Dispatches events to their appropriate handlers
+ *
+ * \p event - Event to be handled
+ */
+bool WorldScreen::handleEvent(const sf::Event& event) {
+    switch (event.type) {
+        case sf::Event::Resized:
+            _screenMiddle = sf::Vector2i(event.size.width / 2, event.size.height / 2);
+            if (_activeMenu != nullptr) {
+                _activeMenu->handleResize(event.size);
+            }
+            return false;
+        case sf::Event::LostFocus:
+            _mouseCaptured = false;
+            return false;
+        case sf::Event::MouseButtonPressed:
+            return handleMouseButtonPressed(event.mouseButton);
+        case sf::Event::MouseButtonReleased:
+            return handleMouseButtonReleased(event.mouseButton);
+        case sf::Event::KeyPressed:
+            return handleKeyPressed(event.key);
+        case sf::Event::MouseMoved:
+            return handleMouseMoved(event.mouseMove);
+        default:
+            return false;
+    }
+}
+
+/*! \callergraph
+ *
+ * Handles placing/removing blocks if there's no menu or forwarding the
+ * mouse click to the menu if there is one.
+ *
+ * \p event - The mouse click event to handle
+ */
+bool WorldScreen::handleMouseButtonPressed(const sf::Event::MouseButtonEvent& event) {
+    if (_activeMenu != nullptr && _activeMenu->handleMouseButtonPressed(event)) {
+        return true;
+    }
+
+    // If the mouse isn't captured at this point, it means there is an
+    // active menu which didn't handle the click or we lost focus and
+    // just got it back. Either way, calling removeMenu() will do
+    // what we want. If it is captured, start adding/removing blocks
+    switch (event.button) {
+        case sf::Mouse::Button::Left:
+            if (!_mouseCaptured) {
+                removeMenu();
+            } else {
+                removeBlock();
+            }
+            return true;
+        case sf::Mouse::Button::Right:
+            if (!_mouseCaptured) {
+                removeMenu();
+            } else {
+                placeBlock();
+            }
+            return true;
+        default:
+            return false;
+    }
+}
+
+/*! \callergraph
+ *
+ * Simply forwards the release event on to the menu. We don't actually
+ * care about it.
+ * (Done in a format similar to the other functions so that if we do want
+ * to handle it in the future, there's less chance of messing it up)
+ *
+ * \p event - The mouse button release event to handle
+ */
+bool WorldScreen::handleMouseButtonReleased(const sf::Event::MouseButtonEvent& event) {
+    if (_activeMenu != nullptr && _activeMenu->handleMouseButtonReleased(event)) {
+        return true;
+    }
+
+    return false;
+}
+
+/*! \callergraph
+ *
+ * Forwards the key press on to the children, and, if they don't handle it,
+ * handles Escape, Q, C, and E.
+ *
+ * \p event - The key event to handle
+ */
+bool WorldScreen::handleKeyPressed(const sf::Event::KeyEvent& event) {
+    if (_activeMenu != nullptr && _activeMenu->handleKeyPressed(event)) {
+        return true;
+    }
+
+    switch (event.code) {
+        case sf::Keyboard::C:
+            if (_activeMenu == nullptr) {
+                addMenu(new ColorSelectorMenu(_selectedColor));
+            } else if (_activeMenu->getType() == Menu::Type::ColorSelector) {
+                removeMenu();
+            }
+            return true;
+        case sf::Keyboard::E:
+            copySelectionColor();
+            return true;
+        case sf::Keyboard::Escape:
+            if (_activeMenu == nullptr) {
+                addMenu(new EscapeMenu(_window.getSize().x, _window.getSize().y, _game, *this));
+            } else {
+                removeMenu();
+            }
+            return true;
+        default:
+            return false;
+    }
+}
+
+/*! \callergraph
+ *
+ * Forwards mouse movement on to the menu, if there is one.
+ * I tried to have this also handle looking around, but the problem
+ * is that re-centering the mouse generates an event in itself, which
+ * causes the camera to swing wildly around. The current implementation
+ * works much better.
+ *
+ * \p event - The mouse movement to forward
+ */
+bool WorldScreen::handleMouseMoved(const sf::Event::MouseMoveEvent& event) {
+    if (_activeMenu != nullptr && _activeMenu->handleMouseMoved(event)) {
+        return true;
+    }
+
+    return false;
+}
+
+/*! \callergraph
+ *
+ * Gets the position of the block space next to the block we're looking at
+ * (where we should place a block) and then tells the world to make that
+ * block solid. Removes the block if it intersected with us. This function
+ * may have to be changed slightly when moving to the client-server model.
+ */
+void WorldScreen::placeBlock() {
+    auto selectedBlock = _player.getSelection();
+    if (!selectedBlock)
+        return;
+
+    sf::Vector3f position = selectedBlock->getPosition() + selectedBlock->getNormal();
+    sf::Vector3i blockPosition(position.x, position.y, position.z);
+
+    _world.setBlockType(blockPosition, Block::Type::SOLID);
+    _world.setBlockColor(blockPosition, _selectedColor);
+
+    if (_world.checkCollision(_player))
+        _world.setBlockType(blockPosition, Block::Type::AIR);
+}
+
+/*! \callergraph
+ *
+ * Gets the position of the block we're looking at and sets it to air
+ */
+void WorldScreen::removeBlock() {
+    auto selectedBlock = _player.getSelection();
+    if (!selectedBlock)
+        return;
+
+    sf::Vector3f position = selectedBlock->getPosition();
+    sf::Vector3i blockPosition(position.x, position.y, position.z);
+
+    _world.setBlockType(blockPosition, Block::Type::AIR);
+}
+
+/*! \callergraph
+ *
+ * Adds a menu to the chain
+ *
+ * \p m - The menu to add. You must allocate it but we will handle deallocating.
+ */
+void WorldScreen::addMenu(Menu* const m) {
+    _mouseCaptured = false;
+
+    std::unique_ptr<Menu> current(std::move(_activeMenu));
+    _activeMenu = std::unique_ptr<Menu>(m);
+    _activeMenu->prevMenu = std::move(current);
+}
+
+/*! \callergraph
+ *
+ * Removes the current menu and goes up the chain
+ */
+void WorldScreen::removeMenu() {
+    if (_activeMenu != nullptr) {
+        _activeMenu = std::move(_activeMenu->prevMenu);
+    }
+
+    if (_activeMenu == nullptr) {
+        _mouseCaptured = true;
+        sf::Mouse::setPosition(_screenMiddle, _window);
+    }
+}
+
+/*! \callergraph
+ *
+ * Moves the player and handles the rotation
+ */
+void WorldScreen::handlePlayerMovement() {
+    if (!_mouseCaptured)
+        return;
+
+    sf::Vector3f rotation(_player.getRotation());
+
+    if (_mouseCaptured) {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(_window);
+
+        // Calculate how far the mouse has moved
+        sf::Vector2f diff((mousePos.x - _screenMiddle.x) * MOUSE_SENSITIVITY, (mousePos.y - _screenMiddle.y) * MOUSE_SENSITIVITY);
+
+        // Use that distance to create a rotation
+        // Also make sure it stays within bounds
+        rotation += sf::Vector3f(diff.y, diff.x, 0.f);
+        if (rotation.x > 89.99) rotation.x = 89.99;
+        else if (rotation.x < -89.99) rotation.x = -89.99;
+
+        _player.setRotation(rotation);
+
+        // Recenter the mouse
+        sf::Mouse::setPosition(_screenMiddle, _window);
+    }
+
+    float speed = MOVEMENT_SPEED;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) {
+        speed *= SPRINT_SCALE;
+    }
+
+    bool left = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
+    bool right = sf::Keyboard::isKeyPressed(sf::Keyboard::D);
+    bool up = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+    bool forward = sf::Keyboard::isKeyPressed(sf::Keyboard::W);
+    bool backward = sf::Keyboard::isKeyPressed(sf::Keyboard::S);
+
+    sf::Vector3f vel;
+    if (forward){
+        vel.x += speed * Math::sinDeg(rotation.y);
+        vel.z += -speed * Math::cosDeg(rotation.y);
+    } else if (backward){
+        vel.x -= speed * Math::sinDeg(rotation.y);
+        vel.z -= -speed * Math::cosDeg(rotation.y);
+    }
+    if (left){
+        vel.x += speed * Math::sinDeg(rotation.y - 90);
+        vel.z += -speed * Math::cosDeg(rotation.y - 90);
+    } else if (right){
+        vel.x += speed * Math::sinDeg(rotation.y + 90);
+        vel.z += -speed * Math::cosDeg(rotation.y + 90);
+    }
+
+    vel.y = _player.getVelocity().y;
+    if (up && !_player.getJumping() && Math::similar(vel.y, 0.0f, 5)) {
+        vel.y = JUMP_SPEED;
+        _player.setJumping(true);
+    }
+
+    vel.y -= GRAVITY_SPEED;
+
+    _player.setVelocity(vel);
+}
+
+/*! \callergraph
+ *
+ * Makes the selected color equal the color of the selected block
+ * (called when the user presses E)
+ */
+void WorldScreen::copySelectionColor() {
+    auto selectedBlock = _player.getSelection();
+    if (selectedBlock) {
+        sf::Vector3f posf = selectedBlock->getPosition();
+        sf::Vector3i posi(posf.x, posf.y, posf.z);
+        _selectedColor = _world.getBlockColor(posi);
+    }
+}
+
+/*! \callergraph
+ *
+ * Called every frame. Updates FPSCounter, handles player movement, and
+ * recalculates selected block.
+ */
+void WorldScreen::tick() {
+    _window.setMouseCursorVisible(!_mouseCaptured);
+    _fpsCounter.update();
+
+    if (_activeMenu == nullptr) handlePlayerMovement();
+
+    _player.tick(_world);
+}
+
+/*! \callergraph
+ *
+ * Handles rendering all of the components
+ *
+ * \p re - Rendering engine used for OpenGL calls    <br>
+ * \p w  - Window used for SFML calls                <br>
+ */
+void WorldScreen::render(RenderEngine& re, sf::RenderWindow& w) {
+
+    // First we calculate the positions for the color and center rectangles
+    {
+        sf::Vector2u size = w.getSize();
+        sf::Vector2f rectSize = _colorRect.getSize();
+        float lineThickness = _colorRect.getOutlineThickness();
+
+        _colorRect.setPosition(size.x - rectSize.x - lineThickness, size.y - rectSize.y - lineThickness);
+        _colorRect.setFillColor(_selectedColor);
+
+        rectSize = _centerRect.getSize();
+        _centerRect.setPosition(size.x / 2 - rectSize.x / 2, size.y / 2 - rectSize.y / 2);
+        _centerRect.setFillColor(sf::Color::Black);
+    }
+
+    // Next we call render on the renderables
+    _player.render(re, w);
+    _world.render(re, w);
+
+    // Render the FPSCounter (it will check if it should be rendered at all)
+    _fpsCounter.render(re, w);
+
+    // Draw our other GUI components
+    if (_activeMenu == nullptr) {
+        w.pushGLStates();
+        w.draw(_colorRect);
+        w.draw(_centerRect);
+        w.popGLStates();
+    }
+
+    // And draw the menu if there is one
+    if (_activeMenu != nullptr) {
+        w.pushGLStates();
+        _activeMenu->layout(w);
+        _activeMenu->render(re, w);
+        w.popGLStates();
+    }
+}
+",C++ Code,"The code represents a 3D game world with blocks, chunks, and a player that can move and interact with the world. It handles rendering the 3D world and UI elements using OpenGL by loading and compiling shaders, image textures, and representing the game objects. It also handles user input from the keyboard and mouse for player movement, block placement, and menu interactions. The code contains classes for rendering, shaders, blocks, chunks, world, player, collision detection, and various UI elements like menus and an FPS counter. The WorldScreen class acts as the main screen that handles rendering the entire scene, updating the player, and dispatching input events to the appropriate handlers."
+/Player.cpp,"#include <SFML/System.hpp>
+
+#include ""Debug/DebugOptions.h""
+#include ""Player.h""
+#include ""Rendering/AABBRenderer.h""
+#include ""Utils/Math.h""
+#include ""World/World.h""
+
+#define AABB_INSET 0.25
+#define AABB_INSET_SCALED AABB_INSET * 99 / 100 // Needed because floating point is inexact, and when we
+                                                // use the ""exact"" value to adust the velocity, it rounds
+                                                // to put us inside of a block
+
+/*! \callergraph
+ *
+ * \p type     - The Player::Type of this player (either SELF or OTHER)     <br>
+ * \p position - The player's initial position                              <br>
+ * \p rotation - The player's initial look direction                        <br>
+ */
+Player::Player(const Type& type, const sf::Vector3f& position, const sf::Vector3f& rotation)
+        : _type(type), _position(position), _rotation(rotation)
+{}
+
+/*! \callergraph
+ *
+ * Returns the AABB (axis-aligned bounding box) that surrounds the player    <br>
+ * Player is almost 1x2x1 (actually 0.9x1.9x0.9)                             <br>
+ */
+AABB Player::getBoundingBox() const {
+    return AABB(_position, sf::Vector3f(1 - AABB_INSET, 2, 1 - AABB_INSET));
+}
+
+/*! \callergraph
+ *
+ * Returns the player's current position
+ */
+sf::Vector3f Player::getPosition() const {
+    return _position;
+}
+
+/*! \callergraph
+ *
+ * Returns the player's current look direction
+ */
+sf::Vector3f Player::getRotation() const {
+    return _rotation;
+}
+
+/*! \callergraph
+ *
+ * Returns the player's current velocity
+ */
+sf::Vector3f Player::getVelocity() const {
+    return _velocity;
+}
+
+/*! \callergraph
+ *
+ * Sets the player's rotation (look direction)
+ *
+ * \p rotation - The new rotation
+ */
+void Player::setRotation(const sf::Vector3f& rotation) {
+    _rotation = rotation;
+}
+
+/*! \callergraph
+ *
+ * Sets player's position directly
+ *
+ * WARNING: Using this instead of the normal velocity system could lead
+ *          to the player getting stuck in a block
+ *
+ * \p position - The new position
+ */
+void Player::setPosition(const sf::Vector3f& position) {
+    _position = position;
+}
+
+/*! \callergraph
+ *
+ * Sets the velocity of the player, which then gets applied when Player::tick
+ * is called
+ *
+ * \p velocity - The new velocity
+ */
+void Player::setVelocity(const sf::Vector3f& velocity) {
+    _velocity = velocity;
+}
+
+/*! \callergraph
+ *
+ * Used by Player::move to shrink the player's velocity along one axis
+ * when they're about to collide with a block so that they end
+ * up right on the edge instead.
+ *
+ * \p startVel - The initial velocity they're trying to move with            <br>
+ * \p endPos   - Where they would end up if they moved with that velocity    <br>
+ */
+float Player::shrinkVelocity(const float startVel, const float endPos, const float inset) const {
+    if (Math::signum(startVel) > 0) {
+        return startVel - (endPos - std::floor(endPos)) + inset;
+    } else if (Math::signum(startVel) < 0) {
+        return startVel + (std::ceil(endPos) - endPos); // No adjustment, since _position already represents the lower edge of our hitbox
+    } else {
+        return 0;
+    }
+}
+
+/*! \callergraph
+ *
+ * Applies the player's velocity to their position, also keeping them from colliding with a
+ * block if that velocity would cause a collision.
+ *
+ * Works by splitting the velocity into its seperate components (x,y,z) and then applying
+ * them in order. If the application of one component causes the player to collide with a block,
+ * the velocity is adjusted so they are put right up against the nearest block boundary in
+ * that direction.
+ *
+ * The order that they directions is applied is as follows:                                       <br>
+ *     y is applied first, to make sure gravity (once implemented) will always be applied         <br>
+ *     x is applied second, because something needs to go next, and x was selected arbitrarily    <br>
+ *     z is applied last, because it's the one left                                               <br>
+ *
+ * WARNING: This assumes the player's velocity will always be < 1. If this ever does not hold,
+ * either this or Player::shrinkVelocity (or both) will need to be adjusted.
+ *
+ * \p velocity - Essentially the distance they should move in this tick    <br>
+ * \p world    - The world they're moving in (used to check collisions)    <br>
+ */
+void Player::tick(const World& world) {
+    int numSubTicks = 20;
+    for (int i = 0; i < numSubTicks; ++i) {
+        sf::Vector3f startPos = _position;
+
+        _velocity /= (float)numSubTicks;
+        sf::Vector3f finalVelocity = _velocity;
+
+        _position.y += _velocity.y;
+        if (world.checkCollision(*this)) {
+            finalVelocity.y = shrinkVelocity(_velocity.y, _position.y, 0);
+            _position.y = startPos.y + finalVelocity.y;
+            finalVelocity.y = 0;
+            setJumping(false);
+        }
+
+        _position.x += _velocity.x;
+        if (world.checkCollision(*this)) {
+            finalVelocity.x = shrinkVelocity(_velocity.x, _position.x, AABB_INSET_SCALED);
+            _position.x = startPos.x + finalVelocity.x;
+            finalVelocity.x = 0;
+        }
+
+        _position.z += _velocity.z;
+        if (world.checkCollision(*this)) {
+            finalVelocity.z = shrinkVelocity(_velocity.z, _position.z, AABB_INSET_SCALED);
+            _position.z = startPos.z + finalVelocity.z;
+            finalVelocity.z = 0;
+        }
+
+        _velocity = finalVelocity * (float)numSubTicks;
+    }
+
+    _selection.setSelection(getSelection(world, 5));
+}
+
+/*! \callergraph
+ *
+ * Handles applying camera rotation and translation, as well as
+ * rendering the hitbox if that debug option is enabled.
+ *
+ * \p e - The rendering engine (used for OpenGL calls, like rotate and translate)    <br>
+ * \p w - The window (used for SFML calls; unused here)                              <br>
+ */
+void Player::render(RenderEngine& e, sf::RenderWindow& w) {
+    if (_type == Type::SELF) {
+        e.translatePlayer(*this);
+        _selection.render(e, w);
+    }
+    // TODO else render other player
+
+    if (DebugOptions::playerHitboxRendered()) {
+        AABBRenderer::renderer.renderAABB(e, getBoundingBox(), sf::Color::Black, 0.01);
+    }
+}
+
+/*! \callergraph
+ *
+ * Used by Player::getSelection to find the smallest initial t value to get us to a block border
+ * in a certain direction.
+ *
+ * See Player::getSelection for more.
+ *
+ * \p origin    - Start position                             <br>
+ * \p direction - How much we're moving in this direction    <br>
+ */
+float Player::getTMax(float origin, float direction) const {
+    if (direction > 0) {
+        return (Math::ceil(origin) - origin) / Math::abs(direction);
+    } else {
+        return (origin - Math::floor(origin)) / Math::abs(direction);
+    }
+}
+
+/*! \callergraph
+ *
+ * Implementation of the algorithm described at http://www.cse.chalmers.se/edu/year/2011/course/TDA361/grid.pdf
+ *
+ * Uses ray tracing to find the first block directly in front of the player. Uses the
+ * idea that any position on the ray can be modeled by u = td + o, where d is the direction the ray goes,
+ * o is the origin of the ray, and t is some number. The algorithm calculates every t value needed to get
+ * from the block it's currently in to the next block the ray intersects. It keeps following the ray
+ * until it finds a block that is solid, or until it goes out of range. See the paper for more information.
+ *
+ * \p world - The world to trace through                                                                     <br>
+ * \p range - The distance (in blocks) when we should say the selection (if there is one) is out of range    <br>
+ */
+std::optional<BlockFace> Player::getSelection(const World& world, float range) const {
+    sf::Vector3f direction = sf::Vector3f(Math::sinDeg(_rotation.y) * Math::cosDeg(_rotation.x),
+                                         -Math::sinDeg(_rotation.x),
+                                         -Math::cosDeg(_rotation.y) * Math::cosDeg(_rotation.x));
+    sf::Vector3f origin = getHeadLocation();
+    sf::Vector3f pos(Math::floor(origin.x), Math::floor(origin.y), Math::floor(origin.z));
+    sf::Vector3f step(Math::signum(direction.x), Math::signum(direction.y), Math::signum(direction.z));
+    sf::Vector3f tMax(getTMax(origin.x, direction.x), getTMax(origin.y, direction.y), getTMax(origin.z, direction.z));
+    sf::Vector3f tDelta(step.x / direction.x, step.y / direction.y, step.z / direction.z);
+    sf::Vector3f normal;
+
+    // Puts the range in terms of t
+    range /= Math::sqrt(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
+
+    // Loops until it finds a solid block, or until it's out of range
+    while (world.getBlockType(sf::Vector3i(pos.x, pos.y, pos.z)) != Block::Type::SOLID) {
+
+        // All of this just finds the next t we need to consider
+        if (tMax.x < tMax.y) {
+            if (tMax.x < tMax.z) {
+                if (tMax.x > range) break;
+                pos.x += step.x;
+                tMax.x += tDelta.x;
+                normal = sf::Vector3f(-step.x, 0, 0);
+            } else {
+                if (tMax.z > range) break;
+                pos.z += step.z;
+                tMax.z += tDelta.z;
+                normal = sf::Vector3f(0, 0, -step.z);
+            }
+        } else {
+            if (tMax.y < tMax.z) {
+                if (tMax.y > range) break;
+                pos.y += step.y;
+                tMax.y += tDelta.y;
+                normal = sf::Vector3f(0, -step.y, 0);
+            } else {
+                if (tMax.z > range) break;
+                pos.z += step.z;
+                tMax.z += tDelta.z;
+                normal = sf::Vector3f(0, 0, -step.z);
+            }
+        }
+    }
+
+    // If the last position we considered is actually a solid block, we have a valid selection,
+    // so return it, and return nothing otherwise
+    sf::Vector3i finalPosition(pos.x, pos.y, pos.z);
+    if (world.getBlockType(finalPosition) == Block::Type::SOLID) {
+        sf::Color blockColor = world.getBlockColor(finalPosition);
+        return std::optional<BlockFace>(std::in_place, pos, normal, blockColor);
+    } else {
+        return std::optional<BlockFace>();
+    }
+}
+
+/*! \callergraph
+ *
+ * Sets a boolean to indicate the player is jumping
+ * This gets automatically reset in Player::tick when they
+ * hit the ground
+ *
+ * \p jumping - Whether the player is jumping
+ */
+void Player::setJumping(bool jumping) {
+    _jumping = jumping;
+}
+
+/*! \callergraph
+ *
+ * Returns whether the player is currently jumping or not
+ */
+bool Player::getJumping() const {
+    return _jumping;
+}
+
+/*! \callergraph
+ *
+ * Gets the position of the player's head
+ *
+ * This defines things like raycasting (for getting the selection)
+ * and rendering
+ */
+sf::Vector3f Player::getHeadLocation() const {
+    sf::Vector3f size = getBoundingBox().getSize();
+    return _position + sf::Vector3f(size.x / 2, size.y * 7 / 8, size.z / 2);
+}
+",C++ Code,"The code defines the Player class which represents a player entity in the game world. It contains logic for initializing the player, applying movement and handling collisions with blocks, performing raycasting to determine which block the player is looking at for selection highlighting, and rendering the player and selection highlight to the screen. The movement logic handles collisions by shrinking the player's velocity along an axis if moving at that velocity would cause a collision, ensuring the player ends up right against a block boundary. The raycasting algorithm traces a ray from the player's head position and uses a technique based on finding the minimum t value to reach the next block intersection, allowing it to determine the first solid block in front of the player."
+/Rendering/AABBRenderer.cpp,"#include ""Rendering/AABBRenderer.h""
+
+AABBRenderer AABBRenderer::renderer{};
+
+AABBRenderer::AABBRenderer() : _bufInitialized(false) {}
+
+void AABBRenderer::renderAABB(RenderEngine& e, const AABB& box, sf::Color color, float lineWidth) {
+    if (!_bufInitialized) {
+        initBuffer();
+        _bufInitialized = true;
+    }
+
+    e.useNoLightingShader();
+
+    sf::Vector3f p = box.getPosition();
+    sf::Vector3f s = box.getSize();
+    sf::Vector3f linePos;
+    sf::Vector3f lineSize;
+
+    // Scale to GL coords
+    s = s * RenderEngine::SCALE;
+    p = p * RenderEngine::SCALE;
+
+    // Now, we go through the points on the block and render the edges that haven't been taken care of
+    // Each block is one point, whereas each call to pushBlockVertices is an edge that ends at that point
+    std::vector<Vertex> vertexes;
+    linePos = p - sf::Vector3f(lineWidth / 2, lineWidth / 2, lineWidth / 2);
+    lineSize = sf::Vector3f(lineWidth, lineWidth, s.z + lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+    lineSize = sf::Vector3f(lineWidth, s.y + lineWidth, lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+    lineSize = sf::Vector3f(s.x + lineWidth, lineWidth, lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+
+    linePos = sf::Vector3f(p.x, p.y, p.z + s.z) - sf::Vector3f(lineWidth / 2, lineWidth / 2, -lineWidth / 2);
+    lineSize = sf::Vector3f(lineWidth, s.y + lineWidth, -lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+    lineSize = sf::Vector3f(s.x + lineWidth, lineWidth, -lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+
+    linePos = sf::Vector3f(p.x, p.y + s.y, p.z) - sf::Vector3f(lineWidth / 2, -lineWidth / 2, lineWidth / 2);
+    lineSize = sf::Vector3f(lineWidth, -lineWidth, s.z + lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+    lineSize = sf::Vector3f(s.x + lineWidth, -lineWidth, lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+
+    linePos = sf::Vector3f(p.x + s.x, p.y, p.z) - sf::Vector3f(-lineWidth / 2, lineWidth / 2, lineWidth / 2);
+    lineSize = sf::Vector3f(-lineWidth, s.y + lineWidth, lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+    lineSize = sf::Vector3f(-lineWidth, lineWidth, s.z + lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+
+    linePos = sf::Vector3f(p.x + s.x, p.y + s.y, p.z + s.z)
+        - sf::Vector3f(-lineWidth / 2, -lineWidth / 2, -lineWidth / 2);
+    lineSize = sf::Vector3f(-lineWidth, -lineWidth, -s.z - lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+    lineSize = sf::Vector3f(-lineWidth, -s.y - lineWidth, -lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+    lineSize = sf::Vector3f(-s.x - lineWidth, -lineWidth, -lineWidth);
+    pushBlockVertices(vertexes, linePos, lineSize, color);
+
+    setBufferData(vertexes);
+    drawFromBuffer(GL_TRIANGLES);
+}
+
+void AABBRenderer::pushBlockVertices(std::vector<Vertex>& vertexes, const sf::Vector3f& p, const sf::Vector3f& s, sf::Color outlineColor) {
+    sf::Vector3f position = p;
+    sf::Vector3f size = s;
+
+    if (size.x < 0) {
+        position.x += size.x; // Position will get smaller since size is negative
+        size.x = -size.x;
+    }
+    if (size.y < 0) {
+        position.y += size.y; // Position will get smaller since size is negative
+        size.y = -size.y;
+    }
+    if (size.z < 0) {
+        position.z += size.z; // Position will get smaller since size is negative
+        size.z = -size.z;
+    }
+
+    float lowX  = position.x,
+          highX = position.x + size.x,
+          lowY  = position.y,
+          highY = position.y + size.y,
+          lowZ  = position.z,
+          highZ = position.z + size.z;
+
+    float color[] = {outlineColor.r / 256.f, outlineColor.g / 256.f, outlineColor.b / 256.f};
+
+    float posX[] = { 1,  0,  0};
+    float negX[] = {-1,  0,  0};
+    float posY[] = { 0,  1,  0};
+    float negY[] = { 0, -1,  0};
+    float posZ[] = { 0,  0,  1};
+    float negZ[] = { 0,  0, -1};
+
+    float texCoords[] = {0, 0};
+
+    float points[8][3] = {
+        {lowX,  lowY,  lowZ},    // 000
+        {lowX,  lowY,  highZ},   // 001
+        {lowX,  highY, lowZ},    // 010
+        {lowX,  highY, highZ},   // 011
+        {highX, lowY,  lowZ},    // 100
+        {highX, lowY,  highZ},   // 101
+        {highX, highY, lowZ},    // 110
+        {highX, highY, highZ}    // 111
+    };
+
+    vertexes.emplace_back(points[0b000], color, negY, texCoords);
+    vertexes.emplace_back(points[0b001], color, negY, texCoords);
+    vertexes.emplace_back(points[0b101], color, negY, texCoords);
+    vertexes.emplace_back(points[0b101], color, negY, texCoords);
+    vertexes.emplace_back(points[0b100], color, negY, texCoords);
+    vertexes.emplace_back(points[0b000], color, negY, texCoords);
+
+    vertexes.emplace_back(points[0b000], color, negZ, texCoords);
+    vertexes.emplace_back(points[0b100], color, negZ, texCoords);
+    vertexes.emplace_back(points[0b110], color, negZ, texCoords);
+    vertexes.emplace_back(points[0b110], color, negZ, texCoords);
+    vertexes.emplace_back(points[0b010], color, negZ, texCoords);
+    vertexes.emplace_back(points[0b000], color, negZ, texCoords);
+
+    vertexes.emplace_back(points[0b000], color, negX, texCoords);
+    vertexes.emplace_back(points[0b010], color, negX, texCoords);
+    vertexes.emplace_back(points[0b011], color, negX, texCoords);
+    vertexes.emplace_back(points[0b011], color, negX, texCoords);
+    vertexes.emplace_back(points[0b001], color, negX, texCoords);
+    vertexes.emplace_back(points[0b000], color, negX, texCoords);
+
+    vertexes.emplace_back(points[0b111], color, posY, texCoords);
+    vertexes.emplace_back(points[0b011], color, posY, texCoords);
+    vertexes.emplace_back(points[0b010], color, posY, texCoords);
+    vertexes.emplace_back(points[0b010], color, posY, texCoords);
+    vertexes.emplace_back(points[0b110], color, posY, texCoords);
+    vertexes.emplace_back(points[0b111], color, posY, texCoords);
+
+    vertexes.emplace_back(points[0b111], color, posZ, texCoords);
+    vertexes.emplace_back(points[0b101], color, posZ, texCoords);
+    vertexes.emplace_back(points[0b001], color, posZ, texCoords);
+    vertexes.emplace_back(points[0b001], color, posZ, texCoords);
+    vertexes.emplace_back(points[0b011], color, posZ, texCoords);
+    vertexes.emplace_back(points[0b111], color, posZ, texCoords);
+
+    vertexes.emplace_back(points[0b111], color, posX, texCoords);
+    vertexes.emplace_back(points[0b110], color, posX, texCoords);
+    vertexes.emplace_back(points[0b100], color, posX, texCoords);
+    vertexes.emplace_back(points[0b100], color, posX, texCoords);
+    vertexes.emplace_back(points[0b101], color, posX, texCoords);
+    vertexes.emplace_back(points[0b111], color, posX, texCoords);
+}
+",C++ Code,"This code handles rendering an outline around an axis-aligned bounding box in 3D space. It initializes a vertex buffer if needed, calculates the vertices for each edge of the bounding box based on its position and size, pushes those vertices to the buffer, sets the buffer data, and draws the vertices as triangles to render the outline. The code uses a RenderEngine to handle window creation, OpenGL context, and scene rendering. It renders the outline with a specified color and line width."
+/Rendering/BlockSelection.cpp,"#include <optional>
+
+#include ""Rendering/AABBRenderer.h""
+#include ""Rendering/BlockSelection.h""
+
+BlockSelection::BlockSelection() : _selection(std::optional<BlockFace>()) {}
+
+void BlockSelection::render(RenderEngine& e, sf::RenderWindow& w) {
+    if (_selection) {
+        AABBRenderer::renderer.renderAABB(e, AABB(_selection->getPosition(), sf::Vector3f(1, 1, 1)), sf::Color::White);
+    }
+}
+
+",C++ Code,"The code handles rendering block selection highlights in the 3D world by rendering axis aligned bounding boxes around selected blocks. When a block is selected, the selection position is stored and an AABB is rendered around that block's position using the AABBRenderer. This provides visual feedback to the user, indicating which block has been selected. The code takes in a RenderEngine and window as inputs to perform the rendering, and outputs the selection highlight boxes."
+/Rendering/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/AABBRenderer.cpp ${CURR_DIR}/Image.cpp ${CURR_DIR}/stb_image.cpp ${CURR_DIR}/BlockSelection.cpp ${CURR_DIR}/RenderEngine.cpp ${CURR_DIR}/Renderable.cpp ${CURR_DIR}/Shader.cpp ${CURR_DIR}/ShaderProgram.cpp"" CACHE STRING ""Sources for project"" FORCE)
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/AABBRenderer.cpp ${CURR_DIR}/Image.cpp ${CURR_DIR}/stb_image.cpp ${CURR_DIR}/BlockSelection.cpp ${CURR_DIR}/RenderEngine.cpp ${CURR_DIR}/Renderable.cpp ${CURR_DIR}/Shader.cpp ${CURR_DIR}/ShaderProgram.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
+/Rendering/Image.cpp,"#include <filesystem>
+
+#include ""Rendering/Image.h""
+#include ""Rendering/stb_image.h""
+
+Image::Image(std::filesystem::path path) {
+    _data = stbi_load(path.c_str(), &_width, &_height, &_numChannels, 0);
+}
+
+Image::~Image() {
+    if (_data) {
+        stbi_image_free(_data);
+    }
+}
+
+Image::Image(Image&& other) {
+    _data = other._data;
+    other._data = nullptr;
+}
+
+Image& Image::operator=(Image&& other) {
+    if (_data) {
+        stbi_image_free(_data);
+    }
+    _data = other._data;
+    other._data = nullptr;
+    return *this;
+}
+
+",C++ Code,"The code encapsulates functionality for loading and managing image resources used by a 3D rendering engine. It defines an Image class that loads image files from disk using the STB image library, stores the pixel data and dimensions of the image, and frees the memory when images are destroyed. It implements move constructors and move assignment operators to allow Image objects to be passed efficiently. The code ensures memory is freed properly when Image objects are destroyed to avoid memory leaks."
+/Rendering/RenderEngine.cpp,"#include <GL/glew.h>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <SFML/Graphics.hpp>
+
+#include <GlobalLogger.hpp>
+
+#include ""Player.h""
+#include ""Rendering/RenderEngine.h""
+
+using Logger::globalLogger;
+
+// RGBA values for different lights
+glm::vec3 RenderEngine::lightPos =     { -0.1f,  -1.0f,   0.2f};
+glm::vec3 RenderEngine::light2Pos =    {  0.1f,  -1.0f,  -0.2f};
+glm::vec4 RenderEngine::lightAmbient = {  0.25f,  0.25f,  0.25f, 1.0f };
+glm::vec4 RenderEngine::lightDiffuse = {  0.35f,  0.35f,  0.35f, 1.0f };
+
+/*! \callergraph
+ *
+ * Creates a rendering window and sets up OpenGL
+ */
+RenderEngine::RenderEngine() :
+    _window(getVideoMode(),
+            ""jack o' clubs"",
+            sf::Style::Default,
+            sf::ContextSettings(24, 0, 16, 4, 0, sf::ContextSettings::Attribute::Default, false)),
+    _shaderProgramLight(""resources/vertex-shader.glsl"", ""resources/fragment-shader.glsl""),
+    _shaderProgramNoLight(""resources/vertex-shader.glsl"", ""resources/fragment-shader-no-light.glsl"")
+{
+    sf::Vector2u windowSize = _window.getSize();
+    sf::ContextSettings windowSettings = _window.getSettings();
+
+    // This code centers the window on the screen
+    sf::VideoMode defaultVideoMode = sf::VideoMode::getDesktopMode();
+    _window.setPosition(sf::Vector2i(defaultVideoMode.width / 2 - windowSize.x / 2, defaultVideoMode.height / 2 - windowSize.y / 2));
+    sf::Vector2i windowPosition = _window.getPosition();
+
+    globalLogger.log(""Initialized window:"");
+    globalLogger.log(""    OS Handle:               "", _window.getSystemHandle());
+    globalLogger.log(""    Size:                    "", windowSize.x, ""x"", windowSize.y);
+    globalLogger.log(""    Position:                ("", windowPosition.x, "", "", windowPosition.y, "")"");
+    globalLogger.log(""    Depth bits:              "", windowSettings.depthBits);
+    globalLogger.log(""    Stencil bits:            "", windowSettings.stencilBits);
+    globalLogger.log(""    Antialiasing level:      "", windowSettings.antialiasingLevel);
+    globalLogger.log(""    GL version:              "", windowSettings.majorVersion, ""."", windowSettings.minorVersion);
+    globalLogger.log(""    Attribute flags:         "", windowSettings.attributeFlags);
+    globalLogger.log(""    sRGB capable:            "", windowSettings.sRgbCapable ? ""true"" : ""false"");
+    globalLogger.log(""    Vendor:                  "", glGetString(GL_VENDOR));
+    globalLogger.log(""    Renderer:                "", glGetString(GL_RENDERER));
+
+    _window.setVerticalSyncEnabled(true);
+
+    glewInit();
+    _shaderProgramLight.compile();
+    _shaderProgramNoLight.compile();
+
+    // Set background color
+    glClearDepth(1.f);
+    glClearColor(135.f / 256.f, 206.f / 256.f, 235.f / 256.f, 1.f);
+
+    // Make sure things in front get drawn in front
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+
+    // Don't draw both sides of the face (more efficient)
+    glFrontFace(GL_CW);
+    glEnable(GL_CULL_FACE);
+
+    // Make sure the perspective matches the window
+    setPerspective(windowSize.x, windowSize.y);
+}
+
+/*! \callergraph
+ *
+ * Returns a video mode where the window takes up 1/4 of the screen
+ */
+sf::VideoMode RenderEngine::getVideoMode() {
+    sf::VideoMode defaultVideoMode = sf::VideoMode::getDesktopMode();
+    return sf::VideoMode(defaultVideoMode.width / 2, defaultVideoMode.height / 2, defaultVideoMode.bitsPerPixel);
+}
+
+/*! \callergraph
+ *
+ * Defines default values for the other setPerspective
+ *
+ * \p width  - width of the window     <br>
+ * \p height - height of the window    <br>
+ */
+void RenderEngine::setPerspective(int width, int height) {
+    setPerspective(60.f, width, height, 1.f, 10000.f);
+}
+
+/*! \callergraph
+ *
+ * Calls glFustrum with the appropriate values give the input parameters.
+ * idk how glFustrum works, but this code is from StackOverflow, so it's probably right.
+ *
+ * \p fovY   - Desired field of view                          <br>
+ * \p width  - Window width                                   <br>
+ * \p height - Window height                                  <br>
+ * \p zNear  - How close something has to be to be clipped    <br>
+ * \p zFar   - How far something has to be to be clipped      <br>
+ */
+void RenderEngine::setPerspective(GLdouble fovY, int width, int height, GLdouble zNear, GLdouble zFar) {
+    GLdouble aspect = (double) width / height;
+    glm::mat4 projection = glm::perspective(glm::radians(fovY), aspect, zNear, zFar);
+    _shaderProgramLight.setMat4(""projection"", projection);
+    _shaderProgramNoLight.setMat4(""projection"", projection);
+}
+
+/*! \callergraph
+ *
+ * Handles notifying OpenGL and SFML's OpenGL that the screen has
+ * been resized.
+ *
+ * \p e - The size event corresponding to this resize (given to us by SFML)
+ */
+bool RenderEngine::handleResize(const sf::Event::SizeEvent& e) {
+    int width = e.width;
+    int height = e.height;
+
+    setPerspective(width, height);
+
+    // Update's the window's internal GL states to match the resize
+    _window.setView(sf::View(sf::FloatRect(0, 0, width, height)));
+
+    globalLogger.log(""Window resized to "", width, ""x"", height);
+
+    return false;
+}
+
+void RenderEngine::useLightingShader() {
+    _shaderProgramLight.bind();
+}
+
+void RenderEngine::useNoLightingShader() {
+    _shaderProgramNoLight.bind();
+}
+
+/*! \callergraph
+ *
+ * Called before doing a full render. Sets OpenGL up to do rendering.
+ */
+void RenderEngine::beginRender() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    useLightingShader();
+
+    _shaderProgramLight.setVec4(""ambientLight"", lightAmbient);
+    _shaderProgramLight.setVec4(""diffuseLight"", lightDiffuse);
+    _shaderProgramLight.setVec3(""light1Pos"", lightPos);
+    _shaderProgramLight.setVec3(""light2Pos"", light2Pos);
+}
+
+/*! \callergraph
+ *
+ * Called after doing a full render. Flushes the buffer to the screen.
+ */
+void RenderEngine::endRender() {
+    _shaderProgramLight.unbind(); // Regardless of which is bound, this will do the unbind
+    _window.display();
+}
+
+/*! \callergraph
+ *
+ * Moves the camera based on the player's position.
+ *
+ * \p position - Player's position
+ */
+void RenderEngine::translatePlayer(const Player& player) {
+    sf::Vector3f position = player.getHeadLocation();
+    glm::vec3 eye((float)position.x * SCALE, (float)position.y * SCALE, (float)position.z * SCALE);
+
+    sf::Vector3f rotation = player.getRotation();
+    glm::vec3 forward(0,0,0);
+    forward.x += sin(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
+    forward.y += -sin(glm::radians(rotation.x));
+    forward.z += -cos(glm::radians(rotation.y)) * cos(glm::radians(rotation.x));
+    forward = glm::normalize(forward);
+
+    glm::vec3 worldUp(0.0f,1.0f,0.0f);
+    glm::vec3 right = glm::normalize(glm::cross(forward, worldUp));
+    glm::vec3 up = glm::normalize(glm::cross(right, forward));
+    glm::mat4 view = glm::lookAt(eye, eye + forward, up);
+    _shaderProgramLight.setMat4(""view"", view);
+    _shaderProgramNoLight.setMat4(""view"", view);
+}
+
+/*! \callergraph
+ *
+ * Returns the render window. Useful for making SFML calls.
+ */
+sf::RenderWindow& RenderEngine::getWindow() {
+    return _window;
+}
+",C++ Code,"The code handles the rendering of a 3D game world by creating an OpenGL window, compiling shader programs, setting up OpenGL state, translating the camera based on the player's position, and rendering game entities. It loads image files and shader programs, handles player input, and outputs a rendered 3D scene to the screen. Classes like `RenderEngine`, `Shader`, `Block`, and `Chunk` work together to manage the various aspects of rendering the game world, while taking input from the `Player` to translate the camera view. The code uses modern OpenGL and follows an object-oriented design, encapsulating responsibilities into cohesive classes."
+/Rendering/Renderable.cpp,"#include <filesystem>
+
+#include <GlobalLogger.hpp>
+
+#include ""Rendering/Image.h""
+#include ""Rendering/Renderable.h""
+#include ""Rendering/stb_image.h""
+
+using Logger::globalLogger;
+
+std::map<std::string, GLint> Renderable::_textureIndexes{};
+
+struct VertexAttribsCalculator {
+    struct VertexAttrib {
+        int index;
+        int count;
+        void* offset;
+        GLenum type;
+    };
+
+    std::vector<VertexAttrib> attribs;
+    int currIndex = 0;
+    size_t totalSize = 0;
+
+    template<typename T>
+    void addVertexAttrib(GLenum type, int count) {
+        VertexAttrib attrib;
+        attrib.index = currIndex++;
+        attrib.count = count;
+        attrib.offset = (void *)totalSize;
+        attrib.type = type;
+        attribs.push_back(attrib);
+
+        totalSize += sizeof(T) * count;
+    }
+
+    template<typename T>
+    void addVertexAttrib(int count);
+
+    void send() {
+        for (VertexAttrib attrib : attribs) {
+            glVertexAttribPointer(attrib.index, attrib.count, attrib.type, GL_FALSE /* normalized */, totalSize, attrib.offset);
+        }
+    }
+};
+
+template<>
+void VertexAttribsCalculator::addVertexAttrib<GLbyte>(int count) { addVertexAttrib<GLbyte>(GL_BYTE, count); }
+template<>
+void VertexAttribsCalculator::addVertexAttrib<GLubyte>(int count) { addVertexAttrib<GLubyte>(GL_UNSIGNED_BYTE, count); }
+template<>
+void VertexAttribsCalculator::addVertexAttrib<GLshort>(int count) { addVertexAttrib<GLshort>(GL_SHORT, count); }
+template<>
+void VertexAttribsCalculator::addVertexAttrib<GLushort>(int count) { addVertexAttrib<GLushort>(GL_UNSIGNED_SHORT, count); }
+template<>
+void VertexAttribsCalculator::addVertexAttrib<GLint>(int count) { addVertexAttrib<GLint>(GL_INT, count); }
+template<>
+void VertexAttribsCalculator::addVertexAttrib<GLuint>(int count) { addVertexAttrib<GLuint>(GL_UNSIGNED_INT, count); }
+template<>
+void VertexAttribsCalculator::addVertexAttrib<GLfloat>(int count) { addVertexAttrib<GLfloat>(GL_FLOAT, count); }
+template<>
+void VertexAttribsCalculator::addVertexAttrib<GLdouble>(int count) { addVertexAttrib<GLdouble>(GL_DOUBLE, count); }
+
+void Renderable::initBuffer() {
+    glGenVertexArrays(1, &_vao);
+    glGenBuffers(1, &_vbo);
+
+    glBindVertexArray(_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+
+    VertexAttribsCalculator vAttribs;
+    vAttribs.addVertexAttrib<float>(3);
+    vAttribs.addVertexAttrib<float>(3);
+    vAttribs.addVertexAttrib<float>(3);
+    vAttribs.addVertexAttrib<float>(2);
+    vAttribs.send();
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(3);
+    glBindVertexArray(0);
+
+    _initialized = true;
+    _bufferSize = 0;
+}
+
+void Renderable::setBufferData(const std::vector<Vertex>& vertexes) {
+    if (_initialized) {
+        glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+        glBufferData(GL_ARRAY_BUFFER, vertexes.size() * sizeof(Vertex), &vertexes[0], GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        _bufferSize = vertexes.size();
+    }
+}
+
+void Renderable::drawFromBuffer(GLenum type) {
+    if (_initialized) {
+        glBindVertexArray(_vao);
+        glDrawArrays(type, 0, _bufferSize);
+        glBindVertexArray(0);
+    }
+}
+
+bool Renderable::loadTexture(std::string name) {
+    std::filesystem::path imagePath(""resources"");
+    imagePath /= name;
+    imagePath += "".png"";
+    Image img(imagePath);
+
+    if (!img.getData()) {
+        globalLogger.error(""Could not load texture named \"""", name, ""\"". Error loading: "", imagePath);
+        return false;
+    }
+
+    // Set up texture
+    unsigned int textureIndex;
+    glGenTextures(1, &textureIndex);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureIndex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.getWidth(), img.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, img.getData());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    if(glewIsSupported(""GL_EXT_texture_filter_anisotropic"")) {
+        GLfloat fLargest;
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &fLargest);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, fLargest);
+    }
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    _textureIndexes[name] = textureIndex;
+    globalLogger.info(""Successfully loaded "", name);
+    return true;
+}
+
+void Renderable::setTexture(std::string name) {
+    if (_textureIndexes.find(name) != _textureIndexes.end() || loadTexture(name)) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, _textureIndexes[name]);
+    }
+}
+",C++ Code,"This code provides functionality for loading and managing textures in an OpenGL rendering system. It defines a Renderable class that can initialize vertex buffer objects and load texture files. The Renderable class uses helper classes like Image and VertexAttribsCalculator to load image data and set vertex attributes. When a texture is loaded, an OpenGL texture object is generated and image data is uploaded. The texture is then stored in a map using its name as the key so it can be retrieved and bound later when rendering objects that use that texture. This allows 3D objects to have color and detail defined by the texture images."
+/Rendering/Shader.cpp,"#include <fstream>
+
+#include <GlobalLogger.hpp>
+
+#include ""Exception/ShaderCompilationFailureException.h""
+#include ""Rendering/Shader.h""
+
+using Logger::globalLogger;
+
+Shader::Shader(GLenum type, std::string fileName) : _id(glCreateShader(type)), _fileName(fileName) {}
+
+Shader::~Shader() {
+    glDeleteShader(_id);
+}
+
+std::string Shader::getCode() {
+    std::ifstream inputStream;
+    inputStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try {
+        inputStream.open(_fileName);
+        std::stringstream ss;
+        ss << inputStream.rdbuf();
+        inputStream.close();
+        return ss.str();
+    } catch (std::ifstream::failure& e) {
+        throw ShaderCompilationFailureException(_fileName, ""Could not read from file"");
+    }
+}
+
+void Shader::compile() {
+    std::string shaderCode = getCode();
+    const char* shaderCodeCstr = shaderCode.c_str();
+    glShaderSource(_id, 1, &shaderCodeCstr, NULL);
+    glCompileShader(_id);
+
+    int success;
+    glGetShaderiv(_id, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetShaderInfoLog(_id, 512, NULL, infoLog);
+        throw ShaderCompilationFailureException(_fileName, infoLog);
+    } else {
+        globalLogger.info(""Successfully compiled "", _fileName, ""!"");
+    }
+}
+",C++ Code,"The code handles loading and compiling OpenGL shader programs from source files. It opens the shader source files, reads the code, and compiles the shaders using OpenGL functions. Any compilation errors are caught and thrown as exceptions with relevant information. Logging statements are used to inform the user of successful and failed compilation attempts. The code follows good practices like error handling, logging, and exception throwing to ensure robustness."
+/Rendering/ShaderProgram.cpp,"#include <GlobalLogger.hpp>
+
+#include ""Exception/ShaderCompilationFailureException.h""
+#include ""Rendering/ShaderProgram.h""
+#include ""Rendering/Shader.h""
+
+using Logger::globalLogger;
+
+ShaderProgram::ShaderProgram(std::string vertexShaderFileName, std::string fragmentShaderFileName) :
+    _vertexFilename(vertexShaderFileName), _fragmentFilename(fragmentShaderFileName)
+{}
+
+void ShaderProgram::compile() {
+    Shader vertexShader(GL_VERTEX_SHADER, _vertexFilename);
+    Shader fragmentShader(GL_FRAGMENT_SHADER, _fragmentFilename);
+
+    vertexShader.compile();
+    fragmentShader.compile();
+
+    _id.emplace(glCreateProgram());
+
+    glAttachShader(*_id, vertexShader.getId());
+    glAttachShader(*_id, fragmentShader.getId());
+    glLinkProgram(*_id);
+
+    int success;
+    glGetProgramiv(*_id, GL_LINK_STATUS, &success);
+    if (!success) {
+        char infolog[512];
+        glGetProgramInfoLog(*_id, 512, NULL, infolog);
+        throw ShaderCompilationFailureException("""", infolog);
+    } else {
+        globalLogger.info(""Successfully linked shaders!"");
+    }
+}
+
+void ShaderProgram::bind() {
+    if (_id) {
+        glUseProgram(*_id);
+    }
+}
+
+void ShaderProgram::unbind() {
+    if (_id) {
+        glUseProgram(0);
+    }
+}
+
+GLint ShaderProgram::getUniformLocation(std::string name) {
+    GLint loc = -1;
+    if (_id) {
+        if (_uniformLocations.find(name) != _uniformLocations.end()) {
+            loc = _uniformLocations[name];
+        } else {
+            loc = glGetUniformLocation(*_id, name.c_str());
+            if (loc != -1) {
+                _uniformLocations[name] = loc;
+            }
+        }
+    } 
+
+    return loc;
+}
+
+void ShaderProgram::safeCallVector(std::function<void(GLint, GLsizei, const GLfloat*)> func, std::string name, const GLfloat* value) {
+    if (_id) {
+        GLint currentShaderId;
+        glGetIntegerv(GL_CURRENT_PROGRAM,&currentShaderId);
+
+        if (currentShaderId != *_id) {
+            bind();
+        }
+
+        func(getUniformLocation(name), 1, value);
+
+        if (currentShaderId != *_id) {
+            glUseProgram(currentShaderId);
+        }
+    }
+}
+
+void ShaderProgram::safeCallMatrix(std::function<void(GLint, GLsizei, GLboolean, const GLfloat*)> func, std::string name, GLboolean transpose, const GLfloat* value) {
+    if (_id) {
+        GLint currentShaderId;
+        glGetIntegerv(GL_CURRENT_PROGRAM,&currentShaderId);
+
+        if (currentShaderId != *_id) {
+            bind();
+        }
+
+        func(getUniformLocation(name), 1, transpose, value);
+
+        if (currentShaderId != *_id) {
+            glUseProgram(currentShaderId);
+        }
+    }
+}
+",C++ Code,"The code actively compiles shader programs from vertex and fragment shader files by loading the shader files, compiling the shaders, linking them into a shader program, and checking for compilation errors. It then manages the shader program by binding it for use, unbinding it, and retrieving uniform locations. Finally, it safely calls OpenGL functions to set uniform values by first binding the shader program if it is not currently active, calling the OpenGL function, and then unbinding it. This ensures uniform values are set for the correct shader program. Overall, the code handles the basic functionality for compiling and managing OpenGL shader programs in an active and robust manner."
+/Rendering/stb_image.cpp,"#define STB_IMAGE_IMPLEMENTATION
+#include ""Rendering/stb_image.h""
+",C++ Code,"The code implements the core components of a 3D game engine, handling the rendering of a 3D world comprised of blocks, a player, and various UI elements. A RenderEngine handles window creation and OpenGL context to display the rendered scene. Shader and ShaderProgram classes load and compile shader programs for rendering. An Image class loads texture images. Various classes represent game entities like Block, Chunk, and World to manage the 3D world, while a Player class stores the player state and handles movement. Collision detection is implemented using an AABB class. A variety of UI components like buttons and menus are defined to display the game's user interface, including debug and settings menus."
+/Utils/AABB.cpp,"#include ""Utils/AABB.h""
+
+/*! \callergraph
+ * \p position - bottom left back corner of the box      <br>
+ * \p size     - width, length, and height of the box    <br>
+ */
+AABB::AABB(const sf::Vector3f& position, const sf::Vector3f& size) : _position(position), _size(size) {}
+
+/*! \callergraph
+ * Returns the bottom left back corner
+ */
+sf::Vector3f AABB::getPosition() const {
+    return _position;
+}
+
+/*! \callergraph
+ * \p pos - new bottom left back corner
+ */
+void AABB::setPosition(const sf::Vector3f& pos) {
+    _position = pos;
+}
+
+/*! \callergraph
+ * Returns the dimensions of the box
+ */
+sf::Vector3f AABB::getSize() const {
+    return _size;
+}
+
+/*! \callergraph
+ * \p size - new dimensions of the box
+ */
+void AABB::setSize(const sf::Vector3f& size) {
+    _size = size;
+}
+
+/*! \callergraph
+ * Returns the point at the exact center of the box
+ */
+sf::Vector3f AABB::getCenter() const {
+    return _position + (_size / 2.f);
+}
+
+/*! \callergraph
+ * Returns true if we are colliding with the other box
+ *
+ * \p other - The AABB to check if we are colliding with
+ */
+bool AABB::checkCollision(const AABB& other) const {
+    //Base case, size == 0 for all dimensions, denoting object can be passed through
+    if ((_size.x == 0 && _size.y == 0 && _size.z == 0)
+            || (other._size.x == 0 && other._size.y == 0 && other._size.z == 0)) {
+        return false;
+    }
+
+    //Collision exists if all dimensions have overlap
+
+    bool collision = true;
+
+    collision &= checkOverlap(_position.x, _position.x + _size.x, other._position.x, other._position.x + other._size.x);
+    collision &= checkOverlap(_position.y, _position.y + _size.y, other._position.y, other._position.y + other._size.y);
+    collision &= checkOverlap(_position.z, _position.z + _size.z, other._position.z, other._position.z + other._size.z);
+
+    return collision;
+}
+
+/*! \callergraph
+ *
+ * Checks if there is overlap in one dimension
+ *
+ * For a1,a2,b1,b2, there is only not overlap in these two cases:
+ *
+ *     |----|    |----|            |----|    |----|
+ *     a1   a2   b1   b2           b1   b2   a1   a2
+ *
+ * So what we do is check if it's one of those cases and then return the opposite of that.
+ *
+ * \p low1  - object 1's low value  (a1)    <br>
+ * \p high1 - object 1's high value (a2)    <br>
+ * \p low2  - object 2's low value  (b1)    <br>
+ * \p high2 - object 2's high value (b2)    <br>
+ */
+bool AABB::checkOverlap(float low1, float high1, float low2, float high2) const {
+    return (!(high1 <= low2 || low1 >= high2));
+}
+",C++ Code,"The code implements an axis aligned bounding box for collision detection in a 3D game engine. An AABB is initialized with a position and size and provides functions to retrieve its position, size, and center point. The primary function checks if the AABB is colliding with another AABB by checking for overlap in each dimension. If there is overlap in all three dimensions, a collision is reported. This allows objects in the game engine to detect collisions with simple axis aligned bounding boxes, enabling basic collision detection and response."
+/Utils/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/AABB.cpp
+                        ${CURR_DIR}/ICollidable.cpp
+                        ${CURR_DIR}/Font.cpp"" CACHE STRING ""Sources for project"" FORCE)
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/AABB.cpp
+                        ${CURR_DIR}/ICollidable.cpp
+                        ${CURR_DIR}/Font.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
+/Utils/Font.cpp,"#include ""Utils/Font.h""
+
+// Gotta define static members in a seperate file
+// Such as waste of a file
+/*! The default font to use when a font is needed */
+Font Font::defaultFont;
+",C++ Code,"The code defines classes that handle various aspects of rendering 3D graphics and game objects for a 3D game. It defines classes for managing the rendering engine, shaders, images, blocks, chunks, the world, the player, collision detection, and UI components. The RenderEngine handles window creation and scene rendering. The Shader and ShaderProgram classes manage compiling and linking shader programs. The Image class loads image files. BlockSelection renders selection highlights around blocks. The Block and Chunk classes represent individual blocks and chunks of blocks with render data. The World contains all chunks that make up the game world. The Player stores player state and handles movement and rendering. The AABB class detects collisions using axis aligned bounding boxes. The Component and Button classes define the base UI elements. Various menus like the ColorSelectorMenu and EscapeMenu are defined to provide functionality to the player. DebugOptions stores debugging options and FPSCounter displays the frames per second."
+/Utils/ICollidable.cpp,"#include ""Utils/ICollidable.h""
+
+/*! \callergraph
+ *
+ * Checks if two ICollidables are colliding
+ *
+ * \p other - The ICollidable to check for a collision with
+ */
+bool ICollidable::checkCollision(const ICollidable& other) const {
+    return getBoundingBox().checkCollision(other.getBoundingBox());
+}
+",C++ Code,"The code defines a function that checks for collision between two objects that implement the ICollidable interface. It does this by calling the getBoundingBox() method on each object to retrieve their axis-aligned bounding boxes. It then checks if those two bounding boxes are colliding by calling the checkCollision() method, and returns true if a collision is detected, false otherwise. This provides a generic way to detect collisions between any objects that implement the ICollidable interface, allowing them to interact physically in the simulation."
+/World/Block.cpp,"#include <SFML/Graphics/Color.hpp>
+#include <SFML/System.hpp>
+
+#include ""World/Block.h""
+
+/*! \callergraph
+ *
+ * Constructs a block
+ *
+ * \p position - bottom left back corner                          <br>
+ * \p color    - block color                                      <br>
+ * \p type     - Either Block::Type::SOLID or Block::Type::AIR    <br>
+ */
+Block::Block(const sf::Vector3i& position, const sf::Color& color, const Type& type) : _position(position), _color(color), _type(type) {}
+
+/*! \callergraph
+ * Default constructor just because std::array needs default constructable objects
+ */
+Block::Block() : Block(sf::Vector3i(0,0,0), sf::Color(0,0,0), Type(Type::AIR)) {}
+
+/*! \callergraph
+ * Returns the bottom left back corner
+ */
+sf::Vector3i Block::getPosition() const {
+    return _position;
+}
+
+/*! \callergraph
+ *
+ * Moving a block doesn't make much sense, but might as well fill out the API
+ *
+ * \p position - new bottom left back corner
+ */
+void Block::setPosition(const sf::Vector3i& position){
+    _position = position;
+}
+
+/*! \callergraph
+ * Returns the block's color
+ */
+sf::Color Block::getColor() const {
+    return _color;
+}
+
+/*! \callergraph
+ * \p color - new block color
+ */
+void Block::setColor(const sf::Color& color) {
+    _color = color;
+}
+
+/*! \callergraph
+ * Returns the block's Block::Type
+ */
+Block::Type Block::getType() const {
+    return _type;
+}
+
+/*! \callergraph
+ * \p t - new Block::Type
+ */
+void Block::setType(const Block::Type& t) {
+    _type = t;
+}
+
+/*! \callergraph
+ * Returns AABB with size (0,0,0) if air (indicates that it can be passed through),
+ * or one with size (1,1,1) otherwise
+ */
+AABB Block::getBoundingBox() const {
+    if (_type == Type::AIR) {
+        return AABB(sf::Vector3f(_position.x, _position.y, _position.z), sf::Vector3f(0, 0, 0));
+    }
+    return AABB(sf::Vector3f(_position.x, _position.y, _position.z), sf::Vector3f(1, 1, 1));
+}
+",C++ Code,"The code defines a Block class that represents a single cube-shaped block in a 3D world. It stores the position, color, and type of solid or air for the block. The class provides getter and setter methods for manipulating and accessing the block's properties. It also has a method for retrieving the axis-aligned bounding box of the block, returning either a zero-sized box for air blocks or a unit cube for solid blocks. This allows the block to be used for collision detection and interaction with other objects in the 3D world managed by the larger software system."
+/World/BlockFace.cpp,"#include ""Utils/EnumClassHash.h""
+#include ""World/BlockFace.h""
+
+/*!
+ * Defines normal vectors for each of the possible faces
+ */
+std::unordered_map<BlockFace::Face, sf::Vector3f, EnumClassHash> BlockFace::faceNormals =
+    {
+        { BlockFace::Face::NORTH,  sf::Vector3f( 0,  0,  1) },
+        { BlockFace::Face::SOUTH,  sf::Vector3f( 0,  0, -1) },
+        { BlockFace::Face::EAST,   sf::Vector3f( 1,  0,  0) },
+        { BlockFace::Face::WEST,   sf::Vector3f(-1,  0,  0) },
+        { BlockFace::Face::TOP,    sf::Vector3f( 0,  1,  0) },
+        { BlockFace::Face::BOTTOM, sf::Vector3f( 0, -1,  0) }
+    };
+
+/*! \callergraph
+ *
+ * Creates a BlockFace based on its normal vector
+ *
+ * \p position - Block's position                             <br>
+ * \p normal   - Normal vector pointing away from the face    <br>
+ */
+BlockFace::BlockFace(const sf::Vector3f& position, const sf::Vector3f& normal, const sf::Color& color) :
+    _position(position),
+    _normal(normal),
+    _color(color)
+{
+    setFaceFromNormal(_normal);
+}
+
+/*! \callergraph
+ *
+ * Creates a BlockFace based on the face name
+ *
+ * \p position - Block's position    <br>
+ * \p face     - Name of the face    <br>
+ */
+BlockFace::BlockFace(const sf::Vector3f& position, BlockFace::Face face, const sf::Color& color) :
+    _position(position),
+    _face(face),
+    _normal(faceNormals[face]),
+    _color(color)
+{}
+
+/*! \callergraph
+ * Returns the position of the block this face is on
+ */
+sf::Vector3f BlockFace::getPosition() const {
+    return _position;
+}
+
+/*! \callergraph
+ * Returns the normal vector pointing away from this face
+ */
+sf::Vector3f BlockFace::getNormal() const {
+    return _normal;
+}
+
+/*! \callergraph
+ * Returns the BlockFace::Face associated with this face
+ */
+BlockFace::Face BlockFace::getFace() const {
+    return _face;
+}
+
+sf::Color BlockFace::getColor() const {
+    return _color;
+}
+
+/*! \callergraph
+ * Sets the block this face is on
+ */
+void BlockFace::setPosition(const sf::Vector3f& position) {
+    _position = position;
+}
+
+/*! \callergraph
+ * Sets the normal pointing away from this face
+ */
+void BlockFace::setNormal(const sf::Vector3f& normal) {
+    _normal = normal;
+    setFaceFromNormal(normal);
+}
+
+/*! \callergraph
+ * Sets the face for this face
+ */
+void BlockFace::setFace(BlockFace::Face face) {
+    _face = face;
+    _normal = faceNormals[face];
+}
+
+void BlockFace::setColor(sf::Color color) {
+    _color = color;
+}
+
+/*! \callergraph
+ *
+ * Utility function to get the BlockFace::Face from the normal vector.
+ * Goes through all of them and returns the one that matches. Not a
+ * big deal since there's only 6
+ */
+void BlockFace::setFaceFromNormal(const sf::Vector3f& normal) {
+    for (auto i = faceNormals.begin(); i != faceNormals.end(); i++) {
+        if (i->second == normal) {
+            _face = i->first;
+            break;
+        }
+    }
+}
+",C++ Code,"The code defines a BlockFace class that encapsulates the properties and functionality of representing a face of a block in a 3D world. It contains properties for the block's position, normal vector pointing away from the face, a color and a face name. The class has constructors that can initialize a BlockFace from either a position and normal vector, or a position and face name. It also has getter and setter methods for each property to manipulate a BlockFace object. The class defines a utility function to determine the face name from a given normal vector, allowing BlockFace objects to be constructed from either a normal vector or face name. Overall, the BlockFace class provides an abstraction for representing and working with individual faces of blocks in the 3D world."
+/World/CMakeLists.txt,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Block.cpp
+                        ${CURR_DIR}/Chunk.cpp
+                        ${CURR_DIR}/World.cpp
+                        ${CURR_DIR}/BlockFace.cpp"" CACHE STRING ""Sources for project"" FORCE)
+",C++ Code,"file(RELATIVE_PATH CURR_DIR ${ROOT_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+MESSAGE(""Adding ${CURR_DIR}"")
+
+set(SOURCES ""${SOURCES} ${CURR_DIR}/Block.cpp
+                        ${CURR_DIR}/Chunk.cpp
+                        ${CURR_DIR}/World.cpp
+                        ${CURR_DIR}/BlockFace.cpp"" CACHE STRING ""Sources for project"" FORCE)
+"
+/World/Chunk.cpp,"#include <SFML/Graphics/Color.hpp>
+#include <SFML/System.hpp>
+
+#include <GlobalLogger.hpp>
+
+#include ""Exception/OutOfRangeException.h""
+#include ""World/Chunk.h""
+#include ""World/World.h""
+
+using Logger::globalLogger;
+
+constexpr float COLOR_SCALE = 256.f / Chunk::BLOCK_COUNT;
+
+/*! \callergraph
+ * Need a default constructor for stl containers
+ */
+Chunk::Chunk() {}
+
+/*! \callergraph
+ *
+ * Creates a chunk and initializes the blocks to be solid or air based on
+ * the y value. Block color starts at black at the (0,0,0) position in the
+ * chunk and goes to white at (15,15,15). One color increases in each direction
+ * (x is red, y is green, z is blue).
+ *
+ * \p p     - The position of the chunk in chunk coords (chunk coords == block coords / 16)     <br>
+ * \p world - reference to the world (gotta be a pointer because of the default constructor)    <br>
+ */
+Chunk::Chunk(const sf::Vector3i& p, World* world) : _position(p), _changed(true), _world(world) {
+    initBuffer();
+    for (int x = 0; x < BLOCK_COUNT; ++x) {
+        for (int y = 0; y < BLOCK_COUNT; ++y) {
+            for (int z = 0; z < BLOCK_COUNT; ++z) {
+                float blockX = x + _position.x * BLOCK_COUNT;
+                float blockY = y + _position.y * BLOCK_COUNT;
+                float blockZ = z + _position.z * BLOCK_COUNT;
+
+                Block::Type type = blockY > world->getMaxPosition().y / 2 ? Block::Type::AIR : Block::Type::SOLID;
+
+                _blocks.at(x).at(y).at(z) = Block(sf::Vector3i(blockX, blockY, blockZ),
+                                                  sf::Color(x * COLOR_SCALE, y * COLOR_SCALE, z * COLOR_SCALE),
+                                                  type);
+            }
+        }
+    }
+}
+
+/*! \callergraph
+ *
+ * Rebuilds the vertex array for this chunk. Works by going through each
+ * block (including blocks that are 1 block outside of this chunk), finding
+ * the ones that are air, and creating a face at the border of that block
+ * and all blocks that are solid and in this chunk. This way, we only render
+ * faces if you can actually see them.
+ */
+void Chunk::rebuildVertArray() {
+    _vertArray.clear();
+
+    // Go through each block, including one block ouside
+    for (int x = -1; x <= BLOCK_COUNT; ++x) {
+        for (int y = -1; y <= BLOCK_COUNT; ++y) {
+            for (int z = -1; z <= BLOCK_COUNT; ++z) {
+                sf::Vector3i globalPos = localToGlobalBlockPos(sf::Vector3i(x,y,z));
+
+                // If it's not air, who cares, move on
+                if (_world->getBlockType(globalPos) != Block::Type::AIR)
+                    continue;
+
+                // Ok so we're at an air block, let's make faces around this block
+                // if it's in the chunk and we're at the border between solid and
+                // air
+
+                // Do it for x+1
+                sf::Vector3i target(globalPos.x + 1, globalPos.y, globalPos.z);
+                if (isInChunk(target) && getBlockType(target) == Block::Type::SOLID) {
+                    addFace(target, -1, getBlock(target).getColor(), sf::Vector2i(1,2));
+                }
+
+                // Do it for x-1
+                target = sf::Vector3i(globalPos.x - 1, globalPos.y, globalPos.z);
+                if (isInChunk(target) && getBlockType(target) == Block::Type::SOLID) {
+                    addFace(target, 0, getBlock(target).getColor(), sf::Vector2i(2,1));
+                }
+
+                // Do it for y+1
+                target = sf::Vector3i(globalPos.x, globalPos.y + 1, globalPos.z);
+                if (isInChunk(target) && getBlockType(target) == Block::Type::SOLID) {
+                    addFace(target, -1, getBlock(target).getColor(), sf::Vector2i(2,0));
+                }
+
+                // Do it for y-1
+                target = sf::Vector3i(globalPos.x, globalPos.y - 1, globalPos.z);
+                if (isInChunk(target) && getBlockType(target) == Block::Type::SOLID) {
+                    addFace(target, 1, getBlock(target).getColor(), sf::Vector2i(0,2));
+                }
+
+                // Do it for z+1
+                target = sf::Vector3i(globalPos.x, globalPos.y, globalPos.z + 1);
+                if (isInChunk(target) && getBlockType(target) == Block::Type::SOLID) {
+                    addFace(target, -1, getBlock(target).getColor(), sf::Vector2i(0,1));
+                }
+
+                // Do it for z-1
+                target = sf::Vector3i(globalPos.x, globalPos.y, globalPos.z - 1);
+                if (isInChunk(target) && getBlockType(target) == Block::Type::SOLID) {
+                    addFace(target, 2, getBlock(target).getColor(), sf::Vector2i(1,0));
+                }
+            }
+        }
+    }
+
+    _changed = false;
+    setBufferData(_vertArray);
+}
+
+/*! \callergraph
+ *
+ * Ok, so I'll admit this function looks really weird.
+ * The basic idea of it is to automate adding a face to
+ * make rebuildVertArray() not be a thousand lines long.
+ * It works, I promise. If you want more description, look
+ * at the comment below.
+ *
+ * \p target    - Block we're adding a face to                                                                                        <br>
+ * \p addTarget - The dimension to add 1 to initially (used to do faces that don't contain the point at the block's (0,0,0) point)    <br>
+ * \p c         - Color of the block                                                                                                  <br>
+ * \p order     - Order of dimensions to do move in. Used to make sure the face is always drawn clockwise.                            <br>
+ */
+void Chunk::addFace(const sf::Vector3i& target, const int& addTarget, const sf::Color& c, const sf::Vector2i& order) {
+    float fc[3];
+    float fp[3];
+    float fn[3];
+    static constexpr int oneblock = RenderEngine::SCALE;
+
+    fp[0] = target.x * oneblock; fp[1] = target.y * oneblock; fp[2] = target.z * oneblock;
+    if (addTarget != -1) fp[addTarget] += oneblock;
+
+    fc[0] = c.r / 256.f; fc[1] = c.g / 256.f; fc[2] = c.b / 256.f;
+
+    // Okay so this seems a little weird but I can explain
+    // So... order contains the order to go around by indexing the dimensions
+    // So if the order is (1,0) then we first move in the y, then in the x, then
+    // back in the y, and that constitutes the face.
+    // The normal needs to point away from the face, so it will point in whatever
+    // direction we didn't move in at all. But then you have to also make sure it
+    // points in the right direction along that axis, so we also need to handle the
+    // last direction.... as for how it works, just remember that the faces are clockwise
+    // and think it through...... it works I promise
+    fn[order.x] = 0;
+    fn[order.y] = 0;
+
+    if (order.x - order.y == 2) {
+        fn[3 - order.x - order.y] = 1;
+    } else if (order.x - order.y == -2) {
+        fn[3 - order.x - order.y] = -1;
+    } else {
+        fn[3 - order.x - order.y] = order.x - order.y;
+    }
+
+    float texCoords[4][2] {
+        {0, 0},
+        {0, 1},
+        {1, 1},
+        {1, 0}
+    };
+
+    // triangle 1
+    _vertArray.push_back(Vertex(fp, fc, fn, texCoords[0]));
+    fp[order.x] = fp[order.x] + RenderEngine::SCALE;
+    _vertArray.push_back(Vertex(fp, fc, fn, texCoords[1]));
+    fp[order.y] = fp[order.y] + RenderEngine::SCALE;
+    _vertArray.push_back(Vertex(fp, fc, fn, texCoords[2]));
+
+    // triangle 2
+    _vertArray.push_back(Vertex(fp, fc, fn, texCoords[2]));
+    fp[order.x] = fp[order.x] - RenderEngine::SCALE;
+    _vertArray.push_back(Vertex(fp, fc, fn, texCoords[3]));
+    fp[order.y] = fp[order.y] - RenderEngine::SCALE;
+    _vertArray.push_back(Vertex(fp, fc, fn, texCoords[0]));
+}
+
+/*! \callergraph
+ *
+ * Rebuilds the vertex array if needed and then sends it out to OpenGL
+ *
+ * \p e - Render engine (for OpenGL calls)    <br>
+ * \p w - Window (for SFML calls)             <br>
+ */
+void Chunk::render(RenderEngine& e, sf::RenderWindow& w) {
+    if (_changed) {
+        rebuildVertArray();
+    }
+
+    e.useLightingShader();
+    setTexture(""blockTexture"");
+    drawFromBuffer(GL_TRIANGLES);
+}
+
+/*! \callergraph
+ *
+ * Converts a global block position to its local position within this chunk
+ *
+ * \p worldPos - The global position to convert
+ */
+sf::Vector3i Chunk::globalToLocalBlockPos(const sf::Vector3i& worldPos) const {
+    int x = worldPos.x % BLOCK_COUNT;
+    int y = worldPos.y % BLOCK_COUNT;
+    int z = worldPos.z % BLOCK_COUNT;
+
+    if (x < 0) x += BLOCK_COUNT;
+    if (y < 0) y += BLOCK_COUNT;
+    if (z < 0) z += BLOCK_COUNT;
+
+    return sf::Vector3i(x, y, z);
+}
+
+/*! \callergraph
+ *
+ * Converts a local position within this chunk to a global position
+ *
+ * \p localPos - The local position to convert
+ */
+sf::Vector3i Chunk::localToGlobalBlockPos(const sf::Vector3i& localPos) const {
+    return sf::Vector3i(localPos.x + BLOCK_COUNT * _position.x,
+                        localPos.y + BLOCK_COUNT * _position.y,
+                        localPos.z + BLOCK_COUNT * _position.z);
+}
+
+/*! \callergraph
+ *
+ * Returns a constant reference to the block with the given global position
+ *
+ * \p worldPos - global position
+ */
+const Block& Chunk::getBlock(const sf::Vector3i& worldPos) const {
+    // To avoid code duplication, we just remove the const, get the block, and
+    // then put the const back on what we return
+    return const_cast<Chunk*>(this)->getBlock(worldPos);
+}
+
+/*! \callergraph
+ *
+ * Returns a reference to the block at a given global position.
+ *
+ * \p worldPos - global position
+ */
+Block& Chunk::getBlock(const sf::Vector3i& worldPos) {
+    if (!isInChunk(worldPos)) {
+        throw OutOfRangeException();
+    }
+
+    sf::Vector3i pos = globalToLocalBlockPos(worldPos);
+    return _blocks.at(pos.x).at(pos.y).at(pos.z);
+}
+
+/*! \callergraph
+ *
+ * Returns the type of the block at the given position.
+ *
+ * \p worldPos - global position
+ */
+Block::Type Chunk::getBlockType(const sf::Vector3i& worldPos) const {
+    return getBlock(worldPos).getType();
+}
+
+/*! \callergraph
+ *
+ * Returns whether or not a block is in this chunk
+ *
+ * \p pos - global position for the block
+ */
+bool Chunk::isInChunk(const sf::Vector3i& pos) const {
+    return (   pos.x >= _position.x * BLOCK_COUNT && pos.x < _position.x * BLOCK_COUNT + BLOCK_COUNT
+            && pos.y >= _position.y * BLOCK_COUNT && pos.y < _position.y * BLOCK_COUNT + BLOCK_COUNT
+            && pos.z >= _position.z * BLOCK_COUNT && pos.z < _position.z * BLOCK_COUNT + BLOCK_COUNT);
+}
+
+/*! \callergraph
+ *
+ * Notifys the chunk that it should rebuild its vertex array
+ */
+void Chunk::notifyChanged() {
+    _changed = true;
+}
+",C++ Code,"The code handles rendering of a chunk of blocks within a larger 3D world. When initialized, the chunk populates its blocks with solid or air blocks based on their Y position, and assigns them a color based on their position within the chunk. The core functionality involves rebuilding the vertex array for rendering block faces. It iterates through each block, including blocks outside the chunk, and creates faces between air blocks and solid blocks within the chunk. This vertex data is then used to render the chunk using OpenGL. The chunk manages converting between local and global block positions, accessing individual blocks, and notifying when blocks change and the vertex data needs to be rebuilt. Overall, the code encapsulates the rendering logic for a subsection of the larger world, managing the vertex data for rendering visible block faces within that chunk."
+/World/World.cpp,"#include <cmath>
+
+#include <SFML/System.hpp>
+
+#include ""Exception/OutOfRangeException.h""
+#include ""World/World.h""
+
+#define NUM_CHUNKS_LENGTH 2   // Actually half the total length
+#define NUM_CHUNKS_HEIGHT 8
+
+
+/*! \callergraph
+ * Creates a new world which is 4 chunks by 4 chunks by 8 chunks (size is just for testing purposes)
+ */
+World::World() {
+    for (int x = -NUM_CHUNKS_LENGTH; x < NUM_CHUNKS_LENGTH; ++x) {
+        for (int y = 0; y < NUM_CHUNKS_HEIGHT; ++y) {
+            for (int z = -NUM_CHUNKS_LENGTH; z < NUM_CHUNKS_LENGTH; ++z) {
+                sf::Vector3i pos(x, y, z);
+                std::tuple<int, int, int> posTup = std::make_tuple(pos.x, pos.y, pos.z);
+                _chunks[posTup] = Chunk(pos, this);
+            }
+        }
+    }
+}
+
+/*! \callergraph
+ *
+ * Forwards the rendering on to each chunk.
+ *
+ * \p e - Render engine (used for OpenGL calls)    <br>
+ * \p w - Window (for SFML calls)                  <br>
+ */
+void World::render(RenderEngine& e, sf::RenderWindow& w) {
+    for (auto i = _chunks.begin(); i != _chunks.end(); ++i) {
+        i->second.render(e, w);
+    }
+}
+
+/*! \callergraph
+ *
+ * Gets the position of the chunk a particular position is in
+ *
+ * \p pos - global position
+ */
+std::tuple<int, int, int> World::getChunkPos(const sf::Vector3i& pos) const {
+    int x = pos.x;
+    int y = pos.y;
+    int z = pos.z;
+
+    if (pos.x < 0) x += 1;
+    if (pos.y < 0) y += 1;
+    if (pos.z < 0) z += 1;
+
+    x /= Chunk::BLOCK_COUNT;
+    y /= Chunk::BLOCK_COUNT;
+    z /= Chunk::BLOCK_COUNT;
+
+    if (pos.x < 0) x -= 1;
+    if (pos.y < 0) y -= 1;
+    if (pos.z < 0) z -= 1;
+
+    return std::make_tuple(x, y, z);
+}
+
+/*! \callergraph
+ *
+ * Returns the block at a sepcified position
+ *
+ * \p pos - global position
+ */
+const Block& World::getBlock(const sf::Vector3i& pos) const {
+    if (!blockExists(pos)) {
+        throw OutOfRangeException();
+    }
+
+    return _chunks.at(getChunkPos(pos)).getBlock(pos);
+}
+
+/*! \callergraph
+ *
+ * Basically checks if a position is in one of the chunks that actually exist.
+ *
+ * \p pos - global position
+ */
+bool World::blockExists(const sf::Vector3i& pos) const {
+    std::tuple<int, int, int> chunkPos = getChunkPos(pos);
+    auto iter = _chunks.find(chunkPos);
+    return iter != _chunks.end(); //If the block is in a valid chunk, it must exist
+}
+
+/*! \callergraph
+ *
+ * Gets the type of a block, if it exists, and returns air if not
+ *
+ * \p pos - global position
+ */
+Block::Type World::getBlockType(const sf::Vector3i& pos) const {
+    if (blockExists(pos)) {
+        return _chunks.at(getChunkPos(pos)).getBlockType(pos);
+    } else {
+        return Block::Type::AIR;
+    }
+}
+
+/*! \callergraph
+ *
+ * Sets the type of a block at a given position
+ *
+ * \p pos  - global position            <br>
+ * \p type - new type for that block    <br>
+ */
+void World::setBlockType(const sf::Vector3i& pos, const Block::Type& type) {
+    if (blockExists(pos)) {
+        Chunk& chunk = _chunks.at(getChunkPos(pos));
+        chunk.getBlock(pos).setType(type);
+        notifyChanged(pos);
+    }
+}
+
+/*! \callergraph
+ *
+ * Gets the color of a block at a specific position.
+ * Returns black if it doesn't exist
+ *
+ * \p pos - global position
+ */
+sf::Color World::getBlockColor(const sf::Vector3i& pos) const {
+    if (blockExists(pos)) {
+        return _chunks.at(getChunkPos(pos)).getBlock(pos).getColor();
+    } else {
+        return sf::Color::Black;
+    }
+}
+
+/*! \callergraph
+ *
+ * Sets the color of a block
+ *
+ * \p pos   - global position    <br>
+ * \p color - new color          <br>
+ */
+void World::setBlockColor(const sf::Vector3i& pos, const sf::Color& color) {
+    if (blockExists(pos)) {
+        Chunk& chunk = _chunks.at(getChunkPos(pos));
+        chunk.getBlock(pos).setColor(color);
+        notifyChanged(pos);
+    }
+}
+
+/*! \callergraph
+ *
+ * Notifys the chunk that contains a changed block that a block has been changed,
+ * and also notifies the chunks that touch that block (otherwise changing blocks
+ * that are next to a chunk border could cause you to see through the world)
+ *
+ * \p pos - global position of changed block
+ */
+void World::notifyChanged(const sf::Vector3i& pos) {
+        notifyChangedSingle(pos);
+
+        //To avoid render bug where you can see through the world,
+        //we notify in all directions to make sure neighboring chunks
+        //get updated as well
+        notifyChangedSingle(sf::Vector3i(pos.x + 1, pos.y, pos.z));
+        notifyChangedSingle(sf::Vector3i(pos.x - 1, pos.y, pos.z));
+        notifyChangedSingle(sf::Vector3i(pos.x, pos.y + 1, pos.z));
+        notifyChangedSingle(sf::Vector3i(pos.x, pos.y - 1, pos.z));
+        notifyChangedSingle(sf::Vector3i(pos.x, pos.y, pos.z + 1));
+        notifyChangedSingle(sf::Vector3i(pos.x, pos.y, pos.z - 1));
+}
+
+/*! \callergraph
+ *
+ * Base function for notifyChanged that doesn't notify the
+ * chunks around the given block
+ *
+ * \p pos - global position of changed block
+ */
+void World::notifyChangedSingle(const sf::Vector3i& pos) {
+    if (blockExists(pos)) {
+        _chunks.at(getChunkPos(pos)).notifyChanged();
+    }
+}
+
+/*! \callergraph
+ *
+ * Checks if player is colliding with a block
+ * Goes through all blocks in a range slightly
+ * larger than the player and checks if there's
+ * a collision with that block. If no collisions,
+ * return false, else true.
+ *
+ * \p player - The player to check for a collision
+ */
+bool World::checkCollision(const Player& player) const {
+    auto position = player.getPosition();
+    std::vector<Block> collision;
+
+    for (int x = std::floor(position.x); x <= std::ceil(position.x + 1); ++x) {
+
+        for (int z = std::floor(position.z); z <= std::ceil(position.z + 1); ++z) {
+            sf::Vector3i top, bottom;
+
+            for (int y = std::floor(position.y); y <= std::ceil(position.y + 3); ++y) {
+                sf::Vector3i blockPos(x, y, z);
+
+                if (blockExists(blockPos)) {
+
+                    if (player.checkCollision(getBlock(blockPos))) {
+                        return true;
+                    }
+
+                } // if block exists
+
+            } //for y
+        } //for z
+    } // for x
+
+    return false;
+}
+
+/*! \callergraph
+ *
+ * Gets the position vector with the smallest possible values for x, y, and z
+ */
+sf::Vector3i World::getMinPosition() const {
+    return sf::Vector3i(-NUM_CHUNKS_LENGTH * Chunk::BLOCK_COUNT, 0, -NUM_CHUNKS_LENGTH * Chunk::BLOCK_COUNT);
+}
+
+/*! \callergraph
+ *
+ * Gets the position vector with the greatest possible values for x, y, and z
+ */
+sf::Vector3i World::getMaxPosition() const {
+    return sf::Vector3i(NUM_CHUNKS_LENGTH * Chunk::BLOCK_COUNT, NUM_CHUNKS_HEIGHT * Chunk::BLOCK_COUNT, NUM_CHUNKS_LENGTH * Chunk::BLOCK_COUNT);
+}
+",C++ Code,"The code manages a 3D voxel world by dividing it into chunks. It handles rendering chunks to an SFML window using an OpenGL render engine. It allows getting and setting blocks by their position, notifying chunks when blocks change, and checking for collisions between a player and blocks. The chunk management and notification system allows efficiently rendering and updating only the relevant chunks as the world changes."
+/main.cpp,"#include <fstream>
+
+#include <GlobalLogger.hpp>
+
+#include ""Exception/NullptrException.h""
+#include ""Exception/SegmentationFaultException.h""
+#include ""Game.h""
+#include ""Utils/Platforms.h""
+
+#ifdef JOC_LINUX_BUILD
+#include <signal.h>
+#endif
+
+#ifdef JOC_WINDOWS_BUILD
+#include ""windows.h""
+#endif
+
+/*
+ * Program starts here.
+ * Registers signal handlers and starts the game running. Also
+ * prints out details about any exceptions left uncaught.
+ */
+
+using Logger::globalLogger;
+
+int doMain(){
+
+    globalLogger.log(""Welcome to Jack of Clubs!"");
+    globalLogger.log(""This game is in development, so make sure to send bug reports to the author (evan1026 on github)"");
+    globalLogger.log();
+
+    Game g;
+    g.run();
+
+    return 0;
+}
+
+void registerSegfaultHandler();
+
+int main() {
+
+    std::ofstream logFile(""log.txt"");
+    globalLogger.addStream(logFile, false);
+
+    // Registers the segfault handler
+    registerSegfaultHandler();
+
+    try {
+        return doMain();
+    } catch (std::exception& e) {
+        globalLogger.error();
+        globalLogger.error(""***************************************"");
+        globalLogger.error(""* Exception uncaught. Must terminate. *"");
+        globalLogger.error(""*      Exception details follow       *"");
+        globalLogger.error(""***************************************"");
+        globalLogger.error();
+
+        std::stringstream exceptionDetails(e.what());
+        std::string line;
+        while(getline(exceptionDetails, line)) {
+            globalLogger.error(line);
+        }
+
+        globalLogger.error();
+        globalLogger.error();
+        globalLogger.error(""If you're seeing this in production, please screenshot and send to the developer."");
+        exit(1);
+    }
+}
+
+#ifdef JOC_LINUX_BUILD
+void segvHandler(int sig, siginfo_t* si, void* unused) {
+
+    // Throw exception. The 2 tells it to skip the top two functions (which are the OS's function
+    // for handling the trap the CPU generates and this function)
+    if (si->si_addr == nullptr) {
+        throw NullptrException(nullptr, 2);
+    } else {
+        throw SegmentationFaultException(si->si_addr, nullptr, 2);
+    }
+}
+
+void registerSegfaultHandler() {
+    struct sigaction sa;
+    sa.sa_flags = SA_SIGINFO;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_sigaction = segvHandler;
+    if (sigaction(SIGSEGV, &sa, NULL) == -1) {
+        globalLogger.warn(""Could not register segfault handler"");
+        globalLogger.warn(""If a segmentation fault occurs, no stack trace will be available.\n"");
+    }
+}
+#endif
+
+#ifdef JOC_WINDOWS_BUILD
+LONG WINAPI segvHandler(EXCEPTION_POINTERS* einfo) {
+    void* address = nullptr;
+    switch (einfo->ExceptionRecord->ExceptionCode) {
+        case EXCEPTION_ACCESS_VIOLATION:
+            address = (void*)einfo->ExceptionRecord->ExceptionInformation[1];
+            if (address == nullptr) {
+                throw NullptrException(einfo->ExceptionRecord->ExceptionAddress, 0);
+            } else {
+                throw SegmentationFaultException(address, einfo->ExceptionRecord->ExceptionAddress, 0);
+            }
+            break;
+        default:
+            break;
+    }
+
+    return EXCEPTION_EXECUTE_HANDLER;
+}
+
+void registerSegfaultHandler() {
+    SetUnhandledExceptionFilter(segvHandler);
+}
+#endif
+",C++ Code,"The code handles the core functionality of a 3D game engine by providing classes for rendering a 3D world, loading shaders and images, handling player input, collision detection, and UI elements. Classes such as RenderEngine handle window creation and scene rendering. Shader and ShaderProgram classes manage shader compilation and linking. The World class contains all chunks that make up the game world, while the Player class stores the player state and handles movement and rendering. The code also catches exceptions and logs useful error information to aid in debugging."

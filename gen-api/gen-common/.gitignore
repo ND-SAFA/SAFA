@@ -1,0 +1,7 @@
+**/__pycache__
+.idea
+*.env
+build
+*.egg-info
+.DS_Store
+**/.DS_Store

@@ -3,7 +3,7 @@ services:
   fend:
     container_name: fend
     build:
-      context: ../fend
+      context: ./fend
       args:
         API_ENDPOINT: http://localhost:3000
     ports:
@@ -12,7 +12,7 @@ services:
     depends_on: [ "mysql" ]
     container_name: bend
     build:
-      context: .
+      context: ./bend
     ports:
       - 3000:80
     networks:
@@ -34,7 +34,7 @@ services:
       MYSQL_PASSWORD: secret3
       MYSQL_DATABASE: safa-db
     volumes:
-      - ./my.cnf:/etc/mysql/my.cnf # Mount the custom my.cnf file
+      - ./bend/my.cnf:/etc/mysql/my.cnf # Mount the custom my.cnf file
     ports:
       - 3306:3306
     networks:
@@ -44,4 +44,3 @@ volumes:
   db_data:
 networks:
   safa:
-

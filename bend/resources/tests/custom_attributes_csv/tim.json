@@ -1,0 +1,9 @@
+{
+    "artifacts": [
+        {
+            "type": "Requirement",
+            "fileName": "Requirements.csv"
+        }
+    ],
+    "traces": []
+}

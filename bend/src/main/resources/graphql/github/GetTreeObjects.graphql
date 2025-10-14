@@ -1,0 +1,19 @@
+query ($repoName: String!, $repoOwner: String!, $location: String!) {
+    repository(name: $repoName, owner: $repoOwner) {
+        object(expression: $location) {
+            ... on Tree {
+                entries {
+                    name
+                    type
+                    object {
+                        ... on Blob {
+                            text
+                            isBinary
+                        }
+                    }
+                    path
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,180 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.4'
+    id 'io.spring.dependency-management' version '1.1.3'
+    id 'nebula.lint' version '17.0.0'
+    id 'eclipse'
+    id 'idea'
+    id 'checkstyle'
+    id 'jacoco'
+    id 'org.barfuin.gradle.jacocolog' version '3.1.0'
+    id "io.freefair.lombok" version "8.3"
+}
+
+bootJar {
+    archivesBaseName = 'edu.nd.crc.safa'
+    archiveVersion = '2.2.4'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+sourceCompatibility = '17'
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(sourceCompatibility.toString()))
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.sun.xml.bind:jaxb-impl:4.0.3'
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
+    implementation 'javax.activation:activation:1.1'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.0'
+
+    // data parsing
+    implementation 'org.javatuples:javatuples:1.2'
+    implementation 'org.apache.commons:commons-dbcp2:2.9.0'
+    implementation 'org.apache.commons:commons-csv:1.9.0'
+    implementation 'commons-io:commons-io:2.11.0' // TODO: Upgrade contains breaking changes
+    implementation 'org.json:json:20220320'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
+
+    // database
+    implementation 'io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:2.4.4'
+    implementation 'com.amazonaws.secretsmanager:aws-secretsmanager-jdbc:2.0.1'
+    implementation 'mysql:mysql-connector-java:8.0.29'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'org.hibernate.orm:hibernate-core:6.3.1.Final'
+    implementation 'com.zaxxer:HikariCP:5.0.1'
+    implementation 'org.flywaydb:flyway-core:9.0.4'
+    implementation 'org.flywaydb:flyway-mysql:9.1.2'
+
+    //Misc
+    implementation 'javax.websocket:javax.websocket-api:1.1'
+    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+
+    // Spring Boot
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // Spring Data
+    implementation 'org.springframework.data:spring-data-commons'
+    implementation 'org.springframework.data:spring-data-jpa'
+
+    // Spring
+    implementation 'org.springframework.security:spring-security-core'
+    implementation 'org.springframework:spring-websocket'
+    implementation 'org.springframework:spring-messaging'
+    implementation 'org.springframework:spring-web'
+    implementation 'org.springframework.security:spring-security-messaging'
+    implementation 'org.springframework.batch:spring-batch-infrastructure'
+    implementation 'org.springframework.batch:spring-batch-core'
+
+    // authentication
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-orgjson:0.11.5'
+
+    // websockets
+    implementation 'org.webjars:sockjs-client:1.5.1'
+    implementation 'org.webjars:stomp-websocket:2.3.4'
+
+    // automatic documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.2.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-common:2.2.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0' // Creates swagger ui
+    annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.15.0' // Parses javadoc
+
+    // layout generation
+    implementation 'com.google.guava:guava:30.1-jre' // required by elk graph
+    implementation 'org.eclipse.elk:org.eclipse.elk.core:0.8.1'
+    implementation 'org.eclipse.elk:org.eclipse.elk.alg.mrtree:0.8.1'
+
+    // email
+    implementation 'com.infobip:infobip-api-java-client:4.1.0'
+
+    // stripe
+    implementation "com.stripe:stripe-java:24.8.0"
+
+    // testing
+    implementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.h2database:h2:2.1.210' // Most up-to-date version compatible with flyway
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.mockito:mockito-core:4.7.0'
+    testImplementation 'net.bytebuddy:byte-buddy-agent:1.12.13'
+    implementation 'net.bytebuddy:byte-buddy:1.12.13'
+    testImplementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.11.0'
+
+}
+
+test {
+    doFirst {
+        systemProperty 'spring.profiles.active', 'test'
+    }
+
+    testLogging {
+        outputs.upToDateWhen { false }
+        showStandardStreams = true
+    }
+    useJUnitPlatform()
+    finalizedBy jacocoTestCoverageVerification
+}
+
+/*
+ * CI/CD
+ */
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.65
+            }
+        }
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "edu/**/importer/JIRA.class",
+                    "edu/**/importer/Puller.class",
+                    "edu/**/builders/AppEntityBuilder.class",
+                    "edu/**/importer/DbEntityBuilder.class",
+            ])
+        }))
+    }
+}
+
+checkstyle {
+    toolVersion = '8.45'
+    configFile = file('checkstyle.xml')
+    sourceSets = [project.sourceSets.main]
+}
+
+checkstyleMain {
+    source = 'src/main/java'
+    ignoreFailures = false
+    maxWarnings = 0
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+    }
+}

@@ -1,0 +1,1 @@
+{"artifacts":[{"summary":"The Thermostat function shall set the value of the heat control.","name":"SR1","attributes":{"listAttr":["val1","val2"],"intAttr":1,"strAttr":"strValue"},"id":null,"body":"The Thermostat function shall set the value of the heat control.","type":"requirement","documentIds":[]}]}

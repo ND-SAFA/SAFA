@@ -1,0 +1,15 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo Build started on `date`
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_LINK
+      - docker build -t bend .
+      - docker tag bend $ECR_LINK/bend:latest
+  post_build:
+    commands:
+      - docker push $ECR_LINK/bend:latest
+artifacts:
+  files:
+    - '**/*'

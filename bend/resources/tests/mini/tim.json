@@ -1,0 +1,19 @@
+{
+    "artifacts": [
+        {
+            "type": "SafetyRequirement",
+            "fileName": "SafetyRequirements.csv"
+        },
+        {
+            "type": "Requirement",
+            "fileName": "Requirements.csv"
+        }
+    ],
+    "traces": [
+        {
+            "sourceType": "Requirement",
+            "targetType": "SafetyRequirement",
+            "fileName": "Requirements2SafetyRequirements.csv"
+        }
+    ]
+}

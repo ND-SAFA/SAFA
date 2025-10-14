@@ -1,0 +1,91 @@
+{
+  "data": {
+    "repository": {
+      "object": {
+        "entries": [
+          {
+            "name": ".clang",
+            "type": "blob",
+            "object": {
+              "text": "compilation_database = \"build\"\n",
+              "isBinary": false
+            },
+            "path": ".clang"
+          },
+          {
+            "name": ".clang-tidy",
+            "type": "blob",
+            "object": {
+              "text": "Checks: '-*,bugprone-*,cert-dcl21-cpp,cert-dcl50-cpp,cert-env33-c,cert-err34-c,cert-err52-cpp,cert-err60-cpp,cert-flp30-c,cert-msc50-cpp,cert-msc51-cpp,cppcoreguidelines-*,google-build-using-namespace,google-explicit-constructor,google-global-names-in-headers,google-readability-casting,google-runtime-int,google-runtime-operator,hicpp-*,misc-*,modernize-*,performance-*,readability-*,-modernize-use-trailing-return-type,-readability-avoid-const-params-in-decls,-hicpp-special-member-functions,-hicpp-use-override,-readability-identifier-length,-bugprone-easily-swappable-parameters'\nCheckOptions:\n    - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic\n      value: 1\n    - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor\n      value: 1\nFormatStyle: 'file'\nHeaderFilterRegex: '^(?!/lib.*)/include/.*\\.hpp$'\n",
+              "isBinary": false
+            },
+            "path": ".clang-tidy"
+          },
+          {
+            "name": ".gitignore",
+            "type": "blob",
+            "object": {
+              "text": "build/\n*.swp\n.ycm_extra_conf.py\n",
+              "isBinary": false
+            },
+            "path": ".gitignore"
+          },
+          {
+            "name": ".gitmodules",
+            "type": "blob",
+            "object": {
+              "text": "[submodule \"cmake-modules\"]\n\tpath = cmake-modules\n\turl = https://github.com/bilke/cmake-modules.git\n\tbranch = master\n[submodule \"lib/blink1-tool\"]\n\tpath = lib/blink1-tool\n\turl = https://github.com/todbot/blink1-tool.git\n\tbranch = main\n[submodule \"lib/googletest\"]\n\tpath = lib/googletest\n\turl = https://github.com/google/googletest.git\n\tbranch = main\n[submodule \"lib/doxygen-awesome-css\"]\n\tpath = lib/doxygen-awesome-css\n\turl = https://github.com/jothepro/doxygen-awesome-css.git\n\tbranch = main\n",
+              "isBinary": false
+            },
+            "path": ".gitmodules"
+          },
+          {
+            "name": "CMakeLists.txt",
+            "type": "blob",
+            "object": {
+              "text": "cmake_minimum_required(VERSION 3.10)\n\nproject(blink1-lib VERSION 1.0.0)\n\nset(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib)\n\nif(NOT CMAKE_BUILD_TYPE)\n  set(CMAKE_BUILD_TYPE Release)\nendif()\n\nif (CMAKE_BUILD_TYPE MATCHES Debug)\n    add_definitions(-DDEBUG_PRINTF)\nendif (CMAKE_BUILD_TYPE MATCHES Debug)\n\nset(CMAKE_EXPORT_COMPILE_COMMANDS yes)\n\nget_directory_property(HAS_PARENT PARENT_DIRECTORY)\noption(BLINK1_LIB_BUILD_STATIC no)\noption(BLINK1_LIB_BUILD_SHARED no)\n\nif ((HAS_PARENT OR BLINK1_LIB_BUILD_STATIC) AND NOT BLINK1_LIB_BUILD_SHARED)\n    set(LIBRARY_TYPE STATIC)\nelseif ((NOT HAS_PARENT OR BLINK1_LIB_BUILD_SHARED) AND NOT BLINK1_LIB_BUILD_STATIC)\n    set(LIBRARY_TYPE SHARED)\nelse()\n    message(FATAL_ERROR \"Must set exactly 1 of BLINK1_LIB_BUILD_SHARED or BLINK1_LIB_BUILD_STATIC, or neither of them.\")\nendif()\n\nmessage(\"-- blink1-lib library type: ${LIBRARY_TYPE}\")\n\nif (HAS_PARENT)\n    set(INCLUDE_DIR_SYSTEM SYSTEM)\nelse(HAS_PARENT)\n    set(INCLUDE_DIR_SYSTEM \"\")\nendif(HAS_PARENT)\n\n##############\n# BLINK1-LIB #\n##############\nset(CMAKE_CXX_FLAGS_RELEASE \"${CMAKE_CXX_FLAG_RELEASE} -O3\")\nset(CMAKE_CXX_FLAGS_DEBUG \"${CMAKE_CXX_FLAGS_DEBUG} -O0 -DDEBUG -g\")\nset(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)\nset(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)\n\nset(INCLUDES ${INCLUDE_DIR})\n\nset(SOURCES\n    ${SOURCE_DIR}/Blink1Device.cpp\n    ${SOURCE_DIR}/PatternLine.cpp\n    ${SOURCE_DIR}/PatternLineN.cpp\n    ${SOURCE_DIR}/PlayState.cpp\n    ${SOURCE_DIR}/RGB.cpp\n    ${SOURCE_DIR}/RGBN.cpp\n)\n\nset(CXX_STANDARD_REQUIRED yes)\n\nadd_library(blink1 ${LIBRARY_TYPE} ${SOURCES})\nadd_library(blink1-testing ${LIBRARY_TYPE} ${SOURCES} ${SOURCE_DIR}/Blink1TestingLibrary.cpp)\n\nset_property(TARGET blink1 PROPERTY CXX_STANDARD 20)\nset_property(TARGET blink1-testing PROPERTY CXX_STANDARD 20)\n\n###############\n# BLINK1-TOOL #\n###############\nset(BLINK1_DIR ${LIB_DIR}/blink1-tool)\nset(LIB_BLINK1_LOC ${BLINK1_DIR}/libblink1.so)\nset(INCLUDES ${INCLUDES} ${BLINK1_DIR} ${BLINK1_DIR}/hidapi/hidapi)\n\nadd_definitions(-DUSE_HIDAPI)\n\nadd_custom_command(OUTPUT ${LIB_BLINK1_LOC}\n                   COMMAND $(MAKE) lib\n                   WORKING_DIRECTORY ${BLINK1_DIR})\nadd_custom_target(libblink1_target DEPENDS ${LIB_BLINK1_LOC})\nadd_library(libblink1 STATIC IMPORTED GLOBAL)\nset_target_properties(libblink1 PROPERTIES IMPORTED_LOCATION ${LIB_BLINK1_LOC})\nadd_dependencies(libblink1 libblink1_target)\n\ntarget_link_libraries(blink1 libblink1)\n\ntarget_include_directories(blink1 ${INCLUDE_DIR_SYSTEM} PUBLIC ${INCLUDES})\ntarget_include_directories(blink1-testing ${INCLUDE_DIR_SYSTEM} PUBLIC ${INCLUDES})\n\nif(NOT HAS_PARENT)\n\n    ###########\n    # DOXYGEN #\n    ###########\n    set(DOXYGEN_GENERATE_HTML YES)\n    set(DOXYGEN_GENERATE_MAN YES)\n    set(DOXYGEN_GENERATE_TREEVIEW YES)\n    set(DOXYGEN_HTML_EXTRA_STYLESHEET \"${LIB_DIR}/doxygen-awesome-css/doxygen-awesome.css\")\n    find_package(Doxygen)\n    if (DOXYGEN_FOUND)\n        doxygen_add_docs(\n            doxygen\n            ${INCLUDE_DIR}\n            COMMENT \"Generate documentation\"\n        )\n    endif(DOXYGEN_FOUND)\n\n    ###########\n    # Testing #\n    ###########\n    add_subdirectory(${LIB_DIR}/googletest)\n    include(GoogleTest)\n    set(TEST_EXECUTABLE_NAME blink1_lib_test)\n    set(TEST_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)\n\n    set(TEST_SOURCES\n        ${TEST_SOURCE_DIR}/Blink1Device_BadInit_test.cpp\n        ${TEST_SOURCE_DIR}/Blink1Device_Blocking_test.cpp\n        ${TEST_SOURCE_DIR}/Blink1Device_GoodInit_test.cpp\n        ${TEST_SOURCE_DIR}/Blink1Device_GoodInitBadFunction_test.cpp\n        ${TEST_SOURCE_DIR}/PatternLineN_test.cpp\n        ${TEST_SOURCE_DIR}/PatternLine_test.cpp\n        ${TEST_SOURCE_DIR}/PlayState_test.cpp\n        ${TEST_SOURCE_DIR}/RGBN_test.cpp\n        ${TEST_SOURCE_DIR}/RGB_test.cpp\n    )\n\n    enable_testing()\n    add_executable(${TEST_EXECUTABLE_NAME} ${TEST_SOURCES})\n    target_link_libraries(${TEST_EXECUTABLE_NAME} blink1-testing gtest gtest_main gmock gmock_main)\n    gtest_discover_tests(${TEST_EXECUTABLE_NAME})\n    set_property(TARGET ${TEST_EXECUTABLE_NAME} PROPERTY CXX_STANDARD 20)\n\n    set(WARNINGS \"-Wall -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align -Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wsign-conversion\")\n    if (CMAKE_CXX_COMPILER_ID STREQUAL \"Clang\")\n        # Set specific warnings if they ever exist\n    elseif (CMAKE_CXX_COMPILER_ID STREQUAL \"GNU\")\n        set(WARNINGS \"${WARNINGS} -Wmisleading-indentation\")\n    endif()\n    set_target_properties(${TEST_EXECUTABLE_NAME} PROPERTIES COMPILE_FLAGS \"${WARNINGS}\")\n\n    ############\n    # COVERAGE #\n    ############\n    if (CMAKE_BUILD_TYPE MATCHES Debug)\n        list(APPEND CMAKE_MODULE_PATH \"${CMAKE_CURRENT_SOURCE_DIR}/cmake-modules\")\n        include(CodeCoverage)\n\n        set(COVERAGE_EXCLUDES \"/usr/*\" \"${LIB_DIR}/*\" \"${TEST_SOURCE_DIR}/*\")\n        APPEND_COVERAGE_COMPILER_FLAGS()\n\n        if (CMAKE_CXX_COMPILER_ID STREQUAL \"Clang\")\n            set(GCOV_PATH \"${CMAKE_CURRENT_SOURCE_DIR}/scripts/llvm-cov.sh\")\n            SETUP_TARGET_FOR_COVERAGE_LCOV(NAME coverage\n                                           EXECUTABLE ${TEST_EXECUTABLE_NAME}\n                                           DEPENDENCIES ${TEST_EXECUTABLE_NAME})\n        else()\n            SETUP_TARGET_FOR_COVERAGE_GCOVR_HTML(NAME coverage\n                                                 EXECUTABLE ${TEST_EXECUTABLE_NAME}\n                                                 DEPENDENCIES ${TEST_EXECUTABLE_NAME})\n        endif()\n\n        add_definitions(-DDEBUG_PRINTF)\n\n        set_target_properties(\n            blink1\n            PROPERTIES\n                CXX_CLANG_TIDY \"clang-tidy\"\n        )\n\n    endif (CMAKE_BUILD_TYPE MATCHES Debug)\n\n    ################\n    # OPTIMIZATION #\n    ################\n    include(CheckIPOSupported)\n    check_ipo_supported(RESULT ipo_supported OUTPUT error)\n    if (ipo_supported)\n        message(STATUS \"IPO/LTO enabled\")\n        set_property(TARGET ${TEST_EXECUTABLE_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)\n    else()\n        message(STATUS \"IPO/LTO not supported\")\n    endif()\n\nendif(NOT HAS_PARENT)\n",
+              "isBinary": false
+            },
+            "path": "CMakeLists.txt"
+          },
+          {
+            "name": "LICENSE",
+            "type": "blob",
+            "object": {
+              "text": "MIT License\n\nCopyright (c) 2022 Evan Allan\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n",
+              "isBinary": false
+            },
+            "path": "LICENSE"
+          },
+          {
+            "name": "README.md",
+            "type": "blob",
+            "object": {
+              "text": "blink1-lib\n==========\n[![Build](https://github.com/evan1026/blink1-lib/actions/workflows/build.yml/badge.svg)](https://github.com/evan1026/blink1-lib/actions/workflows/build.yml)\n\nThis project is a C++ wrapper that uses classes and RAII principles to simplify\ndevelopment of C++ code that interfaces with the [blink(1)](https://blink1.thingm.com/)\nas compared to [the official blink1-tool C library](https://github.com/todbot/blink1-tool).\n\n## Usage\nCurrently, this library supports being a CMake subdirectory, as well as building against shared or static\nlibrary files which can be found in the releases tab. I may also create a header-only version in the future for\nthose who prefer that.\n\n### Shared or Static Library\nEach release contains tar files with headers and library files which can be linked to your project.\n\n### CMake Subdirectory\nThere are two main targets created:\n* `blink1` - The main library\n* `blink1-testing` - The testing library (see below)\n\nExample usage:\n```cmake\nadd_definitions(-DUSE_HIDAPI)  # blink1-tool requires either USE_HIDAPI or USE_HIDDATA to be set\n                               # USE_HIDAPI is the default - see todbot/blink1-tool for more info\nadd_subdirectory(path/to/blink1-lib)\n\ntarget_link_libraries(${EXECUTABLE_NAME} blink1)\ntarget_link_libraries(${TEST_EXECUTABLE_NAME} blink1-testing)\n```\n\nBy default, when this library is built as a subdirectory, it will build static libraries.\nThis behavior can be changed by setting the `BLINK1_LIB_BUILD_SHARED` option.\n\n### CPM\nIncluding with CPM is much the same as adding the library as a subdirectory, but CPM manages downloading it:\n```cmake\nadd_definitions(-DUSE_HIDAPI)\n\nCPMAddPackage(\n  NAME blink1-lib\n  GITHUB_REPOSITORY evan1026/blink1-lib\n  VERSION 1.1.0\n)\n\ntarget_link_libraries(${EXECUTABLE_NAME} blink1)\ntarget_link_libraries(${TEST_EXECUTABLE_NAME} blink1-testing)\n```\n\nTo use the latest development version:\n```cmake\nCPMAddPackage(\n  NAME blink1-lib\n  GITHUB_REPOSITORY evan1026/blink1-lib\n  VERSION latest\n  GIT_TAG latest\n)\n```\n\n## Testing Library\nIn addition to providing a wrapper around the blink1-tool library, this project\nalso provides a testing library to simplify unit-testing and development for blink(1)\ndevices. This library is specifically designed to work with gtest, but I could update\nit to be more generic if there's any desire for that. It can also be used for\ndevelopment so that blink(1) code can be run without a device needing to be present,\nor to test your program's behavior under special cases that are hard to recreate\nwith a real device.\n\nIn order to use this library, include `Blink1TestingLibrary.hpp` in your test case\nand make sure you link against `blink1-testing`.\n\nFurther information about the library's features can be found [here](https://evan1026.github.io/blink1-lib/docs/namespacefake__blink1__lib.html).\n\n## Docs\nClass documentation can be found [here](https://evan1026.github.io/blink1-lib/docs/index.html)\n",
+              "isBinary": false
+            },
+            "path": "README.md"
+          },
+          {
+            "name": "cmake-modules",
+            "type": "commit",
+            "object": null,
+            "path": "cmake-modules"
+          },
+          {
+            "name": "src",
+            "type": "tree",
+            "object": {},
+            "path": "src"
+          },
+          {
+            "name": "include",
+            "type": "tree",
+            "object": {},
+            "path": "include"
+          }
+        ]
+      }
+    }
+  }
+}

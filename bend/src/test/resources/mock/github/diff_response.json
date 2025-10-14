@@ -1,0 +1,288 @@
+{
+  "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/compare/00cb437...HEAD",
+  "html_url": "https://github.com/MarcusGitAccount/home_assistant_ro/compare/00cb437...HEAD",
+  "permalink_url": "https://github.com/MarcusGitAccount/home_assistant_ro/compare/MarcusGitAccount:00cb437...MarcusGitAccount:590cd8b",
+  "diff_url": "https://github.com/MarcusGitAccount/home_assistant_ro/compare/00cb437...HEAD.diff",
+  "patch_url": "https://github.com/MarcusGitAccount/home_assistant_ro/compare/00cb437...HEAD.patch",
+  "base_commit": {
+    "sha": "00cb43782b9a46f7362ce16f24f3d03c9285b409",
+    "node_id": "MDY6Q29tbWl0MjYyMTU1NTU0OjAwY2I0Mzc4MmI5YTQ2ZjczNjJjZTE2ZjI0ZjNkMDNjOTI4NWI0MDk=",
+    "commit": {
+      "author": {
+        "name": "Marcus Pop",
+        "email": "marcuspopb@gmail.com",
+        "date": "2020-10-15T20:46:36Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2020-10-15T20:46:36Z"
+      },
+      "message": "Update README.md",
+      "tree": {
+        "sha": "ff62acede47a921065b68a1bdc14b76eab003e8b",
+        "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/ff62acede47a921065b68a1bdc14b76eab003e8b"
+      },
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/commits/00cb43782b9a46f7362ce16f24f3d03c9285b409",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsBcBAABCAAQBQJfiLUsCRBK7hj4Ov3rIwAAdHIIAJON/XVC1OtU5eoJfWs75sxR\nrPm6geNXM/TYQz2YO6qV0qhFFKiYWE/dRdhv0OBh/tIv3jGJ7H+hmcgrtTl44UFl\nFuZq4X7oMpH0M8nRK9/G/36LfDwhIWkmRVAiMIyVZj5Oqm6Ib19tTqEAwInlsqzd\na7JGaSksNsFwRe7ntcHHROLJJTusp2bAfwolVPQeyB4jEZwFC/SuRni4NSu+BIPk\n5xLh8vIrfvD4RPIk9uJ1G8BcNag4f9Q1fI+pJ5E2g2AMTRMvoO+JrvAItSdCdiCj\nv4NIvi01iyFfnCLy7kvzrXX4xsX72BnqXwZ58sfQ8y0vaiPKKvaSZG7bcuIvf7Y=\n=wOak\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree ff62acede47a921065b68a1bdc14b76eab003e8b\nparent b9c83610386bd3556676172b62acf0e4d3545f33\nauthor Marcus Pop <marcuspopb@gmail.com> 1602794796 +0300\ncommitter GitHub <noreply@github.com> 1602794796 +0300\n\nUpdate README.md"
+      }
+    },
+    "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/commits/00cb43782b9a46f7362ce16f24f3d03c9285b409",
+    "html_url": "https://github.com/MarcusGitAccount/home_assistant_ro/commit/00cb43782b9a46f7362ce16f24f3d03c9285b409",
+    "comments_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/commits/00cb43782b9a46f7362ce16f24f3d03c9285b409/comments",
+    "author": {
+      "login": "MarcusGitAccount",
+      "id": 16170265,
+      "node_id": "MDQ6VXNlcjE2MTcwMjY1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16170265?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MarcusGitAccount",
+      "html_url": "https://github.com/MarcusGitAccount",
+      "followers_url": "https://api.github.com/users/MarcusGitAccount/followers",
+      "following_url": "https://api.github.com/users/MarcusGitAccount/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MarcusGitAccount/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MarcusGitAccount/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MarcusGitAccount/subscriptions",
+      "organizations_url": "https://api.github.com/users/MarcusGitAccount/orgs",
+      "repos_url": "https://api.github.com/users/MarcusGitAccount/repos",
+      "events_url": "https://api.github.com/users/MarcusGitAccount/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MarcusGitAccount/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "b9c83610386bd3556676172b62acf0e4d3545f33",
+        "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/commits/b9c83610386bd3556676172b62acf0e4d3545f33",
+        "html_url": "https://github.com/MarcusGitAccount/home_assistant_ro/commit/b9c83610386bd3556676172b62acf0e4d3545f33"
+      }
+    ]
+  },
+  "merge_base_commit": {
+    "sha": "00cb43782b9a46f7362ce16f24f3d03c9285b409",
+    "node_id": "MDY6Q29tbWl0MjYyMTU1NTU0OjAwY2I0Mzc4MmI5YTQ2ZjczNjJjZTE2ZjI0ZjNkMDNjOTI4NWI0MDk=",
+    "commit": {
+      "author": {
+        "name": "Marcus Pop",
+        "email": "marcuspopb@gmail.com",
+        "date": "2020-10-15T20:46:36Z"
+      },
+      "committer": {
+        "name": "GitHub",
+        "email": "noreply@github.com",
+        "date": "2020-10-15T20:46:36Z"
+      },
+      "message": "Update README.md",
+      "tree": {
+        "sha": "ff62acede47a921065b68a1bdc14b76eab003e8b",
+        "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/ff62acede47a921065b68a1bdc14b76eab003e8b"
+      },
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/commits/00cb43782b9a46f7362ce16f24f3d03c9285b409",
+      "comment_count": 0,
+      "verification": {
+        "verified": true,
+        "reason": "valid",
+        "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsBcBAABCAAQBQJfiLUsCRBK7hj4Ov3rIwAAdHIIAJON/XVC1OtU5eoJfWs75sxR\nrPm6geNXM/TYQz2YO6qV0qhFFKiYWE/dRdhv0OBh/tIv3jGJ7H+hmcgrtTl44UFl\nFuZq4X7oMpH0M8nRK9/G/36LfDwhIWkmRVAiMIyVZj5Oqm6Ib19tTqEAwInlsqzd\na7JGaSksNsFwRe7ntcHHROLJJTusp2bAfwolVPQeyB4jEZwFC/SuRni4NSu+BIPk\n5xLh8vIrfvD4RPIk9uJ1G8BcNag4f9Q1fI+pJ5E2g2AMTRMvoO+JrvAItSdCdiCj\nv4NIvi01iyFfnCLy7kvzrXX4xsX72BnqXwZ58sfQ8y0vaiPKKvaSZG7bcuIvf7Y=\n=wOak\n-----END PGP SIGNATURE-----\n",
+        "payload": "tree ff62acede47a921065b68a1bdc14b76eab003e8b\nparent b9c83610386bd3556676172b62acf0e4d3545f33\nauthor Marcus Pop <marcuspopb@gmail.com> 1602794796 +0300\ncommitter GitHub <noreply@github.com> 1602794796 +0300\n\nUpdate README.md"
+      }
+    },
+    "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/commits/00cb43782b9a46f7362ce16f24f3d03c9285b409",
+    "html_url": "https://github.com/MarcusGitAccount/home_assistant_ro/commit/00cb43782b9a46f7362ce16f24f3d03c9285b409",
+    "comments_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/commits/00cb43782b9a46f7362ce16f24f3d03c9285b409/comments",
+    "author": {
+      "login": "MarcusGitAccount",
+      "id": 16170265,
+      "node_id": "MDQ6VXNlcjE2MTcwMjY1",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16170265?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/MarcusGitAccount",
+      "html_url": "https://github.com/MarcusGitAccount",
+      "followers_url": "https://api.github.com/users/MarcusGitAccount/followers",
+      "following_url": "https://api.github.com/users/MarcusGitAccount/following{/other_user}",
+      "gists_url": "https://api.github.com/users/MarcusGitAccount/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/MarcusGitAccount/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/MarcusGitAccount/subscriptions",
+      "organizations_url": "https://api.github.com/users/MarcusGitAccount/orgs",
+      "repos_url": "https://api.github.com/users/MarcusGitAccount/repos",
+      "events_url": "https://api.github.com/users/MarcusGitAccount/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/MarcusGitAccount/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "web-flow",
+      "id": 19864447,
+      "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/web-flow",
+      "html_url": "https://github.com/web-flow",
+      "followers_url": "https://api.github.com/users/web-flow/followers",
+      "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+      "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+      "organizations_url": "https://api.github.com/users/web-flow/orgs",
+      "repos_url": "https://api.github.com/users/web-flow/repos",
+      "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/web-flow/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "b9c83610386bd3556676172b62acf0e4d3545f33",
+        "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/commits/b9c83610386bd3556676172b62acf0e4d3545f33",
+        "html_url": "https://github.com/MarcusGitAccount/home_assistant_ro/commit/b9c83610386bd3556676172b62acf0e4d3545f33"
+      }
+    ]
+  },
+  "status": "ahead",
+  "ahead_by": 1,
+  "behind_by": 0,
+  "total_commits": 1,
+  "commits": [
+    {
+      "sha": "590cd8bc11f1be53d09ee3dfb581818814fa99e2",
+      "node_id": "C_kwDOD6AtItoAKDU5MGNkOGJjMTFmMWJlNTNkMDllZTNkZmI1ODE4MTg4MTRmYTk5ZTI",
+      "commit": {
+        "author": {
+          "name": "Marcus Pop",
+          "email": "marcuspopb@gmail.com",
+          "date": "2022-10-01T10:51:01Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2022-10-01T10:51:01Z"
+        },
+        "message": "Update requirements.txt",
+        "tree": {
+          "sha": "013585737c8728d33335921de223f4ca11a0cf4a",
+          "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/trees/013585737c8728d33335921de223f4ca11a0cf4a"
+        },
+        "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/git/commits/590cd8bc11f1be53d09ee3dfb581818814fa99e2",
+        "comment_count": 0,
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsBcBAABCAAQBQJjOBuVCRBK7hj4Ov3rIwAAw7MIAIGqOVamJxtYlo6UMq+wxXyb\nrUEc03ZYufi7l1TnO9Rhcisec1Fo5q6uhzcZd57H8hwpBE25XFtQFdGLSbCd5dwI\nnwTDzBVy0KF2donRP0yTqjlUdAs0DrnLVJ7l0ddo8FDNfwi2PbnpReir+ifF6jBU\nOoPL0HJ33He2GNwEwQ7UDDIyTFvEt9rkDHca8ZQaj4gXjVULXdEgP7Qa+7VfZsM0\n/djDfOP79Swb4NwjlHef+S5bRdMUXic0sht3nBLR2/XCWKnFdILK6KX2RCsyV8+K\nbDG/0SZOQKqOPJAm1drt7GY4P7B3WRfdkMZiK//oEXsv8mQe4RhQUVhOwF9i74E=\n=xt4j\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 013585737c8728d33335921de223f4ca11a0cf4a\nparent 00cb43782b9a46f7362ce16f24f3d03c9285b409\nauthor Marcus Pop <marcuspopb@gmail.com> 1664621461 +0300\ncommitter GitHub <noreply@github.com> 1664621461 +0300\n\nUpdate requirements.txt"
+        }
+      },
+      "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/commits/590cd8bc11f1be53d09ee3dfb581818814fa99e2",
+      "html_url": "https://github.com/MarcusGitAccount/home_assistant_ro/commit/590cd8bc11f1be53d09ee3dfb581818814fa99e2",
+      "comments_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/commits/590cd8bc11f1be53d09ee3dfb581818814fa99e2/comments",
+      "author": {
+        "login": "MarcusGitAccount",
+        "id": 16170265,
+        "node_id": "MDQ6VXNlcjE2MTcwMjY1",
+        "avatar_url": "https://avatars.githubusercontent.com/u/16170265?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/MarcusGitAccount",
+        "html_url": "https://github.com/MarcusGitAccount",
+        "followers_url": "https://api.github.com/users/MarcusGitAccount/followers",
+        "following_url": "https://api.github.com/users/MarcusGitAccount/following{/other_user}",
+        "gists_url": "https://api.github.com/users/MarcusGitAccount/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/MarcusGitAccount/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/MarcusGitAccount/subscriptions",
+        "organizations_url": "https://api.github.com/users/MarcusGitAccount/orgs",
+        "repos_url": "https://api.github.com/users/MarcusGitAccount/repos",
+        "events_url": "https://api.github.com/users/MarcusGitAccount/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/MarcusGitAccount/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "committer": {
+        "login": "web-flow",
+        "id": 19864447,
+        "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+        "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/web-flow",
+        "html_url": "https://github.com/web-flow",
+        "followers_url": "https://api.github.com/users/web-flow/followers",
+        "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+        "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+        "organizations_url": "https://api.github.com/users/web-flow/orgs",
+        "repos_url": "https://api.github.com/users/web-flow/repos",
+        "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/web-flow/received_events",
+        "type": "User",
+        "site_admin": false
+      },
+      "parents": [
+        {
+          "sha": "00cb43782b9a46f7362ce16f24f3d03c9285b409",
+          "url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/commits/00cb43782b9a46f7362ce16f24f3d03c9285b409",
+          "html_url": "https://github.com/MarcusGitAccount/home_assistant_ro/commit/00cb43782b9a46f7362ce16f24f3d03c9285b409"
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "sha": "4d6903a5d0cfa07ae8097c08ea33573c87deb792",
+      "filename": "modules/calendar/requirements.txt",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/MarcusGitAccount/home_assistant_ro/blob/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
+      "raw_url": "https://github.com/MarcusGitAccount/home_assistant_ro/raw/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
+      "contents_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/contents/modules%2Fcalendar%2Frequirements.txt?ref=590cd8bc11f1be53d09ee3dfb581818814fa99e2",
+      "patch": "@@ -1,5 +1,5 @@\n google_auth_oauthlib==0.4.1\r\n-Flask==1.1.2\r\n+Flask==2.2.2\r\n Flask_Cors==3.0.8\r\n google_api_python_client==1.9.3\r\n protobuf==3.12.2\r"
+    },
+    {
+      "sha": "4d6903a5d0cfa07ae8097c08ea33573c87deb792",
+      "filename": "modules/calendar/file.pl",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/MarcusGitAccount/home_assistant_ro/blob/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
+      "raw_url": "https://github.com/MarcusGitAccount/home_assistant_ro/raw/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
+      "contents_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/contents/modules%2Fcalendar%2Frequirements.txt?ref=590cd8bc11f1be53d09ee3dfb581818814fa99e2",
+      "patch": "@@ -1,5 +1,5 @@\n google_auth_oauthlib==0.4.1\r\n-Flask==1.1.2\r\n+Flask==2.2.2\r\n Flask_Cors==3.0.8\r\n google_api_python_client==1.9.3\r\n protobuf==3.12.2\r"
+    },
+    {
+      "sha": "4d6903a5d0cfa07ae8097c08ea33573c87deb792",
+      "filename": "modules/weather/file.pl",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "changes": 2,
+      "blob_url": "https://github.com/MarcusGitAccount/home_assistant_ro/blob/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
+      "raw_url": "https://github.com/MarcusGitAccount/home_assistant_ro/raw/590cd8bc11f1be53d09ee3dfb581818814fa99e2/modules%2Fcalendar%2Frequirements.txt",
+      "contents_url": "https://api.github.com/repos/MarcusGitAccount/home_assistant_ro/contents/modules%2Fcalendar%2Frequirements.txt?ref=590cd8bc11f1be53d09ee3dfb581818814fa99e2",
+      "patch": "@@ -1,5 +1,5 @@\n google_auth_oauthlib==0.4.1\r\n-Flask==1.1.2\r\n+Flask==2.2.2\r\n Flask_Cors==3.0.8\r\n google_api_python_client==1.9.3\r\n protobuf==3.12.2\r"
+    }
+  ]
+}

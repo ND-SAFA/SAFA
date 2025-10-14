@@ -1,0 +1,64 @@
+{
+  "data": {
+    "viewer": {
+      "repositories": {
+        "edges": [
+          {
+            "node": {
+              "id": "MDEwOlJlcG9zaXRvcnkzODQxMDYxMDE=",
+              "name": "fend",
+              "owner": {
+                "login": "ND-SAFA"
+              },
+              "isPrivate": true,
+              "url": "https://github.com/ND-SAFA/fend",
+              "description": "SAFA's VueJS front-end.",
+              "visibility": "PRIVATE",
+              "createdAt": "2021-07-08T11:46:49Z",
+              "primaryLanguage": {
+                "name": "TypeScript"
+              },
+              "defaultBranchRef": null,
+              "refs": {
+                "edges": [
+                  {
+                    "node": {
+                      "name": "FEAT-aws-integration",
+                      "target": {
+                        "oid": "c56fdb05b91a229c07013d7c01c75563f56f7f1b"
+                      }
+                    }
+                  },
+                  {
+                    "node": {
+                      "name": "development",
+                      "target": {
+                        "oid": "8abec6b74c08236cc8972687e566957a00de7521"
+                      }
+                    }
+                  },
+                  {
+                    "node": {
+                      "name": "production",
+                      "target": {
+                        "oid": "042a4c0e4e3d518a5048d664ce13613db5edf41d"
+                      }
+                    }
+                  }
+                ],
+                "pageInfo": {
+                  "hasNextPage": false,
+                  "endCursor": "Mw"
+                }
+              }
+            }
+          }
+        ],
+        "pageInfo": {
+          "hasNextPage": false,
+          "endCursor": "no idea what this cursor looks like"
+        }
+      }
+    }
+  }
+}

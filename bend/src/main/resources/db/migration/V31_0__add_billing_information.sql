@@ -1,0 +1,1 @@
+UPDATE organization SET payment_tier = 'AS_NEEDED' WHERE TRUE;

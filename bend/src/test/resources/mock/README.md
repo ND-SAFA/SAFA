@@ -1,0 +1,1 @@
+Storing data resources for mocked services

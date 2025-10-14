@@ -1,0 +1,4 @@
+ALTER TABLE job
+    ADD COLUMN task_id BINARY(16) NULL;
+
+

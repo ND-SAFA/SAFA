@@ -1,0 +1,3 @@
+ALTER TABLE github_access_credentials DROP COLUMN refresh_token;
+ALTER TABLE github_access_credentials DROP COLUMN access_token_expiration_date;
+ALTER TABLE github_access_credentials DROP COLUMN refresh_token_expiration_date;

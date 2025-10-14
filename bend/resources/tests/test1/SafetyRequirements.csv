@@ -1,0 +1,6 @@
+ID,Summary,Content
+SR-1,The Isolette shall include an independent regulator function that maintains the Current Temperature inside the Isolette within the Desired Temperature Range.,The Isolette shall include an independent regulator function that maintains the Current Temperature inside the Isolette within the Desired Temperature Range.
+SR-2,The Isolette shall include an independent monitor function that activates an Alarm when a safety violation occurs,The Isolette shall include an independent monitor function that activates an Alarm when a safety violation occurs
+SR-2.1,The alarm shall be activated when the Current Temperature falls below or rises above the Alarm Temperature Range.,The alarm shall be activated when the Current Temperature falls below or rises above the Alarm Temperature Range.
+SR-2.2,The alarm shall be activated when the Current Temperature or the Alarm Temperature Range is flagged as invalid.,The alarm shall be activated when the Current Temperature or the Alarm Temperature Range is flagged as invalid.
+SR-2.3,The alarm shall be activated when an internal failure has been detected in the monitor function.,The alarm shall be activated when an internal failure has been detected in the monitor function.

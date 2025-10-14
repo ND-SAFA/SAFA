@@ -1,0 +1,92 @@
+name: Build, Test, and Release
+
+on:
+  push:
+    branches:
+      - development
+      - production
+  pull_request:
+    branches:
+      - development
+      - production
+
+env:
+  JAVA_VERSION: 17
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: ${{ env.JAVA_VERSION }}
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Test Code
+        run: ./gradlew test
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-report
+          path: build/reports/tests/test/
+
+  run_checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: ${{ env.JAVA_VERSION }}
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Get Changed Files
+        id: changed-files
+        uses: tj-actions/changed-files@v42
+
+      - name: Run Custom Checks
+        env:
+          ADDED_FILES: ${{ steps.changed-files.outputs.added_files }}
+        run: |
+          for file in checks/*.py; do
+            echo Running $file
+            if ! python "$file"; then
+              exit 1
+            fi
+          done
+
+      - name: Lint Source Code
+        run: ./gradlew checkstyleMain
+
+  release_build:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/production' }}
+    needs: [run_tests, run_checks]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get Tag Name
+        id: get-tag-name
+        run: echo TAG="v$(./builder.sh print_version)" >> "$GITHUB_OUTPUT"
+
+      - name: Create Tag
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: ${{ steps.get-tag-name.outputs.TAG }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.get-tag-name.outputs.TAG }}
+          name: "Release ${{ steps.get-tag-name.outputs.TAG }}"
+          body: "[See the changelog on Notion](https://nd-safa.notion.site/60a940adc5b74cc6b64cdc9e4a5cd440?v=639b39b6b8fd466a8084c1e1d24569e9)"

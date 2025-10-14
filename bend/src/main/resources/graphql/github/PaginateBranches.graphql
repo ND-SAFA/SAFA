@@ -1,0 +1,20 @@
+query ($repoName: String!, $repoOwner: String!, $after: String!) {
+    repository(name: $repoName, owner: $repoOwner) {
+        refs(refPrefix: "refs/heads/", first: 100, after: $after) {
+            edges {
+                node {
+                    name
+                    target {
+                        ... on Commit {
+                            oid
+                        }
+                    }
+                }
+            }
+            pageInfo {
+                hasNextPage
+                endCursor
+            }
+        }
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "artifacts": [
+        {
+            "type": "requirements",
+            "fileName": "requirements.csv"
+        },
+        {
+            "type": "designs",
+            "fileName": "designs.csv"
+        },
+        {
+            "type": "code",
+            "fileName": "code.csv"
+        }
+    ],
+    "traces": [
+        {
+            "sourceType": "designs",
+            "targetType": "requirements",
+            "fileName": "designs2requirements.csv",
+            "generateLinks": false
+        },
+        {
+            "sourceType": "code",
+            "targetType": "designs",
+            "fileName": "code2designs.csv",
+            "generateLinks": false
+        }
+    ]
+}

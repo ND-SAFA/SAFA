@@ -1,4 +1,0 @@
-[submodule "tgen"]
-	path = tgen
-	url = https://github.com/ND-SAFA/tgen.git
-	branch = development

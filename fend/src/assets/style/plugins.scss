@@ -1,0 +1,27 @@
+// Code Diff - Line Style
+
+code.hljs {
+  min-height: 26px;
+}
+
+// Grid Layout - Item Backdrop
+
+.vue-grid-item.css-transforms {
+  background-color: $color-background;
+  border-radius: 4px;
+}
+
+// Quasar - Inputs
+
+.q-field {
+  min-width: 200px;
+}
+
+// Quasar - Stepper
+
+.stepper-minimal {
+  .q-stepper__title {
+    white-space: pre-wrap;
+    width: min-content;
+  }
+}

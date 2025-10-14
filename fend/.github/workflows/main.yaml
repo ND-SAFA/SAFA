@@ -1,0 +1,29 @@
+name: Linting
+
+on:
+  pull_request:
+    branches:
+      - development
+      - staging
+
+jobs:
+  lint-run:
+    name: Lint Checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install Node.js dependencies
+        run: npm i
+
+      - name: Run linters
+        run: npm run lint
+
+      - name: Build
+        run: npm run build

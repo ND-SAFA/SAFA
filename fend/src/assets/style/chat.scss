@@ -1,0 +1,12 @@
+.chat-wrapper {
+  max-width: 60vw;
+
+  &.chat-messages {
+    max-height: 70vh;
+  }
+
+  &.chat-input {
+    position: absolute;
+    bottom: 20px;
+  }
+}

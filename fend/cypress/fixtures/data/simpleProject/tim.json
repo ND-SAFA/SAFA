@@ -1,0 +1,52 @@
+{
+  "artifacts": [
+    {
+      "type": "EnvironmentalAssumption",
+      "fileName": "EnvironmentalAssumption.csv"
+    },
+    {
+      "type": "Hazard",
+      "fileName": "Hazard.csv"
+    },
+    {
+      "type": "Requirement",
+      "fileName": "Requirement.csv"
+    },
+    {
+      "type": "Design",
+      "fileName": "Design.csv"
+    }
+  ],
+  "traces": [
+    {
+      "sourceType": "Hazard",
+      "targetType": "Hazard",
+      "fileName": "Hazard2Hazard.csv"
+    },
+    {
+      "sourceType": "Design",
+      "targetType": "Design",
+      "fileName": "Design2Design.csv"
+    },
+    {
+      "sourceType": "Design",
+      "targetType": "Requirement",
+      "fileName": "Design2Requirement.csv"
+    },
+    {
+      "sourceType": "Requirement",
+      "targetType": "Hazard",
+      "fileName": "Requirement2Hazard.csv"
+    },
+    {
+      "sourceType": "EnvironmentalAssumption",
+      "targetType": "Hazard",
+      "fileName": "EnvironmentalAssumption2Hazard.csv"
+    },
+    {
+      "sourceType": "Requirement",
+      "targetType": "Requirement",
+      "fileName": "Requirement2Requirement.csv"
+    }
+  ]
+}

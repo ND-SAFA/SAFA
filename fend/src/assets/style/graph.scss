@@ -1,0 +1,172 @@
+$graph-border-width: 1px;
+$graph-border-radius: 8px;
+
+// Graph Window
+
+#cytoscape-artifact {
+  min-height: inherit !important;
+}
+
+.cy-popup {
+  position: absolute;
+  z-index: 10;
+
+  & > div {
+    margin-top: 30vh;
+  }
+}
+
+.cy-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.artifact-view {
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out, width 0.1s ease-in-out;
+
+  &.visible {
+    transition-delay: 0.1s;
+    opacity: 100;
+  }
+
+  &.disabled {
+    display: none;
+  }
+
+  &.collapsed {
+    width: 0 !important;
+  }
+}
+
+.artifact-fab {
+  z-index: 1000;
+}
+
+// Graph Nodes
+
+.cy-node-position {
+  position: absolute;
+  z-index: 1;
+  webkit-transform-origin: top left;
+  ms-transform-origin: top left;
+  transform-origin: top left;
+}
+
+.cy-node-display {
+  border-width: 3px !important;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: $color-neutral;
+  cursor: pointer;
+  // Helps the graph not get fuzzy when adding a shadow on hover.
+  box-shadow: 2px 5px 9px rgba(0,0,0,0) !important;
+
+  &:hover, &.cy-node-selected {
+    //background-color: $color-background;
+    box-shadow: rgba(0, 0, 0, 0.24) 2px 5px 9px !important;
+
+    &:after {
+      background-image: linear-gradient(to bottom, rgba(255,255,255,0), $color-neutral 50%);
+    }
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  .cy-node-title {
+    span {
+      max-height: 50px;
+      line-height: 24px !important;
+    }
+  }
+
+  .cy-node-artifact-name {
+    h1 {
+      line-height: 28px !important;
+    }
+  }
+
+  & > .cy-node-separator {
+    height: 3px;
+    border-radius: 1px;
+  }
+
+  &.cy-node-tim {
+    text-align: center;
+    width: 252px;
+    height: 152px;
+  }
+
+  &.cy-node-artifact {
+    width: 206px;
+    height: 160px;
+  }
+
+  &.cy-node-sidebar {
+    position: absolute;
+    left: -70px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &.cy-node-footer {
+    position: inherit;
+    width: 206px;
+    height: 40px;
+    margin-top: 4px;
+
+    & > .cy-node-delta-footer {
+      position: absolute;
+      top: 0;
+      left: 28%;
+    }
+  }
+
+  &.cy-node-menu {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .cy-node-delta-chip {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    width: 98%;
+    height: 10px;
+    border-radius: 5px;
+
+    & > .cy-node-delta-child-chip {
+      height: 10px;
+      border-radius: 5px;
+      width: 32.5%;
+      margin-right: 2px;
+    }
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0), $color-background 70%);
+    width: 100%;
+    height: 4px;
+  }
+}
+
+// Context Menu
+
+.cy-menu-position {
+  z-index: 1000;
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: auto;
+  bottom: auto;
+}

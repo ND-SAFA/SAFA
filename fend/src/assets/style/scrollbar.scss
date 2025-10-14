@@ -1,0 +1,26 @@
+// Scrollbar Styling
+
+*::-webkit-scrollbar {
+  background: transparent !important;
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent !important;        /* color of the tracking area */
+}
+
+*::-webkit-scrollbar-thumb {
+  background: $color-border !important;    /* color of the scroll thumb */
+  border-radius: 20px !important;       /* roundness of the scroll thumb */
+  border: 3px solid $color-neutral !important;  /* creates padding around scroll thumb */
+
+  &:hover {
+    background: $color-primary !important;
+    border-width: 2px !important;
+  }
+}
+
+* {
+  scrollbar-color: $color-primary transparent !important;   /* scroll thumb and track */
+}

@@ -1,0 +1,301 @@
+// Public
+
+.card-page {
+  width: 450px;
+
+  .login-button {
+    width: 120px;
+  }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+// Navigation - Inputs
+
+.button-group-selected {
+  background-color: $color-background !important;
+  border-radius: $default-border-radius !important;
+}
+
+.nav-input {
+  background-color: $color-background;
+
+  & > .q-field__inner > .q-field__control:hover:after {
+    border-color: $color-primary !important;
+  }
+
+  &.q-field--highlighted, &:hover, &:focus {
+    i {
+      color: $color-primary !important;
+    }
+  }
+
+  .q-field__control:before {
+    border-color: $color-primary !important;
+  }
+
+  .q-field__native > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 75%;
+  }
+
+  &.nav-document {
+    min-width: 200px;
+    max-width: 300px;
+  }
+
+  &.nav-version {
+    width: 100px;
+    min-width: 100px;
+  }
+
+  &.nav-search-mode {
+    min-width: 150px !important;
+  }
+
+  &.nav-search-prompt {
+    width: 600px;
+    min-width: 130px !important;
+    max-width: 30vw;
+  }
+}
+
+.nav-multi-input {
+  &-left {
+    & > .q-field__inner > .q-field__control {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+
+      &:before {
+        border-right: none;
+      }
+    }
+  }
+
+  &-right {
+    & > .q-field__inner > .q-field__control {
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+
+      &:before {
+        border-left: none;
+      }
+    }
+  }
+}
+
+.nav-breadcrumb-list {
+  font-size: 32px;
+}
+
+.nav-breadcrumb {
+  min-width: 120px !important;
+  max-width: 300px;
+  border: 1px solid transparent;
+  transition: border 0.3s;
+  border-radius: $default-border-radius;
+
+  .q-field__label {
+    font-size: 16px;
+  }
+
+  .q-field__native {
+    font-size: 16px;
+    color: $color-text !important;
+
+    & > span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &:hover, &:focus, &:active, &.q-field--highlighted {
+    border: 1px solid $color-primary !important;
+
+    .q-field__control:before {
+      border-color: $color-primary !important;
+    }
+
+    .q-icon, .q-spinner {
+      color: $color-primary !important;
+    }
+  }
+
+  &.q-field--highlighted {
+    background-color: $color-background !important;
+  }
+
+  &.nav-view {
+    max-width: 400px !important;
+  }
+}
+
+// Navigation - Topbar
+
+.nav-topbar {
+  //border-left: 1px solid rgba(0, 0, 0, 0.12);
+  min-height: 70px;
+}
+
+.nav-saving-icon {
+  position: relative;
+  width: 0;
+  height: 0;
+  right: 4px;
+  bottom: 2px;
+}
+
+.nav-job-icon {
+  position: relative;
+  bottom: 4px;
+  right: 16px;
+  width: 0;
+  height: 0;
+}
+
+.nav-job-badge {
+  z-index: 1000;
+}
+
+.nav-mode-select {
+  .q-btn--outline:before {
+    border-radius: $default-border-radius;
+  }
+}
+
+// Navigation - Sidebar
+
+.q-drawer--mobile {
+  width: 100% !important;
+}
+
+.nav-sidebar-header {
+  height: 40px;
+
+  &-open {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+.nav-account {
+  position: absolute;
+  bottom: 0;
+}
+
+.icon-safa {
+  animation: fadeIn 1s;
+
+  .logo-wing-line, .logo-border-line, .logo-body-line {
+    fill: none;
+    stroke: url(#color-gradient);
+    stroke-miterlimit: 10;
+  }
+
+  .logo-border-line {
+    fill: $color-background;
+    stroke-width: 16px;
+  }
+
+  .logo-body-line, .logo-wing-line {
+    stroke-width: 6px;
+  }
+
+  .logo-eye, .logo-border-point, .logo-wing-dot, .logo-name {
+    fill: url(#color-gradient);
+  }
+
+  &.logo {
+    height: 60px;
+    width: 60px;
+  }
+
+  &.clickable {
+    height: 42pt;
+  }
+}
+
+.q-drawer-container:not(.q-drawer--mini-animate) .q-drawer--mini .q-item {
+  margin: 4px;
+}
+
+.q-item.q-link {
+  margin: 8px;
+  border-radius: $default-border-radius;
+  transition: margin 0.1s;
+
+  &.q-router-link--active {
+    background-color: $color-background !important;
+  }
+}
+
+// Navigation - Notifications
+
+.nav-notifications {
+  min-width: 300px;
+  max-height: 40vh;
+  overflow-y: scroll;
+}
+
+.nav-alert {
+  border-left-width: 4px !important;
+}
+
+// Navigation - Page
+
+.nav-page-centered {
+  max-width: 1100px;
+}
+
+.nav-page-loading {
+  margin-top: 40vh;
+}
+
+// Fixes box shadow in dark mode.
+
+body.body--dark .q-layout__shadow:after {
+  box-shadow: 0 0 10px 2px rgb(255 255 255 / 6%), 0 0 10px rgb(255 255 255 / 6%);
+}
+
+// Navigation - Modal
+
+.modal {
+  &-sm {
+    width: 400px;
+  }
+  &-md {
+    width: 600px;
+    max-width: unset !important;
+  }
+  &-lg {
+    width: 800px;
+    max-width: unset !important;
+  }
+  &-xl {
+    width: 80vw;
+    max-width: unset !important;
+  }
+}
+
+.rounded {
+  border-radius: 4px !important;
+}
+
+// Onboarding
+
+.q-carousel__control {
+  background: linear-gradient(rgba(0, 0, 0, 0), $color-neutral 40%);
+  bottom: 0;
+}
+
+// Tabs
+
+.q-tab__label {
+  font-size: 20px !important;
+}

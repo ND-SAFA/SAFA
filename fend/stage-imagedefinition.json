@@ -1,0 +1,6 @@
+[
+  {
+    "name": "fend-core",
+    "imageUri": "310072273153.dkr.ecr.us-east-1.amazonaws.com/fend:latest"
+  }
+]

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="robots" content="noindex"/>
+    <link rel="icon" type="image/x-icon" href="<%= BASE_URL %>favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="<%= BASE_URL %>favicon.ico" />
+    <title>SAFA</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.websitepolicies.io/lib/cookieconsent/cookieconsent.min.js" defer></script>
+    <script>
+        window.addEventListener("load",function(){window.wpcc.init({
+          "border":"thin",
+          "corners":"small",
+          "colors":{
+            "popup":{"background":"#ffffff","text":"#000000","border":"#5975B8"},
+            "button":{"background":"#5975B8","text":"#ffffff"}
+          },
+          "position":"bottom",
+          "content":{
+            "href":"https://www.notion.so/nd-safa/Cookie-Policy-42e25cd70d40431194ae9ac0a79c717b",
+            "button":"I Accept",
+            "message":"This website uses cookies for securely storing your account information."
+        }})});
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <strong>
+        We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work
+        properly without JavaScript enabled. Please enable it to
+        continue.
+      </strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>

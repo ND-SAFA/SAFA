@@ -1,0 +1,244 @@
+$color-primary: var(--q-primary);
+$color-secondary: var(--q-secondary);
+$color-accent: var(--q-accent);
+
+$color-info: var(--q-info);
+$color-positive: var(--q-positive);
+$color-negative: var(--q-negative);
+$color-warning: var(--q-warning);
+
+$color-text: var(--q-text);
+$color-caption: var(--q-textCaption);
+$color-neutral: var(--q-neutral);
+$color-background: var(--q-background);
+$color-border: var(--q-border);
+$color-selected: var(--q-selected);
+
+$color-added: var(--q-added);
+$color-modified: var(--q-modified);
+$color-removed: var(--q-removed);
+$color-flagged: var(--q-flagged);
+$color-unchanged: var(--q-unchanged);
+
+$color-node-default: var(--q-nodeDefault);
+$color-node-generated: var(--q-nodeGenerated);
+
+$color-node-gradient1: var(--q-nodeGradient1);
+$color-node-gradient2: var(--q-nodeGradient2);
+$color-node-gradient3: var(--q-nodeGradient3);
+$color-node-gradient4: var(--q-nodeGradient4);
+$color-node-gradient5: var(--q-nodeGradient5);
+$color-node-gradient6: var(--q-nodeGradient6);
+$color-node-gradient7: var(--q-nodeGradient7);
+$color-node-gradient8: var(--q-nodeGradient8);
+$color-node-gradient9: var(--q-nodeGradient9);
+
+$color-gradient-list:
+        $color-node-gradient1, $color-node-gradient2, $color-node-gradient3,
+        $color-node-gradient4, $color-node-gradient5, $color-node-gradient6,
+        $color-node-gradient7, $color-node-gradient8, $color-node-gradient9;
+$color-linear-gradient: linear-gradient(
+                to bottom right,
+                #{$color-node-gradient1},
+                #{$color-node-gradient2},
+                #{$color-node-gradient3},
+                #{$color-node-gradient5},
+                #{$color-node-gradient7},
+                #{$color-node-gradient8},
+                #{$color-node-gradient9}
+) !important;
+
+// Gradient
+
+.text-gradient, .bg-gradient {
+  &:before {
+    border-color: $color-background !important;
+  }
+
+  i, .q-fab__label, .q-btn__content {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-image: $color-linear-gradient;
+  }
+}
+
+.bd-gradient {
+  background-image: $color-linear-gradient;
+
+  &:before {
+    border: 1px solid transparent !important;
+    background: $color-neutral !important;
+    background-clip: content-box, border-box !important;
+    background-origin: border-box !important;
+  }
+}
+
+.nav-gradient {
+  circle {
+    stroke: url(#color-gradient-full);
+  }
+  .q-linear-progress__model {
+    &:before, &:after {
+      border: 1px solid transparent !important;
+      background-image: $color-linear-gradient;
+      background-clip: content-box, border-box !important;
+      background-origin: border-box !important;
+    }
+  }
+}
+
+// Background Palette Tags
+
+.bg-transparent {
+  background-color: transparent !important;
+}
+
+.bg-background {
+  background-color: $color-background !important;
+}
+
+.bg-neutral {
+  background-color: $color-neutral !important;
+}
+
+.bg-added {
+  background-color: $color-added !important;
+}
+
+.bg-modified {
+  background-color: $color-modified !important;
+}
+
+.bg-removed {
+  background-color: $color-removed !important;
+}
+
+.bg-unchanged {
+  background-color: $color-unchanged !important;
+}
+
+@for $i from 1 through 9 {
+  .bg-nodeGradient#{$i} {
+    background-color: nth($color-gradient-list, $i) !important;
+  }
+}
+
+// Border Palette Tags
+
+.bd-primary {
+  border: 1px solid $color-primary !important;
+}
+
+.bd-secondary {
+  border: 1px solid $color-secondary !important;
+}
+
+.bd-positive {
+  border: 1px solid $color-positive !important;
+}
+
+.bd-negative {
+  border: 1px solid $color-negative !important;
+}
+
+.bd-warning {
+  border: 1px solid $color-warning !important;
+}
+
+.bd-text {
+  border: 1px solid $color-text !important;
+}
+
+.bd-textCaption {
+  border: 1px solid $color-caption !important;
+}
+
+.bd-selected {
+  border: 1px solid $color-selected !important;
+}
+
+.bd-border {
+  border: 1px solid $color-border !important;
+}
+
+.bd-added {
+  border: 1px solid $color-added !important;
+}
+
+.bd-modified {
+  border: 1px solid $color-modified !important;
+}
+
+.bd-removed {
+  border: 1px solid $color-removed !important;
+}
+
+.bd-unchanged {
+  border: 1px solid $color-unchanged !important;
+}
+
+@for $i from 1 through 9 {
+  .bd-nodeGradient#{$i} {
+    border: 1px solid nth($color-gradient-list, $i) !important;
+  }
+}
+
+.bd-transparent {
+  border: 1px solid transparent !important;
+}
+
+// Text Palette Tags
+
+.text-text {
+  color: $color-text !important;
+}
+
+.text-textCaption {
+  color: $color-caption !important;
+}
+
+.text-added {
+  color: $color-added !important;
+}
+
+.text-modified {
+  color: $color-modified !important;
+}
+
+.text-removed {
+  color: $color-removed !important;
+}
+
+.text-warning {
+  color: $color-warning !important;
+}
+
+.text-nodeDefault {
+  color: $color-node-default !important;
+}
+
+.text-nodeGenerated {
+  color: $color-node-generated !important;
+}
+
+.text-added {
+  color: $color-added !important;
+}
+
+.text-modified {
+  color: $color-modified !important;
+}
+
+.text-removed {
+  color: $color-removed !important;
+}
+
+.text-unchanged {
+  color: $color-unchanged !important;
+}
+
+@for $i from 1 through 9 {
+  .text-nodeGradient#{$i} {
+    color: nth($color-gradient-list, $i) !important;
+  }
+}

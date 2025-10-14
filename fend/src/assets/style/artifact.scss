@@ -1,0 +1,20 @@
+$artifact-highlight-width: 2px;
+
+.artifact-comment {
+  border-style: solid !important;
+  border-width: 0 0 0 $artifact-highlight-width !important;
+  border-color: transparent !important;
+
+  &.artifact-flag {
+    border-color: $color-secondary !important;
+  }
+}
+
+.artifact-check {
+  width: $artifact-highlight-width;
+
+  & > .artifact-check-chip {
+    max-width: 300px;
+    height: fit-content;
+  }
+}

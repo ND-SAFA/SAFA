@@ -1,0 +1,136 @@
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400&display=swap");
+
+$heading-font-family: "Source Sans Pro";
+$body-font-family: "Source Sans Pro";
+$default-border-radius: 4px;
+
+// Text Styling
+
+#app {
+  [class*="text-"] {
+    font-family: $body-font-family, sans-serif !important;
+  }
+  font-family: $body-font-family, sans-serif !important;
+}
+
+h1 {
+  font-size: 2rem;
+  line-height: 2rem;
+}
+
+h2 {
+  font-size: 1.75rem;
+  line-height: 1.75rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+}
+
+h1, h2, h3, h4, h6, h6 {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+pre {
+  margin: 0;
+
+  code {
+    padding: 0;
+  }
+}
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-sm {
+  font-size: 10px;
+}
+
+.text-lg {
+  font-size: 20px;
+}
+
+.inherit-color {
+  color: inherit !important;
+}
+
+.text-expanded {
+  white-space: nowrap;
+  width: inherit;
+  max-width: 60vw;
+}
+
+.text-white-space-normal {
+  white-space: normal;
+}
+
+.text-word-break-all {
+  word-break: break-all;
+}
+
+// Text Block Styling
+
+.attribute-chip {
+  max-width: 200px;
+}
+
+.attribute-bar {
+  width: 200px;
+
+  .attribute-bar-text {
+    max-width: 50px;
+  }
+}
+
+.artifact-display {
+  max-width: 600px;
+}
+
+.trace-chip {
+  border-width: 2px;
+  border-style: solid;
+
+  &:before { border: none !important; }
+
+  &-generated {
+    border-width: 1px;
+  }
+
+  &-unreviewed {
+    border-style: dashed !important;
+
+    &:before { border: none !important; }
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+// Markdown
+
+.q-markdown--line-numbers-wrapper,
+.q-markdown--line-numbers,
+.q-markdown--code-wrapper,
+.q-markdown--code {
+  //background-color: transparent !important;
+}
+.q-markdown--note {
+  border-color: $color-background $color-background $color-background $color-primary !important;
+  background-color: $color-background !important;
+  border-width: 1px 1px 1px 4px !important;
+  border-radius: 4px !important;
+}
+
+.q-markdown--link {
+  color: $color-primary !important;
+}
+
+.q-markdown--token {
+  background-color: $color-background !important;
+  color: $color-text !important;
+}

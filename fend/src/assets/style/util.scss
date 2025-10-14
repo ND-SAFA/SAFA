@@ -1,0 +1,81 @@
+// Width Utilities
+
+.width {
+  &-min {
+    width: min-content;
+  }
+  &-max {
+    width: max-content;
+  }
+  &-fit {
+    width: fit-content;
+  }
+  &-100 {
+    width: 100%;
+  }
+  &-50 {
+    width: 50%;
+  }
+}
+
+// Height Utilities
+
+.scrollable {
+  overflow-y: scroll;
+
+  &-md {
+    max-height: 400px;
+  }
+}
+
+// Flex Utilities
+
+.align {
+  &-start {
+    align-items: flex-start !important;
+  }
+  &-center {
+    align-items: center !important;
+  }
+  &-end {
+    align-items: flex-end !important;
+  }
+}
+
+.nowrap {
+  flex-wrap: nowrap;
+}
+
+// Opacity Changes
+
+.faded {
+  opacity: 0.6;
+}
+
+.show-on-hover {
+  opacity: 0;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.show-on-hover-parent {
+  .show-on-hover-child {
+    opacity: 0;
+  }
+
+  &:hover {
+    .show-on-hover-child {
+      opacity: 1;
+    }
+  }
+}
+
+// Sticky
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}

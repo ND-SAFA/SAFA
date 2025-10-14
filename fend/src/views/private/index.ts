@@ -1,0 +1,11 @@
+export { default as ArtifactView } from "./ArtifactView.vue";
+export { default as ProjectCreatorView } from "./ProjectCreatorView.vue";
+export { default as ProjectSettingsView } from "./ProjectSettingsView.vue";
+export { default as UploadStatusView } from "./UploadStatusView.vue";
+export { default as HomeView } from "./HomeView.vue";
+export { default as MyAccountView } from "./MyAccountView.vue";
+export { default as MyOrganizationView } from "./MyOrganizationView.vue";
+export { default as MyTeamView } from "./MyTeamView.vue";
+export { default as ProjectSelectorView } from "./ProjectSelectorView.vue";
+export { default as SearchView } from "./SearchView.vue";
+export { default as AdminView } from "./AdminView.vue";

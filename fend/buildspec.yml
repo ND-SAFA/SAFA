@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo Build started on `date`
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_LINK
+      - docker build -t fend
+        --build-arg API_ENDPOINT=${API_ENDPOINT}
+        --build-arg JIRA_CLIENT_ID=${JIRA_CLIENT_ID}
+        --build-arg JIRA_REDIRECT_LINK=${JIRA_REDIRECT_LINK}
+        --build-arg GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+        --build-arg GITHUB_REDIRECT_LINK=${GITHUB_REDIRECT_LINK}
+        --build-arg DEMO_PROJECT=${DEMO_PROJECT}
+        --build-arg DEMO_EMAIL=${DEMO_EMAIL}
+        --build-arg DEMO_PW=${DEMO_PW} .
+      - docker tag fend $ECR_LINK/fend:latest
+  post_build:
+    commands:
+      - docker push $ECR_LINK/fend:latest
+artifacts:
+  files:
+    - '**/*'

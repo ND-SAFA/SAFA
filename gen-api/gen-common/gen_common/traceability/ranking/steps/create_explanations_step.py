@@ -21,7 +21,7 @@ from gen_common.util.llm_response_util import LLMResponseUtil
 from gen_common.util.math_util import MathUtil
 from gen_common.util.prompt_util import PromptUtil
 from gen_common.util.ranking_util import RankingUtil
-from gen_common_test.traceability.ranking.explanation_prompts import EXPLANATION_GOAL, EXPLANATION_TASK_QUESTIONNAIRE
+from gen.tracing.prompts.explanation_prompts import EXPLANATION_GOAL, EXPLANATION_TASK_QUESTIONNAIRE
 
 
 class CreateExplanationsStep(AbstractPipelineStep[RankingArgs, RankingState]):

@@ -17,7 +17,7 @@ from gen_common.util.prompt_util import PromptUtil
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
 from gen_common_test.base.tests.base_test import BaseTest
-from gen_common_test.traceability.ranking.explanation_prompts import EXPLANATION_TASK_QUESTIONNAIRE
+from gen.tracing.prompts.explanation_prompts import EXPLANATION_TASK_QUESTIONNAIRE
 from gen_common_test.traceability.ranking.steps.ranking_pipeline_test import RankingPipelineTest
 
 from gen.hgen.common.content_generator import ContentGenerator

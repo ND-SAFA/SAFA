@@ -6,7 +6,7 @@ from gen_common.util.enum_util import EnumDict
 from gen_common.util.ranking_util import RankingUtil
 from gen_common_test.base.mock.decorators.anthropic import mock_anthropic
 from gen_common_test.base.mock.test_ai_manager import TestAIManager
-from gen_common_test.traceability.ranking.explanation_prompts import EXPLANATION_TASK_QUESTIONNAIRE
+from gen.tracing.prompts.explanation_prompts import EXPLANATION_TASK_QUESTIONNAIRE
 from gen_common_test.traceability.ranking.steps.ranking_pipeline_test import DEFAULT_CHILDREN_IDS, DEFAULT_PARENT_IDS, \
     RankingPipelineTest
 

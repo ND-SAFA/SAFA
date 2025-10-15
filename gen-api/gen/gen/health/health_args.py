@@ -7,7 +7,7 @@ from gen_common.llm.abstract_llm_manager import AbstractLLMManager
 from gen_common.pipeline.args import Args
 from gen_common.util.dataclass_util import required_field
 
-from gen_test.health.concepts.matching.constants import CONCEPT_TYPE
+from gen.health.health_contants import CONCEPT_TYPE
 
 
 @dataclass

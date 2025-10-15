@@ -12,20 +12,12 @@ RUN apt-get update && apt-get install -y \
 RUN pip install --upgrade pip setuptools wheel
 
 ## Step - Install requirements
-ADD tgen/requirements/ /app/tgen/requirements/
-RUN pip3 install -r /app/tgen/requirements/nlp-requirements.txt
-RUN pip3 install -r /app/tgen/requirements/base-requirements.txt
-
 COPY requirements.txt /app/
 RUN pip3 install -r /app/requirements.txt
 
-# install task manager package.
-ARG TASK_MANAGER=s3
-COPY requirements/ /app/requirements
-RUN pip3 install -r "/app/requirements/$TASK_MANAGER-requirements.txt"
-
 ## Step - Copy source and build files
-COPY tgen/gen/ /app/gen/
+COPY gen-common/gen_common/ /app/gen_common/
+COPY gen/gen/ /app/gen/
 COPY src/api/ /app/api/
 
 ### COPy

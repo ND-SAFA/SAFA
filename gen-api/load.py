@@ -1,6 +1,7 @@
 import gc
 import os
 
+import nltk
 from dotenv import load_dotenv
 from sentence_transformers import SentenceTransformer
 
@@ -15,4 +16,5 @@ for m in CACHED_MODELS:
     model = SentenceTransformer(m, cache_folder=CACHE_DIR)
     print(f"{m} has been cached.")
 print("All models have been cached.")
+nltk.download('stopwords')
 gc.collect()

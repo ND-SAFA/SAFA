@@ -4,7 +4,9 @@ import os
 import sys
 
 from dotenv import load_dotenv
+import logging
 
+logger = logging.getLogger(__name__)
 
 def main():
     """Run administrative tasks."""
@@ -23,7 +25,6 @@ def main():
 
 if __name__ == '__main__':
     if len(sys.argv) == 4:
-        from gen_common.infra.t_logging.logger_manager import logger
 
         env_file = sys.argv.pop(-1)
         env_file_path = os.path.normpath(os.path.join("..", "..", env_file))

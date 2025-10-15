@@ -10,7 +10,8 @@ from gen_common.data.tdatasets.prompt_dataset import PromptDataset
 from gen_common.data.tdatasets.trace_dataset import TraceDataset
 
 from gen.health.health_args import HealthArgs
-from gen_test.health.concepts.matching.constants import CONCEPT_TARGET_LAYER_ID, CONCEPT_TYPE
+from gen_test.health.concepts.matching.constants import CONCEPT_TARGET_LAYER_ID
+from gen.health.health_contants import CONCEPT_TYPE
 from gen_test.res.paths import GEN_TEST_PROJECT_CONCEPTS_CONCEPTS_PATH, GEN_TEST_PROJECT_CONCEPTS_REQUIREMENTS_PATH
 
 

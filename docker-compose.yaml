@@ -24,6 +24,7 @@ services:
       - DB_URL=jdbc:mysql://mysql/safa-db
   gen:
     container_name: gen
+    depends_on: [ "redis" ]
     build:
       context: ./gen-api
       dockerfile: Dockerfile

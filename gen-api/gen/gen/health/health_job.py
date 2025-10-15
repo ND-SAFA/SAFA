@@ -15,7 +15,7 @@ from gen.health.health_args import HealthArgs
 from gen.health.health_state import HealthState
 from gen.health.health_util import expand_query_selection
 from gen.health.types.health_tasks import HealthTask
-from gen_test.health.concepts.matching.constants import CONCEPT_TYPE
+from gen.health.health_contants import CONCEPT_TYPE
 
 HealthPipelineType = Type[AbstractPipeline[HealthArgs, State]]
 HealthPipelineMap: Dict[HealthTask, HealthPipelineType] = {

@@ -5,6 +5,10 @@ build/
 !**/src/main/**
 !**/src/test/**
 *.env
+.env
+.env.*
+**/.env
+**/.env.*
 
 # Data
 .jpb

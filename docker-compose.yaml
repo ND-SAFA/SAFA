@@ -16,6 +16,9 @@ services:
       args:
         # Frontend should call relative path so it stays same-origin
         API_ENDPOINT: /api
+        DEMO_EMAIL: ${DEMO_EMAIL:-}
+        DEMO_PASSWORD: ${DEMO_PASSWORD:-}
+        DEMO_PROJECT_VERSION: ${DEMO_PROJECT_VERSION:-}
     ports: []           # no public exposure
     networks: [safa]
 
@@ -72,10 +75,10 @@ services:
       resources:
         limits: { memory: 1G }
     environment:
-      MYSQL_ROOT_PASSWORD: secret2
-      MYSQL_USER: user
-      MYSQL_PASSWORD: secret3
-      MYSQL_DATABASE: safa-db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-safa-db}
     volumes:
       - ./bend/my.cnf:/etc/mysql/my.cnf
       - db_data:/var/lib/mysql

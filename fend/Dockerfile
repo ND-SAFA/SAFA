@@ -11,6 +11,9 @@ RUN npm install -g serve
 
 # create .env file
 ARG API_ENDPOINT
+ARG DEMO_EMAIL
+ARG DEMO_PASSWORD
+ARG DEMO_PROJECT_VERSION
 
 RUN test -n "$API_ENDPOINT"
 
@@ -18,6 +21,9 @@ RUN test -n "$API_ENDPOINT"
 RUN touch ./.env.production && \
   echo -e "\
 VUE_APP_API_ENDPOINT=$API_ENDPOINT\n\
+VUE_APP_DEMO_EMAIL=$DEMO_EMAIL\n\
+VUE_APP_DEMO_PW=$DEMO_PASSWORD\n\
+VUE_APP_DEMO_PROJECT=$DEMO_PROJECT_VERSION\n\
 " > ./.env.production
 RUN cat .env.production
 

@@ -263,10 +263,212 @@ accept_invite() {
     echo ""
 }
 
+# Function to view all projects
+view_projects() {
+    echo -e "${YELLOW}Available Projects:${NC}"
+    echo ""
+    execute_sql "SELECT p.project_id, p.name, p.description, pv.version_id FROM project p LEFT JOIN project_version pv ON p.project_id = pv.project_id ORDER BY p.name;" | column -t -s $'\t'
+    echo ""
+}
+
+# Function to view user's project memberships
+view_user_projects() {
+    echo -e "${YELLOW}Enter the email address of the user:${NC}"
+    read -r email
+
+    if [[ -z "$email" ]]; then
+        echo -e "${RED}Error: Email cannot be empty${NC}"
+        return 1
+    fi
+
+    # Get user_id
+    local user_id=$(execute_sql "SELECT user_id FROM safa_user WHERE email = '$email';" | tail -n 1)
+
+    if [[ -z "$user_id" ]]; then
+        echo -e "${RED}Error: User with email '$email' not found${NC}"
+        return 1
+    fi
+
+    echo ""
+    echo -e "${YELLOW}Projects for user '$email':${NC}"
+    echo ""
+    execute_sql "SELECT upm.membership_id, upm.project_role, p.project_id, p.name FROM user_project_membership upm JOIN project p ON upm.project_id = p.project_id WHERE upm.user_id = '$user_id';" | column -t -s $'\t'
+    echo ""
+}
+
+# Function to add user to project
+add_user_to_project() {
+    echo -e "${YELLOW}Step 1: Select User${NC}"
+    echo ""
+    execute_sql "SELECT user_id, email, verified FROM safa_user;" | column -t -s $'\t'
+    echo ""
+    echo -e "${YELLOW}Enter the email address of the user:${NC}"
+    read -r email
+
+    if [[ -z "$email" ]]; then
+        echo -e "${RED}Error: Email cannot be empty${NC}"
+        return 1
+    fi
+
+    # Get user_id
+    local user_id=$(execute_sql "SELECT user_id FROM safa_user WHERE email = '$email';" | tail -n 1)
+
+    if [[ -z "$user_id" ]]; then
+        echo -e "${RED}Error: User with email '$email' not found${NC}"
+        return 1
+    fi
+
+    echo ""
+    echo -e "${GREEN}Selected user: $email${NC}"
+    echo ""
+
+    echo -e "${YELLOW}Step 2: Select Project${NC}"
+    echo ""
+    execute_sql "SELECT project_id, name, description FROM project ORDER BY name;" | column -t -s $'\t'
+    echo ""
+    echo -e "${YELLOW}Enter the project_id:${NC}"
+    read -r project_id
+
+    if [[ -z "$project_id" ]]; then
+        echo -e "${RED}Error: Project ID cannot be empty${NC}"
+        return 1
+    fi
+
+    # Check if project exists
+    local project_count=$(execute_sql "SELECT COUNT(*) FROM project WHERE project_id = '$project_id';" | tail -n 1)
+
+    if [[ "$project_count" -eq 0 ]]; then
+        echo -e "${RED}Error: Project with ID '$project_id' not found${NC}"
+        return 1
+    fi
+
+    # Get project name
+    local project_name=$(execute_sql "SELECT name FROM project WHERE project_id = '$project_id';" | tail -n 1)
+
+    echo ""
+    echo -e "${GREEN}Selected project: $project_name${NC}"
+    echo ""
+
+    echo -e "${YELLOW}Step 3: Select Role${NC}"
+    echo ""
+    echo "  1) OWNER"
+    echo "  2) EDITOR"
+    echo "  3) VIEWER"
+    echo ""
+    echo -ne "${YELLOW}Enter role number [1-3]: ${NC}"
+    read -r role_choice
+
+    local role
+    case $role_choice in
+        1)
+            role="OWNER"
+            ;;
+        2)
+            role="EDITOR"
+            ;;
+        3)
+            role="VIEWER"
+            ;;
+        *)
+            echo -e "${RED}Invalid role choice${NC}"
+            return 1
+            ;;
+    esac
+
+    echo ""
+    echo -e "${GREEN}Selected role: $role${NC}"
+    echo ""
+
+    # Check if membership already exists
+    local existing=$(execute_sql "SELECT COUNT(*) FROM user_project_membership WHERE user_id = '$user_id' AND project_id = '$project_id';" | tail -n 1)
+
+    if [[ "$existing" -gt 0 ]]; then
+        echo -e "${YELLOW}User already has membership to this project. Update role? (yes/no)${NC}"
+        read -r update_confirm
+
+        if [[ "$update_confirm" == "yes" ]]; then
+            execute_sql "UPDATE user_project_membership SET project_role = '$role' WHERE user_id = '$user_id' AND project_id = '$project_id';"
+            echo -e "${GREEN}Success! Updated membership role to $role${NC}"
+        else
+            echo -e "${YELLOW}Operation cancelled${NC}"
+            return 0
+        fi
+    else
+        # Generate a UUID for membership_id
+        local membership_id=$(uuidgen)
+
+        # Insert membership
+        execute_sql "INSERT INTO user_project_membership (membership_id, project_role, user_id, project_id) VALUES ('$membership_id', '$role', '$user_id', '$project_id');"
+
+        echo -e "${GREEN}Success! Added user '$email' to project '$project_name' with role $role${NC}"
+    fi
+
+    echo ""
+    echo -e "${YELLOW}Current memberships for this user:${NC}"
+    execute_sql "SELECT upm.membership_id, upm.project_role, p.project_id, p.name FROM user_project_membership upm JOIN project p ON upm.project_id = p.project_id WHERE upm.user_id = '$user_id';" | column -t -s $'\t'
+    echo ""
+}
+
+# Function to remove user from project
+remove_user_from_project() {
+    echo -e "${YELLOW}Enter the email address of the user:${NC}"
+    read -r email
+
+    if [[ -z "$email" ]]; then
+        echo -e "${RED}Error: Email cannot be empty${NC}"
+        return 1
+    fi
+
+    # Get user_id
+    local user_id=$(execute_sql "SELECT user_id FROM safa_user WHERE email = '$email';" | tail -n 1)
+
+    if [[ -z "$user_id" ]]; then
+        echo -e "${RED}Error: User with email '$email' not found${NC}"
+        return 1
+    fi
+
+    echo ""
+    echo -e "${YELLOW}Current project memberships for '$email':${NC}"
+    execute_sql "SELECT upm.membership_id, upm.project_role, p.project_id, p.name FROM user_project_membership upm JOIN project p ON upm.project_id = p.project_id WHERE upm.user_id = '$user_id';" | column -t -s $'\t'
+    echo ""
+
+    echo -e "${YELLOW}Enter the project_id to remove user from:${NC}"
+    read -r project_id
+
+    if [[ -z "$project_id" ]]; then
+        echo -e "${RED}Error: Project ID cannot be empty${NC}"
+        return 1
+    fi
+
+    # Check if membership exists
+    local membership_count=$(execute_sql "SELECT COUNT(*) FROM user_project_membership WHERE user_id = '$user_id' AND project_id = '$project_id';" | tail -n 1)
+
+    if [[ "$membership_count" -eq 0 ]]; then
+        echo -e "${RED}Error: User does not have membership to this project${NC}"
+        return 1
+    fi
+
+    # Confirm removal
+    echo -e "${RED}Remove user '$email' from this project? (yes/no)${NC}"
+    read -r confirmation
+
+    if [[ "$confirmation" != "yes" ]]; then
+        echo -e "${YELLOW}Operation cancelled${NC}"
+        return 0
+    fi
+
+    # Delete membership
+    execute_sql "DELETE FROM user_project_membership WHERE user_id = '$user_id' AND project_id = '$project_id';"
+
+    echo -e "${GREEN}Success! Removed user from project${NC}"
+    echo ""
+}
+
 # Main menu
 show_menu() {
     echo -e "${YELLOW}Select an action:${NC}"
     echo ""
+    echo "  ${BLUE}USER MANAGEMENT:${NC}"
     echo "  1) View all users"
     echo "  2) View user statistics"
     echo "  3) Verify user and promote to superuser"
@@ -274,11 +476,20 @@ show_menu() {
     echo "  5) Promote user to superuser"
     echo "  6) Demote user from superuser"
     echo "  7) Delete user"
+    echo ""
+    echo "  ${BLUE}INVITE MANAGEMENT:${NC}"
     echo "  8) View pending member invites"
     echo "  9) Accept/remove invite token"
+    echo ""
+    echo "  ${BLUE}PROJECT MEMBERSHIP:${NC}"
+    echo "  10) View all projects"
+    echo "  11) View user's project memberships"
+    echo "  12) Add user to project"
+    echo "  13) Remove user from project"
+    echo ""
     echo "  0) Exit"
     echo ""
-    echo -ne "${YELLOW}Enter your choice [0-9]: ${NC}"
+    echo -ne "${YELLOW}Enter your choice [0-13]: ${NC}"
 }
 
 # Main loop
@@ -324,6 +535,18 @@ main() {
                 ;;
             9)
                 accept_invite
+                ;;
+            10)
+                view_projects
+                ;;
+            11)
+                view_user_projects
+                ;;
+            12)
+                add_user_to_project
+                ;;
+            13)
+                remove_user_from_project
                 ;;
             0)
                 echo -e "${GREEN}Goodbye!${NC}"

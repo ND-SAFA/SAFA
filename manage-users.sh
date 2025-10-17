@@ -211,6 +211,58 @@ show_user_stats() {
     echo ""
 }
 
+# Function to view pending invites
+view_invites() {
+    echo -e "${YELLOW}Pending Member Invites:${NC}"
+    echo ""
+    execute_sql "SELECT HEX(id) as invite_id, HEX(entity_id) as org_id, expiration, role, uses FROM membership_invite_token ORDER BY expiration DESC;" | column -t -s $'\t'
+    echo ""
+}
+
+# Function to delete/accept an invite token
+accept_invite() {
+    echo -e "${YELLOW}Enter the invite ID (hex format) to accept/verify:${NC}"
+    echo -e "${BLUE}Tip: Use option 8 to view pending invites and get the invite_id${NC}"
+    read -r invite_id
+
+    if [[ -z "$invite_id" ]]; then
+        echo -e "${RED}Error: Invite ID cannot be empty${NC}"
+        return 1
+    fi
+
+    # Convert hex to binary for query
+    local binary_id=$(echo "$invite_id" | sed 's/\(..\)/\\x\1/g')
+
+    # Check if invite exists
+    local invite_count=$(execute_sql "SELECT COUNT(*) FROM membership_invite_token WHERE HEX(id) = '$invite_id';" | tail -n 1)
+
+    if [[ "$invite_count" -eq 0 ]]; then
+        echo -e "${RED}Error: Invite with ID '$invite_id' not found${NC}"
+        return 1
+    fi
+
+    # Show invite details
+    echo ""
+    echo -e "${YELLOW}Invite details:${NC}"
+    execute_sql "SELECT HEX(id) as invite_id, HEX(entity_id) as org_id, expiration, role, uses FROM membership_invite_token WHERE HEX(id) = '$invite_id';" | column -t -s $'\t'
+    echo ""
+
+    # Confirm deletion
+    echo -e "${YELLOW}Delete this invite token? This effectively 'accepts' the invite. (yes/no)${NC}"
+    read -r confirmation
+
+    if [[ "$confirmation" != "yes" ]]; then
+        echo -e "${YELLOW}Operation cancelled${NC}"
+        return 0
+    fi
+
+    # Delete the invite token
+    execute_sql "DELETE FROM membership_invite_token WHERE HEX(id) = '$invite_id';"
+
+    echo -e "${GREEN}Success! Invite token has been accepted/removed${NC}"
+    echo ""
+}
+
 # Main menu
 show_menu() {
     echo -e "${YELLOW}Select an action:${NC}"
@@ -222,9 +274,11 @@ show_menu() {
     echo "  5) Promote user to superuser"
     echo "  6) Demote user from superuser"
     echo "  7) Delete user"
+    echo "  8) View pending member invites"
+    echo "  9) Accept/remove invite token"
     echo "  0) Exit"
     echo ""
-    echo -ne "${YELLOW}Enter your choice [0-7]: ${NC}"
+    echo -ne "${YELLOW}Enter your choice [0-9]: ${NC}"
 }
 
 # Main loop
@@ -264,6 +318,12 @@ main() {
                 ;;
             7)
                 delete_user
+                ;;
+            8)
+                view_invites
+                ;;
+            9)
+                accept_invite
                 ;;
             0)
                 echo -e "${GREEN}Goodbye!${NC}"

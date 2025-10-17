@@ -68,10 +68,15 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         String username = ((SafaUserDetails) auth.getPrincipal()).getUsername();
         String token = this.tokenService.createTokenForUsername(username, SecurityConstants.LOGIN_EXPIRATION_TIME);
         JSONObject responseJson = new JSONObject();
+
+        // Check if the request is HTTPS to determine if we should use secure cookies
+        boolean isSecure = req.isSecure() || "https".equalsIgnoreCase(req.getHeader("X-Forwarded-Proto"));
+
         ResponseCookie cookie = ResponseCookie.from(SecurityConstants.JWT_COOKIE_NAME, token)
-            .secure(true)
+            .secure(isSecure)
             .httpOnly(true)
-            .sameSite("None")
+            .sameSite(isSecure ? "None" : "Lax")
+            .path("/")
             .maxAge(SecurityConstants.LOGIN_EXPIRATION_TIME)
             .build();
 

@@ -158,8 +158,9 @@ class RequestBuilder<
 
     // Add query parameters to the URL.
     const query = new URLSearchParams(this.queryVariables);
+    const queryString = query.toString();
 
-    url = `${url}${query ? `?${query}` : ""}`;
+    url = `${url}${queryString ? `?${queryString}` : ""}`;
 
     const res = await fetch(url, {
       credentials: "include",

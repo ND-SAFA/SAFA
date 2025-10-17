@@ -39,14 +39,16 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain chain) throws IOException, ServletException {
+        // Check if this is a public endpoint FIRST, before any authentication logic
+        if (AuthenticationConfig.OPEN_ENDPOINTS.contains(request.getRequestURI())) {
+            log.debug("Skipping authorization filter for open endpoint: {}", request.getRequestURI());
+            chain.doFilter(request, response);
+            return;
+        }
+
         try {
             if (request.getCookies() == null) {
                 log.debug("Request contained no cookies.");
-                return;
-            }
-
-            if (AuthenticationConfig.OPEN_ENDPOINTS.contains(request.getRequestURI())) {
-                log.debug("Skipping authorization filter for open endpoints.");
                 return;
             }
 

@@ -1,44 +1,49 @@
 version: '3'
 services:
+  proxy:
+    image: nginx:alpine
+    container_name: proxy
+    depends_on: ["fend", "bend"]
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"        # later: "443:443" with TLS
+    networks: [safa]
+
   fend:
-    container_name: fend
     build:
       context: ./fend
       args:
-        API_ENDPOINT: http://localhost:3000
-    ports:
-      - 8080:80
-    networks:
-      - safa
+        # Frontend should call relative path so it stays same-origin
+        API_ENDPOINT: /api
+    ports: []           # no public exposure
+    networks: [safa]
+
   bend:
-    depends_on: [ "mysql" ]
-    container_name: bend
+    depends_on: ["mysql"]
     build:
       context: ./bend
-    ports:
-      - 3000:80
-    networks:
-      - safa
+    # expose port only inside docker network
+    expose:
+      - "80"
     environment:
       - TGEN_ENDPOINT=http://gen:80
       - DB_URL=jdbc:mysql://mysql/safa-db
+    networks: [safa]
+
   gen:
-    container_name: gen
-    depends_on: [ "redis" ]
+    depends_on: ["redis"]
     build:
       context: ./gen-api
       dockerfile: Dockerfile
-      args:
-        TASK_MANAGER: redis
-    env_file:
-      - .env
-    ports:
-      - "4000:80"
+      args: { TASK_MANAGER: redis }
+    env_file: [.env]
+    expose:
+      - "80"
     volumes:
       - tgen-volume:/vol
       - ~/.cache/models:/root/.cache/huggingface/datasets
-    networks:
-      - safa
+    networks: [safa]
     environment:
       - DEBUG=false
       - ENV_MODE=development
@@ -51,35 +56,36 @@ services:
       - BROKER_PASSWORD=guest
       - HF_DATASETS_CACHE=/root/.cache/huggingface/datasets
       - BEND_URL=http://bend:80
-      - JWT_TOKEN=dev-secret-token-change-in-production
+      - JWT_TOKEN=change-me
+      - SECRET_KEY=change-me
+
   redis:
-    container_name: redis
     image: redis:alpine
-    networks:
-      - safa
+    networks: [safa]
+    # no ports -> private
+
   mysql:
     image: mysql:8.0
     hostname: mysql
     container_name: mysql
     deploy:
       resources:
-        limits:
-          memory: 1G
+        limits: { memory: 1G }
     environment:
       MYSQL_ROOT_PASSWORD: secret2
       MYSQL_USER: user
       MYSQL_PASSWORD: secret3
       MYSQL_DATABASE: safa-db
     volumes:
-      - ./bend/my.cnf:/etc/mysql/my.cnf # Mount the custom my.cnf file
-    ports:
-      - 3306:3306
-    networks:
-      - safa
+      - ./bend/my.cnf:/etc/mysql/my.cnf
+      - db_data:/var/lib/mysql
+    networks: [safa]
+    # no ports -> private
 
 volumes:
   db_data:
   tgen-volume:
     name: tgen-volume
+
 networks:
   safa:

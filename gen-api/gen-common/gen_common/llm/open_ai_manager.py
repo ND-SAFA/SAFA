@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 import openai
 
 from gen_common.constants import environment_constants, open_ai_constants
-from gen_common.constants.environment_constants import OPEN_AI_KEY, OPEN_AI_ORG
+from gen_common.constants.environment_constants import OPEN_AI_KEY
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.infra.t_threading.threading_state import MultiThreadState
 from gen_common.llm.abstract_llm_manager import AIObject, AbstractLLMManager
@@ -121,9 +121,7 @@ class OpenAIManager(AbstractLLMManager[AttrDict]):
         :return: The response from open ai.
         """
         if not environment_constants.IS_TEST:
-            assert OPEN_AI_ORG and OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_ORG=}'.split('=')[0]} " \
-                                                f"and {f'{OPEN_AI_KEY=}'.split('=')[0]} in .env"
-            openai.organization = OPEN_AI_ORG
+            assert OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_KEY=}'.split('=')[0]} in .env"
             openai.api_key = OPEN_AI_KEY
         else:
             assert isinstance(openai.ChatCompletion.create, MagicMock), "Should not make real request if in test mode!!"

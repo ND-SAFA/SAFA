@@ -74,7 +74,7 @@ kubernetes==34.1.0
 langchain==0.3.27
 langchain-anthropic==0.3.22
 langchain-chroma==0.2.6
-langchain-core==0.3.79
+langchain-core==0.3.81
 langchain-huggingface==0.3.1
 langchain-openai==0.3.35
 langchain-text-splitters==0.3.11

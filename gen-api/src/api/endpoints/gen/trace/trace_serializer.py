@@ -1,6 +1,7 @@
 from typing import TypedDict
 
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.gen.serializers.api_key_serializer_mixin import ApiKeySerializerMixin
 from api.endpoints.gen.serializers.dataset_serializer import DatasetSerializer
 from gen_common.data.readers.definitions.api_definition import ApiDefinition
 
@@ -12,7 +13,7 @@ class TraceRequest(TypedDict):
     dataset: ApiDefinition
 
 
-class TraceSerializer(AbstractSerializer):
+class TraceSerializer(ApiKeySerializerMixin, AbstractSerializer):
     """
     Serializes prediction payload.
     """

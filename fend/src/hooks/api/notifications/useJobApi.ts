@@ -94,7 +94,14 @@ export const useJobApi = defineStore("jobApi", (): JobApiHook => {
   }
 
   async function handleCreate(job: JobSchema): Promise<void> {
-    await subscribeToJob(job.id);
+    // Subscribe to job updates, but don't fail if WebSocket subscription fails
+    // The job is already created on the backend, so we should still update the UI
+    try {
+      await subscribeToJob(job.id);
+    } catch (error) {
+      console.warn(`Failed to subscribe to job ${job.id} via WebSocket:`, error);
+      // Continue anyway - the job is already running on the backend
+    }
     jobStore.updateJob(job);
     jobStore.selectedJob = job;
   }

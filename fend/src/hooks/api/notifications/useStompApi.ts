@@ -101,23 +101,31 @@ export const useStompApi = defineStore("stompApi", (): StompApiHook => {
     topic: string,
     handler: (message: Message) => void
   ): Promise<void> {
-    await connect();
+    try {
+      await connect();
 
-    if (topic.trim() === "") {
-      throw Error("Expected destination to be non-empty.");
+      if (topic.trim() === "") {
+        throw Error("Expected destination to be non-empty.");
+      }
+
+      if (isSubscribedToTopic(topic)) {
+        logStore.onDevDebug(formatTopic(topic) + " is already subscribed to.");
+        return;
+      }
+
+      const stomp = getStomp();
+      const subscription = stomp.subscribe(topic, handler);
+      const channel: StompChannel = { subscription, topic, handler };
+
+      channels.value.push(channel);
+      logStore.onDevDebug("Subscribed to " + formatTopic(topic));
+    } catch (error) {
+      logStore.onDevError(
+        `Failed to subscribe to topic ${formatTopic(topic)}: ${error}`
+      );
+      // Re-throw so callers can handle the error appropriately
+      throw error;
     }
-
-    if (isSubscribedToTopic(topic)) {
-      logStore.onDevDebug(formatTopic(topic) + " is already subscribed to.");
-      return;
-    }
-
-    const stomp = getStomp();
-    const subscription = stomp.subscribe(topic, handler);
-    const channel: StompChannel = { subscription, topic, handler };
-
-    channels.value.push(channel);
-    logStore.onDevDebug("Subscribed to " + formatTopic(topic));
   }
 
   /**

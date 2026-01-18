@@ -3,6 +3,7 @@
     <flex-item parts="12" class="q-mr-md">
       <log-out />
       <integrations-accounts />
+      <api-keys-settings />
       <theme-controller />
       <update-password />
       <delete-account />
@@ -24,6 +25,7 @@ export default {
 import { FlexBox, FlexItem } from "@/components/common";
 import { ExternalLinks } from "@/components/account/display";
 import {
+  ApiKeysSettings,
   IntegrationsAccounts,
   DeleteAccount,
   UpdatePassword,

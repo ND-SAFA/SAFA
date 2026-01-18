@@ -29,6 +29,7 @@ public class AppRoutes {
         public static final String DELETE_ACCOUNT = Accounts.ROOT + "/delete";
         public static final String SELF = Accounts.ROOT + "/self";
         public static final String DEFAULT_ORG = Accounts.ROOT + "/organization";
+        public static final String API_KEYS = Accounts.ROOT + "/api-keys";
         public static final String IMPERSONATE = "/execute-as/{user}";
 
         @NoArgsConstructor(access = AccessLevel.NONE)

@@ -6,6 +6,7 @@ import openai
 
 from gen_common.constants import environment_constants, open_ai_constants
 from gen_common.constants.environment_constants import OPEN_AI_KEY
+from gen_common.llm.api_key_context import ApiKeyContext, get_effective_api_key
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.infra.t_threading.threading_state import MultiThreadState
 from gen_common.llm.abstract_llm_manager import AIObject, AbstractLLMManager
@@ -116,13 +117,18 @@ class OpenAIManager(AbstractLLMManager[AttrDict]):
     @staticmethod
     def _make_request(**params) -> AttrDict:
         """
-        Makes a request to open ai.
+        Makes a request to open ai, using request context API key if available.
         :param params: Parameters for the request.
         :return: The response from open ai.
         """
         if not environment_constants.IS_TEST:
-            assert OPEN_AI_KEY, f"Must supply value for {f'{OPEN_AI_KEY=}'.split('=')[0]} in .env"
-            openai.api_key = OPEN_AI_KEY
+            # Get effective API key (request-specific or fallback to environment)
+            effective_key = get_effective_api_key(
+                ApiKeyContext.get_openai_key(),
+                OPEN_AI_KEY
+            )
+            assert effective_key, "Must supply OPEN_AI_KEY in environment or request"
+            openai.api_key = effective_key
         else:
             assert isinstance(openai.ChatCompletion.create, MagicMock), "Should not make real request if in test mode!!"
         res = openai.ChatCompletion.create(**params)

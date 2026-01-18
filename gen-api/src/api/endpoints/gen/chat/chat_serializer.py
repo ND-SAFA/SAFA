@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.gen.serializers.api_key_serializer_mixin import ApiKeySerializerMixin
 from api.endpoints.gen.serializers.dataset_serializer import DatasetSerializer
 from api.endpoints.gen.serializers.message_serializer import MessageMetaSerializer
 from gen_common.data.readers.definitions.api_definition import ApiDefinition
@@ -15,7 +16,7 @@ class ChatRequest(BaseObject):
     chat_history: List[MessageMeta]
 
 
-class ChatSerializer(AbstractSerializer):
+class ChatSerializer(ApiKeySerializerMixin, AbstractSerializer):
     """
     Serializes the request for performing health checks on an artifact.
     """

@@ -8,12 +8,16 @@ import java.util.concurrent.TimeUnit;
 
 import edu.nd.crc.safa.config.TGenConfig;
 import edu.nd.crc.safa.features.common.RequestService;
+import edu.nd.crc.safa.features.generation.common.GenApiPayloadWrapper;
 import edu.nd.crc.safa.features.generation.common.TGenStatus;
 import edu.nd.crc.safa.features.generation.common.TGenTask;
 import edu.nd.crc.safa.features.jobs.logging.JobLogger;
 import edu.nd.crc.safa.features.jobs.logging.entities.JobLogEntry;
 import edu.nd.crc.safa.features.jobs.services.JobService;
 import edu.nd.crc.safa.features.projects.entities.app.SafaError;
+import edu.nd.crc.safa.features.users.services.SafaUserService;
+import edu.nd.crc.safa.features.users.services.UserApiKeyService;
+import edu.nd.crc.safa.features.users.services.UserApiKeyService.UserApiKeys;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +30,9 @@ public class GenApiController {
     private static final int HOURS = 3600;
     private static final int MAX_DURATION = 12 * HOURS;
     private final RequestService requestService;
-    private JobService jobService;
+    private final JobService jobService;
+    private final SafaUserService userService;
+    private final UserApiKeyService apiKeyService;
 
     /**
      * Submits job to TGen and polls status until job is completed or has failed.
@@ -51,7 +57,7 @@ public class GenApiController {
     }
 
     /**
-     * Sends authenticated request to GEN api.
+     * Sends authenticated request to GEN api with user-specific API keys injected.
      *
      * @param endpoint      The GEN endpoint.
      * @param payload       The payload to endpoint.
@@ -62,10 +68,39 @@ public class GenApiController {
     public <T> T performRequest(String endpoint,
                                 Object payload,
                                 Class<T> responseClass) {
+        // Inject user's API keys into the payload
+        Object wrappedPayload = wrapPayloadWithApiKeys(payload);
+
         // Step - Send request
         Map<String, String> cookies = new HashMap<>();
         cookies.put(GEN_COOKIE_KEY, TGenConfig.get().getGenKey());
-        return this.requestService.sendPost(endpoint, payload, cookies, responseClass);
+        return this.requestService.sendPost(endpoint, wrappedPayload, cookies, responseClass);
+    }
+
+    /**
+     * Wraps the payload with the current user's API keys.
+     *
+     * @param payload The original payload
+     * @return Wrapped payload with API keys, or original payload if no user context
+     */
+    private Object wrapPayloadWithApiKeys(Object payload) {
+        try {
+            // Get current user's API keys
+            UUID userId = userService.getCurrentUser().getUserId();
+            UserApiKeys apiKeys = apiKeyService.getApiKeys(userId);
+
+            // Wrap payload with API keys and provider preference
+            return new GenApiPayloadWrapper<>(
+                payload,
+                apiKeys.getOpenaiKey(),
+                apiKeys.getAnthropicKey(),
+                apiKeys.getPreferredProvider()
+            );
+        } catch (Exception e) {
+            // If unable to get user context or API keys, return original payload
+            // This maintains backward compatibility
+            return payload;
+        }
     }
 
     /**

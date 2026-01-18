@@ -13,6 +13,7 @@ Before running the application, you need to create a `.env` file in the root dir
 **Required:**
 - `OPEN_AI_KEY`: OpenAI API key
 - `ANTHROPIC_API_KEY`: Anthropic API key for LLM operations
+- `ENCRYPTION_KEY`: 256-bit encryption key for user API keys (generate with `openssl rand -base64 32`)
 - `MYSQL_ROOT_PASSWORD`: MySQL root password
 - `MYSQL_USER`: MySQL user
 - `MYSQL_PASSWORD`: MySQL password
@@ -31,6 +32,9 @@ Example `.env` file:
 # API Keys
 OPEN_AI_KEY=your-openai-key
 ANTHROPIC_API_KEY=your-anthropic-key
+
+# Encryption Key (generate with: openssl rand -base64 32)
+ENCRYPTION_KEY=your-generated-encryption-key
 
 # MySQL Configuration
 MYSQL_ROOT_PASSWORD=secret2

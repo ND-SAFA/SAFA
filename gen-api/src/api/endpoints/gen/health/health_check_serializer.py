@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_MEDIUM
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.gen.serializers.api_key_serializer_mixin import ApiKeySerializerMixin
 from api.endpoints.gen.serializers.dataset_serializer import DatasetSerializer
 from gen_common.data.readers.definitions.api_definition import ApiDefinition
 from gen_common.infra.base_object import BaseObject
@@ -16,7 +17,7 @@ class HealthCheckRequest(BaseObject):
     concept_layer_id: str
 
 
-class HealthCheckSerializer(AbstractSerializer):
+class HealthCheckSerializer(ApiKeySerializerMixin, AbstractSerializer):
     """
     Serializes the request for performing health checks on an artifact.
     """

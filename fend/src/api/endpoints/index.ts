@@ -4,6 +4,7 @@ export * from "./link-api";
 export * from "./parse-api";
 export * from "./project-api";
 export * from "./session-api";
+export * from "./user-api-keys-api";
 export * from "./version-api";
 export * from "./matrix-api";
 export * from "./entity-retrieval-api";

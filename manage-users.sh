@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Database credentials from docker-compose.yaml
-DB_CONTAINER="mysql"
+DB_CONTAINER="safa-mysql"
 DB_NAME="safa-db"
 DB_USER="root"
 DB_PASS="secret2"

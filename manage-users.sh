@@ -155,6 +155,60 @@ demote_user() {
     echo ""
 }
 
+# Function to reset user password
+reset_password() {
+    echo -e "${YELLOW}Enter the email address of the user:${NC}"
+    read -r email
+
+    if [[ -z "$email" ]]; then
+        echo -e "${RED}Error: Email cannot be empty${NC}"
+        return 1
+    fi
+
+    # Check if user exists
+    local user_count=$(execute_sql "SELECT COUNT(*) FROM safa_user WHERE email = '$email';" | tail -n 1)
+
+    if [[ "$user_count" -eq 0 ]]; then
+        echo -e "${RED}Error: User with email '$email' not found${NC}"
+        return 1
+    fi
+
+    echo -e "${YELLOW}Enter new password:${NC}"
+    read -s new_password
+    echo ""
+
+    if [[ -z "$new_password" ]]; then
+        echo -e "${RED}Error: Password cannot be empty${NC}"
+        return 1
+    fi
+
+    echo -e "${YELLOW}Generating password hash...${NC}"
+
+    # Use the backend container to generate a BCrypt hash
+    # Spring Boot uses BCrypt with strength 10 by default
+    local hashed_password=$(docker exec safa-bend java -cp /app/classes:/app/lib/* \
+        -Dloader.main=org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder \
+        org.springframework.boot.loader.launch.PropertiesLauncher "$new_password" 2>/dev/null | grep -v "^$" | tail -1)
+
+    # Fallback: use Python if available (generates BCrypt hash)
+    if [[ -z "$hashed_password" ]]; then
+        echo -e "${YELLOW}Using Python to generate hash...${NC}"
+        hashed_password=$(python3 -c "import bcrypt; print(bcrypt.hashpw('$new_password'.encode(), bcrypt.gensalt(rounds=10)).decode())" 2>/dev/null)
+    fi
+
+    if [[ -z "$hashed_password" ]]; then
+        echo -e "${RED}Error: Could not generate password hash${NC}"
+        echo -e "${YELLOW}Please install python3-bcrypt or ensure the backend container is running${NC}"
+        return 1
+    fi
+
+    # Update password in database
+    execute_sql "UPDATE safa_user SET password = '$hashed_password' WHERE email = '$email';"
+
+    echo -e "${GREEN}Success! Password has been reset for user '$email'${NC}"
+    echo ""
+}
+
 # Function to delete user
 delete_user() {
     echo -e "${RED}WARNING: This will permanently delete the user and all associated data!${NC}"
@@ -475,21 +529,22 @@ show_menu() {
     echo "  4) Verify user only"
     echo "  5) Promote user to superuser"
     echo "  6) Demote user from superuser"
-    echo "  7) Delete user"
+    echo "  7) Reset user password"
+    echo "  8) Delete user"
     echo ""
     echo "  ${BLUE}INVITE MANAGEMENT:${NC}"
-    echo "  8) View pending member invites"
-    echo "  9) Accept/remove invite token"
+    echo "  9) View pending member invites"
+    echo "  10) Accept/remove invite token"
     echo ""
     echo "  ${BLUE}PROJECT MEMBERSHIP:${NC}"
-    echo "  10) View all projects"
-    echo "  11) View user's project memberships"
-    echo "  12) Add user to project"
-    echo "  13) Remove user from project"
+    echo "  11) View all projects"
+    echo "  12) View user's project memberships"
+    echo "  13) Add user to project"
+    echo "  14) Remove user from project"
     echo ""
     echo "  0) Exit"
     echo ""
-    echo -ne "${YELLOW}Enter your choice [0-13]: ${NC}"
+    echo -ne "${YELLOW}Enter your choice [0-14]: ${NC}"
 }
 
 # Main loop
@@ -528,24 +583,27 @@ main() {
                 demote_user
                 ;;
             7)
-                delete_user
+                reset_password
                 ;;
             8)
-                view_invites
+                delete_user
                 ;;
             9)
-                accept_invite
+                view_invites
                 ;;
             10)
-                view_projects
+                accept_invite
                 ;;
             11)
-                view_user_projects
+                view_projects
                 ;;
             12)
-                add_user_to_project
+                view_user_projects
                 ;;
             13)
+                add_user_to_project
+                ;;
+            14)
                 remove_user_from_project
                 ;;
             0)

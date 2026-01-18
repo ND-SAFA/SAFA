@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from api.constants.datetime_constants import duration2days
-from api.server.settings import JWT_ALGO, ROOT_PASSWORD, SECRET_KEY
+from api.server.settings import DISABLE_AUTH, JWT_ALGO, ROOT_PASSWORD, SECRET_KEY
 
 """
 Configuration
@@ -99,6 +99,9 @@ def authorize_request(request: HttpRequest, data) -> Optional[str]:
     :param data: The data of the request to authorize.
     :return: Error is something went wrong. None otherwise.
     """
+    if DISABLE_AUTH:
+        return None
+
     try:
         if COOKIE_KEY not in request.COOKIES and AUTH_KEY not in data:
             raise Exception(f"Expected `{AUTH_KEY}` to be included in request or cookie `{COOKIE_KEY}` to be set.")

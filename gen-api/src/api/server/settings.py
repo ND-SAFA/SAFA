@@ -40,6 +40,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", None)
 ROOT_PASSWORD = os.environ.get("ROOT_PASSWORD", None)
+DISABLE_AUTH = os.environ.get("DISABLE_AUTH", "false").lower() == "true"
 JWT_ALGO = "HS256"
 
 # SECURITY WARNING: don't run with debug turned on in production!

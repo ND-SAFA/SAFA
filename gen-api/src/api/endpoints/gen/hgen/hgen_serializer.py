@@ -4,6 +4,7 @@ from typing import List
 from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_LONG, TEXT_MEDIUM
+from api.endpoints.gen.serializers.api_key_serializer_mixin import ApiKeySerializerMixin
 from api.endpoints.gen.serializers.artifact_serializer import ArtifactSerializer
 from gen_common.data.objects.artifact import Artifact
 from gen_common.infra.base_object import BaseObject
@@ -18,7 +19,7 @@ class HGenRequest(BaseObject):
     summary: str
 
 
-class HGenSerializer(serializers.Serializer):
+class HGenSerializer(ApiKeySerializerMixin, serializers.Serializer):
     """
     Serializes the request for hierarchy generation
     """

@@ -93,3 +93,35 @@ export interface PasswordChangeSchema {
    */
   newPassword: string;
 }
+
+/**
+ * Defines a user API keys model.
+ */
+export interface UserApiKeysSchema {
+  /**
+   * The user's OpenAI API key (masked on retrieval).
+   */
+  openaiApiKey?: string;
+  /**
+   * The user's Anthropic API key (masked on retrieval).
+   */
+  anthropicApiKey?: string;
+  /**
+   * The user's preferred LLM provider.
+   */
+  preferredProvider?: 'openai' | 'anthropic';
+}
+
+/**
+ * LLM Provider options.
+ */
+export type LLMProvider = 'openai' | 'anthropic';
+
+/**
+ * LLM Provider display information.
+ */
+export interface LLMProviderOption {
+  value: LLMProvider;
+  label: string;
+  description: string;
+}

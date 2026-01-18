@@ -33,6 +33,7 @@ export enum Endpoint {
   accountDelete = "accounts/delete",
   accountGet = "accounts/self",
   accountOrg = "accounts/organization",
+  accountApiKeys = "accounts/api-keys",
 
   // Admin
 

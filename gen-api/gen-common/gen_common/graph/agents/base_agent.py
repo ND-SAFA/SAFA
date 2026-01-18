@@ -10,6 +10,8 @@ from pydantic.main import BaseModel
 
 from gen_common.constants import anthropic_constants, environment_constants
 from gen_common.constants.environment_constants import ANTHROPIC_KEY, OPEN_AI_KEY
+from gen_common.llm.api_key_context import ApiKeyContext, get_effective_api_key
+from gen_common.llm.provider_selector import ProviderSelector, LLMProvider
 from gen_common.constants.graph_defaults import BASE_AGENT_DEFAULT_MODEL
 from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.graph.branches.paths.path_selector import PathSelector
@@ -57,7 +59,7 @@ class BaseAgent:
     @default_mutable()
     def __init__(self, system_prompt: Prompt | str | PathSelector,
                  response_manager: AbstractResponseManager = None,
-                 chat_model_type: BaseChatModel | SupportedLLMs = SupportedLLMs.ANTHROPIC,
+                 chat_model_type: BaseChatModel | SupportedLLMs = None,
                  model_name: str = BASE_AGENT_DEFAULT_MODEL,
                  state_vars_for_context: List[StateVar] = None,
                  allowed_missing_state_vars: Set[StateVar] = None,
@@ -275,14 +277,25 @@ class BaseAgent:
     @staticmethod
     def _update_api_key(llm_selected: SupportedLLMs, model_args: Dict[str, Any]) -> None:
         """
-        Updates the args to have the appropriate api key.
+        Updates the args to have the appropriate api key, preferring request context over environment.
         :param llm_selected: The LLM selected if it is a supported one (otherwise None).
         :param model_args: Additional args for the model initialization.
         :return: None (updates directly)
         """
         if llm_selected is not None:
             param_name = f"{llm_selected.name.lower()}_api_key"
-            model_args[param_name] = API_KEYS.get(llm_selected)
+
+            # Get API key from context if available, otherwise use environment variable
+            if llm_selected == SupportedLLMs.OPENAI:
+                request_key = ApiKeyContext.get_openai_key()
+                effective_key = get_effective_api_key(request_key, OPEN_AI_KEY)
+            elif llm_selected == SupportedLLMs.ANTHROPIC:
+                request_key = ApiKeyContext.get_anthropic_key()
+                effective_key = get_effective_api_key(request_key, ANTHROPIC_KEY)
+            else:
+                effective_key = API_KEYS.get(llm_selected)
+
+            model_args[param_name] = effective_key
 
     def _get_model(self) -> BaseChatModel:
         """
@@ -297,9 +310,21 @@ class BaseAgent:
     def _create_model(chat_model_type: BaseChatModel | SupportedLLMs, **model_args) -> BaseChatModel:
         """
         Creates the chat model to use.
-        :param chat_model_type: Defines the chat model class to use.
+        If chat_model_type is None, uses ProviderSelector to dynamically choose based on user preference.
+        :param chat_model_type: Defines the chat model class to use, or None for dynamic selection.
         :param model_args: Additional args for the model initialization.
         """
+        # If no specific model type requested, use ProviderSelector to choose based on user preference
+        if chat_model_type is None:
+            preferred_provider = ProviderSelector.get_preferred_provider()
+            if preferred_provider == LLMProvider.OPENAI:
+                chat_model_type = SupportedLLMs.OPENAI
+            elif preferred_provider == LLMProvider.ANTHROPIC:
+                chat_model_type = SupportedLLMs.ANTHROPIC
+            else:
+                # Fallback to Anthropic if provider selection fails
+                chat_model_type = SupportedLLMs.ANTHROPIC
+
         llm_selected, chat_model_type = BaseAgent._get_llm_selected(chat_model_type)
         BaseAgent._update_api_key(llm_selected, model_args)
         return chat_model_type(**model_args)

@@ -5,6 +5,7 @@ import anthropic
 
 from gen_common.constants import anthropic_constants, environment_constants
 from gen_common.constants.environment_constants import ANTHROPIC_KEY
+from gen_common.llm.api_key_context import ApiKeyContext, get_effective_api_key
 from gen_common.constants.symbol_constants import EMPTY_STRING
 from gen_common.infra.t_logging.logger_manager import logger
 from gen_common.infra.t_threading.threading_state import MultiThreadState
@@ -174,15 +175,21 @@ class AnthropicManager(AbstractLLMManager[AnthropicResponse]):
 
 def get_client():
     """
-    Returns the current anthropic client.
-    :return:  Returns the singleton anthropic client.
+    Returns the current anthropic client with appropriate API key.
+    Uses request context API key if available, otherwise falls back to environment.
+    :return:  Returns the anthropic client.
     """
     if environment_constants.IS_TEST:
         from gen_common.infra.mock.anthropic import MockAnthropicClient
         return MockAnthropicClient()
     else:
-        assert ANTHROPIC_KEY, f"Must supply value for {ANTHROPIC_KEY} "
-        return anthropic.Client(api_key=ANTHROPIC_KEY)
+        # Get effective API key (request-specific or fallback to environment)
+        effective_key = get_effective_api_key(
+            ApiKeyContext.get_anthropic_key(),
+            ANTHROPIC_KEY
+        )
+        assert effective_key, "Must supply ANTHROPIC_API_KEY in environment or request"
+        return anthropic.Client(api_key=effective_key)
 
 
 def close_client(anthropic_client: anthropic.Client) -> None:

@@ -9,11 +9,17 @@ RUN apt-get update && apt-get install -y \
     g++ \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --upgrade pip setuptools wheel
+# Install uv for faster dependency management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-## Step - Install requirements
+# Set environment variables for uv
+ENV UV_SYSTEM_PYTHON=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
+
+## Step - Install requirements using uv
 COPY requirements.txt /app/
-RUN pip3 install -r /app/requirements.txt
+RUN uv pip install --no-cache -r /app/requirements.txt
 
 ## Step - Copy source and build files
 COPY gen-common/gen_common/ /app/gen_common/

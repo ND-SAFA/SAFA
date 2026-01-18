@@ -2,7 +2,7 @@ version: '3'
 services:
   proxy:
     image: nginx:alpine
-    container_name: proxy
+    container_name: safa-proxy
     depends_on: ["fend", "bend"]
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
@@ -11,6 +11,7 @@ services:
     networks: [safa]
 
   fend:
+    container_name: safa-fend
     build:
       context: ./fend
       args:
@@ -23,18 +24,21 @@ services:
     networks: [safa]
 
   bend:
+    container_name: safa-bend
     depends_on: ["mysql"]
     build:
       context: ./bend
+    env_file: [.env]
     # expose port only inside docker network
     expose:
       - "80"
     environment:
-      - TGEN_ENDPOINT=http://gen:80
-      - DB_URL=jdbc:mysql://mysql/safa-db
+      - TGEN_ENDPOINT=http://safa-gen:80
+      - DB_URL=jdbc:mysql://safa-mysql/safa-db
     networks: [safa]
 
   gen:
+    container_name: safa-gen
     depends_on: ["redis"]
     build:
       context: ./gen-api
@@ -54,23 +58,26 @@ services:
       - DEFAULT_CROSS_ENCODER_MODEL=cross-encoder/ms-marco-TinyBERT-L-2
       - DEFAULT_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
       - BROKER=redis
-      - BROKER_URL=redis://redis:6379/0
+      - BROKER_URL=redis://safa-redis:6379/0
       - BROKER_USERNAME=guest
       - BROKER_PASSWORD=guest
       - HF_DATASETS_CACHE=/root/.cache/huggingface/datasets
-      - BEND_URL=http://bend:80
+      - BEND_URL=http://safa-bend:80
       - JWT_TOKEN=change-me
       - SECRET_KEY=change-me
+      - ROOT_PASSWORD=change-me
+      - DISABLE_AUTH=true
 
   redis:
     image: redis:alpine
+    container_name: safa-redis
     networks: [safa]
     # no ports -> private
 
   mysql:
     image: mysql:8.0
-    hostname: mysql
-    container_name: mysql
+    hostname: safa-mysql
+    container_name: safa-mysql
     deploy:
       resources:
         limits: { memory: 1G }

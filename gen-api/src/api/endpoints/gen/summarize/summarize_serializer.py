@@ -5,6 +5,7 @@ from rest_framework import serializers
 
 from api.constants.api_constants import TEXT_LONG
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
+from api.endpoints.gen.serializers.api_key_serializer_mixin import ApiKeySerializerMixin
 from api.endpoints.gen.serializers.artifact_serializer import ArtifactSerializer
 from gen_common.data.objects.artifact import Artifact
 
@@ -15,7 +16,7 @@ class SummarizeRequest:
     project_summary: str
 
 
-class SummarizeSerializer(AbstractSerializer):
+class SummarizeSerializer(ApiKeySerializerMixin, AbstractSerializer):
     """
     Serializes the request for artifact summaries.
     """

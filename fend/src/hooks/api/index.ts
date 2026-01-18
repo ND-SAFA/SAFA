@@ -8,3 +8,4 @@ export * from "./data";
 export * from "./generation";
 export * from "./notifications";
 export * from "./organization";
+export * from "./users";

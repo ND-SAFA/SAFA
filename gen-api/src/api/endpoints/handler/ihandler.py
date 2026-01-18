@@ -7,6 +7,7 @@ from django.http import HttpRequest, JsonResponse
 from api.endpoints.auth_view import authorize_request
 from api.endpoints.gen.serializers.abstract_serializer import AbstractSerializer
 from api.utils.view_util import ViewUtil
+from gen_common.llm.api_key_context import ApiKeyContext
 from gen_common.util.json_util import NpEncoder
 
 
@@ -43,10 +44,33 @@ class IHandler(ABC):
         if self.skip_serialization:
             serialized_data = json.loads(request.body)  # will re-serialize but make sure serializer passes before starting job
 
-        response = self._request_handler(serialized_data)
-        if isinstance(response, JsonResponse):
-            return response
-        return JsonResponse(response, encoder=NpEncoder, safe=False)
+        # Extract and set API keys in context if provided
+        self._set_api_key_context(raw_data)
+
+        try:
+            response = self._request_handler(serialized_data)
+            if isinstance(response, JsonResponse):
+                return response
+            return JsonResponse(response, encoder=NpEncoder, safe=False)
+        finally:
+            # Always clean up context after request
+            ApiKeyContext.clear()
+
+    def _set_api_key_context(self, raw_data: Dict) -> None:
+        """
+        Extracts API keys and provider preference from request data and sets them in the request context.
+        :param raw_data: The raw request data.
+        """
+        openai_key = raw_data.get('openai_api_key')
+        anthropic_key = raw_data.get('anthropic_api_key')
+        preferred_provider = raw_data.get('preferred_provider')
+
+        if openai_key:
+            ApiKeyContext.set_openai_key(openai_key)
+        if anthropic_key:
+            ApiKeyContext.set_anthropic_key(anthropic_key)
+        if preferred_provider:
+            ApiKeyContext.set_preferred_provider(preferred_provider)
 
     def serialize_data(self, data: Dict):
         """

@@ -25,7 +25,10 @@ services:
 
   bend:
     container_name: safa-bend
-    depends_on: ["mysql"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
     build:
       context: ./bend
     env_file: [.env]
@@ -78,6 +81,12 @@ services:
     image: mysql:8.0
     hostname: safa-mysql
     container_name: safa-mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
     deploy:
       resources:
         limits: { memory: 1G }

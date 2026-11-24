@@ -2,11 +2,11 @@
 
 ## Overview
 
-SAFA (Safety Artifact Forest Analysis) is a comprehensive multi-component system designed for analyzing safety artifacts and trace links. The platform consists of three integrated applications: a Spring Boot backend API (bend) built with Java 17 and Gradle, a Vue 3 frontend application (fend) using TypeScript and Quasar framework, and a Django-based generation API (gen-api) with Python and Celery for AI-powered analysis and document generation. The system leverages advanced language models through the tgen component and shared utilities via gen-common to provide intelligent safety artifact analysis and traceability management.
-
 ![SAFA trace graph showing hazards, safety requirements, and design artifacts for a drone safety project](docs/images/safa-trace-graph.png)
 
 *Tree view of a sample drone-safety project: hazards (pink) trace down to safety requirements (blue) and the design decisions (green) that satisfy them.*
+
+SAFA (Safety Artifact Forest Analysis) is a comprehensive multi-component system designed for analyzing safety artifacts and trace links. The platform consists of three integrated applications: a Spring Boot backend API (bend) built with Java 17 and Gradle, a Vue 3 frontend application (fend) using TypeScript and Quasar framework, and a Django-based generation API (gen-api) with Python and Celery for AI-powered analysis and document generation. The system leverages advanced language models through the tgen component and shared utilities via gen-common to provide intelligent safety artifact analysis and traceability management.
 
 ## Getting Started
 
